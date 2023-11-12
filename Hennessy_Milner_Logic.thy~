@@ -1,0 +1,86 @@
+theory Hennessy_Milner_Logic
+imports Behavioral_Equivalences
+begin
+
+datatype ('a, 'i) hml_formula =
+HML_true
+| HML_conj \<open>'i set\<close> \<open>'i \<Rightarrow> ('a,'i) hml_psi\<close>  (\<open>AND _ _\<close>)
+| HML_poss \<open>'a\<close> \<open>('a,'i) hml_formula\<close>            (\<open>\<langle>_\<rangle>_\<close> [60] 60)
+| HML_tau \<open>('a, 'i) hml_formula\<close>
+| HML_eps \<open>('a, 'i) hml_formula\<close>
+
+and ('a, 'i) hml_psi = 
+HML_neg \<open>('a,'i) hml_formula\<close>                  (\<open>~_\<close> [20] 60)
+| HML_phi \<open>('a, 'i) hml_formula\<close>
+
+context lts_tau
+begin
+
+function satisfies :: \<open>'s \<Rightarrow> ('a,'s) hml_formula \<Rightarrow> bool\<close> (infix \<open>\<Turnstile>\<close> 50) 
+and psi_sat :: \<open>'s \<Rightarrow> ('a,'s) hml_psi \<Rightarrow> bool\<close> (infix \<open>\<TTurnstile>\<close> 50)
+where
+\<open>(_ \<Turnstile> HML_true) = True\<close> |
+  \<open>(p \<Turnstile> \<langle>\<alpha>\<rangle>\<phi>) = (\<exists>p'. p \<mapsto> \<alpha> p' \<and> p' \<Turnstile> \<phi>)\<close>|
+  \<open>(p \<Turnstile> AND I \<Phi>) = (\<forall>i \<in> I. p \<TTurnstile> (\<Phi> i))\<close> |
+\<open>p \<Turnstile> HML_tau \<phi> = (\<exists>p'. p \<mapsto> \<tau> p' \<and> p' \<Turnstile> \<phi>)\<close> |
+\<open>p \<Turnstile> HML_eps \<phi> = (\<exists>p'. p \<Zsurj> p' \<and> p' \<Turnstile> \<phi>)\<close> |
+\<open>psi_sat p (HML_neg \<phi>) = (\<not> (p \<Turnstile> \<phi>))\<close> |
+\<open>psi_sat p (HML_phi \<phi>) = (p \<Turnstile> \<phi>)\<close>
+  using hml_formula.exhaust hml_psi.exhaust
+  by (metis sumE surj_pair, blast+)
+
+
+(*inductive_set wf_rel_formula :: "('s \<times> ('a, 's) hml_formula) rel" where
+"(HML_neg \<phi>) = \<Phi> i \<and> i \<in> I \<Longrightarrow> ((p, \<phi>), (p, HML_conj I \<Phi>)) \<in> wf_rel_formula" |
+"(HML_phi \<phi>) = \<Phi> i \<and> i \<in> I \<Longrightarrow> ((p, \<phi>), (p, HML_conj I \<Phi>)) \<in> wf_rel_formula" |
+"((p, \<phi>), (p, HML_poss \<alpha> \<phi>)) \<in> wf_rel_formula" |
+"((p, \<phi>), (p, HML_tau \<phi>)) \<in> wf_rel_formula" |
+"((p, \<phi>), (p, HML_eps \<phi>)) \<in> wf_rel_formula"
+*)
+
+(*inductive_set wf_rel_formula :: "('s \<times> ((('a, 's) hml_formula) + ('a, 's) hml_psi)) rel" where
+"((p, Inl \<phi>), (p, Inl (HML_poss \<alpha> \<phi>))) \<in> wf_rel_formula" |
+"((p, Inl \<phi>), (p, Inl (HML_tau \<phi>))) \<in> wf_rel_formula" |
+"((p, Inl \<phi>), (p, Inl (HML_eps \<phi>))) \<in> wf_rel_formula" |
+"\<phi> = \<Phi> i \<and> i \<in> I \<Longrightarrow> ((p, Inr \<phi>), (p, Inl (HML_conj I \<Phi>))) \<in> wf_rel_formula" |
+"((p, Inl \<phi>), (p, Inr (HML_neg \<phi>))) \<in> wf_rel_formula" |
+"((p, Inl \<phi>), (p, Inr (HML_phi \<phi>))) \<in> wf_rel_formula" 
+*)
+
+inductive_set wf_rel_formula :: "(('s \<times> ('a, 's) hml_formula) + ('s \<times> ('a, 's) hml_psi)) rel" where
+"(Inl (p, \<phi>), Inl (p, HML_poss \<alpha> \<phi>)) \<in> wf_rel_formula" |
+"(Inl (p, \<phi>), Inl (p, HML_tau \<phi>)) \<in> wf_rel_formula" |
+"(Inl (p, \<phi>), Inl (p, HML_eps \<phi>)) \<in> wf_rel_formula" |
+"\<phi> = \<Phi> i \<and> i \<in> I \<Longrightarrow> (Inr (p, \<phi>), Inl (p, HML_conj I \<Phi>)) \<in> wf_rel_formula" |
+"(Inl (p, \<phi>), Inr (p, HML_neg \<phi>)) \<in> wf_rel_formula" |
+"(Inl (p, \<phi>), Inr (p, HML_phi \<phi>)) \<in> wf_rel_formula" 
+
+
+thm wf_rel_formula.cases
+thm hml_formula.induct
+
+lemma wf_rel_formula_wf: "wf wf_rel_formula"
+  unfolding wf_def
+proof safe
+  show "\<And>P x. \<forall>x. (\<forall>y. (y, x) \<in> wf_rel_formula \<longrightarrow> P y) \<longrightarrow> P x \<Longrightarrow> P x" sorry
+qed
+
+termination
+  using wf_rel_formula_wf wf_rel_formula.intros try sledgehammer
+proof
+  have "wf wf_rel_formula" using wf_rel_formula_wf by simp
+  have "\<And>p \<alpha> \<phi> x. (Inl (x, \<phi>), Inl (p, \<langle>\<alpha>\<rangle>\<phi>)) \<in> wf_rel_formula" using wf_rel_formula.intros try sledgehammer
+  have "\<And>p \<phi>. (Inl ((p::'s), (\<phi>:: ('a, 's) hml_formula)), Inr (p, HML_phi \<phi>)) \<in> wf_rel_formula" using wf_rel_formula.intros
+  from wf_rel_formula.intros have "\<And>p \<alpha> \<phi> x. (Inl (x, \<phi>), Inl (p, \<langle>\<alpha>\<rangle>\<phi>)) \<in> wf_rel_formula"
+  show "All satisfies_psi_sat_dom" using wf_rel_formula_wf wf_rel_formula.intros
+proof
+  by (standard) (simp add: wf_rel_formula.intros)+
+
+  by (relation "wf_rel_formula (\<lambda>x. case x of Inl \<phi> \<Rightarrow> \<phi> | Inr (p, (HML_neg \<psi>)) \<Rightarrow> (p, \<psi>) | Inr (p, (HML_phi \<psi>)) \<Rightarrow> (p, \<psi>))")
+
+(*terminierung zeigen mit lambda über sum type, case Inl: wf_rel_formula, case Inr: (\<lambda>y. case y ...)*)
+(*Termination von beiden funs wird zsm gezeigt. 
+Isabelle erstellt intern zusammengefügte Funktion, s.h. functions.pdf*)
+
+end
+end
