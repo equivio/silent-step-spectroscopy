@@ -16,7 +16,14 @@ begin
 
 \<comment> \<open>
 fun hml_semantic :: "('a, 's) HML \<Rightarrow> 's set" ("\<lbrakk>_\<rbrakk>HML" 60) where
-  "\<lbrakk>HML_true\<rbrakk>HML = {}" (* How to get the set of all processes? 's set? *)
+  "\<lbrakk>HML_true      \<rbrakk>HML = {p. True}" |
+  "\<lbrakk>HML_poss   a \<phi>\<rbrakk>HML = {p. \<exists>p'. p \<mapsto> a p' \<and> p' \<in> \<lbrakk>\<phi>\<rbrakk>HML}" |
+  "\<lbrakk>HML_silent   \<phi>\<rbrakk>HML = {p. \<exists>p'. p \<Zsurj> p' \<and> p' \<in> \<lbrakk>\<phi>\<rbrakk>HML}" |
+  "\<lbrakk>HML_internal \<phi>\<rbrakk>HML = {p. \<exists>p'. p \<mapsto> \<tau> p' \<and> p' \<in> \<lbrakk>\<phi>\<rbrakk>HML} \<union> (\<lbrakk>\<phi>\<rbrakk>HML)" |
+  "\<lbrakk>HML_conj  I \<psi>s\<rbrakk>HML = {p. \<forall>i \<in> I. (\<lambda> \<psi>. case \<psi> of 
+                                             Inl \<phi> \<Rightarrow> p \<in> \<lbrakk>\<phi>\<rbrakk>HML | 
+                                             Inr \<phi> \<Rightarrow> p \<notin> \<lbrakk>\<phi>\<rbrakk>HML ) 
+                                     (\<psi>s i)}"
 \<close>
 
 function hml_models     :: "('a, 's) HML     \<Rightarrow> 's \<Rightarrow> bool" ("_ \<Turnstile> _" 60) 
