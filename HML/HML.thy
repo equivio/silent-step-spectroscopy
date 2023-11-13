@@ -43,9 +43,62 @@ where
    apply simp
   by fastforce
 
+inductive_set hml_models_wf_argument_space :: "(('a, 's) HML  \<times> 's) rel" where
+                             "((\<phi>, x), HML_poss   a \<phi>, p) \<in> hml_models_wf_argument_space" |
+                             "((\<phi>, x), HML_silent   \<phi>, p) \<in> hml_models_wf_argument_space" |
+                             "((\<phi>, x), HML_internal \<phi>, p) \<in> hml_models_wf_argument_space" |
+  "x \<in> I \<Longrightarrow> \<psi>s x = Inl \<phi> \<Longrightarrow> ((\<phi>, p), HML_conj  I \<psi>s, p) \<in> hml_models_wf_argument_space" |
+  "x \<in> I \<Longrightarrow> \<psi>s x = Inr \<phi> \<Longrightarrow> ((\<phi>, p), HML_conj  I \<psi>s, p) \<in> hml_models_wf_argument_space"
+
+lemma wf_hml_models_wf_argument_space: "wf hml_models_wf_argument_space"
+  unfolding wf_def
+proof safe
+  fix P \<phi> s
+  assume "\<forall>\<phi>s. (\<forall>\<phi>'s'. (\<phi>'s', \<phi>s) \<in> hml_models_wf_argument_space \<longrightarrow> P \<phi>'s') \<longrightarrow> P \<phi>s"
+  hence "\<forall>\<phi> s. (\<forall>\<phi>' s'. ((\<phi>' s'), (\<phi>, s)) \<in> hml_models_wf_argument_space \<longrightarrow> P (\<phi>' s')) \<longrightarrow> P (\<phi>, s)" sledgehammer
+    by meson 
+  show "P (\<phi>, s)"
+  proof (induct \<phi> arbitrary: s)
+    case HML_true
+    then show ?case
+      by (metis (no_types, lifting) HML.distinct(1) HML.distinct(3) HML.distinct(5) HML.distinct(7) \<open>\<forall>\<phi>s. (\<forall>\<phi>'s'. (\<phi>'s', \<phi>s) \<in> hml_models_wf_argument_space \<longrightarrow> P \<phi>'s') \<longrightarrow> P \<phi>s\<close> case_prodI2 case_prod_curry hml_models_wf_argument_space.simps)
+  next
+    case (HML_poss x1 \<phi>)
+    then show ?case
+      by (smt (verit) HML.distinct(11) HML.distinct(13) HML.distinct(9) HML.inject(1) \<open>\<forall>\<phi>s. (\<forall>\<phi>'s'. (\<phi>'s', \<phi>s) \<in> hml_models_wf_argument_space \<longrightarrow> P \<phi>'s') \<longrightarrow> P \<phi>s\<close> case_prodE' case_prod_conv hml_models_wf_argument_space.simps hml_models_wf_argument_space_def mem_Collect_eq)
+  next
+    case (HML_silent \<phi>)
+    then show ?case
+      by (smt (verit) HML.distinct(15) HML.distinct(17) HML.distinct(9) HML.inject(2) LTS_Tau.hml_models_wf_argument_space_def \<open>\<forall>\<phi>s. (\<forall>\<phi>'s'. (\<phi>'s', \<phi>s) \<in> hml_models_wf_argument_space \<longrightarrow> P \<phi>'s') \<longrightarrow> P \<phi>s\<close> case_prodE' case_prod_conv hml_models_wf_argument_space.simps mem_Collect_eq)
+  next
+    case (HML_internal \<phi>)
+    then show ?case
+      by (smt (verit) HML.distinct(11) HML.distinct(15) HML.distinct(19) HML.inject(3) \<open>\<forall>\<phi>s. (\<forall>\<phi>'s'. (\<phi>'s', \<phi>s) \<in> hml_models_wf_argument_space \<longrightarrow> P \<phi>'s') \<longrightarrow> P \<phi>s\<close> case_prodE' hml_models_wf_argument_space.simps hml_models_wf_argument_space_def mem_Collect_eq split_conv)
+  next
+    case (HML_conj x1 x2)
+    then show ?case
+      by (smt (verit) HML.distinct(13) HML.distinct(17) HML.distinct(19) HML.inject(4) LTS_Tau.hml_models_wf_argument_space_def \<open>\<forall>\<phi>s. (\<forall>\<phi>'s'. (\<phi>'s', \<phi>s) \<in> hml_models_wf_argument_space \<longrightarrow> P \<phi>'s') \<longrightarrow> P \<phi>s\<close> case_prodE' case_prod_conv hml_models_wf_argument_space.simps mem_Collect_eq range_eqI setl.intros sum_set_simps(1) sum_set_simps(4))
+  qed
+qed
+
 termination
-proof
- 
+  unfolding wf_def
+proof 
+  from wf_hml_models_wf_argument_space show "wf hml_models_wf_argument_space".
+  show "\<And>a \<phi> p x. ((\<phi>, x), HML_poss a \<phi>, p) \<in> hml_models_wf_argument_space"
+    by (simp add: hml_models_wf_argument_space.intros(1))
+  show "\<And>\<phi> p x. ((\<phi>, x), HML_silent \<phi>, p) \<in> hml_models_wf_argument_space"
+    by (simp add: LTS_Tau.hml_models_wf_argument_space.simps)
+  show "\<And>\<phi> p x. ((\<phi>, x), HML_internal \<phi>, p) \<in> hml_models_wf_argument_space"
+    by (simp add: hml_models_wf_argument_space.intros(3))
+  show "\<And>\<phi> p. ((\<phi>, p), HML_internal \<phi>, p) \<in> hml_models_wf_argument_space"
+    by (simp add: hml_models_wf_argument_space.intros(3))
+  show "\<And>I \<psi>s p x a. x \<in> I \<Longrightarrow> \<psi>s x = Inl a \<Longrightarrow> ((a, p), HML_conj I \<psi>s, p) \<in> hml_models_wf_argument_space"
+    by (simp add: hml_models_wf_argument_space.intros(4))
+  show "\<And>I \<psi>s p x b. x \<in> I \<Longrightarrow> \<psi>s x = Inr b \<Longrightarrow> ((b, p), HML_conj I \<psi>s, p) \<in> hml_models_wf_argument_space"
+    by (simp add: hml_models_wf_argument_space.intros(5))
+qed
+
 end
 
 end
