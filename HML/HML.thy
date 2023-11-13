@@ -18,8 +18,11 @@ context LTS_Tau
 begin
 
 \<comment> \<open>
+inductive_set processes :: "'s set" where
+  "(s::'s) \<in> processes"
+
 fun hml_semantic :: "('a, 's) HML \<Rightarrow> 's set" ("\<lbrakk>_\<rbrakk>HML" 60) where
-  "\<lbrakk>HML_true\<rbrakk>HML = {}" (* How to get the set of all processes? 's set? *)
+  "\<lbrakk>HML_true\<rbrakk>HML = processes"
 \<close>
 
 function
@@ -64,8 +67,41 @@ where
    apply simp
   by fastforce
 
+inductive_set hml_models_wf_arg_space :: "(('a, 's) HML \<times> 's, ('a, 's) HML_neg \<times> 's) sum rel" where
+            "(Inl (\<phi>, x),    Inl (HML_poss   a \<phi>, p)) \<in> hml_models_wf_arg_space" |
+            "(Inl (\<phi>, x),    Inl (HML_silent   \<phi>, p)) \<in> hml_models_wf_arg_space" |
+            "(Inl (\<phi>, x),    Inl (HML_internal \<phi>, p)) \<in> hml_models_wf_arg_space" |
+  "x \<in> I \<Longrightarrow> (Inr (\<psi>s x, p), Inl (HML_conj  I \<psi>s, p)) \<in> hml_models_wf_arg_space" |
+            "(Inl (\<phi>, p),    Inr (HML_just     \<phi>, p)) \<in> hml_models_wf_arg_space" |
+            "(Inl (\<phi>, p),    Inr (HML_not      \<phi>, p)) \<in> hml_models_wf_arg_space"
+
+lemma wf_hml_models_wf_arg_space: "wf hml_models_wf_arg_space"
+  unfolding wf_def
+proof safe
+  fix P p
+  assume "\<forall>x. (\<forall>y. (y, x) \<in> hml_models_wf_arg_space \<longrightarrow>  P y) \<longrightarrow> P x"
+  then show "P p"
+  proof (cases p)
+    case (Inl \<phi>x)
+    hence "p = Inl \<phi>x".
+    then show ?thesis sorry
+  next
+    case (Inr \<psi>x)
+    then show ?thesis sorry
+  qed
+qed
+
 termination
-proof
+  apply standard
+  apply (rule wf_hml_models_wf_arg_space)
+  using hml_models_wf_arg_space.intros(1) apply blast
+  apply (simp add: hml_models_wf_arg_space.intros(2))
+  apply (simp add: hml_models_wf_arg_space.intros(3))
+  using hml_models_wf_arg_space.intros(3) apply auto[1]
+  using hml_models_wf_arg_space.intros(4) apply blast
+  using hml_models_wf_arg_space.intros(5) apply auto[1]
+  by (simp add: hml_models_wf_arg_space.intros(6))
+  
 
 end
 
