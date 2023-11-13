@@ -14,6 +14,37 @@ and
     HML_just "('act, 'i) HML" |
     HML_not "('act, 'i) HML"
 
+function
+    hml_depth     :: "('act, 'i) HML     \<Rightarrow> nat" and
+    hml_neg_depth :: "('act, 'i) HML_neg \<Rightarrow> nat"
+  where
+    "hml_depth         HML_true = 0" |
+    "hml_depth (HML_poss   a \<phi>) = Suc (hml_depth \<phi>)" |
+    "hml_depth (HML_silent   \<phi>) = Suc (hml_depth \<phi>)" |
+    "hml_depth (HML_internal \<phi>) = Suc (hml_depth \<phi>)" |
+    "hml_depth (HML_conj  I \<psi>s) = Max {n . \<exists>i \<in> I. n = (hml_neg_depth (\<psi>s i))}" |
+
+    "hml_neg_depth (HML_just \<phi>) = hml_depth \<phi>" |
+    "hml_neg_depth (HML_not \<phi>)  = Suc (hml_depth \<phi>)"
+  apply (metis HML.exhaust HML_neg.exhaust obj_sumE)
+  by blast+
+
+inductive_set hml_depth_argument_space :: "(('act, 'i) HML, ('act, 'i) HML_neg) sum rel" where
+             "(Inl \<phi>,       Inl (HML_poss   a \<phi>)) \<in> hml_depth_argument_space" |
+             "(Inl \<phi>,       Inl (HML_silent   \<phi>)) \<in> hml_depth_argument_space" |
+             "(Inl \<phi>,       Inl (HML_internal \<phi>)) \<in> hml_depth_argument_space" |
+  "xa \<in> I \<Longrightarrow> (Inr (\<psi>s xa), Inl (HML_conj  I \<psi>s)) \<in> hml_depth_argument_space" |
+             "(Inl \<phi>,       Inr (HML_just     \<phi>)) \<in> hml_depth_argument_space" |
+             "(Inl \<phi>,       Inr (HML_not      \<phi>)) \<in> hml_depth_argument_space"
+
+lemma wf_hml_depth_argument_space: "wf hml_depth_argument_space"
+  unfolding wf_def sorry
+
+termination hml_depth
+  apply standard
+  apply (rule wf_hml_depth_argument_space)
+  using hml_depth_argument_space.intros by metis+
+
 context LTS_Tau
 begin
 
@@ -67,41 +98,72 @@ where
    apply simp
   by fastforce
 
+
 inductive_set hml_models_wf_arg_space :: "(('a, 's) HML \<times> 's, ('a, 's) HML_neg \<times> 's) sum rel" where
-            "(Inl (\<phi>, x),    Inl (HML_poss   a \<phi>, p)) \<in> hml_models_wf_arg_space" |
-            "(Inl (\<phi>, x),    Inl (HML_silent   \<phi>, p)) \<in> hml_models_wf_arg_space" |
-            "(Inl (\<phi>, x),    Inl (HML_internal \<phi>, p)) \<in> hml_models_wf_arg_space" |
-  "x \<in> I \<Longrightarrow> (Inr (\<psi>s x, p), Inl (HML_conj  I \<psi>s, p)) \<in> hml_models_wf_arg_space" |
-            "(Inl (\<phi>, p),    Inr (HML_just     \<phi>, p)) \<in> hml_models_wf_arg_space" |
-            "(Inl (\<phi>, p),    Inr (HML_not      \<phi>, p)) \<in> hml_models_wf_arg_space"
+                         "(Inl (\<phi>, x), Inl (HML_poss   a \<phi>, p)) \<in> hml_models_wf_arg_space" |
+                         "(Inl (\<phi>, x), Inl (HML_silent   \<phi>, p)) \<in> hml_models_wf_arg_space" |
+                         "(Inl (\<phi>, x), Inl (HML_internal \<phi>, p)) \<in> hml_models_wf_arg_space" |
+  "i \<in> I \<Longrightarrow> \<psi> = \<psi>s i \<Longrightarrow> (Inr (\<psi>, p), Inl (HML_conj  I \<psi>s, p)) \<in> hml_models_wf_arg_space" |
+                         "(Inl (\<phi>, p), Inr (HML_just     \<phi>, p)) \<in> hml_models_wf_arg_space" |
+                         "(Inl (\<phi>, p), Inr (HML_not      \<phi>, p)) \<in> hml_models_wf_arg_space"
 
 lemma wf_hml_models_wf_arg_space: "wf hml_models_wf_arg_space"
   unfolding wf_def
 proof safe
-  fix P p
-  assume "\<forall>x. (\<forall>y. (y, x) \<in> hml_models_wf_arg_space \<longrightarrow>  P y) \<longrightarrow> P x"
-  then show "P p"
-  proof (cases p)
-    case (Inl \<phi>x)
-    hence "p = Inl \<phi>x".
-    then show ?thesis sorry
+  fix P :: "('a, 's) HML \<times> 's + ('a, 's) HML_neg \<times> 's \<Rightarrow> bool"
+  fix \<phi>Or\<psi>s :: "('a, 's) HML \<times> 's + ('a, 's) HML_neg \<times> 's"
+
+  assume "\<forall>x. (\<forall>y. (y, x) \<in> hml_models_wf_arg_space \<longrightarrow> P y) \<longrightarrow> P x"
+
+  show "P \<phi>Or\<psi>s"
+  proof (cases \<phi>Or\<psi>s)
+    case (Inl \<phi>s)
+    hence "\<phi>Or\<psi>s = Inl \<phi>s".
+    then obtain \<phi> and s where "\<phi>Or\<psi>s = Inl (\<phi>, s)" by fastforce
+
+    have "P (Inl (\<phi>, s))"
+    proof (induct \<phi> arbitrary: s)
+      case HML_true
+      then show ?case 
+        by (smt (verit) HML.distinct(1) HML.distinct(3) HML.distinct(5) HML.distinct(7) Inl_Inr_False \<open>\<forall>x. (\<forall>y. (y, x) \<in> hml_models_wf_arg_space \<longrightarrow> P y) \<longrightarrow> P x\<close> fst_conv hml_models_wf_arg_space.simps sum.sel(1)) 
+    next
+      case (HML_poss x1 \<phi>)
+      then show ?case 
+        by (smt (verit, best) HML.distinct(11) HML.distinct(13) HML.distinct(9) HML.inject(1) Inl_Inr_False \<open>\<forall>x. (\<forall>y. (y, x) \<in> hml_models_wf_arg_space \<longrightarrow> P y) \<longrightarrow> P x\<close> hml_models_wf_arg_space.simps prod.inject sum.inject(1))
+    next
+      case (HML_silent \<phi>)
+      then show ?case 
+        by (smt (verit, best) HML.distinct(15) HML.distinct(17) HML.distinct(9) HML.inject(2) Inl_Inr_False \<open>\<forall>x. (\<forall>y. (y, x) \<in> hml_models_wf_arg_space \<longrightarrow> P y) \<longrightarrow> P x\<close> hml_models_wf_arg_space.simps prod.inject sum.inject(1))
+    next
+      case (HML_internal \<phi>)
+      then show ?case 
+        by (smt (verit) HML.distinct(11) HML.distinct(15) HML.distinct(19) HML.inject(3) Inl_Inr_False \<open>\<forall>x. (\<forall>y. (y, x) \<in> hml_models_wf_arg_space \<longrightarrow> P y) \<longrightarrow> P x\<close> hml_models_wf_arg_space.simps prod.inject sum.inject(1))
+    next
+      case (HML_just \<phi>)
+      then show ?thesis sorry
+    next
+      case (HML_not \<phi>)
+      then show ?thesis sorry
+    next 
+      fix I :: "'s set"
+      fix \<psi>s :: "'s \<Rightarrow> ('a, 's) HML_neg"
+      fix p :: 's
+      assume 
+        "(\<And>x2a. x2a \<in> range \<psi>s  \<Longrightarrow> P (Inl (\<phi>, s)))"
+      then show "P (Inl (HML_conj I \<psi>s, p))" sorry
+    qed
+      
+    then show "P \<phi>Or\<psi>s" using \<open>\<phi>Or\<psi>s = Inl (\<phi>, s)\<close> by blast
   next
-    case (Inr \<psi>x)
-    then show ?thesis sorry
+    case (Inr \<psi>s)
+    then show "P \<phi>Or\<psi>s" sorry
   qed
 qed
 
 termination
-  apply standard
+  apply (relation hml_models_wf_arg_space)
   apply (rule wf_hml_models_wf_arg_space)
-  using hml_models_wf_arg_space.intros(1) apply blast
-  apply (simp add: hml_models_wf_arg_space.intros(2))
-  apply (simp add: hml_models_wf_arg_space.intros(3))
-  using hml_models_wf_arg_space.intros(3) apply auto[1]
-  using hml_models_wf_arg_space.intros(4) apply blast
-  using hml_models_wf_arg_space.intros(5) apply auto[1]
-  by (simp add: hml_models_wf_arg_space.intros(6))
-  
+  using hml_models_wf_arg_space.intros by blast+
 
 end
 
