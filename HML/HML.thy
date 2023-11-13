@@ -37,70 +37,67 @@ where
 
   "(hml_neg_models (HML_just \<phi>) p) = (\<phi> \<Turnstile> p)" |
   "(hml_neg_models (HML_not \<phi>) p) = (\<not>(\<phi> \<Turnstile> p))"
-                      apply (metis HML.exhaust HML_neg.exhaust sumE surj_pair)
-                      apply simp
-                      apply blast
-                      apply fastforce
-                      apply simp
-                      apply force
-                      apply blast
-                      apply force
-                      apply force
-                     apply force
-                    apply blast
-                   apply force
-                  apply fastforce
-                 apply force
-                apply simp
-               apply blast
-              apply blast
-             apply fastforce
-            apply simp
-           apply simp
-          apply fastforce
-         apply fastforce
-        apply force
-       apply simp
-      apply force
-     apply fastforce
-    apply simp
-   apply simp
-  by fastforce
+  by (metis HML.exhaust HML_neg.exhaust sumE surj_pair, auto)
 
 inductive_set hml_models_wf_arg_space :: "(('a, 's) HML \<times> 's, ('a, 's) HML_neg \<times> 's) sum rel" where
-            "(Inl (\<phi>, x),    Inl (HML_poss   a \<phi>, p)) \<in> hml_models_wf_arg_space" |
-            "(Inl (\<phi>, x),    Inl (HML_silent   \<phi>, p)) \<in> hml_models_wf_arg_space" |
-            "(Inl (\<phi>, x),    Inl (HML_internal \<phi>, p)) \<in> hml_models_wf_arg_space" |
-  "x \<in> I \<Longrightarrow> (Inr (\<psi>s x, p), Inl (HML_conj  I \<psi>s, p)) \<in> hml_models_wf_arg_space" |
-            "(Inl (\<phi>, p),    Inr (HML_just     \<phi>, p)) \<in> hml_models_wf_arg_space" |
-            "(Inl (\<phi>, p),    Inr (HML_not      \<phi>, p)) \<in> hml_models_wf_arg_space"
+  "(Inl (\<phi>, x),    Inl (HML_poss   a \<phi>, p)) \<in> hml_models_wf_arg_space" |
+  "(Inl (\<phi>, x),    Inl (HML_silent   \<phi>, p)) \<in> hml_models_wf_arg_space" |
+  "(Inl (\<phi>, x),    Inl (HML_internal \<phi>, p)) \<in> hml_models_wf_arg_space" |
+"\<psi> = \<psi>s i \<and> i \<in> I \<Longrightarrow>
+   (Inr (\<psi>, p),    Inl (HML_conj  I \<psi>s, p)) \<in> hml_models_wf_arg_space" |
+  "(Inl (\<phi>, p),    Inr (HML_just     \<phi>, p)) \<in> hml_models_wf_arg_space" |
+  "(Inl (\<phi>, p),    Inr (HML_not      \<phi>, p)) \<in> hml_models_wf_arg_space"
 
 lemma wf_hml_models_wf_arg_space: "wf hml_models_wf_arg_space"
   unfolding wf_def
 proof safe
-  fix P p
-  assume "\<forall>x. (\<forall>y. (y, x) \<in> hml_models_wf_arg_space \<longrightarrow>  P y) \<longrightarrow> P x"
-  then show "P p"
-  proof (cases p)
-    case (Inl \<phi>x)
-    hence "p = Inl \<phi>x".
-    then show ?thesis sorry
-  next
-    case (Inr \<psi>x)
-    then show ?thesis sorry
+  fix P a
+  assume "\<forall>y. (\<forall>x. (x, y) \<in> hml_models_wf_arg_space \<longrightarrow>  P x) \<longrightarrow> P y"
+  then show "P a"
+  proof (induct a)
+    fix l :: "('a, 's) HML \<times> 's" and
+        r :: "('a, 's) HML_neg \<times> 's"
+    obtain \<phi> x \<psi> p where
+      l_def: "l = (\<phi>, x)" and
+      r_def: "r = (\<psi>, p)" by fastforce
+    show "\<forall>y. (\<forall>x. (x, y) \<in> hml_models_wf_arg_space \<longrightarrow> P x) \<longrightarrow> P y \<Longrightarrow> P (Inl l)"  and
+         "\<forall>y. (\<forall>x. (x, y) \<in> hml_models_wf_arg_space \<longrightarrow> P x) \<longrightarrow> P y \<Longrightarrow> P (Inr r)"
+     unfolding l_def r_def
+    proof (induct \<phi> and \<psi> arbitrary: x and p)
+      case HML_true
+      then show ?case
+        by (smt (verit) HML.distinct(1) HML.distinct(3) HML.distinct(5) HML.distinct(7) Inl_inject Pair_inject hml_models_wf_arg_space.simps sum.distinct(1))
+    next
+      case (HML_poss x1 x2)
+      then show ?case
+        by (smt (verit) HML.distinct(11) HML.distinct(13) HML.distinct(9) HML.inject(1) Inl_inject Pair_inject hml_models_wf_arg_space.simps sum.distinct(1))
+    next
+      case (HML_silent x)
+      then show ?case
+        by (smt (verit) HML.distinct(15) HML.distinct(17) HML.distinct(9) HML.inject(2) Inl_inject Pair_inject hml_models_wf_arg_space.simps sum.distinct(1))
+    next
+      case (HML_internal x)
+      then show ?case
+        by (smt (verit) HML.distinct(11) HML.distinct(15) HML.distinct(19) HML.inject(3) Inl_inject Pair_inject hml_models_wf_arg_space.simps sum.distinct(1))
+    next
+      case (HML_conj x1 x2)
+      then show ?case
+        by (smt (verit) HML.distinct(13) HML.distinct(17) HML.distinct(19) HML.inject(4) Inl_inject Pair_inject hml_models_wf_arg_space.simps range_eqI sum.distinct(1))
+    next
+      case (HML_just x)
+      then show ?case
+        by (smt (verit) HML_neg.distinct(1) HML_neg.inject(1) Inr_inject Pair_inject hml_models_wf_arg_space.simps sum.distinct(1))
+    next
+      case (HML_not x)
+      then show ?case
+        by (smt (verit) HML_neg.distinct(2) HML_neg.inject(2) Inr_inject Pair_inject hml_models_wf_arg_space.simps sum.distinct(1))
+    qed
   qed
 qed
 
 termination
-  apply standard
-  apply (rule wf_hml_models_wf_arg_space)
-  using hml_models_wf_arg_space.intros(1) apply blast
-  apply (simp add: hml_models_wf_arg_space.intros(2))
-  apply (simp add: hml_models_wf_arg_space.intros(3))
-  using hml_models_wf_arg_space.intros(3) apply auto[1]
-  using hml_models_wf_arg_space.intros(4) apply blast
-  using hml_models_wf_arg_space.intros(5) apply auto[1]
-  by (simp add: hml_models_wf_arg_space.intros(6))
+  using wf_hml_models_wf_arg_space
+  by (standard) (simp add: hml_models_wf_arg_space.intros)+
   
 
 end
