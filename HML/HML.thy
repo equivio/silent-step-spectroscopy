@@ -38,7 +38,49 @@ inductive_set hml_depth_argument_space :: "(('act, 'i) HML, ('act, 'i) HML_neg) 
              "(Inl \<phi>,       Inr (HML_not      \<phi>)) \<in> hml_depth_argument_space"
 
 lemma wf_hml_depth_argument_space: "wf hml_depth_argument_space"
-  unfolding wf_def sorry
+  unfolding wf_def
+proof safe
+  fix P :: "('act, 'i) HML + ('act, 'i) HML_neg \<Rightarrow> bool"
+  fix x :: "('act, 'i) HML + ('act, 'i) HML_neg"
+  assume "\<forall>x. (\<forall>y. (y, x) \<in> hml_depth_argument_space \<longrightarrow> P y) \<longrightarrow> P x"
+  then show "P x"
+  proof (induct x)
+    fix l :: "('act, 'i) HML"
+    fix r :: "('act, 'i) HML_neg"
+
+    show "\<forall>x. (\<forall>y. (y, x) \<in> hml_depth_argument_space \<longrightarrow> P y) \<longrightarrow> P x \<Longrightarrow> P (Inl l)"
+     and "\<forall>x. (\<forall>y. (y, x) \<in> hml_depth_argument_space \<longrightarrow> P y) \<longrightarrow> P x \<Longrightarrow> P (Inr r)"
+    proof (induct l and r)
+      case HML_true
+      then show ?case 
+        by (smt (verit, ccfv_SIG) HML.distinct(1) HML.distinct(3) HML.distinct(5) HML.distinct(7) Inl_Inr_False Inl_inject hml_depth_argument_space.simps)
+    next
+      case (HML_poss x1 x2)
+      then show ?case 
+        by (smt (verit, ccfv_SIG) HML.distinct(11) HML.distinct(13) HML.distinct(9) HML.inject(1) Inl_Inr_False hml_depth_argument_space.simps sum.sel(1))
+    next
+      case (HML_silent x)
+      then show ?case 
+        by (smt (verit, ccfv_SIG) HML.distinct(15) HML.distinct(17) HML.distinct(9) HML.inject(2) Inl_Inr_False hml_depth_argument_space.simps sum.sel(1))
+    next
+      case (HML_internal x)
+      then show ?case 
+        by (smt (verit, del_insts) HML.distinct(11) HML.distinct(15) HML.distinct(19) HML.inject(3) Inl_Inr_False Inl_inject hml_depth_argument_space.simps)
+    next
+      case (HML_conj x1 x2)
+      then show ?case 
+        by (smt (verit, best) HML.distinct(13) HML.distinct(17) HML.distinct(19) HML.inject(4) Inl_Inr_False Inl_inject hml_depth_argument_space.cases rangeI)
+    next
+      case (HML_just x)
+      then show ?case 
+        by (smt (verit, ccfv_threshold) HML_neg.distinct(1) HML_neg.inject(1) Inl_Inr_False Inr_inject hml_depth_argument_space.simps) 
+    next
+      case (HML_not x)
+      then show ?case 
+        by (smt (verit, ccfv_threshold) HML_neg.distinct(1) HML_neg.inject(2) Inl_Inr_False Inr_inject hml_depth_argument_space.simps)
+    qed
+  qed
+qed
 
 termination hml_depth
   apply standard
