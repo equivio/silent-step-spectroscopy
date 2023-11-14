@@ -16,6 +16,9 @@ locale energy_game =
         weight :: "'gstate \<Rightarrow> 'gstate \<Rightarrow> 'energy update" ("w") and
         defender :: "'gstate \<Rightarrow> bool" ("Gd") and 
         defender_win_level :: "'energy"
+      assumes win_is_stuck: "(weight g1 g2) defender_win_level = defender_win_level" and
+              weight_well_def: "(weight g1 g2) e1 \<noteq> undefined" and
+              e0: "e0 \<noteq> undefined"
 begin
 
 abbreviation attacker :: "'gstate \<Rightarrow> bool" ("Ga") where "Ga p \<equiv> \<not> Gd p" 
@@ -25,38 +28,70 @@ abbreviation move (infix "\<Zinj>" 70) where "g1 \<Zinj> g2 \<equiv> (g1, g2) \<
 abbreviation weighted_move :: "'gstate \<Rightarrow> 'energy update \<Rightarrow> 'gstate \<Rightarrow>  bool" ("_ \<Zinj>w _ _" [60,60,60] 70) where
   "weighted_move g1 u g2 \<equiv> g1 \<Zinj> g2 \<and> (weight g1 g2 = u)"
 
+fun energy_level :: "'gstate list \<Rightarrow> 'energy" where
+  "energy_level p = (if p = [g0] then e0 else (
+    if (\<exists>gn p'. p' @ [gn] = p) then ((weight (last (THE p'. \<exists>gn. p' @ [gn] = p)) (THE gn. \<exists>p'. p' @ [gn] = p)) 
+      (energy_level (THE p'. \<exists>gn. p' @ [gn] = p))) 
+    else undefined))"
+
+lemma energy_level_def1:
+  shows "energy_level [g0] = e0"
+  by simp
+
+lemma energy_level_def2:
+  assumes "p' \<noteq> []"
+  shows "energy_level (p' @ [gn]) = weight (last p') gn (energy_level p')"
+proof-
+  define p where p_def: "p \<equiv> p' @ [gn]"
+  have p'_eq: "(THE p'. \<exists>gn. p' @ [gn] = p) = p'" unfolding p_def by simp
+  have gn_eq: "(THE gn. \<exists>p'. p' @ [gn] = p) = gn" unfolding p_def by simp
+
+  thus ?thesis unfolding p_def using p'_eq gn_eq assms p_def by simp
+qed
+
+lemma energy_level_def3:
+  shows "energy_level [] = undefined"
+  by simp
+
+lemma energy_level_def4:
+  assumes "p \<noteq> []" "hd p = g0"  
+  shows "energy_level p \<noteq> undefined"
+using assms proof(induct p rule: rev_induct)
+  case Nil
+  thus ?case by simp
+next
+  case (snoc x xs)
+  thus ?case proof(cases "xs = []")
+    case True
+    hence "xs @ [x] = [x]" by simp
+    with snoc(3) have "x = g0" by simp
+    hence "energy_level [x] = e0" by simp
+    thus ?thesis unfolding \<open>xs @ [x] = [x]\<close> using e0 by simp
+  next
+    case False
+    then show ?thesis 
+      using energy_level_def2 weight_well_def by simp
+  qed
+qed
+
 subsection \<open>Finite Plays\<close>
-(*Definition of a finite_play as (finite) paths*)
 inductive finite_play :: "'gstate list \<Rightarrow> bool" where
   "finite_play [g0]" |
-  "finite_play ([gn] @ p)" if "finite_play p" and "last p \<Zinj> gn" (*missing: dealing with weight*)
+  "finite_play (p @ [gn])" if "finite_play p" and "last p \<Zinj> gn" and "(w (last p) gn) (energy_level p) \<noteq> defender_win_level"
 
-(*Definition of Round*)
-inductive round:: "'gstate  \<Rightarrow> 'gstate \<Rightarrow> nat \<Rightarrow> bool" where
-  "round g0 g0 0" |
-  "round g gs (Suc n)" if "\<exists>gp. round gp g n \<and> gp \<Zinj> g"  (*missing: dealing with weight*)
+(* write a lemma that shows that the energy level of a finite play
+  can be expressed via *recursion* on its list elements *)
 
-(*Definition of Energy Level of a round i*)
+(*abbreviation "play_stuck p \<equiv> \<nexists>ps. finite_play (p @ ps)"
 
-(*fun energy_level:: "'gstate \<Rightarrow> 'gstate \<Rightarrow> 'energy"
-  where
-    "energy_level g0 g0 = e0" | 
-    "energy_level g gs= weight g gs" *)
-    (*"energy_level g gs = undefined" if "u < defender_win_level"*) (*ordering of energy level necessary*)
-
-(*abbreviation "finite_energy_level p \<equiv> round_finite_energy_level p (length p)" 
-
-abbreviation "play_stuck p \<equiv> \<nexists>ps. finite_play (p @ ps)" 
+lemma play_stuck_eq:
+  shows "play_stuck p \<equiv> \<nexists>gn. finite_play (p @ [gn])"
+  sorry
 
 abbreviation "is_defender_turn p \<equiv> Gd (last p)"
-abbreviation "is_attacker_turn p \<equiv> Ga (last p)"
+abbreviation "is_attacker_turn p \<equiv> Ga (last p)"*)
 
-definition defender_won :: "'gstate list \<Rightarrow> bool" where
-  "defender_won \<equiv> \<exists>n. finite_energy_level p n "
-definition attacker_won :: "'gstate list \<Rightarrow> bool" where 
-  "attacker_won p \<equiv> \<forall>n. finite_energy_level p n \<noteq> defender_win_level \<and> is_defender_turn p \<and> play_stuck p" 
-*)
-(*****************Strategies and Winning Budgets******************************************)
+
 end \<comment> \<open>end of context energy_game\<close>
 
 end
