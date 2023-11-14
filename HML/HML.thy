@@ -157,48 +157,40 @@ proof safe
 
   assume "\<forall>x. (\<forall>y. (y, x) \<in> hml_models_wf_arg_space \<longrightarrow> P y) \<longrightarrow> P x"
 
-  show "P \<phi>Or\<psi>s"
-  proof (cases \<phi>Or\<psi>s)
-    case (Inl \<phi>s)
-    hence "\<phi>Or\<psi>s = Inl \<phi>s".
-    then obtain \<phi> and s where "\<phi>Or\<psi>s = Inl (\<phi>, s)" by fastforce
+  then show "P \<phi>Or\<psi>s"
+  proof (induct \<phi>Or\<psi>s)
+    fix l :: "('a, 's) HML \<times> 's"
+    obtain \<phi> and sl where "l = (\<phi>, sl)" by fastforce
 
-    have "P (Inl (\<phi>, s))"
-    proof (induct \<phi> arbitrary: s)
+    fix r :: "('a, 's) HML_neg \<times> 's"
+    obtain \<psi> and sr where "r = (\<psi>, sr)" by fastforce
+
+    from \<open>l = (\<phi>, sl)\<close> and \<open>r = (\<psi>, sr)\<close>
+    show "\<forall>x. (\<forall>y. (y, x) \<in> hml_models_wf_arg_space \<longrightarrow> P y) \<longrightarrow> P x \<Longrightarrow> P (Inl l)"
+     and "\<forall>x. (\<forall>y. (y, x) \<in> hml_models_wf_arg_space \<longrightarrow> P y) \<longrightarrow> P x \<Longrightarrow> P (Inr r)"
+    proof (induct \<phi> and \<psi> arbitrary: sl and sr)
       case HML_true
       then show ?case 
-        by (smt (verit) HML.distinct(1) HML.distinct(3) HML.distinct(5) HML.distinct(7) Inl_Inr_False \<open>\<forall>x. (\<forall>y. (y, x) \<in> hml_models_wf_arg_space \<longrightarrow> P y) \<longrightarrow> P x\<close> fst_conv hml_models_wf_arg_space.simps sum.sel(1)) 
+        by (smt (verit) HML.distinct(1) HML.distinct(3) HML.distinct(5) HML.distinct(7) Inl_inject Pair_inject \<open>\<forall>x. (\<forall>y. (y, x) \<in> hml_models_wf_arg_space \<longrightarrow> P y) \<longrightarrow> P x\<close> hml_models_wf_arg_space.simps sum.distinct(1))
     next
-      case (HML_poss x1 \<phi>)
-      then show ?case 
-        by (smt (verit, best) HML.distinct(11) HML.distinct(13) HML.distinct(9) HML.inject(1) Inl_Inr_False \<open>\<forall>x. (\<forall>y. (y, x) \<in> hml_models_wf_arg_space \<longrightarrow> P y) \<longrightarrow> P x\<close> hml_models_wf_arg_space.simps prod.inject sum.inject(1))
+      case (HML_poss x1 x2)
+      then show ?case sorry
     next
-      case (HML_silent \<phi>)
-      then show ?case 
-        by (smt (verit, best) HML.distinct(15) HML.distinct(17) HML.distinct(9) HML.inject(2) Inl_Inr_False \<open>\<forall>x. (\<forall>y. (y, x) \<in> hml_models_wf_arg_space \<longrightarrow> P y) \<longrightarrow> P x\<close> hml_models_wf_arg_space.simps prod.inject sum.inject(1))
+      case (HML_silent x)
+      then show ?case sorry
     next
-      case (HML_internal \<phi>)
-      then show ?case 
-        by (smt (verit) HML.distinct(11) HML.distinct(15) HML.distinct(19) HML.inject(3) Inl_Inr_False \<open>\<forall>x. (\<forall>y. (y, x) \<in> hml_models_wf_arg_space \<longrightarrow> P y) \<longrightarrow> P x\<close> hml_models_wf_arg_space.simps prod.inject sum.inject(1))
+      case (HML_internal x)
+      then show ?case sorry
     next
-      case (HML_just \<phi>)
-      then show ?thesis sorry
+      case (HML_conj x1 x2)
+      then show ?case sorry
     next
-      case (HML_not \<phi>)
-      then show ?thesis sorry
-    next 
-      fix I :: "'s set"
-      fix \<psi>s :: "'s \<Rightarrow> ('a, 's) HML_neg"
-      fix p :: 's
-      assume 
-        "(\<And>x2a. x2a \<in> range \<psi>s  \<Longrightarrow> P (Inl (\<phi>, s)))"
-      then show "P (Inl (HML_conj I \<psi>s, p))" sorry
+      case (HML_just x)
+      then show ?case sorry
+    next
+      case (HML_not x)
+      then show ?case sorry
     qed
-      
-    then show "P \<phi>Or\<psi>s" using \<open>\<phi>Or\<psi>s = Inl (\<phi>, s)\<close> by blast
-  next
-    case (Inr \<psi>s)
-    then show "P \<phi>Or\<psi>s" sorry
   qed
 qed
 
