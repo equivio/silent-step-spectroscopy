@@ -82,16 +82,29 @@ inductive finite_play :: "'gstate list \<Rightarrow> bool" where
 (* write a lemma that shows that the energy level of a finite play
   can be expressed via *recursion* on its list elements *)
 
-(*abbreviation "play_stuck p \<equiv> \<nexists>ps. finite_play (p @ ps)"
-
-lemma play_stuck_eq:
-  shows "play_stuck p \<equiv> \<nexists>gn. finite_play (p @ [gn])"
-  sorry
+abbreviation "play_stuck p \<equiv>  \<nexists>ps. finite_play (p @ ps)" (*only check wheter p is currently stucked*)
 
 abbreviation "is_defender_turn p \<equiv> Gd (last p)"
-abbreviation "is_attacker_turn p \<equiv> Ga (last p)"*)
+abbreviation "is_attacker_turn p \<equiv> Ga (last p)"
 
+lemma next_turn:
+  fixes p
+  shows "is_defender_turn p \<or> is_attacker_turn p"
+by simp
 
+definition won_by_defender:: "'gstate list \<Rightarrow> bool" where
+  "won_by_defender p \<equiv> play_stuck p \<and> is_attacker_turn p"
+
+definition won_by_attacker:: "'gstate list \<Rightarrow> bool" where
+  "won_by_attacker p \<equiv> play_stuck p \<and> is_defender_turn p"
+
+definition no_winner:: "'gstate list \<Rightarrow> bool" where
+  "no_winner p \<equiv> \<not>play_stuck p"
+
+lemma winner:
+  fixes p
+  shows "won_by_defender p \<or> won_by_attacker p \<or> no_winner p"
+  using no_winner_def won_by_attacker_def won_by_defender_def by auto
 end \<comment> \<open>end of context energy_game\<close>
 
 end
