@@ -90,14 +90,6 @@ termination hml_depth
 context LTS_Tau
 begin
 
-\<comment> \<open>
-inductive_set processes :: "'s set" where
-  "(s::'s) \<in> processes"
-
-fun hml_semantic :: "('a, 's) HML \<Rightarrow> 's set" ("\<lbrakk>_\<rbrakk>HML" 60) where
-  "\<lbrakk>HML_true\<rbrakk>HML = processes"
-\<close>
-
 function
       hml_models     :: "('a, 's) HML     \<Rightarrow> 's \<Rightarrow> bool" ("_ \<Turnstile> _" 60) 
   and hml_neg_models :: "('a, 's) HML_neg \<Rightarrow> 's \<Rightarrow> bool"
@@ -113,8 +105,6 @@ where
   apply (metis HML.exhaust HML_neg.exhaust sumE surj_pair)
   by blast+
                       
-
-
 inductive_set hml_models_wf_arg_space :: "(('a, 's) HML \<times> 's, ('a, 's) HML_neg \<times> 's) sum rel" where
                          "(Inl (\<phi>, x), Inl (HML_poss   a \<phi>, p)) \<in> hml_models_wf_arg_space" |
                          "(Inl (\<phi>, x), Inl (HML_silent   \<phi>, p)) \<in> hml_models_wf_arg_space" |
