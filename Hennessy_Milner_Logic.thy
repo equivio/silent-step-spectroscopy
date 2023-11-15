@@ -19,6 +19,9 @@ thm hml_psi.induct
 context lts_tau
 begin
 
+abbreviation HML_soft_poss:: "'a \<Rightarrow> ('a, 'i) hml_formula \<Rightarrow> ('a, 'i)hml_psi" where
+"HML_soft_poss \<alpha> \<phi> \<equiv> (if (\<alpha> \<noteq> \<tau>) then (HML_phi (HML_poss \<alpha> \<phi>)) else (HML_phi \<phi>))"
+
 function satisfies :: \<open>'s \<Rightarrow> ('a,'s) hml_formula \<Rightarrow> bool\<close> (infix \<open>\<Turnstile>\<close> 50) 
 and psi_sat :: \<open>'s \<Rightarrow> ('a,'s) hml_psi \<Rightarrow> bool\<close> (infix \<open>\<TTurnstile>\<close> 50)
 where
