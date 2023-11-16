@@ -79,8 +79,43 @@ inductive finite_play :: "'gstate list \<Rightarrow> bool" where
   "finite_play [g0]" |
   "finite_play (p @ [gn])" if "finite_play p" and "last p \<Zinj> gn" and "(w (last p) gn) (energy_level p) \<noteq> defender_win_level"
 
-(* write a lemma that shows that the energy level of a finite play
-  can be expressed via *recursion* on its list elements *)
+lemma finite_play_prefix:
+  assumes "finite_play (a @ b)" "a \<noteq> []"
+  shows "finite_play a"
+using assms proof(induct "a @ b" arbitrary: b rule: finite_play.induct)
+  case 1
+  thus ?case
+    by (metis Nil_is_append_conv butlast_append butlast_snoc finite_play.simps)
+next
+  case (2 p gn)
+  thus ?case
+    by (metis butlast_append butlast_snoc finite_play.intros(2))
+qed
+
+corollary finite_play_suffix:
+  assumes "finite_play (p @ [gn])" and "p \<noteq> []"
+  shows "finite_play p"
+  using assms finite_play_prefix by fast
+
+fun pairs :: "'a list \<Rightarrow> ('a \<times> 'a) list" where
+  "pairs p = (if length p \<le> 1 then [] else (hd p, hd (tl p)) # pairs (tl p))"
+
+(* some intuiton on this definition*)
+lemma "pairs [1,2,3] = [(1,2), (2,3)]" by simp
+lemma empty_pair: "pairs [] = []" by simp
+lemma single_pair: "pairs [x] = []" by simp
+lemma pairs_append_single: "pairs (p @ [gn]) = (if length p \<ge> 1 then (pairs p) @ [((last p), gn)] else [])" oops
+
+lemma energy_level_fold_eq:
+  assumes "finite_play p"
+  shows "energy_level p = fold (\<lambda>g e. (weight (fst g) (snd g)) e) (pairs p) e0"
+using assms proof (induct "p" rule: finite_play.induct)
+  case 1
+  thus ?case unfolding single_pair[of "g0"] fold_Nil by simp
+next
+  case (2 p gn)
+  then show ?case sorry
+qed
 
 abbreviation "play_stuck p \<equiv>  \<nexists>ps. finite_play (p @ ps)" (*only check wheter p is currently stucked*)
 
