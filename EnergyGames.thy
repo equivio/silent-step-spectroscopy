@@ -157,10 +157,9 @@ definition won_by_attacker:: "'gstate list \<Rightarrow> bool" where
 definition no_winner:: "'gstate list \<Rightarrow> bool" where
   "no_winner p \<equiv> \<not>play_stuck p"
 
-lemma winner:
-  fixes p
+lemma play_won_cases:
   shows "won_by_defender p \<or> won_by_attacker p \<or> no_winner p"
-  using no_winner_def won_by_attacker_def won_by_defender_def by auto
+  unfolding no_winner_def won_by_attacker_def won_by_defender_def by blast
 end \<comment> \<open>end of context energy_game\<close>
 
 end
