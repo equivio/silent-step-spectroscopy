@@ -63,27 +63,27 @@ proof safe
       then show ?case
         by (smt (verit) hml.distinct(1) hml.distinct(3) hml.distinct(5) hml.distinct(7) Inl_inject Pair_inject hml_models_wf_arg_space.simps sum.distinct(1))
     next
-      case (Obs x1 x2)
+      case (Obs a \<phi>)
       then show ?case
         by (smt (verit) hml.distinct(11) hml.distinct(13) hml.distinct(9) hml.inject(1) Inl_inject Pair_inject hml_models_wf_arg_space.simps sum.distinct(1))
     next
-      case (Silent x)
+      case (Silent \<phi>)
       then show ?case
         by (smt (verit) hml.distinct(15) hml.distinct(17) hml.distinct(9) hml.inject(2) Inl_inject Pair_inject hml_models_wf_arg_space.simps sum.distinct(1))
     next
-      case (Internal x)
+      case (Internal \<phi>)
       then show ?case
         by (smt (verit) hml.distinct(11) hml.distinct(15) hml.distinct(19) hml.inject(3) Inl_inject Pair_inject hml_models_wf_arg_space.simps sum.distinct(1))
     next
-      case (Conj x1 x2)
+      case (Conj I \<psi>s)
       then show ?case
         by (smt (verit) hml.distinct(13) hml.distinct(17) hml.distinct(19) hml.inject(4) Inl_inject Pair_inject hml_models_wf_arg_space.simps range_eqI sum.distinct(1))
     next
-      case (Pos x)
+      case (Pos \<phi>)
       then show ?case
         by (smt (verit) hml_conjunct.distinct(1) hml_conjunct.inject(1) Inr_inject Pair_inject hml_models_wf_arg_space.simps sum.distinct(1))
     next
-      case (Neg x)
+      case (Neg \<phi>)
       then show ?case
         by (smt (verit) hml_conjunct.distinct(2) hml_conjunct.inject(2) Inr_inject Pair_inject hml_models_wf_arg_space.simps sum.distinct(1))
     qed
