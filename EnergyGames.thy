@@ -97,6 +97,9 @@ corollary finite_play_suffix:
   shows "finite_play p"
   using assms finite_play_prefix by fast
 
+lemma finite_play_min_len: "finite_play p \<Longrightarrow> length p \<ge> 1"
+  by (metis One_nat_def Suc_le_eq energy_game.finite_play.simps energy_game_axioms length_greater_0_conv not_Cons_self snoc_eq_iff_butlast)
+
 fun pairs :: "'a list \<Rightarrow> ('a \<times> 'a) list" where
   "pairs p = (if length p \<le> 1 then [] else (hd p, hd (tl p)) # pairs (tl p))"
 
@@ -104,7 +107,8 @@ fun pairs :: "'a list \<Rightarrow> ('a \<times> 'a) list" where
 lemma "pairs [1,2,3] = [(1,2), (2,3)]" by simp
 lemma empty_pair: "pairs [] = []" by simp
 lemma single_pair: "pairs [x] = []" by simp
-lemma pairs_append_single: "pairs (p @ [gn]) = (if length p \<ge> 1 then (pairs p) @ [((last p), gn)] else [])" oops
+lemma pairs_append_single: "pairs (p @ [gn]) = (if length p \<ge> 1 then (pairs p) @ [(last p, gn)] else [])" 
+  by (induct p, simp_all add: not_less_eq_eq)
 
 lemma energy_level_fold_eq:
   assumes "finite_play p"
@@ -114,7 +118,13 @@ using assms proof (induct "p" rule: finite_play.induct)
   thus ?case unfolding single_pair[of "g0"] fold_Nil by simp
 next
   case (2 p gn)
-  then show ?case sorry
+  have "length p \<ge> 1" using 2(1) finite_play_min_len by auto
+  hence pred_eq: "(pairs (p @ [gn])) = (pairs p) @ [(last p, gn)]" using pairs_append_single by metis
+
+  have "fold (\<lambda>g. w (fst g) (snd g)) [(last p, gn)] = w (last p) gn" by simp
+  hence "fold (\<lambda>g. w (fst g) (snd g)) ((pairs p) @ [(last p, gn)]) = (w (last p) gn) \<circ> (fold (\<lambda>g. w (fst g) (snd g)) (pairs p))" 
+    using fold_append by simp
+  with 2 show ?case using pred_eq by fastforce
 qed
 
 abbreviation "play_stuck p \<equiv>  \<nexists>ps. finite_play (p @ ps)" (*only check wheter p is currently stucked*)
