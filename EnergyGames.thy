@@ -127,7 +127,21 @@ next
   with 2 show ?case using pred_eq by fastforce
 qed
 
-abbreviation "play_stuck p \<equiv>  \<nexists>ps. finite_play (p @ ps)" (*only check wheter p is currently stucked*)
+abbreviation "play_stuck p \<equiv>  \<nexists>gn. finite_play (p @ [gn])"
+
+lemma play_stuck_def:
+  shows "play_stuck p \<longleftrightarrow> (\<nexists>ps. ps \<noteq> [] \<and> finite_play (p @ ps))"
+proof
+  assume asm: "\<nexists>gn. finite_play (p @ [gn])"
+  show "\<nexists>ps. ps \<noteq> [] \<and> finite_play (p @ ps)" proof(rule ccontr)
+    assume "\<not>(\<nexists>ps. ps \<noteq> [] \<and> finite_play (p @ ps))"
+    hence "\<exists>gn ps. finite_play (p @ [gn] @ ps)" by (metis append_Cons append_Nil list.exhaust)
+    hence "\<exists>gn. finite_play (p @ [gn])" using finite_play_prefix by (metis append.assoc snoc_eq_iff_butlast)
+    with asm show "False" by simp
+  qed
+next
+  show "\<nexists>ps. ps \<noteq> [] \<and> finite_play (p @ ps) \<Longrightarrow> play_stuck p" by auto
+qed
 
 abbreviation "is_defender_turn p \<equiv> Gd (last p)"
 abbreviation "is_attacker_turn p \<equiv> Ga (last p)"
