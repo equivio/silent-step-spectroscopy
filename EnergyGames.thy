@@ -146,10 +146,7 @@ qed
 abbreviation "is_defender_turn p \<equiv> Gd (last p)"
 abbreviation "is_attacker_turn p \<equiv> Ga (last p)"
 
-lemma next_turn:
-  fixes p
-  shows "is_defender_turn p \<or> is_attacker_turn p"
-by simp
+lemma next_turn_well_def:  "is_defender_turn p \<or> is_attacker_turn p" and "is_defender_turn p \<longleftrightarrow> \<not> is_attacker_turn p" by simp+
 
 definition won_by_defender:: "'gstate list \<Rightarrow> bool" where
   "won_by_defender p \<equiv> play_stuck p \<and> is_attacker_turn p"
