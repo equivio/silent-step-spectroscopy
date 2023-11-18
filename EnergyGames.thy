@@ -6,13 +6,11 @@ begin
 
 section \<open>Energy Games\<close>
 
-type_synonym 'gstate move = "'gstate \<times> 'gstate"
 type_synonym 'energy update = "'energy \<Rightarrow> 'energy"
-(******************Basic Game Definitions******************************************)
 locale energy_game =
   fixes g0 :: "'gstate" and
         e0 :: "'energy" and
-        moves :: "'gstate move set" and
+        moves :: "'gstate \<Rightarrow> 'gstate \<Rightarrow> bool" (infix "\<Zinj>" 70) and
         weight :: "'gstate \<Rightarrow> 'gstate \<Rightarrow> 'energy update" ("w") and
         defender :: "'gstate \<Rightarrow> bool" ("Gd") and 
         defender_win_level :: "'energy"
@@ -22,8 +20,6 @@ locale energy_game =
 begin
 
 abbreviation attacker :: "'gstate \<Rightarrow> bool" ("Ga") where "Ga p \<equiv> \<not> Gd p" 
-
-abbreviation move (infix "\<Zinj>" 70) where "g1 \<Zinj> g2 \<equiv> (g1, g2) \<in> moves"
 
 abbreviation weighted_move :: "'gstate \<Rightarrow> 'energy update \<Rightarrow> 'gstate \<Rightarrow>  bool" ("_ \<Zinj>w _ _" [60,60,60] 70) where
   "weighted_move g1 u g2 \<equiv> g1 \<Zinj> g2 \<and> (weight g1 g2 = u)"
