@@ -11,7 +11,7 @@ locale energy_game =
   fixes g0 :: "'gstate" and
         e0 :: "'energy" and
         moves :: "'gstate \<Rightarrow> 'gstate \<Rightarrow> bool" (infix "\<Zinj>" 70) and
-        weight :: "'gstate \<Rightarrow> 'gstate \<Rightarrow> 'energy update" ("w") and
+        weight :: "'gstate \<Rightarrow> 'gstate \<Rightarrow> 'energy update" ("wgt") and
         defender :: "'gstate \<Rightarrow> bool" ("Gd") and 
         defender_win_level :: "'energy"
       assumes win_is_stuck: "(weight g1 g2) defender_win_level = defender_win_level" and
@@ -21,7 +21,7 @@ begin
 
 abbreviation attacker :: "'gstate \<Rightarrow> bool" ("Ga") where "Ga p \<equiv> \<not> Gd p" 
 
-abbreviation weighted_move :: "'gstate \<Rightarrow> 'energy update \<Rightarrow> 'gstate \<Rightarrow>  bool" ("_ \<Zinj>w _ _" [60,60,60] 70) where
+abbreviation weighted_move :: "'gstate \<Rightarrow> 'energy update \<Rightarrow> 'gstate \<Rightarrow>  bool" ("_ \<Zinj>wgt _ _" [60,60,60] 70) where
   "weighted_move g1 u g2 \<equiv> g1 \<Zinj> g2 \<and> (weight g1 g2 = u)"
 
 fun energy_level :: "'gstate list \<Rightarrow> 'energy" where
@@ -99,7 +99,7 @@ lemma finite_play_min_len: "finite_play p \<Longrightarrow> length p \<ge> 1"
 fun pairs :: "'a list \<Rightarrow> ('a \<times> 'a) list" where
   "pairs p = (if length p \<le> 1 then [] else (hd p, hd (tl p)) # pairs (tl p))"
 
-(* some intuiton on this definition*)
+(* some intuition on this definition*)
 lemma "pairs [1,2,3] = [(1,2), (2,3)]" by simp
 lemma empty_pair: "pairs [] = []" by simp
 lemma single_pair: "pairs [x] = []" by simp
@@ -117,8 +117,8 @@ next
   have "length p \<ge> 1" using 2(1) finite_play_min_len by auto
   hence pred_eq: "(pairs (p @ [gn])) = (pairs p) @ [(last p, gn)]" using pairs_append_single by metis
 
-  have "fold (\<lambda>g. w (fst g) (snd g)) [(last p, gn)] = w (last p) gn" by simp
-  hence "fold (\<lambda>g. w (fst g) (snd g)) ((pairs p) @ [(last p, gn)]) = (w (last p) gn) \<circ> (fold (\<lambda>g. w (fst g) (snd g)) (pairs p))" 
+  have "fold (\<lambda>g. wgt (fst g) (snd g)) [(last p, gn)] = wgt (last p) gn" by simp
+  hence "fold (\<lambda>g. wgt (fst g) (snd g)) ((pairs p) @ [(last p, gn)]) = (wgt (last p) gn) \<circ> (fold (\<lambda>g. wgt (fst g) (snd g)) (pairs p))" 
     using fold_append by simp
   with 2 show ?case using pred_eq by fastforce
 qed
@@ -156,6 +156,18 @@ definition no_winner:: "'gstate list \<Rightarrow> bool" where
 lemma play_won_cases:
   shows "won_by_defender p \<or> won_by_attacker p \<or> no_winner p"
   unfolding no_winner_def won_by_attacker_def won_by_defender_def by blast
+
+lemma play_won_well_def: 
+  shows "won_by_defender p  \<longleftrightarrow>  \<not> (won_by_attacker p \<or> no_winner p)"
+  using no_winner_def won_by_attacker_def won_by_defender_def by auto
+
+lemma play_won_well_att:
+  shows "won_by_attacker p  \<longleftrightarrow>  \<not> (won_by_defender p \<or> no_winner p)"
+  using no_winner_def won_by_attacker_def won_by_defender_def by auto
+
+lemma play_won_well_noWin:
+    shows "no_winner p  \<longleftrightarrow>  \<not> (won_by_defender p \<or> won_by_attacker p)"
+    using no_winner_def won_by_attacker_def won_by_defender_def by auto
 end \<comment> \<open>end of context energy_game\<close>
 
 end
