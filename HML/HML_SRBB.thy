@@ -18,6 +18,111 @@ and
     HML_srbb_silent_pos "('act, 'i) HML_srbb_conjunction" |
     HML_srbb_silent_neg "('act, 'i) HML_srbb_conjunction"
 
+function
+      modal_depth_srbb :: "('act, 'i) HML_srbb \<Rightarrow> nat"
+  and modal_depth_srbb_conjunction :: "('act, 'i) HML_srbb_conjunction \<Rightarrow> nat"
+  and modal_depth_srbb_conjunct :: "('act, 'i) HML_srbb_conjunct \<Rightarrow> nat" where
+ "modal_depth_srbb HML_srbb_true = 0" |
+ "modal_depth_srbb (HML_srbb_silent \<chi>) = modal_depth_srbb_conjunction \<chi>" |
+
+ "modal_depth_srbb_conjunction (HML_srbb_poss \<alpha> \<phi>) = 1 + modal_depth_srbb \<phi>" |
+ "modal_depth_srbb_conjunction (HML_srbb_conj I \<psi>s) =
+    Max ({0} \<union> {modal_depth_srbb_conjunct (\<psi>s i) | i. i \<in> I})" |
+ "modal_depth_srbb_conjunction (HML_srbb_stable_conj I \<psi>s) = 
+    Max ({0} \<union> {modal_depth_srbb_conjunct (\<psi>s i) | i. i \<in> I})" |
+ "modal_depth_srbb_conjunction (HML_srbb_branch_conj a \<phi> I \<psi>s) =
+    Max ({1 + modal_depth_srbb \<phi>} \<union> {modal_depth_srbb_conjunct (\<psi>s i) | i. i \<in> I})" |
+
+ "modal_depth_srbb_conjunct (HML_srbb_silent_pos \<chi>) = modal_depth_srbb_conjunction \<chi>" |
+ "modal_depth_srbb_conjunct (HML_srbb_silent_neg \<chi>) = modal_depth_srbb_conjunction \<chi>"
+  
+  apply (metis HML_srbb.exhaust HML_srbb_conjunct.exhaust HML_srbb_conjunction.exhaust old.sum.exhaust)
+  by blast+
+
+inductive_set modal_depth_srbb_arg_space 
+           :: "(('act, 'i) HML_srbb + 
+                ('act, 'i) HML_srbb_conjunction + 
+                ('act, 'i) HML_srbb_conjunct) rel" where
+  "(Inr (Inl \<chi>), 
+   Inl (HML_srbb_silent \<chi>)) \<in> modal_depth_srbb_arg_space" |
+
+  "(Inl \<phi>,
+   Inr (Inl (HML_srbb_poss \<alpha> \<phi>))) \<in> modal_depth_srbb_arg_space" |
+  "(Inr (Inr (\<psi>s xa)),
+   Inr (Inl (HML_srbb_conj I \<psi>s))) \<in> modal_depth_srbb_arg_space" |
+  "(Inr (Inr (\<psi>s xa)),
+   Inr (Inl (HML_srbb_stable_conj I \<psi>s))) \<in> modal_depth_srbb_arg_space" |
+  "(Inl \<phi>,
+   Inr (Inl (HML_srbb_branch_conj a \<phi> I \<psi>s))) \<in> modal_depth_srbb_arg_space" |
+  "(Inr (Inr (\<psi>s xa)),
+   Inr (Inl (HML_srbb_branch_conj a \<phi> I \<psi>s))) \<in> modal_depth_srbb_arg_space" |
+
+  "(Inr (Inl \<chi>),
+   Inr (Inr (HML_srbb_silent_pos \<chi>))) \<in> modal_depth_srbb_arg_space" |
+  "(Inr (Inl \<chi>),
+   Inr (Inr (HML_srbb_silent_neg \<chi>))) \<in> modal_depth_srbb_arg_space"
+
+lemma wf_modal_depth_srbb_arg_space : "wf modal_depth_srbb_arg_space"
+  unfolding wf_def
+proof safe
+  fix P x
+  assume "\<forall>x. (\<forall>y. (y, x) \<in> modal_depth_srbb_arg_space \<longrightarrow> P y) \<longrightarrow> P x"
+  then show "P x"
+  proof (induct x)
+    fix \<phi>
+    fix \<chi>\<psi>
+    show "P (Inl \<phi>)" and "P (Inr \<chi>\<psi>)"
+    proof (induct \<chi>\<psi>)
+      fix \<chi>
+      fix \<psi>
+      show "P (Inl \<phi>)" and "P (Inr (Inl \<chi>))" and "P (Inl \<phi>)" and "P (Inr (Inr \<psi>))"
+        using \<open>\<forall>x. (\<forall>y. (y, x) \<in> modal_depth_srbb_arg_space \<longrightarrow> P y) \<longrightarrow> P x\<close>
+      proof (induct \<phi> and \<chi> and \<psi>)
+        case HML_srbb_true
+        {
+          case 1
+          then show ?case 
+            by (smt (verit) HML_srbb.distinct(1) modal_depth_srbb_arg_space.simps sum.distinct(1) sum.inject(1))
+        next
+          case 2
+          then show ?case sorry
+        }
+      next
+        case (HML_srbb_silent x)
+        {
+          case 1
+          then show ?case sorry
+        next
+          case 2
+          then show ?case sorry
+        }
+      next
+        case (HML_srbb_poss x1 x2)
+        then show ?case sorry
+      next
+        case (HML_srbb_conj x1 x2)
+        then show ?case sorry
+      next
+        case (HML_srbb_stable_conj x1 x2)
+        then show ?case sorry
+      next
+        case (HML_srbb_branch_conj x1 x2 x3 x4)
+        then show ?case sorry
+      next
+        case (HML_srbb_silent_pos x)
+        then show ?case sorry
+      next
+        case (HML_srbb_silent_neg x)
+        then show ?case sorry
+      qed
+    qed
+  qed
+qed
+
+termination
+  using wf_modal_depth_srbb_arg_space and modal_depth_srbb_arg_space.intros 
+  by (relation modal_depth_srbb_arg_space) force+
+
 context LTS_Tau
 begin
 
