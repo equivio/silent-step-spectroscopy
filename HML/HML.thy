@@ -20,17 +20,17 @@ context LTS_Tau
 begin
 
 function
-      hml_models     :: "('a, 's) hml     \<Rightarrow> 's \<Rightarrow> bool" ("_ \<Turnstile> _" 60) 
-  and hml_neg_models :: "('a, 's) hml_conjunct \<Rightarrow> 's \<Rightarrow> bool"
+      hml_models          :: "('a, 's) hml     \<Rightarrow> 's \<Rightarrow> bool" ("_ \<Turnstile> _" 60) 
+  and hml_conjunct_models :: "('a, 's) hml_conjunct \<Rightarrow> 's \<Rightarrow> bool"
 where
   "(TT           \<Turnstile> _) = True" |
   "((Obs a \<phi>)    \<Turnstile> p) = (\<exists>p'. p \<mapsto> a p' \<and> (\<phi> \<Turnstile> p'))" |
   "((Silent \<phi>)   \<Turnstile> p) = (\<exists>p'. p \<Zsurj> p' \<and> (\<phi> \<Turnstile> p'))" |
   "((Internal \<phi>) \<Turnstile> p) = ((\<exists>p'. p \<mapsto> \<tau> p' \<and> (\<phi> \<Turnstile> p')) \<or> (\<phi> \<Turnstile> p))" |
-  "((Conj I \<psi>s)  \<Turnstile> p) = (\<forall>i \<in> I. hml_neg_models (\<psi>s i) p)" |
+  "((Conj I \<psi>s)  \<Turnstile> p) = (\<forall>i \<in> I. hml_conjunct_models (\<psi>s i) p)" |
 
-  "(hml_neg_models (Pos \<phi>) p) = (\<phi> \<Turnstile> p)" |
-  "(hml_neg_models (Neg \<phi>) p) = (\<not>(\<phi> \<Turnstile> p))"
+  "(hml_conjunct_models (Pos \<phi>) p) = (\<phi> \<Turnstile> p)" |
+  "(hml_conjunct_models (Neg \<phi>) p) = (\<not>(\<phi> \<Turnstile> p))"
   by (metis hml.exhaust hml_conjunct.exhaust sumE surj_pair, auto)
             
 inductive_set hml_models_wf_arg_space :: "(('a, 's) hml \<times> 's, ('a, 's) hml_conjunct \<times> 's) sum rel" where
