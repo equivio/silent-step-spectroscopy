@@ -185,5 +185,23 @@ lemma play_won_well_noWin:
     shows "no_winner p  \<longleftrightarrow>  \<not> (won_by_defender p \<or> won_by_attacker p)"
   using no_winner_def won_by_attacker_def won_by_defender_def by auto
 
+definition attacker_strategy:: "'gstate \<Rightarrow> 'gstate \<Rightarrow> bool" where
+  "attacker_strategy p q \<equiv>  attacker p  \<and> finite_play (p # [q])"
+
+definition defender_strategy:: "'gstate \<Rightarrow> 'gstate \<Rightarrow> bool" where
+  "defender_strategy p q \<equiv>  defender p  \<and> finite_play (p # [q])"
+
+
+lemma attacker_strategy_pos:
+  assumes "attacker_strategy p q"
+  shows "next_pos_defender p q"
+  using assms attacker_strategy_def next_pos_defender_def by auto
+ 
+ 
+lemma defender_strategy_pos:
+  assumes "defender_strategy p q"
+  shows "next_pos_attacker p q"
+  using assms defender_strategy_def next_pos_attacker_def by auto
+
 end \<comment> \<open>end of context energy_game\<close>
 end
