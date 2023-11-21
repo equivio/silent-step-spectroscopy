@@ -142,8 +142,24 @@ qed
 abbreviation "is_defender_turn p \<equiv> Gd (last p)"
 abbreviation "is_attacker_turn p \<equiv> Ga (last p)"
 
-lemma next_turn_well_def:  "is_defender_turn p \<or> is_attacker_turn p" and "is_defender_turn p \<longleftrightarrow> \<not> is_attacker_turn p" by simp+
+lemma next_turn_well_defender:  "is_defender_turn p \<or> is_attacker_turn p" and "is_defender_turn p \<longleftrightarrow> \<not> is_attacker_turn p" by simp+
 
+definition next_pos_defender :: \<open>'gstate \<Rightarrow> 'gstate \<Rightarrow> bool\<close> where
+  "next_pos_defender p q \<equiv> True" if "attacker p \<and> move p q" 
+
+definition next_pos_attacker :: \<open>'gstate \<Rightarrow> 'gstate \<Rightarrow> bool\<close> where
+  "next_pos_attacker p q \<equiv> True" if "defender p \<and> move p q" 
+
+(*lemma alternating_pos: 
+  assumes "move p q"
+  shows "attacker p \<longleftrightarrow> defender q"
+proof (rule iffI)
+  assume A1: "attacker p"
+  from assms A1 have A2: "next_pos_def p q" using next_pos_def_def by auto 
+  show "defender q"
+  
+qed
+*)
 definition won_by_defender:: "'gstate list \<Rightarrow> bool" where
   "won_by_defender p \<equiv> play_stuck p \<and> is_attacker_turn p"
 
@@ -167,7 +183,7 @@ lemma play_won_well_att:
 
 lemma play_won_well_noWin:
     shows "no_winner p  \<longleftrightarrow>  \<not> (won_by_defender p \<or> won_by_attacker p)"
-    using no_winner_def won_by_attacker_def won_by_defender_def by auto
-end \<comment> \<open>end of context energy_game\<close>
+  using no_winner_def won_by_attacker_def won_by_defender_def by auto
 
+end \<comment> \<open>end of context energy_game\<close>
 end
