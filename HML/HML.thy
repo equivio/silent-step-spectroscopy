@@ -14,13 +14,8 @@ and
     HML_just "('act, 'i) HML" |
     HML_not "('act, 'i) HML"
 
-
-
 context LTS_Tau
 begin
-
-abbreviation HML_soft_poss:: "'a \<Rightarrow> ('a, 'i) HML \<Rightarrow> ('a, 'i)HML_neg" where
-"HML_soft_poss \<alpha> \<phi> \<equiv> (if (\<alpha> \<noteq> \<tau>) then (HML_just (HML_poss \<alpha> \<phi>)) else (HML_just \<phi>))"
 
 function
       hml_models     :: "('a, 's) HML     \<Rightarrow> 's \<Rightarrow> bool" ("_ \<Turnstile> _" 60) 
