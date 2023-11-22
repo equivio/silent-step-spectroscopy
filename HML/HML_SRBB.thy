@@ -154,6 +154,65 @@ function
   apply (metis HML_srbb.exhaust HML_srbb_conjunct.exhaust HML_srbb_conjunction.exhaust sumE)
   by fastforce+
 
+inductive_set hml_srbb_to_hml_arg_space :: "(('a, 's) HML_srbb + ('a, 's) HML_srbb_conjunction + ('a, 's) HML_srbb_conjunct) rel" where
+  "(Inr (Inl \<chi>), Inl (HML_srbb_silent \<chi>)) \<in> hml_srbb_to_hml_arg_space" |
+  "(Inl \<phi>,       Inr (Inl (HML_srbb_poss a \<phi>))) \<in> hml_srbb_to_hml_arg_space" |
+  "z \<in> range \<psi>s \<Longrightarrow> (Inr (Inr z), Inr (Inl (HML_srbb_conj I \<psi>s))) \<in> hml_srbb_to_hml_arg_space" |
+  "x = (SOME i. i \<notin> I) \<Longrightarrow> xa \<noteq> x \<Longrightarrow> (Inr (Inr (\<psi>s xa)), Inr (Inl (HML_srbb_stable_conj I \<psi>s))) \<in> hml_srbb_to_hml_arg_space" |
+  "x = (SOME i. i \<notin> I) \<Longrightarrow> xa = x \<Longrightarrow> a = \<tau> \<Longrightarrow> (Inl \<phi>, Inr (Inl (HML_srbb_branch_conj a \<phi> I \<psi>s))) \<in> hml_srbb_to_hml_arg_space" |
+  "x = (SOME i. i \<notin> I) \<Longrightarrow> xa = x \<Longrightarrow> a \<noteq> \<tau> \<Longrightarrow> (Inl \<phi>, Inr (Inl (HML_srbb_branch_conj a \<phi> I \<psi>s))) \<in> hml_srbb_to_hml_arg_space" |
+  "x = (SOME i. i \<notin> I) \<Longrightarrow> xa \<noteq> x \<Longrightarrow> (Inr (Inr (\<psi>s xa)), Inr (Inl (HML_srbb_branch_conj a \<phi> I \<psi>s))) \<in> hml_srbb_to_hml_arg_space" |
+  "(Inr (Inl \<chi>), Inr (Inr (HML_srbb_silent_pos \<chi>))) \<in> hml_srbb_to_hml_arg_space" |
+  "(Inr (Inl \<chi>), Inr (Inr (HML_srbb_silent_neg \<chi>))) \<in> hml_srbb_to_hml_arg_space"
+
+lemma wf_hml_srbb_to_hml_arg_space : "wf hml_srbb_to_hml_arg_space"
+  unfolding wf_def
+proof safe
+  fix P \<phi>\<chi>\<psi>
+  assume "\<forall>x. (\<forall>y. (y, x) \<in> hml_srbb_to_hml_arg_space \<longrightarrow> P y) \<longrightarrow> P x"
+  show "P \<phi>\<chi>\<psi>"
+  proof (induct \<phi>\<chi>\<psi>)
+    fix \<phi> \<chi>\<psi>
+    show "P (Inl \<phi>)" and "P (Inr \<chi>\<psi>)"
+    proof (induct \<chi>\<psi>)
+      fix \<chi> \<psi>
+      have "P (Inl \<phi>)" and "P (Inr (Inl \<chi>))" and "P (Inr (Inr \<psi>))"
+        using \<open>\<forall>x. (\<forall>y. (y, x) \<in> hml_srbb_to_hml_arg_space \<longrightarrow> P y) \<longrightarrow> P x\<close>
+      proof (induct \<phi> and \<chi> and \<psi>)
+        case HML_srbb_true
+        then show ?case sorry
+      next
+        case (HML_srbb_silent x)
+        then show ?case sorry
+      next
+        case (HML_srbb_poss x1 x2)
+        then show ?case sorry
+      next
+        case (HML_srbb_conj x1 x2)
+        then show ?case sorry
+      next
+        case (HML_srbb_stable_conj x1 x2)
+        then show ?case sorry
+      next
+        case (HML_srbb_branch_conj x1 x2 x3 x4)
+        then show ?case sorry
+      next
+        case (HML_srbb_silent_pos x)
+        then show ?case sorry
+      next
+        case (HML_srbb_silent_neg x)
+        then show ?case sorry
+      qed
+      then show "P (Inl \<phi>)" and "P (Inr (Inl \<chi>))" and "P (Inl \<phi>)" and "P (Inr (Inr \<psi>))" by auto
+    qed
+  qed
+qed
+
+termination
+  using wf_hml_srbb_to_hml_arg_space
+   and hml_srbb_to_hml_arg_space.simps
+  by (relation hml_srbb_to_hml_arg_space, force+)
+
 end
 
 end
