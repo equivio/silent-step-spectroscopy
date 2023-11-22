@@ -75,46 +75,42 @@ proof safe
     proof (induct \<chi>\<psi>)
       fix \<chi>
       fix \<psi>
-      show "P (Inl \<phi>)" and "P (Inr (Inl \<chi>))" and "P (Inl \<phi>)" and "P (Inr (Inr \<psi>))"
+      have "P (Inl \<phi>)" and "P (Inr (Inl \<chi>))" and "P (Inr (Inr \<psi>))"
         using \<open>\<forall>x. (\<forall>y. (y, x) \<in> modal_depth_srbb_arg_space \<longrightarrow> P y) \<longrightarrow> P x\<close>
       proof (induct \<phi> and \<chi> and \<psi>)
         case HML_srbb_true
-        {
-          case 1
-          then show ?case 
-            by (smt (verit) HML_srbb.distinct(1) modal_depth_srbb_arg_space.simps sum.distinct(1) sum.inject(1))
-        next
-          case 2
-          then show ?case sorry
-        }
+        then show ?case 
+          by (smt (verit) HML_srbb.distinct(1) Inl_inject modal_depth_srbb_arg_space.simps sum.distinct(1))
       next
         case (HML_srbb_silent x)
-        {
-          case 1
-          then show ?case sorry
-        next
-          case 2
-          then show ?case sorry
-        }
+        then show ?case 
+          by (smt (verit) HML_srbb.inject Inl_inject modal_depth_srbb_arg_space.simps sum.distinct(1))
       next
         case (HML_srbb_poss x1 x2)
-        then show ?case sorry
+        then show ?case 
+          by (smt (verit) HML_srbb_conjunction.distinct(1) HML_srbb_conjunction.distinct(3) HML_srbb_conjunction.distinct(5) HML_srbb_conjunction.inject(1) Inl_Inr_False Inl_inject Inr_inject modal_depth_srbb_arg_space.simps)
       next
         case (HML_srbb_conj x1 x2)
-        then show ?case sorry
+        then show ?case 
+          by (smt (verit) HML_srbb_conjunction.distinct(1) HML_srbb_conjunction.distinct(7) HML_srbb_conjunction.distinct(9) HML_srbb_conjunction.inject(2) Inl_Inr_False Inl_inject Inr_inject modal_depth_srbb_arg_space.simps range_eqI)
       next
         case (HML_srbb_stable_conj x1 x2)
-        then show ?case sorry
+        then show ?case 
+          by (smt (verit) HML_srbb_conjunction.distinct(11) HML_srbb_conjunction.distinct(3) HML_srbb_conjunction.distinct(7) HML_srbb_conjunction.inject(3) Inl_Inr_False Inr_inject modal_depth_srbb_arg_space.simps range_eqI sum.inject(1))
       next
         case (HML_srbb_branch_conj x1 x2 x3 x4)
-        then show ?case sorry
+        then show ?case 
+          by (smt (verit) HML_srbb_conjunction.distinct(11) HML_srbb_conjunction.distinct(5) HML_srbb_conjunction.distinct(9) HML_srbb_conjunction.inject(4) Inl_Inr_False Inl_inject Inr_inject modal_depth_srbb_arg_space.simps range_eqI)
       next
         case (HML_srbb_silent_pos x)
-        then show ?case sorry
+        then show ?case 
+          by (smt (verit) HML_srbb_conjunct.distinct(1) HML_srbb_conjunct.inject(1) Inl_Inr_False Inr_inject modal_depth_srbb_arg_space.simps)
       next
         case (HML_srbb_silent_neg x)
-        then show ?case sorry
+        then show ?case 
+          by (smt (verit) HML_srbb_conjunct.distinct(1) HML_srbb_conjunct.inject(2) Inl_Inr_False Inr_inject modal_depth_srbb_arg_space.simps)
       qed
+      then show "P (Inl \<phi>)" and "P (Inr (Inl \<chi>))" and "P (Inl \<phi>)" and "P (Inr (Inr \<psi>))" by auto
     qed
   qed
 qed
