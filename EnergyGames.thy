@@ -11,7 +11,7 @@ locale energy_game =
   fixes g0 :: "'gstate" and
         e0 :: "'energy" and
         moves :: "'gstate \<Rightarrow> 'gstate \<Rightarrow> bool" (infix "\<Zinj>" 70) and
-        weight :: "'gstate \<Rightarrow> 'gstate \<Rightarrow> 'energy update" ("wgt") and
+        weight :: "'gstate \<Rightarrow> 'gstate \<Rightarrow> 'energy update" and
         defender :: "'gstate \<Rightarrow> bool" ("Gd") and 
         defender_win_level :: "'energy"
 begin
@@ -116,8 +116,8 @@ next
   have "length p \<ge> 1" using 2(1) finite_play_min_len by auto
   hence pred_eq: "(pairs (p @ [gn])) = (pairs p) @ [(last p, gn)]" using pairs_append_single by metis
 
-  have "fold (\<lambda>(g1, g2). wgt g1 g2) [(last p, gn)] = wgt (last p) gn" by simp
-  hence "fold (\<lambda>(g1, g2). wgt g1 g2) ((pairs p) @ [(last p, gn)]) = (wgt (last p) gn) \<circ> (fold (\<lambda>(g1, g2). wgt g1 g2) (pairs p))" 
+  have "fold (\<lambda>(g1, g2). weight g1 g2) [(last p, gn)] = weight (last p) gn" by simp
+  hence "fold (\<lambda>(g1, g2). weight g1 g2) ((pairs p) @ [(last p, gn)]) = (weight (last p) gn) \<circ> (fold (\<lambda>(g1, g2). weight g1 g2) (pairs p))" 
     using fold_append by simp
   with 2 show ?case using pred_eq by fastforce
 qed
