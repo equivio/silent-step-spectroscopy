@@ -22,10 +22,14 @@ abbreviation weighted_move :: "'gstate \<Rightarrow> 'energy update \<Rightarrow
   "weighted_move g1 u g2 \<equiv> g1 \<Zinj> g2 \<and> (weight g1 g2 = u)"
 
 fun energy_level :: "'gstate list \<Rightarrow> 'energy" where
-  "energy_level p = (if p = [g0] then e0 else (
-    if (\<exists>gn p'. p' @ [gn] = p) then ((weight (last (THE p'. \<exists>gn. p' @ [gn] = p)) (THE gn. \<exists>p'. p' @ [gn] = p)) 
-      (energy_level (THE p'. \<exists>gn. p' @ [gn] = p))) 
-    else undefined))"
+  "energy_level p = (
+    if p = [g0] then 
+      e0 
+    else 
+      (if (\<exists>gn p'. p' @ [gn] = p) then 
+        ((weight (last (butlast p)) (last p)) (energy_level (butlast p))) 
+       else 
+        undefined))"
 
 lemma energy_level_def1:
   shows "energy_level [g0] = e0"
