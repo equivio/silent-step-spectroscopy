@@ -14,9 +14,6 @@ locale energy_game =
         weight :: "'gstate \<Rightarrow> 'gstate \<Rightarrow> 'energy update" ("wgt") and
         defender :: "'gstate \<Rightarrow> bool" ("Gd") and 
         defender_win_level :: "'energy"
-      assumes win_is_stuck: "(weight g1 g2) defender_win_level = defender_win_level" and
-              weight_well_def: "(weight g1 g2) e1 \<noteq> undefined" and
-              e0: "e0 \<noteq> undefined"
 begin
 
 abbreviation attacker :: "'gstate \<Rightarrow> bool" ("Ga") where "Ga p \<equiv> \<not> Gd p" 
@@ -50,7 +47,7 @@ lemma energy_level_def3:
   by simp
 
 lemma energy_level_def4:
-  assumes "p \<noteq> []" "hd p = g0"  
+  assumes "p \<noteq> []" "hd p = g0" and e0: "e0 \<noteq> undefined" and weight_well_def: "\<And>g1 g2 e1. (weight g1 g2) e1 \<noteq> undefined"
   shows "energy_level p \<noteq> undefined"
 using assms proof(induct p rule: rev_induct)
   case Nil
@@ -94,7 +91,7 @@ corollary finite_play_suffix:
   using assms finite_play_prefix by fast
 
 lemma finite_play_min_len: "finite_play p \<Longrightarrow> length p \<ge> 1"
-  by (metis One_nat_def Suc_le_eq energy_game.finite_play.simps energy_game_axioms length_greater_0_conv not_Cons_self snoc_eq_iff_butlast)
+  by (metis One_nat_def Suc_le_eq energy_game.finite_play.simps length_greater_0_conv not_Cons_self snoc_eq_iff_butlast)
 
 fun pairs :: "'a list \<Rightarrow> ('a \<times> 'a) list" where
   "pairs p = (if length p \<le> 1 then [] else (hd p, hd (tl p)) # pairs (tl p))"
