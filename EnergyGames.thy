@@ -26,7 +26,7 @@ fun energy_level :: "'gstate list \<Rightarrow> 'energy" where
     if p = [g0] then 
       e0 
     else 
-      (if (\<exists>gn p'. p' @ [gn] = p) then 
+      (if (p \<noteq> []) then 
         ((weight (last (butlast p)) (last p)) (energy_level (butlast p))) 
        else 
         undefined))"
@@ -38,13 +38,7 @@ lemma energy_level_def1:
 lemma energy_level_def2:
   assumes "p' \<noteq> []"
   shows "energy_level (p' @ [gn]) = weight (last p') gn (energy_level p')"
-proof-
-  define p where p_def: "p \<equiv> p' @ [gn]"
-  have p'_eq: "(THE p'. \<exists>gn. p' @ [gn] = p) = p'" unfolding p_def by simp
-  have gn_eq: "(THE gn. \<exists>p'. p' @ [gn] = p) = gn" unfolding p_def by simp
-
-  thus ?thesis unfolding p_def using p'_eq gn_eq assms p_def by simp
-qed
+  using assms by simp
 
 lemma energy_level_def3:
   shows "energy_level [] = undefined"
@@ -109,7 +103,7 @@ lemma pairs_append_single: "pairs (p @ [gn]) = (if length p \<ge> 1 then (pairs 
 
 lemma energy_level_fold_eq:
   assumes "finite_play p"
-  shows "energy_level p = fold (\<lambda>g e. (weight (fst g) (snd g)) e) (pairs p) e0"
+  shows "energy_level p = fold (\<lambda>(g1, g2) e. (weight g1 g2) e) (pairs p) e0"
 using assms proof (induct "p" rule: finite_play.induct)
   case 1
   thus ?case unfolding single_pair[of "g0"] fold_Nil by simp
@@ -118,8 +112,8 @@ next
   have "length p \<ge> 1" using 2(1) finite_play_min_len by auto
   hence pred_eq: "(pairs (p @ [gn])) = (pairs p) @ [(last p, gn)]" using pairs_append_single by metis
 
-  have "fold (\<lambda>g. wgt (fst g) (snd g)) [(last p, gn)] = wgt (last p) gn" by simp
-  hence "fold (\<lambda>g. wgt (fst g) (snd g)) ((pairs p) @ [(last p, gn)]) = (wgt (last p) gn) \<circ> (fold (\<lambda>g. wgt (fst g) (snd g)) (pairs p))" 
+  have "fold (\<lambda>(g1, g2). wgt g1 g2) [(last p, gn)] = wgt (last p) gn" by simp
+  hence "fold (\<lambda>(g1, g2). wgt g1 g2) ((pairs p) @ [(last p, gn)]) = (wgt (last p) gn) \<circ> (fold (\<lambda>(g1, g2). wgt g1 g2) (pairs p))" 
     using fold_append by simp
   with 2 show ?case using pred_eq by fastforce
 qed
