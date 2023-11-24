@@ -10,16 +10,19 @@ type_synonym 'energy update = "'energy \<Rightarrow> 'energy"
 locale energy_game =
   fixes g0 :: "'gstate" and
         e0 :: "'energy" and
-        moves :: "'gstate \<Rightarrow> 'gstate \<Rightarrow> bool" (infix "\<Zinj>" 70) and
-        weight :: "'gstate \<Rightarrow> 'gstate \<Rightarrow> 'energy update" and
+        weight_opt :: "'gstate \<Rightarrow> 'gstate \<Rightarrow> 'energy update option" and
         defender :: "'gstate \<Rightarrow> bool" ("Gd") and 
         defender_win_level :: "'energy"
 begin
 
 abbreviation attacker :: "'gstate \<Rightarrow> bool" ("Ga") where "Ga p \<equiv> \<not> Gd p" 
 
+abbreviation moves :: "'gstate \<Rightarrow> 'gstate \<Rightarrow> bool" (infix "\<Zinj>" 70) where "g1 \<Zinj> g2 \<equiv> weight_opt g1 g2 \<noteq> None"
+
 abbreviation weighted_move :: "'gstate \<Rightarrow> 'energy update \<Rightarrow> 'gstate \<Rightarrow>  bool" ("_ \<Zinj>wgt _ _" [60,60,60] 70) where
-  "weighted_move g1 u g2 \<equiv> g1 \<Zinj> g2 \<and> (weight g1 g2 = u)"
+  "weighted_move g1 u g2 \<equiv> g1 \<Zinj> g2 \<and> (the (weight_opt g1 g2) = u)"
+
+abbreviation "weight g1 g2 \<equiv> the (weight_opt g1 g2)"
 
 fun energy_level :: "'gstate list \<Rightarrow> 'energy" where
   "energy_level p = (
