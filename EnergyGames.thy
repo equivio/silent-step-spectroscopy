@@ -145,24 +145,19 @@ definition won_by_defender:: "'gstate list \<Rightarrow> bool" where
 definition won_by_attacker:: "'gstate list \<Rightarrow> bool" where
   "won_by_attacker p \<equiv> play_stuck p \<and> is_defender_turn p"
 
-definition no_winner:: "'gstate list \<Rightarrow> bool" where
+abbreviation no_winner:: "'gstate list \<Rightarrow> bool" where
   "no_winner p \<equiv> \<not>play_stuck p"
 
 lemma play_won_cases:
   shows "won_by_defender p \<or> won_by_attacker p \<or> no_winner p"
-  unfolding no_winner_def won_by_attacker_def won_by_defender_def by blast
+  unfolding won_by_attacker_def won_by_defender_def by blast
 
-lemma play_won_well_def: 
-  shows "won_by_defender p  \<longleftrightarrow>  \<not> (won_by_attacker p \<or> no_winner p)"
-  using no_winner_def won_by_attacker_def won_by_defender_def by auto
+lemma play_won_unique:
+  shows"won_by_defender p  \<longleftrightarrow>  \<not> (won_by_attacker p \<or> no_winner p)"
+  and  "won_by_attacker p  \<longleftrightarrow>  \<not> (won_by_defender p \<or> no_winner p)"
+  and  "no_winner p  \<longleftrightarrow>  \<not> (won_by_defender p \<or> won_by_attacker p)"
+  unfolding  won_by_attacker_def won_by_defender_def by auto+
 
-lemma play_won_well_att:
-  shows "won_by_attacker p  \<longleftrightarrow>  \<not> (won_by_defender p \<or> no_winner p)"
-  using no_winner_def won_by_attacker_def won_by_defender_def by auto
-
-lemma play_won_well_noWin:
-    shows "no_winner p  \<longleftrightarrow>  \<not> (won_by_defender p \<or> won_by_attacker p)"
-    using no_winner_def won_by_attacker_def won_by_defender_def by auto
 end \<comment> \<open>end of context energy_game\<close>
 
 end
