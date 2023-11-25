@@ -142,24 +142,6 @@ qed
 abbreviation "is_defender_turn p \<equiv> Gd (last p)"
 abbreviation "is_attacker_turn p \<equiv> Ga (last p)"
 
-lemma next_turn_well_defender:  "is_defender_turn p \<or> is_attacker_turn p" and "is_defender_turn p \<longleftrightarrow> \<not> is_attacker_turn p" by simp+
-
-definition next_pos_defender :: \<open>'gstate \<Rightarrow> 'gstate \<Rightarrow> bool\<close> where
-  "next_pos_defender p q \<equiv> True" if "attacker p \<and> move p q" 
-
-definition next_pos_attacker :: \<open>'gstate \<Rightarrow> 'gstate \<Rightarrow> bool\<close> where
-  "next_pos_attacker p q \<equiv> True" if "defender p \<and> move p q" 
-
-(*lemma alternating_pos: 
-  assumes "move p q"
-  shows "attacker p \<longleftrightarrow> defender q"
-proof (rule iffI)
-  assume A1: "attacker p"
-  from assms A1 have A2: "next_pos_def p q" using next_pos_def_def by auto 
-  show "defender q"
-  
-qed
-*)
 definition won_by_defender:: "'gstate list \<Rightarrow> bool" where
   "won_by_defender p \<equiv> play_stuck p \<and> is_attacker_turn p"
 
@@ -190,18 +172,6 @@ definition attacker_strategy:: "'gstate \<Rightarrow> 'gstate \<Rightarrow> bool
 
 definition defender_strategy:: "'gstate \<Rightarrow> 'gstate \<Rightarrow> bool" where
   "defender_strategy p q \<equiv>  defender p  \<and> finite_play (p # [q])"
-
-
-lemma attacker_strategy_pos:
-  assumes "attacker_strategy p q"
-  shows "next_pos_defender p q"
-  using assms attacker_strategy_def next_pos_defender_def by auto
- 
- 
-lemma defender_strategy_pos:
-  assumes "defender_strategy p q"
-  shows "next_pos_attacker p q"
-  using assms defender_strategy_def next_pos_attacker_def by auto
 
 end \<comment> \<open>end of context energy_game\<close>
 end
