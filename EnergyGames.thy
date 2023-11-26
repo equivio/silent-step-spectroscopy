@@ -7,6 +7,9 @@ begin
 section \<open>Energy Games\<close>
 
 type_synonym 'energy update = "'energy \<Rightarrow> 'energy"
+type_synonym 'gstate strategy = "'gstate \<Rightarrow> 'gstate \<Rightarrow> bool"
+type_synonym 'gstate fplay = "'gstate list"
+
 locale energy_game =
   fixes g0 :: "'gstate" and
         e0 :: "'energy" and
@@ -24,7 +27,7 @@ abbreviation weighted_move :: "'gstate \<Rightarrow> 'energy update \<Rightarrow
 
 abbreviation "weight g1 g2 \<equiv> the (weight_opt g1 g2)"
 
-fun energy_level :: "'gstate list \<Rightarrow> 'energy" where
+fun energy_level :: "'gstate fplay \<Rightarrow> 'energy" where
   "energy_level p = (
     if p = [g0] then 
       e0 
@@ -69,7 +72,7 @@ next
 qed
 
 subsection \<open>Finite Plays\<close>
-inductive finite_play :: "'gstate list \<Rightarrow> bool" where
+inductive finite_play :: "'gstate fplay \<Rightarrow> bool" where
   "finite_play [g0]" |
   "finite_play (p @ [gn])" if "finite_play p" and "last p \<Zinj> gn" and "(w (last p) gn) (energy_level p) \<noteq> defender_win_level"
 
@@ -144,13 +147,13 @@ qed
 abbreviation "is_defender_turn p \<equiv> Gd (last p)"
 abbreviation "is_attacker_turn p \<equiv> Ga (last p)"
 
-definition won_by_defender:: "'gstate list \<Rightarrow> bool" where
+definition won_by_defender:: "'gstate fplay \<Rightarrow> bool" where
   "won_by_defender p \<equiv> play_stuck p \<and> is_attacker_turn p"
 
-definition won_by_attacker:: "'gstate list \<Rightarrow> bool" where
+definition won_by_attacker:: "'gstate fplay \<Rightarrow> bool" where
   "won_by_attacker p \<equiv> play_stuck p \<and> is_defender_turn p"
 
-abbreviation no_winner:: "'gstate list \<Rightarrow> bool" where
+abbreviation no_winner:: "'gstate fplay \<Rightarrow> bool" where
   "no_winner p \<equiv> \<not>play_stuck p"
 
 lemma play_won_cases:
@@ -163,11 +166,37 @@ lemma play_won_unique:
   and  "no_winner p  \<longleftrightarrow>  \<not> (won_by_defender p \<or> won_by_attacker p)"
   unfolding  won_by_attacker_def won_by_defender_def by auto+
 
+subsection \<open>Strategies\<close>
+
+inductive play_consistent_a :: "'gstate strategy \<Rightarrow> 'gstate fplay \<Rightarrow> bool" where
+  "play_consistent_a s []" |
+  "play_consistent_a s (a # [])" |
+  "play_consistent_a s (a # (b # p))" if "play_consistent_a s (b # p)" and "Ga a \<Longrightarrow> s a b"
+
+inductive play_consistent_d :: "'gstate strategy \<Rightarrow> 'gstate fplay \<Rightarrow> bool" where
+  "play_consistent_d s []" |
+  "play_consistent_d s (a # [])" |
+  "play_consistent_d s (a # (b # p))" if "play_consistent_d s (b # p)" and "Gd a \<Longrightarrow> s a b"
+
+(* This is a nth attempt, but this is still wrong.
+definition play_can_be_won_by_a :: "'gstate list \<Rightarrow> bool"
+  where "play_can_be_won_by_a p \<equiv> \<exists>p'. finite_play (p @ p') \<and> won_by_attacker (p @ p')"
+
+definition winning_a where
+  "winning_a s \<equiv> \<forall>p. (finite_play p \<and> play_consistent_a s p) \<longrightarrow> play_can_be_won_by_a p"
+
+definition winning_d where
+  "winning_d s \<equiv> \<forall>p. (finite_play p \<and> play_consistent_d s p) \<longrightarrow> \<not> play_can_be_won_by_a p"*)
+
+(*definition winning_d :: "'gstate strategy \<Rightarrow> bool" where
+  "winning_d s \<equiv> \<forall>p. (finite_play p \<and> play_consistent_d s p \<and> 
+    Gd (last p)) \<longrightarrow> (\<exists>b. s (last p) b \<and> finite_play (p @ [b]))"
+
 definition attacker_strategy:: "'gstate \<Rightarrow> 'gstate \<Rightarrow> bool" where
   "attacker_strategy p q \<equiv>  attacker p  \<and> finite_play (p # [q])"
 
 definition defender_strategy:: "'gstate \<Rightarrow> 'gstate \<Rightarrow> bool" where
-  "defender_strategy p q \<equiv>  defender p  \<and> finite_play (p # [q])"
+  "defender_strategy p q \<equiv>  defender p  \<and> finite_play (p # [q])"*)
 
 end \<comment> \<open>end of context energy_game\<close>
 end
