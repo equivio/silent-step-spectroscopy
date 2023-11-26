@@ -125,6 +125,7 @@ next
   with 2 show ?case using pred_eq by fastforce
 qed
 
+subsection \<open>Winning\<close>
 abbreviation "play_stuck p \<equiv>  \<nexists>gn. finite_play (p @ [gn])"
 
 lemma play_stuck_def:
@@ -165,6 +166,5 @@ lemma play_won_unique:
   and  "no_winner p  \<longleftrightarrow>  \<not> (won_by_defender p \<or> won_by_attacker p)"
   unfolding  won_by_attacker_def won_by_defender_def by auto+
 
-end
-
+end (*End of context energy_game*)
 end
