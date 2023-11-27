@@ -167,37 +167,13 @@ lemma play_won_unique:
   and  "no_winner p  \<longleftrightarrow>  \<not> (won_by_defender p \<or> won_by_attacker p)"
   unfolding  won_by_attacker_def won_by_defender_def by auto+
 
-subsection \<open>Strategies\<close>
+subsection \<open>Winning Budgets\<close>
 
-inductive play_consistent_a :: "'gstate strategy \<Rightarrow> 'gstate fplay \<Rightarrow> bool" where
-  "play_consistent_a s []" |
-  "play_consistent_a s (a # [])" |
-  "play_consistent_a s (a # (b # p))" if "play_consistent_a s (b # p)" and "Ga a \<Longrightarrow> s a b"
+inductive in_wina:: "'energy \<Rightarrow> 'gstate \<Rightarrow> bool " where
+ "in_wina _ g" if "(Gd g) \<and>( \<forall>g'. \<not>(g \<Zinj> g'))" |(* Einziges Axiom, da nur Angreifer*in zahlt(?)*)
+ "in_wina e g" if "(Ga g) \<and> (\<exists>g'. ((g \<Zinj> g') \<and> (in_wina ((weight g g') e) g')))" |
+ "in_wina e g" if "(Gd g) \<and> (\<forall>g'. ((g \<Zinj> g') \<longrightarrow> (in_wina ((weight g g') e) g')))"   
 
-inductive play_consistent_d :: "'gstate strategy \<Rightarrow> 'gstate fplay \<Rightarrow> bool" where
-  "play_consistent_d s []" |
-  "play_consistent_d s (a # [])" |
-  "play_consistent_d s (a # (b # p))" if "play_consistent_d s (b # p)" and "Gd a \<Longrightarrow> s a b"
-
-(* This is a nth attempt, but this is still wrong.
-definition play_can_be_won_by_a :: "'gstate list \<Rightarrow> bool"
-  where "play_can_be_won_by_a p \<equiv> \<exists>p'. finite_play (p @ p') \<and> won_by_attacker (p @ p')"
-
-definition winning_a where
-  "winning_a s \<equiv> \<forall>p. (finite_play p \<and> play_consistent_a s p) \<longrightarrow> play_can_be_won_by_a p"
-
-definition winning_d where
-  "winning_d s \<equiv> \<forall>p. (finite_play p \<and> play_consistent_d s p) \<longrightarrow> \<not> play_can_be_won_by_a p"*)
-
-(*definition winning_d :: "'gstate strategy \<Rightarrow> bool" where
-  "winning_d s \<equiv> \<forall>p. (finite_play p \<and> play_consistent_d s p \<and> 
-    Gd (last p)) \<longrightarrow> (\<exists>b. s (last p) b \<and> finite_play (p @ [b]))"
-
-definition attacker_strategy:: "'gstate \<Rightarrow> 'gstate \<Rightarrow> bool" where
-  "attacker_strategy p q \<equiv>  attacker p  \<and> finite_play (p # [q])"
-
-definition defender_strategy:: "'gstate \<Rightarrow> 'gstate \<Rightarrow> bool" where
-  "defender_strategy p q \<equiv>  defender p  \<and> finite_play (p # [q])"*)
 
 end (*End of context energy_game*)
 end
