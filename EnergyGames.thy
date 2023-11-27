@@ -74,7 +74,7 @@ qed
 subsection \<open>Finite Plays\<close>
 inductive finite_play :: "'gstate fplay \<Rightarrow> bool" where
   "finite_play [g0]" |
-  "finite_play (p @ [gn])" if "finite_play p" and "last p \<Zinj> gn" and "(w (last p) gn) (energy_level p) \<noteq> defender_win_level"
+  "finite_play (p @ [gn])" if "finite_play p" and "last p \<Zinj> gn" and "(weight (last p) gn) (energy_level p) \<noteq> defender_win_level"
 
 lemma finite_play_prefix:
   assumes "finite_play (a @ b)" "a \<noteq> []"
@@ -170,10 +170,18 @@ lemma play_won_unique:
 subsection \<open>Winning Budgets\<close>
 
 inductive in_wina:: "'energy \<Rightarrow> 'gstate \<Rightarrow> bool " where
- "in_wina _ g" if "(Gd g) \<and>( \<forall>g'. \<not>(g \<Zinj> g'))" |(* Einziges Axiom, da nur Angreifer*in zahlt(?)*)
+ "in_wina e g" if "(Gd g) \<and>( \<forall>g'. \<not>((g \<Zinj> g') \<and> (weight g g') e \<noteq> defender_win_level))" |(* Einziges Axiom, da nur Angreifer*in zahlt(?)*)
  "in_wina e g" if "(Ga g) \<and> (\<exists>g'. ((g \<Zinj> g') \<and> (in_wina ((weight g g') e) g')))" |
- "in_wina e g" if "(Gd g) \<and> (\<forall>g'. ((g \<Zinj> g') \<longrightarrow> (in_wina ((weight g g') e) g')))"   
+ "in_wina e g" if "(Gd g) \<and> (\<forall>g'. ((g \<Zinj> g') \<longrightarrow> (in_wina ((weight g g') e) g')))" 
 
+(* lemma attacker_wins_wina_notempty:
+  fixes p
+  assumes "(finite_play p) \<and>(won_by_attacker p)"
+  shows "(Gd (last p)) \<and>( \<forall>g'. \<not>(((last p) \<Zinj> g') \<and> (weight (last p) g') e \<noteq> defender_win_level))"
+proof (-)
+  from assms have "play_stuck p \<and> is_defender_turn p" using won_by_attacker_def by auto
+  hence "\<nexists>gn. finite_play (p @ [gn])" by auto
+  hence "\<forall>g'. \<not>(((last p) \<Zinj> g') \<and> (weight (last p) g') e \<noteq> defender_win_level)" *)
 
 end (*End of context energy_game*)
 end
