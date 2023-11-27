@@ -37,20 +37,20 @@ fun energy_level :: "'gstate fplay \<Rightarrow> 'energy" where
        else 
         undefined))"
 
-lemma energy_level_def1:
+lemma %invisible energy_level_def1:
   shows "energy_level [g0] = e0"
   by simp
 
-lemma energy_level_def2:
+lemma %invisible energy_level_def2:
   assumes "p' \<noteq> []"
   shows "energy_level (p' @ [gn]) = weight (last p') gn (energy_level p')"
   using assms by simp
 
-lemma energy_level_def3:
+lemma %invisible energy_level_def3:
   shows "energy_level [] = undefined"
   by simp
 
-lemma energy_level_def4:
+lemma %invisible energy_level_def4:
   assumes "p \<noteq> []" "hd p = g0" and e0: "e0 \<noteq> undefined" and weight_well_def: "\<And>g1 g2 e1. (weight g1 g2) e1 \<noteq> undefined"
   shows "energy_level p \<noteq> undefined"
 using assms proof(induct p rule: rev_induct)
@@ -105,10 +105,10 @@ lemma pairs_is_zip:
   by (induct p, simp_all, smt (verit, ccfv_threshold) One_nat_def Suc_lessI energy_game.pairs.elims length_0_conv length_Suc_conv length_greater_0_conv linorder_not_less list.collapse list.sel(3) nat_neq_iff zip.simps(1) zip_Cons_Cons)
 
 (* some intuition on this definition*)
-lemma "pairs [1,2,3] = [(1,2), (2,3)]" by simp
-lemma empty_pair: "pairs [] = []" by simp
-lemma single_pair: "pairs [x] = []" by simp
-lemma pairs_append_single: "pairs (p @ [gn]) = (if length p \<ge> 1 then (pairs p) @ [(last p, gn)] else [])" 
+lemma %invisible "pairs [1,2,3] = [(1,2), (2,3)]" by simp
+lemma %invisible empty_pair: "pairs [] = []" by simp
+lemma %invisible single_pair: "pairs [x] = []" by simp
+lemma %invisible pairs_append_single: "pairs (p @ [gn]) = (if length p \<ge> 1 then (pairs p) @ [(last p, gn)] else [])" 
   by (induct p, simp_all add: not_less_eq_eq)
 
 lemma energy_level_fold_eq:
@@ -128,6 +128,7 @@ next
   with 2 show ?case using pred_eq by fastforce
 qed
 
+subsection \<open>Winning\<close>
 abbreviation "play_stuck p \<equiv>  \<nexists>gn. finite_play (p @ [gn])"
 
 lemma play_stuck_def:
@@ -198,5 +199,5 @@ definition attacker_strategy:: "'gstate \<Rightarrow> 'gstate \<Rightarrow> bool
 definition defender_strategy:: "'gstate \<Rightarrow> 'gstate \<Rightarrow> bool" where
   "defender_strategy p q \<equiv>  defender p  \<and> finite_play (p # [q])"*)
 
-end \<comment> \<open>end of context energy_game\<close>
+end (*End of context energy_game*)
 end
