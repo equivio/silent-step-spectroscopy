@@ -182,17 +182,35 @@ lemma attacker_wins_last_wina_notempty:
   using assms won_by_attacker_def finite_play.intros(2) in_wina.intros(1) by meson
 
 
-lemma attacker_wins_wina_notempty:
+(* lemma attacker_wins_wina_notempty:
   fixes p
-  assumes "finite_play p" and "won_by_attacker p"
+  assumes "finite_play p" and "\<exists>e. in_wina e (last p)" and "\<forall>g.\<forall>g'. (g \<Zinj> (last p)) \<and> (g' \<Zinj> (last p)) \<longrightarrow> g=g'"
   shows "\<exists>e. in_wina e g0"
-  using assms proof (induct "p" rule: finite_play.induct)
-  case 1
-  then show ?case using attacker_wins_last_wina_notempty finite_play.intros(1) by fastforce
+using assms proof(induct p rule: rev_induct)
+  case Nil
+  then show ?case using finite_play.simps by blast
 next
-  case (2 p gn)
-  then show ?case sorry
-qed
+  case (snoc x xs)
+  consider "xs = []" | "xs \<noteq> []" by auto  
+  then show ?case 
+  proof (cases)
+    case 1 
+    then show "\<exists>e. in_wina e g0" using attacker_wins_last_wina_notempty finite_play.intros
+      by (metis finite_play.simps last_ConsL not_Cons_self2 snoc.prems(1) snoc.prems(2) snoc_eq_iff_butlast)
+  next
+    case 2
+    from snoc.prems(1) have "finite_play xs" using finite_play.intros(2)
+      using "2" finite_play_prefix by blast
+    consider (ga) "Ga (last xs)" | (gd) "Gd (last xs)" by auto
+    then show "\<exists>e. in_wina e g0" 
+    proof (cases)
+      case ga
+      then have "\<exists>e. Ga (last xs) \<and> (\<exists>g'. (last xs) \<Zinj> g' \<and> in_wina (weight (last xs) g' e) g')" using snoc.prems(2)
+      then show 
+
+    from snoc.prems(2) snoc.prems(3) have "\<exists>e. in_wina e (last xs)" using in_wina.intros
+*)
+
 
 
 end (*End of context energy_game*)
