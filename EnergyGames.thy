@@ -170,18 +170,30 @@ lemma play_won_unique:
 subsection \<open>Winning Budgets\<close>
 
 inductive in_wina:: "'energy \<Rightarrow> 'gstate \<Rightarrow> bool " where
- "in_wina e g" if "(Gd g) \<and>( \<forall>g'. \<not>((g \<Zinj> g') \<and> (weight g g') e \<noteq> defender_win_level))" |(* Einziges Axiom, da nur Angreifer*in zahlt(?)*)
+ "in_wina e g" if "(Gd g) \<and> (\<forall>g'. \<not>(g \<Zinj> g') \<or> (weight g g') e = defender_win_level)" |(* Einziges Axiom, da nur Angreifer*in zahlt(?)*)
  "in_wina e g" if "(Ga g) \<and> (\<exists>g'. ((g \<Zinj> g') \<and> (in_wina ((weight g g') e) g')))" |
  "in_wina e g" if "(Gd g) \<and> (\<forall>g'. ((g \<Zinj> g') \<longrightarrow> (in_wina ((weight g g') e) g')))" 
 
-(* lemma attacker_wins_wina_notempty:
+
+lemma attacker_wins_last_wina_notempty:
   fixes p
-  assumes "(finite_play p) \<and>(won_by_attacker p)"
-  shows "(Gd (last p)) \<and>( \<forall>g'. \<not>(((last p) \<Zinj> g') \<and> (weight (last p) g') e \<noteq> defender_win_level))"
-proof (-)
-  from assms have "play_stuck p \<and> is_defender_turn p" using won_by_attacker_def by auto
-  hence "\<nexists>gn. finite_play (p @ [gn])" by auto
-  hence "\<forall>g'. \<not>(((last p) \<Zinj> g') \<and> (weight (last p) g') e \<noteq> defender_win_level)" *)
+  assumes "(finite_play p) \<and> (won_by_attacker p)"
+  shows "\<exists>e. in_wina e (last p)"
+  using assms won_by_attacker_def finite_play.intros(2) in_wina.intros(1) by meson
+
+
+lemma attacker_wins_wina_notempty:
+  fixes p
+  assumes "finite_play p" and "won_by_attacker p"
+  shows "\<exists>e. in_wina e g0"
+  using assms proof (induct "p" rule: finite_play.induct)
+  case 1
+  then show ?case using attacker_wins_last_wina_notempty finite_play.intros(1) by fastforce
+next
+  case (2 p gn)
+  then show ?case sorry
+qed
+
 
 end (*End of context energy_game*)
 end
