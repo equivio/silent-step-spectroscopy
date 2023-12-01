@@ -152,7 +152,7 @@ definition won_by_defender:: "'gstate fplay \<Rightarrow> bool" where
   "won_by_defender p \<equiv> (play_stuck p \<and> is_attacker_turn p) \<or> (energy_level p = defender_win_level)"
 
 definition won_by_attacker:: "'gstate fplay \<Rightarrow> bool" where
-  "won_by_attacker p \<equiv> play_stuck p \<and> is_defender_turn p"
+  "won_by_attacker p \<equiv> play_stuck p \<and> is_defender_turn p \<and> (energy_level p \<noteq> defender_win_level)"
 
 abbreviation no_winner:: "'gstate fplay \<Rightarrow> bool" where
   "no_winner p \<equiv> \<not>play_stuck p"
