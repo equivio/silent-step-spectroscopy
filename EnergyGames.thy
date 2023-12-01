@@ -14,8 +14,7 @@ locale energy_game =
   fixes g0 :: "'gstate" and
         e0 :: "'energy" and
         weight_opt :: "'gstate \<Rightarrow> 'gstate \<Rightarrow> 'energy update option" and
-        defender :: "'gstate \<Rightarrow> bool" ("Gd") and 
-        defender_win_level :: "'energy"
+        defender :: "'gstate \<Rightarrow> bool" ("Gd")
 begin
 
 abbreviation attacker :: "'gstate \<Rightarrow> bool" ("Ga") where "Ga p \<equiv> \<not> Gd p" 
@@ -74,7 +73,7 @@ qed
 subsection \<open>Finite Plays\<close>
 inductive finite_play :: "'gstate fplay \<Rightarrow> bool" where
   "finite_play [g0]" |
-  "finite_play (p @ [gn])" if "finite_play p" and "last p \<Zinj> gn" and "(weight (last p) gn) (energy_level p) \<noteq> defender_win_level"
+  "finite_play (p @ [gn])" if "finite_play p" and "last p \<Zinj> gn"
 
 lemma finite_play_prefix:
   assumes "finite_play (a @ b)" "a \<noteq> []"
@@ -170,7 +169,7 @@ lemma play_won_unique:
 subsection \<open>Winning Budgets\<close>
 
 inductive in_wina:: "'energy \<Rightarrow> 'gstate \<Rightarrow> bool " where
- "in_wina e g" if "(Gd g) \<and> (\<forall>g'. \<not>(g \<Zinj> g') \<or> (weight g g') e = defender_win_level)" |(* Einziges Axiom, da nur Angreifer*in zahlt(?)*)
+ "in_wina e g" if "(Gd g) \<and> (\<forall>g'. \<not>(g \<Zinj> g'))" |(* Einziges Axiom, da nur Angreifer*in zahlt(?)*)
  "in_wina e g" if "(Ga g) \<and> (\<exists>g'. ((g \<Zinj> g') \<and> (in_wina ((weight g g') e) g')))" |
  "in_wina e g" if "(Gd g) \<and> (\<forall>g'. ((g \<Zinj> g') \<longrightarrow> (in_wina ((weight g g') e) g')))" 
 
