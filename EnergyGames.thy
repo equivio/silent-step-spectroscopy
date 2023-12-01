@@ -14,7 +14,8 @@ locale energy_game =
   fixes g0 :: "'gstate" and
         e0 :: "'energy" and
         weight_opt :: "'gstate \<Rightarrow> 'gstate \<Rightarrow> 'energy update option" and
-        defender :: "'gstate \<Rightarrow> bool" ("Gd")
+        defender :: "'gstate \<Rightarrow> bool" ("Gd") and 
+        defender_win_level :: "'energy"
 begin
 
 abbreviation attacker :: "'gstate \<Rightarrow> bool" ("Ga") where "Ga p \<equiv> \<not> Gd p" 
@@ -148,7 +149,7 @@ abbreviation "is_defender_turn p \<equiv> Gd (last p)"
 abbreviation "is_attacker_turn p \<equiv> Ga (last p)"
 
 definition won_by_defender:: "'gstate fplay \<Rightarrow> bool" where
-  "won_by_defender p \<equiv> play_stuck p \<and> is_attacker_turn p"
+  "won_by_defender p \<equiv> (play_stuck p \<and> is_attacker_turn p) \<or> (energy_level p = defender_win_level)"
 
 definition won_by_attacker:: "'gstate fplay \<Rightarrow> bool" where
   "won_by_attacker p \<equiv> play_stuck p \<and> is_defender_turn p"
