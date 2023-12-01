@@ -184,15 +184,17 @@ lemma attacker_wins_last_wina_notempty:
 inductive play_consistent_wina :: "'gstate fplay \<Rightarrow> bool" where
   "play_consistent_wina []" | (* ist das smart? *)
   "play_consistent_wina [g0]" |
-  "play_consistent_wina ((p @ [g]) @ [g'])" if "(finite_play ((p @ [g]) @ [g'])) \<and> ((Gd g) \<or> ((Ga g) 
-                                                  \<and> (\<exists>e.(in_wina ((weight g g') e) g'))))" 
+  "play_consistent_wina ((p @ [g]) @ [g'])" if "(finite_play ((p @ [g]) @ [g'])) \<and> (Gd g)" |
+  "play_consistent_wina ((p @ [g]) @ [g'])" if "(finite_play ((p @ [g]) @ [g'])) \<and>
+                                               (Ga g) \<and> (\<exists>e.(in_wina ((weight g g') e) g'))"
 
 lemma won_play_is_consistent:
   fixes p
   assumes "(finite_play p) \<and> (won_by_attacker p)"
   shows "play_consistent_wina p"
-  using assms won_by_attacker_def finite_play.intros in_wina.intros play_consistent_wina.intros 
-     play_won_unique finite_play.simps by metis
+  using assms won_by_attacker_def finite_play.intros(1) in_wina.intros play_consistent_wina.intros 
+     play_won_unique finite_play.simps
+  by (metis append_Nil energy_game.play_won_unique(1) energy_game.won_by_defender_def) 
 
 
 (* lemma attacker_wins_wina_notempty:
