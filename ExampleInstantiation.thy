@@ -24,7 +24,7 @@ datatype state = a | b1 | b2 | c | d1 | d2 | e
 fun weight_opt :: "state \<Rightarrow> state \<Rightarrow> energy update option" where
   "weight_opt a b1 = Some (\<lambda>x. x - (E 1 0))" |
   "weight_opt a b2 = Some (\<lambda>x. x - (E 0 1))" |
-  "weight_opt b1 c = Some id" | 
+  "weight_opt b1 c = Some id" |
   "weight_opt b2 c = Some min_update" |
   "weight_opt c d1 = Some (\<lambda>x. x - (E 0 1))" |
   "weight_opt c d2 = Some (\<lambda>x. x - (E 1 0))" |
@@ -35,8 +35,8 @@ fun weight_opt :: "state \<Rightarrow> state \<Rightarrow> energy update option"
 fun defender :: "state \<Rightarrow> bool" where
   "defender b1 = True" |
   "defender b2 = True" |
-  "defender d1 = True" |
-  "defender d2 = True" |
+  "defender c = True" |
+  "defender e = True" |
   "defender _ = False"
 
 interpretation Game: energy_game "a" "E 10 10" "weight_opt" "defender" "E 0 0" .
