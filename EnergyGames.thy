@@ -97,6 +97,12 @@ corollary finite_play_suffix:
 lemma finite_play_min_len: "finite_play p \<Longrightarrow> length p \<ge> 1"
   by (metis One_nat_def Suc_le_eq energy_game.finite_play.simps length_greater_0_conv not_Cons_self snoc_eq_iff_butlast)
 
+lemma finite_play_is_trace:
+  fixes p
+  assumes "finite_play p"
+  shows "((p = ((a @ [g]) @ b)) \<and> a \<noteq>[]) \<longrightarrow> ((last a) \<Zinj> g)"
+  by (metis assms butlast.simps(2) finite_play.simps finite_play_prefix snoc_eq_iff_butlast)
+
 lemma energy_level_fold_eq:
   assumes "finite_play p"
   shows "energy_level p = fold (\<lambda>(g1, g2) e. (weight g1 g2) e) (pairs p) e0"
