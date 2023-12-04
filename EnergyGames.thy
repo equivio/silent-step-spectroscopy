@@ -121,20 +121,23 @@ next
 qed
 
 subsection \<open>Winning\<close>
-abbreviation "play_stuck p \<equiv>  \<nexists>gn. finite_play (p @ [gn])"
+abbreviation "play_stuck p \<equiv> (finite_play p) \<and> (\<nexists>gn. finite_play (p @ [gn]))"
 
 lemma play_stuck_def:
-  shows "play_stuck p \<longleftrightarrow> (\<nexists>ps. ps \<noteq> [] \<and> finite_play (p @ ps))"
+  shows "play_stuck p \<longleftrightarrow> ((finite_play p) \<and> (\<nexists>ps. ps \<noteq> [] \<and> finite_play (p @ ps)))"
 proof
-  assume asm: "\<nexists>gn. finite_play (p @ [gn])"
-  show "\<nexists>ps. ps \<noteq> [] \<and> finite_play (p @ ps)" proof(rule ccontr)
-    assume "\<not>(\<nexists>ps. ps \<noteq> [] \<and> finite_play (p @ ps))"
-    hence "\<exists>gn ps. finite_play (p @ [gn] @ ps)" by (metis append_Cons append_Nil list.exhaust)
+  assume asm: "(finite_play p) \<and> (\<nexists>gn. finite_play (p @ [gn]))"
+  show "((finite_play p) \<and> (\<nexists>ps. ps \<noteq> [] \<and> finite_play (p @ ps)))" 
+  proof(rule ccontr)
+    assume "\<not>( (finite_play p) \<and> (\<nexists>ps. ps \<noteq> [] \<and> finite_play (p @ ps)))"
+    hence "\<exists>gn ps. finite_play (p @ [gn] @ ps)"
+      by (metis Cons_eq_appendI append_self_conv2 asm list.exhaust_sel)
     hence "\<exists>gn. finite_play (p @ [gn])" using finite_play_prefix by (metis append.assoc snoc_eq_iff_butlast)
     with asm show "False" by simp
   qed
 next
-  show "\<nexists>ps. ps \<noteq> [] \<and> finite_play (p @ ps) \<Longrightarrow> play_stuck p" by auto
+  show "(finite_play p) \<and> (\<nexists>ps. ps \<noteq> [] \<and> finite_play (p @ ps)) \<Longrightarrow> play_stuck p" using finite_play_suffix
+    by blast
 qed
 
 abbreviation "is_defender_turn p \<equiv> Gd (last p)"
