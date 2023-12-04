@@ -96,8 +96,8 @@ lemma energy_level_example_3:
 
 lemma play_stuck_example:
   shows "Game.play_stuck [a, b2, c, d1, e]"
-  by (metis (no_types, lifting) butlast.simps(2) butlast_snoc energy_game.finite_play.simps last.simps list.discI not_Cons_self2 weight_opt.simps(38))
-
+  by (metis (mono_tags, opaque_lifting) Game_finite_play_example append.assoc append_Cons energy_game.finite_play_is_trace last_ConsR list.distinct(1) self_append_conv2 snoc_eq_iff_butlast weight_opt.simps(38))
+  
 lemma play_not_stuck_example:
   shows "\<not>(Game.play_stuck [a, b2, c])"
 proof (-) 
@@ -107,12 +107,12 @@ proof (-)
 qed
 
 lemma play_stuck_is_weird: 
-  shows "Game.play_stuck [a, b2, d1]"
+  shows "\<not>(Game.play_stuck [a, b2, d1])"
   by (smt (verit, best) Game.finite_play.simps butlast.simps(2) butlast_snoc distinct_adj_Cons distinct_adj_Cons_Cons last.simps last_snoc weight_opt.simps(18))
 
 lemma play_stuck_is_weird_1: 
-  shows "Game.play_stuck [a, b2, b1]"
-  by (metis Game.finite_play.cases Game.finite_play_prefix butlast.simps(2) butlast_snoc last.simps last_snoc list.discI weight_opt.simps(16))
+  shows "\<not>Game.play_stuck [a, b2, b1]"
+  by (metis Game.finite_play.cases butlast.simps(2) butlast_snoc last.simps last_snoc list.discI weight_opt.simps(16))
 
 lemma attacker_wins_example:
   shows "Game.won_by_attacker [a, b2, c, d1, e]"
@@ -123,10 +123,12 @@ lemma no_winner_example:
   shows "Game.no_winner [a, b2, c]"
   using play_not_stuck_example energy_level_example_1 by simp
 
+(*
 lemma we_fucked_up:
-  shows "Game.won_by_defender [a, b2, d1] "
+  shows "Game.no_winner [a, b2, d1] "
   using play_stuck_is_weird energy_level_example_2
-  by (simp add: energy_game.won_by_defender_def)
+  sorry 
+*)
 
 (*
 lemma we_fucked_up_1:
