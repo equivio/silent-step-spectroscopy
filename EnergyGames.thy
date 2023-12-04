@@ -155,7 +155,7 @@ definition won_by_attacker:: "'gstate fplay \<Rightarrow> bool" where
   "won_by_attacker p \<equiv> play_stuck p \<and> is_defender_turn p \<and> (energy_level p \<noteq> defender_win_level)"
 
 abbreviation no_winner:: "'gstate fplay \<Rightarrow> bool" where
-  "no_winner p \<equiv> \<not>play_stuck p"
+  "no_winner p \<equiv> \<not>play_stuck p \<and> (energy_level p \<noteq> defender_win_level)"
 
 lemma play_won_cases:
   shows "won_by_defender p \<or> won_by_attacker p \<or> no_winner p"
@@ -165,7 +165,7 @@ lemma play_won_unique:
   shows"won_by_defender p  \<longleftrightarrow>  \<not> (won_by_attacker p \<or> no_winner p)"
   and  "won_by_attacker p  \<longleftrightarrow>  \<not> (won_by_defender p \<or> no_winner p)"
   and  "no_winner p  \<longleftrightarrow>  \<not> (won_by_defender p \<or> won_by_attacker p)"
-  unfolding  won_by_attacker_def won_by_defender_def by auto+
+  using  won_by_attacker_def won_by_defender_def by blast+
 
 subsection \<open>Winning Budgets\<close>
 
@@ -180,52 +180,6 @@ lemma attacker_wins_last_wina_notempty:
   assumes "(finite_play p) \<and> (won_by_attacker p)"
   shows "\<exists>e. in_wina e (last p)"
   using assms won_by_attacker_def finite_play.intros(2) in_wina.intros(1) by meson
-
-inductive play_consistent_wina :: "'gstate fplay \<Rightarrow> bool" where
-  "play_consistent_wina []" | (* ist das smart? *)
-  "play_consistent_wina [g0]" |
-  "play_consistent_wina ((p @ [g]) @ [g'])" if "(finite_play ((p @ [g]) @ [g'])) \<and> (Gd g)" |
-  "play_consistent_wina ((p @ [g]) @ [g'])" if "(finite_play ((p @ [g]) @ [g'])) \<and>
-                                               (Ga g) \<and> (\<exists>e.(in_wina ((weight g g') e) g'))"
-
-lemma won_play_is_consistent:
-  fixes p
-  assumes "(finite_play p) \<and> (won_by_attacker p)"
-  shows "play_consistent_wina p"
-  using assms won_by_attacker_def finite_play.intros(1) in_wina.intros play_consistent_wina.intros 
-     play_won_unique finite_play.simps
-  by (metis append_Nil energy_game.play_won_unique(1) energy_game.won_by_defender_def) 
-
-
-(* lemma attacker_wins_wina_notempty:
-  fixes p
-  assumes "finite_play p" and "\<exists>e. in_wina e (last p)" and "\<forall>g.\<forall>g'. (g \<Zinj> (last p)) \<and> (g' \<Zinj> (last p)) \<longrightarrow> g=g'"
-  shows "\<exists>e. in_wina e g0"
-using assms proof(induct p rule: rev_induct)
-  case Nil
-  then show ?case using finite_play.simps by blast
-next
-  case (snoc x xs)
-  consider "xs = []" | "xs \<noteq> []" by auto  
-  then show ?case 
-  proof (cases)
-    case 1 
-    then show "\<exists>e. in_wina e g0" using attacker_wins_last_wina_notempty finite_play.intros
-      by (metis finite_play.simps last_ConsL not_Cons_self2 snoc.prems(1) snoc.prems(2) snoc_eq_iff_butlast)
-  next
-    case 2
-    from snoc.prems(1) have "finite_play xs" using finite_play.intros(2)
-      using "2" finite_play_prefix by blast
-    consider (ga) "Ga (last xs)" | (gd) "Gd (last xs)" by auto
-    then show "\<exists>e. in_wina e g0" 
-    proof (cases)
-      case ga
-      then have "\<exists>e. Ga (last xs) \<and> (\<exists>g'. (last xs) \<Zinj> g' \<and> in_wina (weight (last xs) g' e) g')" using snoc.prems(2)
-      then show 
-
-    from snoc.prems(2) snoc.prems(3) have "\<exists>e. in_wina e (last xs)" using in_wina.intros
-*)
-
 
 
 end (*End of context energy_game*)
