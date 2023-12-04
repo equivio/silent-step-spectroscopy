@@ -49,6 +49,7 @@ lemma moves:
        "b1 \<Zinj> c" "b2 \<Zinj> c"
        "c \<Zinj> d1" "c \<Zinj> d2"
        "d1 \<Zinj> e" "d2 \<Zinj> e"
+       "\<not>(c \<Zinj> e)" "\<not>(e \<Zinj> d1)"
   by simp+
 
 lemma Game_finite_play_example:
@@ -60,6 +61,11 @@ proof-
   hence "finite_play [a, b2, c, d1]" using Game.finite_play.intros(2) by fastforce
   thus "finite_play [a, b2, c, d1, e]" using  Game.finite_play.intros(2) by fastforce
 qed
+
+lemma Game_finite_play_counterexample:
+  shows "\<not>finite_play [a, b2, e, d1, e]"
+  using Game.finite_play.intros Game.finite_play_is_trace
+  by (metis append_Cons append_Nil last_snoc list.distinct(1) weight_opt.simps(20)) 
 
 abbreviation "energy_level \<equiv> Game.energy_level"
 
@@ -75,5 +81,62 @@ proof-
   also have "... = E 9 8" by simp
   finally show ?thesis .
 qed
+
+lemma energy_level_example_1:
+  shows "energy_level [a, b2, c] = E 9 9"
+  sorry
+
+lemma energy_level_example_2:
+  shows "energy_level [a, b2, d1] = undefined"
+  sorry
+
+lemma energy_level_example_3:
+  shows "energy_level [a, b2, b1] = undefined"
+  sorry
+
+lemma play_stuck_example:
+  shows "Game.play_stuck [a, b2, c, d1, e]"
+  by (metis (no_types, lifting) butlast.simps(2) butlast_snoc energy_game.finite_play.simps last.simps list.discI not_Cons_self2 weight_opt.simps(38))
+
+lemma play_not_stuck_example:
+  shows "\<not>(Game.play_stuck [a, b2, c])"
+proof (-) 
+  have "finite_play ([a, b2, c] @ [d1])"
+    by (metis Game.finite_play_suffix Game_finite_play_example append_Cons append_Nil list.distinct(1))
+  thus "\<not>(Game.play_stuck [a, b2, c])" by auto
+qed
+
+lemma play_stuck_is_weird: 
+  shows "Game.play_stuck [a, b2, d1]"
+  by (smt (verit, best) Game.finite_play.simps butlast.simps(2) butlast_snoc distinct_adj_Cons distinct_adj_Cons_Cons last.simps last_snoc weight_opt.simps(18))
+
+lemma play_stuck_is_weird_1: 
+  shows "Game.play_stuck [a, b2, b1]"
+  by (metis Game.finite_play.cases Game.finite_play_prefix butlast.simps(2) butlast_snoc last.simps last_snoc list.discI weight_opt.simps(16))
+
+lemma attacker_wins_example:
+  shows "Game.won_by_attacker [a, b2, c, d1, e]"
+  using play_stuck_example energy_level_example
+  by (simp add: Game.won_by_attacker_def)
+
+lemma no_winner_example: 
+  shows "Game.no_winner [a, b2, c]"
+  using play_not_stuck_example energy_level_example_1 by simp
+
+lemma we_fucked_up:
+  shows "Game.won_by_defender [a, b2, d1] "
+  using play_stuck_is_weird energy_level_example_2
+  by (simp add: energy_game.won_by_defender_def)
+
+(*
+lemma we_fucked_up_1:
+  shows "Game.won_by_attacker [a, b2, b1] "
+proof (-)
+  have X1: "Game.play_stuck [a, b2, b1]" using play_stuck_is_weird_1 by simp
+  have X2: "Game.is_defender_turn [a, b2, b1]" by simp
+  have "energy_level [a, b2, b1] = undefined" using energy_level_example_3 by simp
+  hence "energy_level [a, b2, b1] \<noteq> (E 0 0)" by sorry
+  thus "Game.won_by_attacker [a, b2, b1] " using X1 X2 Game.won_by_attacker_def by auto 
+*)
 
 end
