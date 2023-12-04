@@ -7,6 +7,9 @@ begin
 section \<open>Energy Games\<close>
 
 type_synonym 'energy update = "'energy \<Rightarrow> 'energy"
+type_synonym 'gstate strategy = "'gstate \<Rightarrow> 'gstate \<Rightarrow> bool"
+type_synonym 'gstate fplay = "'gstate list"
+
 locale energy_game =
   fixes g0 :: "'gstate" and
         e0 :: "'energy" and
@@ -24,7 +27,7 @@ abbreviation weighted_move :: "'gstate \<Rightarrow> 'energy update \<Rightarrow
 
 abbreviation "weight g1 g2 \<equiv> the (weight_opt g1 g2)"
 
-fun energy_level :: "'gstate list \<Rightarrow> 'energy" where
+fun energy_level :: "'gstate fplay \<Rightarrow> 'energy" where
   "energy_level p = (
     if p = [g0] then 
       e0 
@@ -69,9 +72,9 @@ next
 qed
 
 subsection \<open>Finite Plays\<close>
-inductive finite_play :: "'gstate list \<Rightarrow> bool" where
+inductive finite_play :: "'gstate fplay \<Rightarrow> bool" where
   "finite_play [g0]" |
-  "finite_play (p @ [gn])" if "finite_play p" and "last p \<Zinj> gn" and "(w (last p) gn) (energy_level p) \<noteq> defender_win_level"
+  "finite_play (p @ [gn])" if "finite_play p" and "last p \<Zinj> gn"
 
 lemma finite_play_prefix:
   assumes "finite_play (a @ b)" "a \<noteq> []"
@@ -145,16 +148,14 @@ qed
 abbreviation "is_defender_turn p \<equiv> Gd (last p)"
 abbreviation "is_attacker_turn p \<equiv> Ga (last p)"
 
-lemma next_turn_well_def:  "is_defender_turn p \<or> is_attacker_turn p" and "is_defender_turn p \<longleftrightarrow> \<not> is_attacker_turn p" by simp+
+definition won_by_defender:: "'gstate fplay \<Rightarrow> bool" where
+  "won_by_defender p \<equiv> (play_stuck p \<and> is_attacker_turn p) \<or> (energy_level p = defender_win_level)"
 
-definition won_by_defender:: "'gstate list \<Rightarrow> bool" where
-  "won_by_defender p \<equiv> play_stuck p \<and> is_attacker_turn p"
+definition won_by_attacker:: "'gstate fplay \<Rightarrow> bool" where
+  "won_by_attacker p \<equiv> play_stuck p \<and> is_defender_turn p \<and> (energy_level p \<noteq> defender_win_level)"
 
-definition won_by_attacker:: "'gstate list \<Rightarrow> bool" where
-  "won_by_attacker p \<equiv> play_stuck p \<and> is_defender_turn p"
-
-abbreviation no_winner:: "'gstate list \<Rightarrow> bool" where
-  "no_winner p \<equiv> \<not>play_stuck p"
+abbreviation no_winner:: "'gstate fplay \<Rightarrow> bool" where
+  "no_winner p \<equiv> \<not>play_stuck p \<and> (energy_level p \<noteq> defender_win_level)"
 
 lemma play_won_cases:
   shows "won_by_defender p \<or> won_by_attacker p \<or> no_winner p"
@@ -164,7 +165,22 @@ lemma play_won_unique:
   shows"won_by_defender p  \<longleftrightarrow>  \<not> (won_by_attacker p \<or> no_winner p)"
   and  "won_by_attacker p  \<longleftrightarrow>  \<not> (won_by_defender p \<or> no_winner p)"
   and  "no_winner p  \<longleftrightarrow>  \<not> (won_by_defender p \<or> won_by_attacker p)"
-  unfolding  won_by_attacker_def won_by_defender_def by auto+
+  using  won_by_attacker_def won_by_defender_def by blast+
+
+subsection \<open>Winning Budgets\<close>
+
+inductive in_wina:: "'energy \<Rightarrow> 'gstate \<Rightarrow> bool " where
+ "in_wina e g" if "(Gd g) \<and> (\<forall>g'. \<not>(g \<Zinj> g'))" |
+ "in_wina e g" if "(Ga g) \<and> (\<exists>g'. ((g \<Zinj> g') \<and> (in_wina ((weight g g') e) g')))" |
+ "in_wina e g" if "(Gd g) \<and> (\<forall>g'. ((g \<Zinj> g') \<longrightarrow> (in_wina ((weight g g') e) g')))" 
+
+
+lemma attacker_wins_last_wina_notempty:
+  fixes p
+  assumes "(finite_play p) \<and> (won_by_attacker p)"
+  shows "\<exists>e. in_wina e (last p)"
+  using assms won_by_attacker_def finite_play.intros(2) in_wina.intros(1) by meson
+
 
 end (*End of context energy_game*)
 end
