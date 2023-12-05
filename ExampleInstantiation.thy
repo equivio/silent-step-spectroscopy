@@ -123,6 +123,40 @@ lemma no_winner_example:
   shows "Game.no_winner [a, b2, c]"
   using play_not_stuck_example energy_level_example_1 by simp
 
+lemma attacker_has_wina_example:
+  shows "\<exists>e1. Game.in_wina e1 (last ([a, b2, c, d1, e]))"
+  by (simp add: energy_game.in_wina.intros(1))
+
+lemma attackers_winas_defender_stuck: 
+  shows "Game.in_wina (E 9 8) e"
+  by (simp add: energy_game.in_wina.intros(1))
+
+lemma attackers_winas_defender_stuck_gen: 
+  shows "\<forall>e'. e' \<noteq> (E 0 0) \<longrightarrow> Game.in_wina e' e"
+  by (simp add: Game.in_wina.intros(1))
+
+lemma attacker_winas_example_attacker:
+  shows "Game.in_wina (E 9 8) d1" 
+proof -
+  have A1: "\<not>(defender d1)" by simp
+  have A2: "d1 \<Zinj> e" by simp
+  have A3: "Game.in_wina (E 9 8) e" by (rule attackers_winas_defender_stuck)
+  from A3 have A4: "\<not>(defender d1) \<and> (\<exists>g'. ((d1 \<Zinj> g') \<and> (Game.in_wina (((Game.weight d1 g' (E 9 8)))) g')))"
+  by (meson A1 A2 Game.in_wina.intros(1) defender.simps(4) weight_opt.simps(38))
+  show "Game.in_wina (E 9 8) d1"  by (metis A4 energy_game.in_wina.intros(2))
+qed
+
+lemma defender_not_stuck_wina:
+  shows "Game.in_wina (E 9 9) c"
+proof -
+  have A1: "defender c" by auto
+  have A2: "\<forall>g'. (c \<Zinj> g') \<longrightarrow> (g' = d1 \<or> g' = d2)"
+    by (metis moves(9) state.exhaust weight_opt.simps(21) weight_opt.simps(22) weight_opt.simps(23) weight_opt.simps(24))
+  have A3: "Game.in_wina ((Game.weight c d1) (E 9 9)) d1"  by (meson Game.in_wina.simps defender.simps(4) defender.simps(6) moves(7) weight_opt.simps(38))
+  have A4: "Game.in_wina ((Game.weight c d2) (E 9 9)) d2" by (metis Game.in_wina.simps defender.simps(4) defender.simps(7) moves(8) weight_opt.simps(38)) 
+  show "Game.in_wina (E 9 9) c" by (metis A1 A2 A3 A4 energy_game.in_wina.intros(3)) 
+qed
+
 (*
 lemma we_fucked_up:
   shows "Game.no_winner [a, b2, d1] "
