@@ -21,4 +21,8 @@ primrec
  "modal_depth_srbb_conjunct (Neg \<chi>) = modal_depth_srbb_conjunction \<chi>" |
  "modal_depth_srbb_conjunct TT = 0"
 
+lemma "modal_depth_srbb (ImmConj {} \<psi>s) = 0" by simp
+
+lemma "modal_depth_srbb (Silent (Obs \<alpha> (Silent (BranchConj \<beta> (ImmConj {} \<psi>s1) {} \<psi>s2)))) = 2" by simp
+
 end
