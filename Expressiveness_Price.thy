@@ -32,4 +32,22 @@ fun observe_n_alphas :: "'a \<Rightarrow> nat \<Rightarrow> ('a, nat) hml_srbb" 
 lemma "modal_depth_srbb (ImmConj {i. True} (\<lambda>n. Pos (Obs \<alpha> (observe_n_alphas \<alpha> n)))) = \<infinity>"
   sorry
 
+\<comment> \<open>==========================================================================================\<close>
+
+primrec
+      immediate_conjunction_depth :: "('a, 's) hml_srbb \<Rightarrow> enat"
+  and imm_conj_depth_\<chi> :: "('a, 's) hml_srbb_conjunction \<Rightarrow> enat"
+  and imm_conj_depth_\<psi> :: "('a, 's) hml_srbb_conjunct \<Rightarrow> enat" where
+  "immediate_conjunction_depth (Internal \<chi>) = imm_conj_depth_\<chi> \<chi>" |
+  "immediate_conjunction_depth (ImmConj I \<psi>s) = 1 + Sup {imm_conj_depth_\<psi> (\<psi>s i) | i . i \<in> I}" |
+
+  "imm_conj_depth_\<chi> (Obs _ \<phi>) = immediate_conjunction_depth \<phi>" |
+  "imm_conj_depth_\<chi> (Conj I \<psi>s) = Sup {imm_conj_depth_\<psi> (\<psi>s i) | i . i \<in> I}" |
+  "imm_conj_depth_\<chi> (StableConj I \<psi>s) = Sup {imm_conj_depth_\<psi> (\<psi>s i) | i . i \<in> I}" |
+  "imm_conj_depth_\<chi> (BranchConj _ \<phi> I \<psi>s) = Sup ({immediate_conjunction_depth \<phi>} \<union> {imm_conj_depth_\<psi> (\<psi>s i) | i . i \<in> I})" |
+
+  "imm_conj_depth_\<psi> (Pos \<chi>) = imm_conj_depth_\<chi> \<chi>" |
+  "imm_conj_depth_\<psi> (Neg \<chi>) = imm_conj_depth_\<chi> \<chi>" |
+  "imm_conj_depth_\<psi> TT = 0"
+
 end
