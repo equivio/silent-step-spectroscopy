@@ -18,12 +18,12 @@ and
 context Inhabited_LTS
 begin
 
-abbreviation HML_and :: "('a, 's) HML_neg \<Rightarrow> ('a, 's) HML_neg \<Rightarrow> ('a, 's) HML" ("_ \<and>hml _" 70) where
-  "HML_and left right \<equiv> HML_conj {l, r} (\<lambda>i. if i = l
-                                              then left
-                                              else if i = r
-                                                   then right
-                                                   else HML_just HML_true)"
+abbreviation HML_and :: "('a, 's) hml_conjunct \<Rightarrow> ('a, 's) hml_conjunct \<Rightarrow> ('a, 's) hml" ("_ \<and>hml _" 70) where
+  "HML_and left right \<equiv> Conj {l, r} (\<lambda>i. if i = l
+                                          then left
+                                          else if i = r
+                                               then right
+                                               else Pos TT)"
 
 end (* context Inhabited_LTS *)
 
@@ -31,8 +31,8 @@ end (* context Inhabited_LTS *)
 context LTS_Tau
 begin
 
-abbreviation HML_soft_poss :: "'a \<Rightarrow> ('a, 'i) HML \<Rightarrow> ('a, 'i) HML" where
-  "HML_soft_poss \<alpha> \<phi> \<equiv> if \<alpha> = \<tau> then HML_internal \<phi> else HML_poss \<alpha> \<phi>"
+abbreviation HML_soft_poss :: "'a \<Rightarrow> ('a, 'i) hml \<Rightarrow> ('a, 'i) hml" where
+  "HML_soft_poss \<alpha> \<phi> \<equiv> if \<alpha> = \<tau> then Internal \<phi> else Obs \<alpha> \<phi>"
 
 function
       hml_models          :: "('a, 's) hml     \<Rightarrow> 's \<Rightarrow> bool" ("_ \<Turnstile> _" 60) 
@@ -109,7 +109,7 @@ termination
   using wf_hml_models_wf_arg_space
   by (standard) (simp add: hml_models_wf_arg_space.intros)+
 
-lemma "(HML_true \<Turnstile> state) = (HML_conj {} \<psi> \<Turnstile> state)"
+lemma "(TT \<Turnstile> state) = (Conj {} \<psi> \<Turnstile> state)"
   by simp
 
 end (* context LTS_Tau *)
