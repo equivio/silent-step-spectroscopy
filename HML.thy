@@ -19,10 +19,10 @@ context Inhabited_LTS
 begin
 
 abbreviation HML_and :: "('a, 's) hml_conjunct \<Rightarrow> ('a, 's) hml_conjunct \<Rightarrow> ('a, 's) hml" ("_ \<and>hml _" 70) where
-  "HML_and left right \<equiv> Conj {l, r} (\<lambda>i. if i = l
-                                          then left
-                                          else if i = r
-                                               then right
+  "HML_and left_conjunct right_conjunct \<equiv> Conj {left, right} (\<lambda>i. if i = left
+                                          then left_conjunct
+                                          else if i = right
+                                               then right_conjunct
                                                else Pos TT)"
 
 end (* context Inhabited_LTS *)
@@ -119,10 +119,10 @@ context Inhabited_Tau_LTS
 begin
 
 abbreviation HML_not :: "('a, 's) hml \<Rightarrow> ('a, 's) hml" where
-  "HML_not \<phi> \<equiv> Conj {l} (\<lambda>i. if i = l then (Neg \<phi>) else (Pos TT))"
+  "HML_not \<phi> \<equiv> Conj {left} (\<lambda>i. if i = left then (Neg \<phi>) else (Pos TT))"
 
-lemma "(\<phi> \<Turnstile> state) = (Conj {l}
-                            (\<lambda>i. if i = l
+lemma "(\<phi> \<Turnstile> state) = (Conj {left}
+                            (\<lambda>i. if i = left
                                  then (Pos \<phi>)
                                  else (Pos TT)) \<Turnstile> state)"
   by simp

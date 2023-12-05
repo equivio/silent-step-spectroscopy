@@ -26,7 +26,7 @@ context Inhabited_Tau_LTS
 begin
 
 abbreviation HML_srbb_TT :: "('a, 's) hml_srbb" where
-  "HML_srbb_TT \<equiv> ImmConj {l} (\<lambda>_. TT)"
+  "HML_srbb_TT \<equiv> ImmConj {left} (\<lambda>_. TT)"
 
 primrec
       hml_srbb_to_hml :: "('a, 's) hml_srbb \<Rightarrow> ('a, 's) hml"
@@ -58,7 +58,7 @@ lemma "HML_srbb_TT \<Turnstile>SRBB state = HML_srbb_true \<Turnstile>SRBB state
 
 lemma "HML_srbb_true \<Turnstile>SRBB state" by simp
 
-lemma "Internal \<chi> \<Turnstile>SRBB state = ImmConj {l} (\<lambda>i. if i = l then Pos \<chi> else TT) \<Turnstile>SRBB state"
+lemma "Internal \<chi> \<Turnstile>SRBB state = ImmConj {left} (\<lambda>i. if i = left then Pos \<chi> else TT) \<Turnstile>SRBB state"
   by simp
 
 end (* Inhabited_Tau_LTS *)
