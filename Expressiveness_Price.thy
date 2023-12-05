@@ -23,6 +23,6 @@ primrec
 
 lemma "modal_depth_srbb (ImmConj {} \<psi>s) = 0" by simp
 
-lemma "modal_depth_srbb (Silent (Obs \<alpha> (Silent (BranchConj \<beta> (ImmConj {} \<psi>s1) {} \<psi>s2)))) = 2" by simp
+lemma "modal_depth_srbb (Internal (Obs \<alpha> (Internal (BranchConj \<beta> (ImmConj {} \<psi>s1) {} \<psi>s2)))) = 2" by simp
 
 end
