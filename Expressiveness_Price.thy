@@ -1,11 +1,11 @@
 theory Expressiveness_Price
-  imports Main "./HML_SRBB"
+  imports Main "./HML_SRBB" "~~/src/HOL/Library/Extended_Nat"
 begin
 
 primrec
-      modal_depth_srbb :: "('act, 'i) hml_srbb \<Rightarrow> nat"
-  and modal_depth_srbb_conjunction :: "('act, 'i) hml_srbb_conjunction \<Rightarrow> nat"
-  and modal_depth_srbb_conjunct :: "('act, 'i) hml_srbb_conjunct \<Rightarrow> nat" where
+      modal_depth_srbb :: "('act, 'i) hml_srbb \<Rightarrow> enat"
+  and modal_depth_srbb_conjunction :: "('act, 'i) hml_srbb_conjunction \<Rightarrow> enat"
+  and modal_depth_srbb_conjunct :: "('act, 'i) hml_srbb_conjunct \<Rightarrow> enat" where
  "modal_depth_srbb (Internal \<chi>) = modal_depth_srbb_conjunction \<chi>" |
  "modal_depth_srbb (ImmConj I \<psi>s) = Sup ({0} \<union> {modal_depth_srbb_conjunct (\<psi>s i) | i. i \<in> I})" |
 
