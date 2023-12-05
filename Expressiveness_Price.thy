@@ -50,4 +50,26 @@ primrec
   "imm_conj_depth_\<psi> (Neg \<chi>) = imm_conj_depth_\<chi> \<chi>" |
   "imm_conj_depth_\<psi> TT = 0"
 
+\<comment> \<open>==========================================================================================\<close>
+
+\<comment> \<open>==========================================================================================\<close>
+
+\<comment> \<open>==========================================================================================\<close>
+
+primrec
+      negation_depth :: "('a, 's) hml_srbb \<Rightarrow> enat"
+  and neg_depth_\<chi> :: "('a, 's) hml_srbb_conjunction \<Rightarrow> enat"
+  and neg_depth_\<psi> :: "('a, 's) hml_srbb_conjunct \<Rightarrow> enat" where
+  "negation_depth (Internal \<chi>) = neg_depth_\<chi> \<chi>" |
+  "negation_depth (ImmConj I \<psi>s) = Sup {neg_depth_\<psi> (\<psi>s i) | i . i \<in> I}" |
+
+  "neg_depth_\<chi> (Obs _ \<phi>) = negation_depth \<phi>" |
+  "neg_depth_\<chi> (Conj I \<psi>s) = Sup {neg_depth_\<psi> (\<psi>s i) | i . i \<in> I}" |
+  "neg_depth_\<chi> (StableConj I \<psi>s) = Sup {neg_depth_\<psi> (\<psi>s i) | i . i \<in> I}" |
+  "neg_depth_\<chi> (BranchConj _ \<phi> I \<psi>s) = Sup ({negation_depth \<phi>} \<union> {neg_depth_\<psi> (\<psi>s i) | i . i \<in> I})" |
+
+  "neg_depth_\<psi> (Pos \<chi>) = neg_depth_\<chi> \<chi>" |
+  "neg_depth_\<psi> (Neg \<chi>) = neg_depth_\<chi> \<chi>" |
+  "neg_depth_\<psi> TT = 0"
+
 end
