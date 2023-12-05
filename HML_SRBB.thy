@@ -48,13 +48,13 @@ primrec
   "hml_srbb_conjunct_to_hml_neg (Neg \<chi>) = hml_conjunct.Neg (hml.Internal (hml_srbb_conjunction_to_hml \<chi>))" |
   "hml_srbb_conjunct_to_hml_neg TT      = hml_conjunct.Pos hml.TT"
 
-fun hml_srbb_models :: "('a, 's) hml_srbb \<Rightarrow> 's \<Rightarrow> bool" ("_ \<Turnstile>SRBB _" 60)where
+fun hml_srbb_models :: "('a, 's) hml_srbb \<Rightarrow> 's \<Rightarrow> bool" (infix "\<Turnstile>SRBB" 60)where
   "hml_srbb_models formula state = ((hml_srbb_to_hml formula) \<Turnstile> state)"
 
-lemma "(HML_srbb_true \<Turnstile>SRBB state) = (ImmConj {} \<psi>s \<Turnstile>SRBB state)"
+lemma "HML_srbb_true \<Turnstile>SRBB state = ImmConj {} \<psi>s \<Turnstile>SRBB state"
   by simp
 
-lemma "(Internal \<chi> \<Turnstile>SRBB state) = (ImmConj {l} (\<lambda>i. if i = l then Pos \<chi> else TT) \<Turnstile>SRBB state)"
+lemma "Internal \<chi> \<Turnstile>SRBB state = ImmConj {l} (\<lambda>i. if i = l then Pos \<chi> else TT) \<Turnstile>SRBB state"
   by simp
 
 end (* Inhabited_Tau_LTS *)
