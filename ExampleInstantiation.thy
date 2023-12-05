@@ -30,6 +30,27 @@ fun weight_opt :: "state \<Rightarrow> state \<Rightarrow> energy update option"
   "weight_opt c d2 = Some (\<lambda>x. x - (E 1 0))" |
   "weight_opt d1 e = Some id" |
   "weight_opt d2 e = Some id" |
+
+  "weight_opt b1 b2 = None" |
+  "weight_opt b2 b2 = None " | 
+  "weight_opt c b2 = None " | 
+  "weight_opt d1 b2 = None " | 
+  "weight_opt d2 b2 = None " | 
+  "weight_opt c c = None " | 
+  "weight_opt d1 c = None " | 
+  "weight_opt d2 c = None " | 
+  "weight_opt b1 d1 = None " | 
+  "weight_opt b2 d1 = None " | 
+  "weight_opt d1 d1 = None " | 
+  "weight_opt d2 d1 = None " | 
+  "weight_opt b1 d2 = None " | 
+  "weight_opt b2 d2 = None " | 
+  "weight_opt d1 d2 = None " | 
+  "weight_opt d2 d2 = None " | 
+  "weight_opt b1 e = None " | 
+  "weight_opt b2 e = None " | 
+  "weight_opt c e = None" |
+
   "weight_opt _ _ = None"
 
 fun defender :: "state \<Rightarrow> bool" where
@@ -65,7 +86,7 @@ qed
 lemma Game_finite_play_counterexample:
   shows "\<not>finite_play [a, b2, e, d1, e]"
   using Game.finite_play.intros Game.finite_play_is_trace
-  by (metis append_Cons append_Nil last_snoc list.distinct(1) weight_opt.simps(20)) 
+  by (metis append_Cons append_Nil last_snoc list.distinct(1) weight_opt.simps(26)) 
 
 abbreviation "energy_level \<equiv> Game.energy_level"
 
@@ -112,7 +133,7 @@ lemma play_stuck_is_weird:
 
 lemma play_stuck_is_weird_1: 
   shows "\<not>Game.play_stuck [a, b2, b1]"
-  by (metis Game.finite_play.cases butlast.simps(2) butlast_snoc last.simps last_snoc list.discI weight_opt.simps(16))
+  by (metis Game.finite_play.cases butlast.simps(2) butlast_snoc last.simps last_snoc list.discI weight_opt.simps(31))
 
 lemma attacker_wins_example:
   shows "Game.won_by_attacker [a, b2, c, d1, e]"
