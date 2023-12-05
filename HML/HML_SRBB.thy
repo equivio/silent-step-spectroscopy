@@ -4,7 +4,7 @@ begin
 
 datatype 
   ('act, 'i) hml_srbb =
-    Silent "('act, 'i) hml_srbb_conjunction" |
+    Internal "('act, 'i) hml_srbb_conjunction" |
     ImmConj "'i set" "'i \<Rightarrow> ('act, 'i) hml_srbb_conjunct"
 and
   ('act, 'i) hml_srbb_conjunction =
@@ -30,7 +30,7 @@ primrec
       hml_srbb_to_hml :: "('a, 's) hml_srbb \<Rightarrow> ('a, 's) hml"
   and hml_srbb_conjunction_to_hml :: "('a, 's) hml_srbb_conjunction \<Rightarrow> ('a, 's) hml"
   and hml_srbb_conjunct_to_hml_neg :: "('a, 's) hml_srbb_conjunct \<Rightarrow> ('a, 's) hml_conjunct" where
-  "hml_srbb_to_hml (Silent \<chi>) = hml.Silent (hml_srbb_conjunction_to_hml \<chi>)" |
+  "hml_srbb_to_hml (Internal \<chi>) = hml.Internal (hml_srbb_conjunction_to_hml \<chi>)" |
   "hml_srbb_to_hml (ImmConj I \<psi>s) = hml.Conj I (hml_srbb_conjunct_to_hml_neg \<circ> \<psi>s)" |
 
   "hml_srbb_conjunction_to_hml (Obs a \<phi>) = hml.Obs a (hml_srbb_to_hml \<phi>)" |
@@ -44,8 +44,8 @@ primrec
      (hml_conjunct.Pos (HML_soft_poss a (hml_srbb_to_hml \<phi>))
       \<and>hml hml_conjunct.Pos (hml.Conj I (hml_srbb_conjunct_to_hml_neg \<circ> \<psi>s)))" |
 
-  "hml_srbb_conjunct_to_hml_neg (Pos \<chi>) = hml_conjunct.Pos (hml.Silent (hml_srbb_conjunction_to_hml \<chi>))" |
-  "hml_srbb_conjunct_to_hml_neg (Neg \<chi>) = hml_conjunct.Neg (hml.Silent (hml_srbb_conjunction_to_hml \<chi>))" |
+  "hml_srbb_conjunct_to_hml_neg (Pos \<chi>) = hml_conjunct.Pos (hml.Internal (hml_srbb_conjunction_to_hml \<chi>))" |
+  "hml_srbb_conjunct_to_hml_neg (Neg \<chi>) = hml_conjunct.Neg (hml.Internal (hml_srbb_conjunction_to_hml \<chi>))" |
   "hml_srbb_conjunct_to_hml_neg TT      = hml_conjunct.Pos hml.TT"
 
 fun hml_srbb_models :: "('a, 's) hml_srbb \<Rightarrow> 's \<Rightarrow> bool" ("_ \<Turnstile>SRBB _" 60)where
@@ -54,7 +54,7 @@ fun hml_srbb_models :: "('a, 's) hml_srbb \<Rightarrow> 's \<Rightarrow> bool" (
 lemma "(HML_srbb_true \<Turnstile>SRBB state) = (ImmConj {} \<psi>s \<Turnstile>SRBB state)"
   by simp
 
-lemma "(Silent \<chi> \<Turnstile>SRBB state) = (ImmConj {l} (\<lambda>i. if i = l then Pos \<chi> else TT) \<Turnstile>SRBB state)"
+lemma "(Internal \<chi> \<Turnstile>SRBB state) = (ImmConj {l} (\<lambda>i. if i = l then Pos \<chi> else TT) \<Turnstile>SRBB state)"
   by simp
 
 end (* Inhabited_Tau_LTS *)

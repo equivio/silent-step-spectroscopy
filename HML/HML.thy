@@ -6,8 +6,8 @@ datatype
   ('act, 'i) hml =
     TT |
     Obs 'act "('act, 'i) hml" |
-    Silent "('act, 'i) hml" |
     Internal "('act, 'i) hml" |
+    Silent "('act, 'i) hml" |
     Conj "'i set" "'i \<Rightarrow> ('act, 'i) hml_conjunct"
 and
   ('act, 'i) hml_conjunct =
@@ -32,7 +32,7 @@ context LTS_Tau
 begin
 
 abbreviation HML_soft_poss :: "'a \<Rightarrow> ('a, 'i) hml \<Rightarrow> ('a, 'i) hml" where
-  "HML_soft_poss \<alpha> \<phi> \<equiv> if \<alpha> = \<tau> then Internal \<phi> else Obs \<alpha> \<phi>"
+  "HML_soft_poss \<alpha> \<phi> \<equiv> if \<alpha> = \<tau> then Silent \<phi> else Obs \<alpha> \<phi>"
 
 function
       hml_models          :: "('a, 's) hml     \<Rightarrow> 's \<Rightarrow> bool" ("_ \<Turnstile> _" 60) 
@@ -40,8 +40,8 @@ function
 where
   "(TT           \<Turnstile> _) = True" |
   "((Obs a \<phi>)    \<Turnstile> p) = (\<exists>p'. p \<mapsto> a p' \<and> (\<phi> \<Turnstile> p'))" |
-  "((Silent \<phi>)   \<Turnstile> p) = (\<exists>p'. p \<Zsurj> p' \<and> (\<phi> \<Turnstile> p'))" |
-  "((Internal \<phi>) \<Turnstile> p) = ((\<exists>p'. p \<mapsto> \<tau> p' \<and> (\<phi> \<Turnstile> p')) \<or> (\<phi> \<Turnstile> p))" |
+  "((Internal \<phi>)   \<Turnstile> p) = (\<exists>p'. p \<Zsurj> p' \<and> (\<phi> \<Turnstile> p'))" |
+  "((Silent \<phi>) \<Turnstile> p) = ((\<exists>p'. p \<mapsto> \<tau> p' \<and> (\<phi> \<Turnstile> p')) \<or> (\<phi> \<Turnstile> p))" |
   "((Conj I \<psi>s)  \<Turnstile> p) = (\<forall>i \<in> I. hml_conjunct_models (\<psi>s i) p)" |
 
   "(hml_conjunct_models (Pos \<phi>) p) = (\<phi> \<Turnstile> p)" |
@@ -82,11 +82,11 @@ proof safe
       then show ?case
         by (smt (verit) hml.distinct(11) hml.distinct(13) hml.distinct(9) hml.inject(1) Inl_inject Pair_inject hml_models_wf_arg_space.simps sum.distinct(1))
     next
-      case (Silent \<phi>)
+      case (Internal \<phi>)
       then show ?case
         by (smt (verit) hml.distinct(15) hml.distinct(17) hml.distinct(9) hml.inject(2) Inl_inject Pair_inject hml_models_wf_arg_space.simps sum.distinct(1))
     next
-      case (Internal \<phi>)
+      case (Silent \<phi>)
       then show ?case
         by (smt (verit) hml.distinct(11) hml.distinct(15) hml.distinct(19) hml.inject(3) Inl_inject Pair_inject hml_models_wf_arg_space.simps sum.distinct(1))
     next
