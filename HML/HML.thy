@@ -114,4 +114,23 @@ lemma "(TT \<Turnstile> state) = (Conj {} \<psi> \<Turnstile> state)"
 
 end (* context LTS_Tau *)
 
+
+context Inhabited_Tau_LTS
+begin
+
+abbreviation HML_not :: "('a, 's) hml \<Rightarrow> ('a, 's) hml" where
+  "HML_not \<phi> \<equiv> Conj {l} (\<lambda>i. if i = l then (Neg \<phi>) else (Pos TT))"
+
+lemma "(\<phi> \<Turnstile> state) = (Conj {l}
+                            (\<lambda>i. if i = l
+                                 then (Pos \<phi>)
+                                 else (Pos TT)) \<Turnstile> state)"
+  by simp
+
+lemma "(\<phi> \<Turnstile> state) = (HML_not (HML_not \<phi>) \<Turnstile> state)"
+  by simp
+
+end (* context Inhabited_Tau_LTS *)
+
+
 end
