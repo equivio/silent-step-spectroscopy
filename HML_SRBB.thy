@@ -18,13 +18,15 @@ and
     Pos "('act, 'i) hml_srbb_conjunction" |
     Neg "('act, 'i) hml_srbb_conjunction" |
     TT
-  
+
+abbreviation HML_srbb_true :: "('a, 's) hml_srbb" where
+  "HML_srbb_true \<equiv> ImmConj {} (\<lambda>_. TT)"
 
 context Inhabited_Tau_LTS
 begin
 
-abbreviation HML_srbb_true :: "('a, 's) hml_srbb" where
-  "HML_srbb_true \<equiv> ImmConj {l} (\<lambda>_. TT)"
+abbreviation HML_srbb_TT :: "('a, 's) hml_srbb" where
+  "HML_srbb_TT \<equiv> ImmConj {l} (\<lambda>_. TT)"
 
 primrec
       hml_srbb_to_hml :: "('a, 's) hml_srbb \<Rightarrow> ('a, 's) hml"
@@ -51,8 +53,10 @@ primrec
 fun hml_srbb_models :: "('a, 's) hml_srbb \<Rightarrow> 's \<Rightarrow> bool" (infix "\<Turnstile>SRBB" 60)where
   "hml_srbb_models formula state = ((hml_srbb_to_hml formula) \<Turnstile> state)"
 
-lemma "HML_srbb_true \<Turnstile>SRBB state = ImmConj {} \<psi>s \<Turnstile>SRBB state"
+lemma "HML_srbb_TT \<Turnstile>SRBB state = HML_srbb_true \<Turnstile>SRBB state"
   by simp
+
+lemma "HML_srbb_true \<Turnstile>SRBB state" by simp
 
 lemma "Internal \<chi> \<Turnstile>SRBB state = ImmConj {l} (\<lambda>i. if i = l then Pos \<chi> else TT) \<Turnstile>SRBB state"
   by simp
