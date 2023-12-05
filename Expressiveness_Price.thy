@@ -39,11 +39,11 @@ primrec
   and imm_conj_depth_\<chi> :: "('a, 's) hml_srbb_conjunction \<Rightarrow> enat"
   and imm_conj_depth_\<psi> :: "('a, 's) hml_srbb_conjunct \<Rightarrow> enat" where
   "immediate_conjunction_depth (Internal \<chi>) = imm_conj_depth_\<chi> \<chi>" |
-  "immediate_conjunction_depth (ImmConj I \<psi>s) = 1 + Sup {imm_conj_depth_\<psi> (\<psi>s i) | i . i \<in> I}" |
+  "immediate_conjunction_depth (ImmConj I \<psi>s) = 1 + Sup ({0} \<union> {imm_conj_depth_\<psi> (\<psi>s i) | i . i \<in> I})" |
 
   "imm_conj_depth_\<chi> (Obs _ \<phi>) = immediate_conjunction_depth \<phi>" |
-  "imm_conj_depth_\<chi> (Conj I \<psi>s) = Sup {imm_conj_depth_\<psi> (\<psi>s i) | i . i \<in> I}" |
-  "imm_conj_depth_\<chi> (StableConj I \<psi>s) = Sup {imm_conj_depth_\<psi> (\<psi>s i) | i . i \<in> I}" |
+  "imm_conj_depth_\<chi> (Conj I \<psi>s) = Sup ({0} \<union> {imm_conj_depth_\<psi> (\<psi>s i) | i . i \<in> I})" |
+  "imm_conj_depth_\<chi> (StableConj I \<psi>s) = Sup ({0} \<union> {imm_conj_depth_\<psi> (\<psi>s i) | i . i \<in> I})" |
   "imm_conj_depth_\<chi> (BranchConj _ \<phi> I \<psi>s) = Sup ({immediate_conjunction_depth \<phi>} \<union> {imm_conj_depth_\<psi> (\<psi>s i) | i . i \<in> I})" |
 
   "imm_conj_depth_\<psi> (Pos \<chi>) = imm_conj_depth_\<chi> \<chi>" |
@@ -61,11 +61,11 @@ primrec
   and neg_depth_\<chi> :: "('a, 's) hml_srbb_conjunction \<Rightarrow> enat"
   and neg_depth_\<psi> :: "('a, 's) hml_srbb_conjunct \<Rightarrow> enat" where
   "negation_depth (Internal \<chi>) = neg_depth_\<chi> \<chi>" |
-  "negation_depth (ImmConj I \<psi>s) = Sup {neg_depth_\<psi> (\<psi>s i) | i . i \<in> I}" |
+  "negation_depth (ImmConj I \<psi>s) = Sup ({0} \<union> {neg_depth_\<psi> (\<psi>s i) | i . i \<in> I})" |
 
   "neg_depth_\<chi> (Obs _ \<phi>) = negation_depth \<phi>" |
-  "neg_depth_\<chi> (Conj I \<psi>s) = Sup {neg_depth_\<psi> (\<psi>s i) | i . i \<in> I}" |
-  "neg_depth_\<chi> (StableConj I \<psi>s) = Sup {neg_depth_\<psi> (\<psi>s i) | i . i \<in> I}" |
+  "neg_depth_\<chi> (Conj I \<psi>s) = Sup ({0} \<union> {neg_depth_\<psi> (\<psi>s i) | i . i \<in> I})" |
+  "neg_depth_\<chi> (StableConj I \<psi>s) = Sup ({0} \<union> {neg_depth_\<psi> (\<psi>s i) | i . i \<in> I})" |
   "neg_depth_\<chi> (BranchConj _ \<phi> I \<psi>s) = Sup ({negation_depth \<phi>} \<union> {neg_depth_\<psi> (\<psi>s i) | i . i \<in> I})" |
 
   "neg_depth_\<psi> (Pos \<chi>) = neg_depth_\<chi> \<chi>" |
