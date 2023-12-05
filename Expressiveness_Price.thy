@@ -21,8 +21,15 @@ primrec
  "modal_depth_srbb_conjunct (Neg \<chi>) = modal_depth_srbb_conjunction \<chi>" |
  "modal_depth_srbb_conjunct TT = 0"
 
-lemma "modal_depth_srbb (ImmConj {} \<psi>s) = 0" by simp
+lemma "modal_depth_srbb HML_srbb_true = 0" by simp
 
-lemma "modal_depth_srbb (Internal (Obs \<alpha> (Internal (BranchConj \<beta> (ImmConj {} \<psi>s1) {} \<psi>s2)))) = 2" by simp
+lemma "modal_depth_srbb (Internal (Obs \<alpha> (Internal (BranchConj \<beta> HML_srbb_true {} \<psi>s2)))) = 2" by simp
+
+fun observe_n_alphas :: "'a \<Rightarrow> nat \<Rightarrow> ('a, nat) hml_srbb" where
+  "observe_n_alphas \<alpha> 0 = HML_srbb_true" |
+  "observe_n_alphas \<alpha> (Suc n) = Internal (Obs \<alpha> (observe_n_alphas \<alpha> n))"
+
+lemma "modal_depth_srbb (ImmConj {i. True} (\<lambda>n. Pos (Obs \<alpha> (observe_n_alphas \<alpha> n)))) = \<infinity>"
+  sorry
 
 end
