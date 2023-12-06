@@ -180,7 +180,7 @@ primrec
   "neg_depth_\<chi> (BranchConj _ \<phi> I \<psi>s) = Sup ({negation_depth \<phi>} \<union> {neg_depth_\<psi> (\<psi>s i) | i . i \<in> I})" |
 
   "neg_depth_\<psi> (Pos \<chi>) = neg_depth_\<chi> \<chi>" |
-  "neg_depth_\<psi> (Neg \<chi>) = neg_depth_\<chi> \<chi>" |
+  "neg_depth_\<psi> (Neg \<chi>) = 1 + neg_depth_\<chi> \<chi>" |
   "neg_depth_\<psi> TT = 0"
 
 end
