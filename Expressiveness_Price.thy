@@ -37,17 +37,35 @@ lemma "modal_depth_srbb (ImmConj {i. True} (\<lambda>n. Pos (Obs \<alpha> (obser
 primrec branching_conjunction_depth :: "('a, 's) hml_srbb \<Rightarrow> enat"
   and branch_conj_depth_\<chi> :: "('a, 's) hml_srbb_conjunction \<Rightarrow> enat"
   and branch_conj_depth_\<psi> :: "('a, 's) hml_srbb_conjunct \<Rightarrow> enat" where
-"branching_conjunction_depth (Internal \<chi>) = branch_conj_depth_\<chi> \<chi>" |
-"branching_conjunction_depth (ImmConj I \<psi>s) = Sup ({0} \<union> {branch_conj_depth_\<psi> (\<psi>s i) | i . i \<in> I})" |
+  "branching_conjunction_depth (Internal \<chi>) = branch_conj_depth_\<chi> \<chi>" |
+  "branching_conjunction_depth (ImmConj I \<psi>s) = Sup {branch_conj_depth_\<psi> (\<psi>s i) | i . i \<in> I}" |
 
-"branch_conj_depth_\<chi> (Obs _ \<psi>) = branching_conjunction_depth \<psi>" |
-"branch_conj_depth_\<chi> (Conj I \<psi>s) = Sup ({0} \<union> {branch_conj_depth_\<psi> (\<psi>s i) | i . i \<in> I})" |
-  "branch_conj_depth_\<chi> (StableConj I \<psi>s) = Sup ({0} \<union> {branch_conj_depth_\<psi> (\<psi>s i) | i . i \<in> I})" |
+  "branch_conj_depth_\<chi> (Obs _ \<phi>) = branching_conjunction_depth \<phi>" |
+  "branch_conj_depth_\<chi> (Conj I \<psi>s) = Sup {branch_conj_depth_\<psi> (\<psi>s i) | i . i \<in> I}" |
+  "branch_conj_depth_\<chi> (StableConj I \<psi>s) = Sup {branch_conj_depth_\<psi> (\<psi>s i) | i . i \<in> I}" |
   "branch_conj_depth_\<chi> (BranchConj _ \<phi> I \<psi>s) = 1 + Sup ({branching_conjunction_depth \<phi>} \<union> {branch_conj_depth_\<psi> (\<psi>s i) | i . i \<in> I})" |
 
-"branch_conj_depth_\<psi> (Pos \<chi>) = branch_conj_depth_\<chi> \<chi>" |
+  "branch_conj_depth_\<psi> (Pos \<chi>) = branch_conj_depth_\<chi> \<chi>" |
   "branch_conj_depth_\<psi> (Neg \<chi>) = branch_conj_depth_\<chi> \<chi>" |
   "branch_conj_depth_\<psi> TT = 0"
+
+\<comment> \<open>==========================================================================================\<close>
+
+primrec
+instable_conjunction_depth :: "('a, 's) hml_srbb \<Rightarrow> enat"
+  and inst_conj_depth_\<chi> :: "('a, 's) hml_srbb_conjunction \<Rightarrow> enat"
+  and inst_conj_depth_\<psi> :: "('a, 's) hml_srbb_conjunct \<Rightarrow> enat" where
+  "instable_conjunction_depth (Internal \<chi>) = inst_conj_depth_\<chi> \<chi>" |
+  "instable_conjunction_depth (ImmConj I \<psi>s) = Sup {branch_conj_depth_\<psi> (\<psi>s i) | i . i \<in> I}" |
+
+  "inst_conj_depth_\<chi> (Obs _ \<phi>) = instable_conjunction_depth \<phi>" |
+  "inst_conj_depth_\<chi> (Conj I \<psi>s) = 1 + Sup {inst_conj_depth_\<psi> (\<psi>s i) | i . i \<in> I}" |
+  "inst_conj_depth_\<chi> (StableConj I \<psi>s) = Sup {inst_conj_depth_\<psi> (\<psi>s i) | i . i \<in> I}" |
+  "inst_conj_depth_\<chi> (BranchConj _ \<phi> I \<psi>s) = Sup ({instable_conjunction_depth \<phi>} \<union> {inst_conj_depth_\<psi> (\<psi>s i) | i . i \<in> I})" |
+
+  "inst_conj_depth_\<psi> (Pos \<chi>) = inst_conj_depth_\<chi> \<chi>" |
+  "inst_conj_depth_\<psi> (Neg \<chi>) = inst_conj_depth_\<chi> \<chi>" |
+  "inst_conj_depth_\<psi> TT = 0"
 
 \<comment> \<open>==========================================================================================\<close>
 
