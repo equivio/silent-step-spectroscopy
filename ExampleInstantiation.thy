@@ -84,15 +84,19 @@ qed
 
 lemma energy_level_example_1:
   shows "energy_level [a, b2, c] = E 9 9"
-  sorry
+proof-
+  have "energy_level [a, b2, c] = min_update (E 10 10 - E 0 1)" by simp
+  also have "... = E 9 9" by (simp add: numeral_eq_enat one_enat_def)
+  finally show "energy_level [a, b2, c] = E 9 9".
+qed
 
 lemma energy_level_example_2:
   shows "energy_level [a, b2, d1] = undefined"
-  sorry
+  using Game.energy_level.elims Game.energy_level.pelims by simp
 
 lemma energy_level_example_3:
   shows "energy_level [a, b2, b1] = undefined"
-  sorry
+  using Game.energy_level.elims Game.energy_level.pelims by simp
 
 lemma play_stuck_example:
   shows "Game.play_stuck [a, b2, c, d1, e]"
