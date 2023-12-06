@@ -40,8 +40,22 @@ next
     using eSuc_enat plus_1_eSuc(1) by auto
 qed
 
-lemma "modal_depth_srbb (ImmConj {i. True} (\<lambda>n. Pos (Obs \<alpha> (observe_n_alphas \<alpha> n)))) = \<infinity>"
-  using obs_n_\<alpha>_depth_n sorry
+lemma inj_keeps_infinity: "infinite S \<Longrightarrow> inj f \<Longrightarrow> infinite {f(x) | x . x \<in> S}" 
+  by (smt (verit) finite_imageD finite_subset image_subsetI mem_Collect_eq subset_UNIV subset_inj_on)
+
+lemma enat_infinite: "infinite ({1 + enat i |i. i \<in> \<nat>} \<union> {0})"
+  apply (rule Un_infinite)
+  apply (rule inj_keeps_infinity)
+  apply (rule Nats_infinite)
+  by (simp add: inj_def)
+
+lemma "modal_depth_srbb (ImmConj \<nat> (\<lambda>n. Pos (Obs \<alpha> (observe_n_alphas \<alpha> n)))) = \<infinity>"
+  unfolding modal_depth_srbb.simps(2)
+    and modal_depth_srbb_conjunct.simps(1)
+    and modal_depth_srbb_conjunction.simps(1)
+    and obs_n_\<alpha>_depth_n
+    and Sup_enat_def
+  using enat_infinite by simp
 
 \<comment> \<open>==========================================================================================\<close>
 
