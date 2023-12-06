@@ -81,7 +81,39 @@ primrec
 
 \<comment> \<open>==========================================================================================\<close>
 
+primrec
+      max_positive_conjunct_depth :: "('a, 's) hml_srbb \<Rightarrow> enat"
+  and max_pos_conj_depth_\<chi> :: "('a, 's) hml_srbb_conjunction \<Rightarrow> enat"
+  and max_pos_conj_depth_\<psi> :: "('a, 's) hml_srbb_conjunct \<Rightarrow> enat" where
+  "max_positive_conjunct_depth (Internal \<chi>) = max_pos_conj_depth_\<chi> \<chi>" |
+  "max_positive_conjunct_depth (ImmConj I \<psi>s) = Sup ({0} \<union> {max_pos_conj_depth_\<psi> (\<psi>s i) | i . i \<in> I})" |
+
+  "max_pos_conj_depth_\<chi> (Obs _ \<phi>) = max_positive_conjunct_depth \<phi>" |
+  "max_pos_conj_depth_\<chi> (Conj I \<psi>s) = Sup ({0} \<union> {max_pos_conj_depth_\<psi> (\<psi>s i) | i . i \<in> I})" |
+  "max_pos_conj_depth_\<chi> (StableConj I \<psi>s) = Sup ({0} \<union> {max_pos_conj_depth_\<psi> (\<psi>s i) | i . i \<in> I})" |
+  "max_pos_conj_depth_\<chi> (BranchConj _ \<phi> I \<psi>s) = Sup ({max_positive_conjunct_depth \<phi>} \<union> {max_pos_conj_depth_\<psi> (\<psi>s i) | i . i \<in> I})" |
+
+  "max_pos_conj_depth_\<psi> (Pos \<chi>) = modal_depth_srbb_conjunction \<chi>" |
+  "max_pos_conj_depth_\<psi> (Neg \<chi>) = max_pos_conj_depth_\<chi> \<chi>" |
+  "max_pos_conj_depth_\<psi> TT = 0"
+
 \<comment> \<open>==========================================================================================\<close>
+
+primrec
+      max_negative_conjunct_depth :: "('a, 's) hml_srbb \<Rightarrow> enat"
+  and max_neg_conj_depth_\<chi> :: "('a, 's) hml_srbb_conjunction \<Rightarrow> enat"
+  and max_neg_conj_depth_\<psi> :: "('a, 's) hml_srbb_conjunct \<Rightarrow> enat" where
+  "max_negative_conjunct_depth (Internal \<chi>) = max_neg_conj_depth_\<chi> \<chi>" |
+  "max_negative_conjunct_depth (ImmConj I \<psi>s) = Sup ({0} \<union> {max_neg_conj_depth_\<psi> (\<psi>s i) | i . i \<in> I})" |
+
+  "max_neg_conj_depth_\<chi> (Obs _ \<phi>) = max_negative_conjunct_depth \<phi>" |
+  "max_neg_conj_depth_\<chi> (Conj I \<psi>s) = Sup ({0} \<union> {max_neg_conj_depth_\<psi> (\<psi>s i) | i . i \<in> I})" |
+  "max_neg_conj_depth_\<chi> (StableConj I \<psi>s) = Sup ({0} \<union> {max_neg_conj_depth_\<psi> (\<psi>s i) | i . i \<in> I})" |
+  "max_neg_conj_depth_\<chi> (BranchConj _ \<phi> I \<psi>s) = Sup ({max_negative_conjunct_depth \<phi>} \<union> {max_neg_conj_depth_\<psi> (\<psi>s i) | i . i \<in> I})" |
+
+  "max_neg_conj_depth_\<psi> (Pos \<chi>) = max_neg_conj_depth_\<chi> \<chi>" |
+  "max_neg_conj_depth_\<psi> (Neg \<chi>) = modal_depth_srbb_conjunction \<chi>" |
+  "max_neg_conj_depth_\<psi> TT = 0"
 
 \<comment> \<open>==========================================================================================\<close>
 
