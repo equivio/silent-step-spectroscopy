@@ -65,6 +65,7 @@ definition distinguishes :: "('a, 's) hml_srbb \<Rightarrow> 's \<Rightarrow> 's
 definition hml_equivalent :: "(('a, 's) hml_srbb) set \<Rightarrow> 's \<Rightarrow> 's \<Rightarrow> bool" where
   "hml_equivalent \<phi>s l r \<equiv> hml_preordered \<phi>s l r \<and> hml_preordered \<phi>s r l"
 
+
 lemma "hml_preordered \<phi>s l r = (\<forall>\<phi> \<in> \<phi>s. \<not>(distinguishes \<phi> l r))"
   by (simp add: distinguishes_def hml_preordered_def)
 
@@ -94,6 +95,9 @@ qed
 
 lemma "\<phi>s \<subseteq> \<phi>s' \<Longrightarrow> hml_equivalent \<phi>s' l r \<Longrightarrow> hml_equivalent \<phi>s l r"
   by (meson hml_equivalent_def hml_preordered_def subsetD)
+
+lemma "hml_preordered \<phi>s l r = (\<forall>\<phi> \<in> \<phi>s. \<not>(distinguishes \<phi> l r))"
+  using distinguishes_def hml_preordered_def by auto
 
 end (* Inhabited_Tau_LTS *)
 
