@@ -30,7 +30,12 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: document
-          path: ./out/*/*/document.pdf
+          path: ./out/AFP/LinearTimeBranchingTimeSpectroscopyAccountingForSilentSteps/document.pdf
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: outline
+          path: ./out/AFP/LinearTimeBranchingTimeSpectroscopyAccountingForSilentSteps/outline.pdf
 
       - uses: actions/upload-artifact@v3
         with:
