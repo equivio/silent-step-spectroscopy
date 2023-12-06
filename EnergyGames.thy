@@ -32,7 +32,7 @@ fun energy_level :: "'gstate fplay \<Rightarrow> 'energy" where
     if p = [g0] then 
       e0 
     else 
-      (if (p \<noteq> []) then 
+      (if (p \<noteq> [] \<and> ((weight_opt (last (butlast p))(last p)) \<noteq> None)) then 
         ((weight (last (butlast p)) (last p)) (energy_level (butlast p))) 
        else 
         undefined))"
@@ -42,7 +42,7 @@ lemma %invisible energy_level_def1:
   by simp
 
 lemma %invisible energy_level_def2:
-  assumes "p' \<noteq> []"
+  assumes "p' \<noteq> []" and "energy_level p' \<noteq> undefined" and "weight_opt (last p') gn \<noteq> None"  
   shows "energy_level (p' @ [gn]) = weight (last p') gn (energy_level p')"
   using assms by simp
 
@@ -51,7 +51,7 @@ lemma %invisible energy_level_def3:
   by simp
 
 lemma %invisible energy_level_def4:
-  assumes "p \<noteq> []" "hd p = g0" and e0: "e0 \<noteq> undefined" and weight_well_def: "\<And>g1 g2 e1. (weight g1 g2) e1 \<noteq> undefined"
+  assumes "p \<noteq> []" "hd p = g0" and e0: "e0 \<noteq> undefined" and weight_well_def: "\<And>g1 g2 e1.((weight_opt g1 g2)\<noteq> None \<and> (weight g1 g2) e1 \<noteq> undefined)"
   shows "energy_level p \<noteq> undefined"
 using assms proof(induct p rule: rev_induct)
   case Nil
