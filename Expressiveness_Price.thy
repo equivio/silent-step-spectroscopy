@@ -82,7 +82,7 @@ instable_conjunction_depth :: "('a, 's) hml_srbb \<Rightarrow> enat"
   and inst_conj_depth_\<chi> :: "('a, 's) hml_srbb_conjunction \<Rightarrow> enat"
   and inst_conj_depth_\<psi> :: "('a, 's) hml_srbb_conjunct \<Rightarrow> enat" where
   "instable_conjunction_depth (Internal \<chi>) = inst_conj_depth_\<chi> \<chi>" |
-  "instable_conjunction_depth (ImmConj I \<psi>s) = Sup {branch_conj_depth_\<psi> (\<psi>s i) | i . i \<in> I}" |
+  "instable_conjunction_depth (ImmConj I \<psi>s) = Sup {inst_conj_depth_\<psi> (\<psi>s i) | i . i \<in> I}" |
 
   "inst_conj_depth_\<chi> (Obs _ \<phi>) = instable_conjunction_depth \<phi>" |
   "inst_conj_depth_\<chi> (Conj I \<psi>s) = 1 + Sup {inst_conj_depth_\<psi> (\<psi>s i) | i . i \<in> I}" |
@@ -95,6 +95,23 @@ instable_conjunction_depth :: "('a, 's) hml_srbb \<Rightarrow> enat"
 
 \<comment> \<open>==========================================================================================\<close>
 
+primrec
+stable_conjunction_depth :: "('a, 's) hml_srbb \<Rightarrow> enat"
+  and st_conj_depth_\<chi> :: "('a, 's) hml_srbb_conjunction \<Rightarrow> enat"
+  and st_conj_depth_\<psi> :: "('a, 's) hml_srbb_conjunct \<Rightarrow> enat" where
+  "stable_conjunction_depth (Internal \<chi>) = st_conj_depth_\<chi> \<chi>" |
+  "stable_conjunction_depth (ImmConj I \<psi>s) = Sup {st_conj_depth_\<psi> (\<psi>s i) | i . i \<in> I}" |
+
+  "st_conj_depth_\<chi> (Obs _ \<phi>) = stable_conjunction_depth \<phi>" |
+  "st_conj_depth_\<chi> (Conj I \<psi>s) = Sup {st_conj_depth_\<psi> (\<psi>s i) | i . i \<in> I}" |
+  "st_conj_depth_\<chi> (StableConj I \<psi>s) = 1 + Sup {st_conj_depth_\<psi> (\<psi>s i) | i . i \<in> I}" |
+  "st_conj_depth_\<chi> (BranchConj _ \<phi> I \<psi>s) = Sup ({stable_conjunction_depth \<phi>} \<union> {st_conj_depth_\<psi> (\<psi>s i) | i . i \<in> I})" |
+
+  "st_conj_depth_\<psi> (Pos \<chi>) = st_conj_depth_\<chi> \<chi>" |
+  "st_conj_depth_\<psi> (Neg \<chi>) = st_conj_depth_\<chi> \<chi>" |
+  "st_conj_depth_\<psi> TT = 0"
+
+\<comment> \<open>==========================================================================================\<close>
 
 primrec
       immediate_conjunction_depth :: "('a, 's) hml_srbb \<Rightarrow> enat"
