@@ -6,7 +6,6 @@ datatype energy = E (one: "enat") (two: "enat")
 
 instantiation energy :: minus
 begin
-definition minus_energy_def: "e1 - e2 \<equiv> E ((one e1) - (one e2)) ((two e1) - (two e2))"
 
 instance ..
 
@@ -127,6 +126,12 @@ lemma no_winner_example:
   shows "Game.no_winner [a, b2, c]"
   using play_not_stuck_example energy_level_example_1 by simp
 
+(*
+lemma no_winner_example_1:
+  shows "Game.no_winner [a, b2, d1]"
+  using play_stuck_is_weird energy_level_example_2 sorry
+*)
+
 lemma attacker_has_wina_example:
   shows "\<exists>e1. Game.in_wina e1 (last ([a, b2, c, d1, e]))"
   by (simp add: energy_game.in_wina.intros(1))
@@ -161,22 +166,5 @@ proof -
   show "Game.in_wina (E 9 9) c" by (metis A1 A2 A3 A4 energy_game.in_wina.intros(3)) 
 qed
 
-(*
-lemma we_fucked_up:
-  shows "Game.no_winner [a, b2, d1] "
-  using play_stuck_is_weird energy_level_example_2
-  sorry 
-*)
-
-(*
-lemma we_fucked_up_1:
-  shows "Game.won_by_attacker [a, b2, b1] "
-proof (-)
-  have X1: "Game.play_stuck [a, b2, b1]" using play_stuck_is_weird_1 by simp
-  have X2: "Game.is_defender_turn [a, b2, b1]" by simp
-  have "energy_level [a, b2, b1] = undefined" using energy_level_example_3 by simp
-  hence "energy_level [a, b2, b1] \<noteq> (E 0 0)" by sorry
-  thus "Game.won_by_attacker [a, b2, b1] " using X1 X2 Game.won_by_attacker_def by auto 
-*)
 
 end
