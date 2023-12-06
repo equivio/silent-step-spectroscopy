@@ -34,6 +34,24 @@ lemma "modal_depth_srbb (ImmConj {i. True} (\<lambda>n. Pos (Obs \<alpha> (obser
 
 \<comment> \<open>==========================================================================================\<close>
 
+primrec branching_conjunction_depth :: "('a, 's) hml_srbb \<Rightarrow> enat"
+  and branch_conj_depth_\<chi> :: "('a, 's) hml_srbb_conjunction \<Rightarrow> enat"
+  and branch_conj_depth_\<psi> :: "('a, 's) hml_srbb_conjunct \<Rightarrow> enat" where
+"branching_conjunction_depth (Internal \<chi>) = branch_conj_depth_\<chi> \<chi>" |
+"branching_conjunction_depth (ImmConj I \<psi>s) = Sup ({0} \<union> {branch_conj_depth_\<psi> (\<psi>s i) | i . i \<in> I})" |
+
+"branch_conj_depth_\<chi> (Obs _ \<psi>) = branching_conjunction_depth \<psi>" |
+"branch_conj_depth_\<chi> (Conj I \<psi>s) = Sup ({0} \<union> {branch_conj_depth_\<psi> (\<psi>s i) | i . i \<in> I})" |
+  "branch_conj_depth_\<chi> (StableConj I \<psi>s) = Sup ({0} \<union> {branch_conj_depth_\<psi> (\<psi>s i) | i . i \<in> I})" |
+  "branch_conj_depth_\<chi> (BranchConj _ \<phi> I \<psi>s) = 1 + Sup ({branching_conjunction_depth \<phi>} \<union> {branch_conj_depth_\<psi> (\<psi>s i) | i . i \<in> I})" |
+
+"branch_conj_depth_\<psi> (Pos \<chi>) = branch_conj_depth_\<chi> \<chi>" |
+  "branch_conj_depth_\<psi> (Neg \<chi>) = branch_conj_depth_\<chi> \<chi>" |
+  "branch_conj_depth_\<psi> TT = 0"
+
+\<comment> \<open>==========================================================================================\<close>
+
+
 primrec
       immediate_conjunction_depth :: "('a, 's) hml_srbb \<Rightarrow> enat"
   and imm_conj_depth_\<chi> :: "('a, 's) hml_srbb_conjunction \<Rightarrow> enat"
