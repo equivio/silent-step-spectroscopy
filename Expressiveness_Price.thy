@@ -29,8 +29,19 @@ fun observe_n_alphas :: "'a \<Rightarrow> nat \<Rightarrow> ('a, nat) hml_srbb" 
   "observe_n_alphas \<alpha> 0 = HML_srbb_true" |
   "observe_n_alphas \<alpha> (Suc n) = Internal (Obs \<alpha> (observe_n_alphas \<alpha> n))"
 
+lemma obs_n_\<alpha>_depth_n: "modal_depth_srbb (observe_n_alphas \<alpha> n) = n"
+proof (induct n)
+  case 0
+  show ?case unfolding observe_n_alphas.simps(1) and modal_depth_srbb.simps(2)
+    using zero_enat_def by force
+next
+  case (Suc n)
+  then show ?case 
+    using eSuc_enat plus_1_eSuc(1) by auto
+qed
+
 lemma "modal_depth_srbb (ImmConj {i. True} (\<lambda>n. Pos (Obs \<alpha> (observe_n_alphas \<alpha> n)))) = \<infinity>"
-  sorry
+  using obs_n_\<alpha>_depth_n sorry
 
 \<comment> \<open>==========================================================================================\<close>
 
