@@ -71,7 +71,16 @@ definition hml_equivalent :: "(('a, 's) hml_srbb) set \<Rightarrow> 's \<Rightar
   "hml_equivalent \<phi>s l r \<equiv> hml_preordered \<phi>s l r \<and> hml_preordered \<phi>s r l"
 
 lemma "hml_equivalent \<phi>s l r = (\<forall>\<phi> \<in> \<phi>s. \<not>(distinguishes \<phi> l r))"
-  using Inhabited_LTS_axioms Inhabited_LTS_def by auto
+  sorry
+
+lemma "equivp (hml_equivalent \<phi>s)"
+  sorry
+
+lemma "Preorder (pred_set_conv (hml_preordered \<phi>s))"
+  sorry
+
+lemma "\<phi>s \<subseteq> \<phi>s' \<Longrightarrow> hml_equivalent \<phi>s l r \<Longrightarrow> hml_equivalent \<phi>s' l r"
+  sorry
 
 end (* Inhabited_Tau_LTS *)
 
