@@ -70,17 +70,35 @@ definition distinguishes :: "('a, 's) hml_srbb \<Rightarrow> 's \<Rightarrow> 's
 definition hml_equivalent :: "(('a, 's) hml_srbb) set \<Rightarrow> 's \<Rightarrow> 's \<Rightarrow> bool" where
   "hml_equivalent \<phi>s l r \<equiv> hml_preordered \<phi>s l r \<and> hml_preordered \<phi>s r l"
 
-lemma "hml_equivalent \<phi>s l r = (\<forall>\<phi> \<in> \<phi>s. \<not>(distinguishes \<phi> l r))"
-  sorry
+lemma "hml_preordered \<phi>s l r = (\<forall>\<phi> \<in> \<phi>s. \<not>(distinguishes \<phi> l r))"
+  by (simp add: distinguishes_def hml_preordered_def)
+
+lemma "hml_equivalent \<phi>s l r = (\<forall>\<phi> \<in> \<phi>s. \<not>(distinguishes \<phi> l r) \<and> \<not>(distinguishes \<phi> r l))"
+  using distinguishes_def hml_equivalent_def hml_preordered_def by auto
 
 lemma "equivp (hml_equivalent \<phi>s)"
-  sorry
+proof (rule equivpI)
+  show "reflp (hml_equivalent \<phi>s)" 
+    by (simp add: hml_equivalent_def hml_preordered_def reflpI)
+next
+  show "symp (hml_equivalent \<phi>s)" 
+    by (metis hml_equivalent_def sympI)
+next
+  show "transp (hml_equivalent \<phi>s)" 
+    by (smt (verit) hml_equivalent_def hml_preordered_def transpI)
+qed
 
-lemma "Preorder (pred_set_conv (hml_preordered \<phi>s))"
-  sorry
+lemma "reflp (hml_preordered \<phi>s) \<and> transp (hml_preordered \<phi>s)"
+proof (rule conjI)
+  show "reflp (hml_preordered \<phi>s)" 
+    by (simp add: hml_preordered_def reflpI)
+next
+  show "transp (hml_preordered \<phi>s)" 
+    by (smt (verit, best) hml_preordered_def transpI)
+qed
 
-lemma "\<phi>s \<subseteq> \<phi>s' \<Longrightarrow> hml_equivalent \<phi>s l r \<Longrightarrow> hml_equivalent \<phi>s' l r"
-  sorry
+lemma "\<phi>s \<subseteq> \<phi>s' \<Longrightarrow> hml_equivalent \<phi>s' l r \<Longrightarrow> hml_equivalent \<phi>s l r"
+  by (meson hml_equivalent_def hml_preordered_def subsetD)
 
 end (* Inhabited_Tau_LTS *)
 
