@@ -165,10 +165,13 @@ lemma play_won_unique:
 subsection \<open>Winning Budgets\<close>
 
 inductive in_wina:: "'energy \<Rightarrow> 'gstate \<Rightarrow> bool " where
- "in_wina e g" if "(Gd g) \<and> (\<forall>g'. \<not>(g \<Zinj> g'))" |
- "in_wina e g" if "(Ga g) \<and> (\<exists>g'. ((g \<Zinj> g') \<and> (in_wina ((weight g g') e) g')))" |
- "in_wina e g" if "(Gd g) \<and> (\<forall>g'. ((g \<Zinj> g') \<longrightarrow> (in_wina ((weight g g') e) g')))" 
+ "in_wina e g" if "(Gd g) \<and> (\<forall>g'. \<not>(g \<Zinj> g')) \<and> (e \<noteq> defender_win_level)" |
+ "in_wina e g" if "(Ga g) \<and> (\<exists>g'. ((g \<Zinj> g') \<and> (in_wina ((weight g g') e) g')))\<and> (e \<noteq> defender_win_level)" |
+ "in_wina e g" if "(Gd g) \<and>(\<forall>g'. ((g \<Zinj> g') \<longrightarrow> (in_wina ((weight g g') e) g'))) \<and> (e \<noteq> defender_win_level)" 
 
+lemma defender_win_level_not_in_wina:
+  shows "\<forall>g. \<not>in_wina defender_win_level g"
+  by (metis in_wina.cases)
 
 lemma attacker_wins_last_wina_notempty:
   fixes p
