@@ -2,13 +2,13 @@ theory ExampleInstantiation
   imports EnergyGames "HOL-Library.Extended_Nat"
 begin
 
-datatype energy = E (one: "enat") (two: "enat")
+datatype energy = E (one: "enat") (two: "enat") | eneg
 
 instantiation energy :: minus
 begin
 abbreviation "somewhere_smaller e1 e2 \<equiv> ((one e1)<(one e2)) \<or> ((two e1) < (two e2))"
 
-definition minus_energy_def: "e1 - e2 \<equiv> if (somewhere_smaller e1 e2) then (E 0 0) 
+definition minus_energy_def: "e1 - e2 \<equiv> if (somewhere_smaller e1 e2) then eneg 
                                         else E ((one e1) - (one e2)) ((two e1) - (two e2))" 
 
 instance ..
@@ -18,7 +18,7 @@ lemma energy_minus[simp]:
   shows "E a b - E c d = E (a - c) (b - d)" using assms minus_energy_def by auto
 end
 
-definition "min_update e1 \<equiv> E (min (one e1) (two e1)) (two e1)" 
+definition "min_update e1 \<equiv> if (e1 = eneg) then eneg else  E (min (one e1) (two e1)) (two e1)" 
 
 lemma min_update[simp]:
   shows "min_update (E a b) = E (min a b) b" unfolding min_update_def using energy.sel by fastforce
@@ -43,7 +43,7 @@ fun defender :: "state \<Rightarrow> bool" where
   "defender e = True" |
   "defender _ = False"
 
-interpretation Game: energy_game "a" "E 10 10" "weight_opt" "defender" "E 0 0" .
+interpretation Game: energy_game "a" "E 10 10" "weight_opt" "defender" "eneg" .
 
 notation Game.moves (infix "\<Zinj>" 70)
 abbreviation "finite_play \<equiv> Game.finite_play"
