@@ -6,11 +6,16 @@ datatype energy = E (one: "enat") (two: "enat")
 
 instantiation energy :: minus
 begin
+abbreviation "somewhere_smaller e1 e2 \<equiv> ((one e1)<(one e2)) \<or> ((two e1) < (two e2))"
+
+definition minus_energy_def: "e1 - e2 \<equiv> if (somewhere_smaller e1 e2) then (E 0 0) 
+                                        else E ((one e1) - (one e2)) ((two e1) - (two e2))" 
 
 instance ..
 
 lemma energy_minus[simp]:
-  shows "E a b - E c d = E (a - c) (b - d)" using minus_energy_def by simp
+  assumes "\<not> (somewhere_smaller (E a b) (E c d))"
+  shows "E a b - E c d = E (a - c) (b - d)" using assms minus_energy_def by auto
 end
 
 definition "min_update e1 \<equiv> E (min (one e1) (two e1)) (two e1)" 
