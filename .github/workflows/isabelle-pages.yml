@@ -27,7 +27,7 @@ jobs:
           key: ${{ runner.os }}-out
 
       - name: Isabelle-action
-        uses: TheHllm/isabelle-action@v1.8
+        uses: TheHllm/isabelle-action@v1.9
         with:
           session: LinearTimeBranchingTimeSpectroscopyAccountingForSilentSteps
       
