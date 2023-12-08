@@ -15,7 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3.4.0
 
-      - name: load chached output
+      - name: chache output
         id: cache-output
         uses: actions/cache@v3
         with:
@@ -27,14 +27,6 @@ jobs:
         with:
           session: LinearTimeBranchingTimeSpectroscopyAccountingForSilentSteps
       
-
-      - name: save cached output
-        id: cache-output
-        uses: actions/cache/save@v3
-        with:
-          path: ./out
-          key: ${{ runner.os }}-out
-
       - uses: actions/upload-artifact@v3
         with:
           name: document

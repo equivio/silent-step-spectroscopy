@@ -31,13 +31,6 @@ jobs:
         with:
           session: LinearTimeBranchingTimeSpectroscopyAccountingForSilentSteps
       
-      - name: save cached output
-        id: cache-output
-        uses: actions/cache/save@v3
-        with:
-          path: ./out
-          key: ${{ runner.os }}-out
-
       - name: Setup Pages
         uses: actions/configure-pages@v2
       - name: Copy documentation
