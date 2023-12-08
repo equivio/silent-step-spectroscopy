@@ -11,7 +11,7 @@ definition "e1 \<le> e2 \<equiv>
   (case e1 of E a1 b1 c1 d1 e1 f1 g1 h1 \<Rightarrow> (
     case e2 of E a2 b2 c2 d2 e2 f2 g2 h2 \<Rightarrow> 
       (a1 \<le> a2 \<and> b1 \<le> b2 \<and> c1 \<le> c2 \<and> d1 \<le> d2 \<and> e1 \<le> e2 \<and> f1 \<le> f2 \<and> g1 \<le> g2 \<and> h1 \<le> h2) 
-    | enget \<Rightarrow> False
+    | eneg \<Rightarrow> False
   ) | eneg \<Rightarrow> True)"
 
 definition "(x::energy) < y = (x \<le> y \<and> \<not> y \<le> x)"
