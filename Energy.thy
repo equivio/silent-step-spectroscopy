@@ -39,10 +39,10 @@ lemma leq_not_eneg:
 end
 
 text \<open>Encode if @{term "e2"} is larger than @{term "e1"} in any component.\<close>
-abbreviation somwhere_larger (infix "\<prec>c" 70) where "e1 \<prec>c e2 \<equiv> \<not>(e1 \<ge> e2)"
+abbreviation somwhere_larger where "somwhere_larger e1 e2 \<equiv> \<not>(e1 \<ge> e2)"
 
 lemma somwhere_larger_eq:
-  assumes "e1 \<prec>c e2"
+  assumes "somwhere_larger e1 e2"
   shows "(e1 = eneg \<and> e2 \<noteq> eneg) \<or> one e1 < one e2 \<or> two e1 < two e2 \<or> three e1 < three e2 \<or>
          four e1 < four e2 \<or> five e1 < five e2 \<or> six e1 < six e2 \<or> seven e1 < seven e2 \<or> 
          eight e1 < eight e2"
@@ -56,7 +56,7 @@ abbreviation (input) "direct_minus e1 e2 \<equiv> E ((one e1) - (one e2)) ((two 
                                              ((five e1) - (five e2)) ((six e1) - (six e2))
                                              ((seven e1) - (seven e2)) ((eight e1) - (eight e2))"
 
-definition minus_energy_def: "e1 - e2 \<equiv> if e1 \<prec>c e2 then eneg else direct_minus e1 e2"
+definition minus_energy_def: "e1 - e2 \<equiv> if somwhere_larger e1 e2 then eneg else direct_minus e1 e2"
 
 instance ..
 
@@ -122,7 +122,7 @@ proof
   fix x y :: energy
   assume "x \<le> y"
 
-  show "x - s \<le> y - s" proof(cases "x \<prec>c s")
+  show "x - s \<le> y - s" proof(cases "somwhere_larger x s")
     case True
     hence "x - s = eneg" unfolding minus_energy_def by simp
     show ?thesis unfolding \<open>x - s = eneg\<close> by (rule eneg_leq)
