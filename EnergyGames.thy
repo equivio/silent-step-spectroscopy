@@ -73,18 +73,18 @@ qed
 
 subsection \<open>Finite Plays\<close>
 inductive finite_play :: "'gstate fplay \<Rightarrow> bool" where
-  "finite_play [g0]" |
-  "finite_play (p @ [gn])" if "finite_play p" and "last p \<Zinj> gn"
+  base: "finite_play [g0]" |
+  suc: "finite_play (p @ [gn])" if "finite_play p" and "last p \<Zinj> gn" and "(weight (last p) gn) (energy_level p) \<noteq> defender_win_level"
 
 lemma finite_play_prefix:
   assumes "finite_play (a @ b)" "a \<noteq> []"
   shows "finite_play a"
 using assms proof(induct "a @ b" arbitrary: b rule: finite_play.induct)
-  case 1
+  case base
   thus ?case
     by (metis Nil_is_append_conv butlast_append butlast_snoc finite_play.simps)
 next
-  case (2 p gn)
+  case (suc p gn)
   thus ?case
     by (metis butlast_append butlast_snoc finite_play.intros(2))
 qed
@@ -95,7 +95,7 @@ corollary finite_play_suffix:
   using assms finite_play_prefix by fast
 
 lemma finite_play_min_len: "finite_play p \<Longrightarrow> length p \<ge> 1"
-  by (metis One_nat_def Suc_le_eq energy_game.finite_play.simps length_greater_0_conv not_Cons_self snoc_eq_iff_butlast)
+  by (metis (full_types) One_nat_def finite_play.simps le_zero_eq length_0_conv length_Cons list.size(3) not_less_eq_eq snoc_eq_iff_butlast)
 
 fun pairs :: "'a list \<Rightarrow> ('a \<times> 'a) list" where
   "pairs p = (if length p \<le> 1 then [] else (hd p, hd (tl p)) # pairs (tl p))"
@@ -115,17 +115,18 @@ lemma energy_level_fold_eq:
   assumes "finite_play p"
   shows "energy_level p = fold (\<lambda>(g1, g2) e. (weight g1 g2) e) (pairs p) e0"
 using assms proof (induct "p" rule: finite_play.induct)
-  case 1
+  case base
   thus ?case unfolding single_pair[of "g0"] fold_Nil by simp
 next
-  case (2 p gn)
-  have "length p \<ge> 1" using 2(1) finite_play_min_len by auto
+  case (suc p gn)
+  have "length p \<ge> 1" using suc(1) finite_play_min_len by auto
   hence pred_eq: "(pairs (p @ [gn])) = (pairs p) @ [(last p, gn)]" using pairs_append_single by metis
 
   have "fold (\<lambda>(g1, g2). weight g1 g2) [(last p, gn)] = weight (last p) gn" by simp
   hence "fold (\<lambda>(g1, g2). weight g1 g2) ((pairs p) @ [(last p, gn)]) = (weight (last p) gn) \<circ> (fold (\<lambda>(g1, g2). weight g1 g2) (pairs p))" 
     using fold_append by simp
-  with 2 show ?case using pred_eq by fastforce
+  with suc show ?case using pred_eq by fastforce
+qed
 qed
 
 subsection \<open>Winning\<close>
