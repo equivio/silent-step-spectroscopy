@@ -16,6 +16,7 @@ locale energy_game =
         weight_opt :: "'gstate \<Rightarrow> 'gstate \<Rightarrow> 'energy update option" and
         defender :: "'gstate \<Rightarrow> bool" ("Gd") and 
         defender_win_level :: "'energy"
+  assumes game_not_trivial: "e0 \<noteq> defender_win_level"
 begin
 
 abbreviation attacker :: "'gstate \<Rightarrow> bool" ("Ga") where "Ga p \<equiv> \<not> Gd p" 
@@ -127,6 +128,18 @@ next
     using fold_append by simp
   with suc show ?case using pred_eq by fastforce
 qed
+
+lemma finite_play_never_defender_win_level:
+  assumes "finite_play p"
+shows "energy_level p \<noteq> defender_win_level"
+  using assms proof(induct rule: finite_play.induct)
+  case base
+  thus ?case by (simp add: game_not_trivial)
+next
+  case (suc p gn)
+  from suc.hyps(1) have "p \<noteq> []" using finite_play.cases by blast
+  hence "energy_level (p @ [gn]) = weight (last p) gn (energy_level p)" by simp
+  thus ?case using suc.hyps(4) by auto
 qed
 
 subsection \<open>Winning\<close>
