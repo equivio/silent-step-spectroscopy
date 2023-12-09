@@ -214,18 +214,27 @@ proof -
   show "Game.in_wina (E 9 9) c" using A1 A2 A3 A4 Game.in_wina.intros(3) energy.distinct(1) by blast 
 qed
 *)
-(* TODO
+
 lemma attacker_does_not_win_example:
   shows "\<not>Game.in_wina (E 0 0) c"
 proof -
-  have "\<not>Game.in_wina eneg e"
-    by (metis Game.in_wina.cases)
-  hence A1: "(\<not>Game.in_wina eneg d1) \<and> (\<not>Game.in_wina eneg d2)"
-    by (metis Game.in_wina.cases)
-  have A2: "\<forall>g'. (c \<Zinj> g') \<longrightarrow> (g' = d1 \<or> g' = d2)"
+  have "somewhere_smaller (E 0 0) (E 0 1)" by simp
+  hence "((E 0 0) - (E 0 1)) = eneg" using minus_energy_def by auto
+  hence "(Game.weight c d1)(E 0 0) = eneg" by simp
+  hence A1: "\<not>(Game.in_wina ((Game.weight c d1)(E 0 0)) d1)" by (metis Game.in_wina.cases)
+
+  have "somewhere_smaller (E 0 0) (E 1 0)" by simp
+  hence "((E 0 0) - (E 1 0)) = eneg" using minus_energy_def by auto
+  hence "(Game.weight c d2)(E 0 0) = eneg" by simp
+  hence A2: "\<not>(Game.in_wina ((Game.weight c d2)(E 0 0)) d2)" by (metis Game.in_wina.cases)
+
+  have "\<forall>g'. (c \<Zinj> g') \<longrightarrow> (g' = d1 \<or> g' = d2)"
     by (metis moves(9) state.exhaust weight_opt.simps(21) weight_opt.simps(22) weight_opt.simps(23) weight_opt.simps(24))
-  from A1 A2 show "\<not>Game.in_wina (E 0 0) c" using Game.in_wina.intros(1,3) 
+  hence "(\<forall>g'. ((c \<Zinj> g') \<longrightarrow> \<not>(Game.in_wina ((Game.weight c g') (E 0 0)) g')))" using A1 A2 by blast
+  hence "\<not>((defender c) \<and>(\<forall>g'. ((c \<Zinj> g') \<longrightarrow> (Game.in_wina ((Game.weight c g') (E 0 0)) g'))) \<and> ((E 0 0) \<noteq> eneg))"
+    using moves(6) by blast
+  thus "\<not>Game.in_wina (E 0 0) c" using Game.in_wina.intros by (metis Game.in_wina.cases defender.simps(3))
 qed
-*)
+
 
 end
