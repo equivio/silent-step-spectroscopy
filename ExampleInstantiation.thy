@@ -151,11 +151,48 @@ lemma no_winner_example:
   shows "Game.no_winner [a, b2, c]"
   using play_not_stuck_example energy_level_example_1 by simp
 
-(* TODO
-lemma 
+lemma attacker_turn_not_stuck:
+  assumes "finite_play p" and "Game.is_attacker_turn p"
+  shows "\<not>Game.play_stuck p"
+using assms proof - 
+  from assms have "last p = a \<or> last p = d1 \<or> last p = d2"
+    using defender.elims(3) by blast
+  hence "(last p)\<Zinj> b1 \<or> (last p) \<Zinj> e" by auto
+  hence "(\<exists>gn. finite_play (p @ [gn]))" using assms(1) Game.finite_play.intros(2) by auto
+  thus "\<not>Game.play_stuck p" by simp
+qed
+
+lemma energy_length_1:
+  assumes "finite_play p" and "length p =1"
+  shows "p = [a]" and "energy_level p = E 10 10"
+using assms proof (-)
+  show "p = [a]" by (metis Game.finite_play.cases Suc_n_not_le_n assms(1) assms(2) energy_game.finite_play_min_len length_Suc_conv_rev)
+  thus "energy_level p = E 10 10" by simp
+qed
+
+(*
+lemma energy_length_2:
+  assumes "finite_play p" and "length p =2"
+  shows "p = [a,b1] \<or> p = [a, b2]" and "(energy_level p = E 10 9) \<or> (energy_level p = E 9 10)"
+  using assms energy_length_1 proof (-)
+  have "p=p'@[g]" and "length p' =1" using Game.finite_play.intros
+  have "p = [a,b1] \<or> p = [a, b2]" 
+  thus "energy_level p = E 10 10" by simp
+qed
+
+lemma energy_not_eneg:
   assumes "finite_play p"
-  shows "no_winner p \<or> won_by_attacker p"
+  shows "energy_level p \<noteq> eneg"
   sorry
+
+lemma no_winner_or_wba:
+  assumes "finite_play p"
+  shows "Game.no_winner p \<or> Game.won_by_attacker p"
+proof -
+  have "Game.is_attacker_turn p \<longrightarrow> \<not>Game.play_stuck p" using attacker_turn_not_stuck by simp
+  hence "\<not> Game.won_by_defender p" using assms energy_not_eneg Game.won_by_defender_def by auto
+  thus "Game.no_winner p \<or> Game.won_by_attacker p" using Game.play_won_cases by blast
+qed
 *)
 
 lemma attackers_winas_defender_stuck: 
