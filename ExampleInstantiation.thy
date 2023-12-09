@@ -12,10 +12,30 @@ definition minus_energy_def: "e1 - e2 \<equiv> if (somewhere_smaller e1 e2) then
                                         else E ((one e1) - (one e2)) ((two e1) - (two e2))" 
 
 instance ..
-
 lemma energy_minus[simp]:
   assumes "\<not> (somewhere_smaller (E a b) (E c d))"
   shows "E a b - E c d = E (a - c) (b - d)" using assms minus_energy_def by auto
+end
+
+instantiation energy :: order begin
+
+definition "e1 \<le> e2 \<equiv>
+  (case e1 of E a1 b1 \<Rightarrow> (
+    case e2 of E a2 b2  \<Rightarrow> 
+      (a1 \<le> a2 \<and> b1 \<le> b2 ) 
+    | eneg \<Rightarrow> False
+  ) | eneg \<Rightarrow> True)"
+
+definition "(x::energy) < y = (x \<le> y \<and> \<not> y \<le> x)"
+
+instance proof
+  fix x y z :: energy
+  show "x \<le> x" unfolding less_eq_energy_def by (simp add: energy.case_eq_if)
+  show "x \<le> y \<Longrightarrow> y \<le> z \<Longrightarrow> x \<le> z" unfolding less_eq_energy_def by (smt (z3) energy.case_eq_if order_trans)
+  show "x < y = (x \<le> y \<and> \<not> y \<le> x)" using less_energy_def .
+  show "x \<le> y \<Longrightarrow> y \<le> x \<Longrightarrow> x = y" unfolding less_eq_energy_def
+    by (smt (z3) energy.case_eq_if energy.expand nle_le)
+qed
 end
 
 definition "min_update e1 \<equiv> E (min (one e1) (two e1)) (two e1)" 
@@ -164,19 +184,36 @@ proof -
   thus "Game.in_wina (E 9 8) d1" using Game.in_wina.intros(2) by blast 
 qed
 
-(* TODO
-lemma defender_not_stuck_wina:
+lemma attacker_winas_example_attacker_2:
+  shows "Game.in_wina (E 8 9) d2" 
+proof -
+  have A1: "\<not>(defender d2)" by simp
+  have A2: "d2 \<Zinj> e" by simp
+  have A3: "Game.in_wina (E 8 9) e" by (simp add: attackers_winas_defender_stuck_gen)
+  have "Game.weight d2 e = id"by simp
+  hence "(Game.weight d2 e (E 8 9)) = E 8 9 " by simp
+  hence "(Game.in_wina (((Game.weight d2 e (E 8 9)))) e)" using A3 by simp
+  from this A3 have A4: "\<not>(defender d2) \<and> (\<exists>g'. ((d2 \<Zinj> g') \<and> (Game.in_wina (((Game.weight d2 g' (E 8 9)))) g')))"
+  by (meson A1 A2 Game.in_wina.intros(1,3) defender.simps(4) weight_opt.simps(38))
+  thus "Game.in_wina (E 8 9) d2" using Game.in_wina.intros(2) by blast 
+qed
+
+(*lemma defender_not_stuck_wina:
   shows "Game.in_wina (E 9 9) c"
 proof -
   have A1: "defender c" by auto
   have A2: "\<forall>g'. (c \<Zinj> g') \<longrightarrow> (g' = d1 \<or> g' = d2)"
     by (metis moves(9) state.exhaust weight_opt.simps(21) weight_opt.simps(22) weight_opt.simps(23) weight_opt.simps(24))
-  have A3: "Game.in_wina ((Game.weight c d1) (E 9 9)) d1"  by (meson Game.in_wina.simps defender.simps(4) defender.simps(6) moves(7) weight_opt.simps(38))
-  have A4: "Game.in_wina ((Game.weight c d2) (E 9 9)) d2" by (metis Game.in_wina.simps defender.simps(4) defender.simps(7) moves(8) weight_opt.simps(38)) 
-  show "Game.in_wina (E 9 9) c" by (metis A1 A2 A3 A4 energy_game.in_wina.intros(3)) 
+  have A3: "Game.in_wina (E 9 8) d1" using attacker_winas_example_attacker by blast
+  have A4: "Game.in_wina (E 8 9) d2" using attacker_winas_example_attacker_2 by blast
+  have "E 9 8 \<le> (E 9 9)" using less_eq_energy_def
+  have A5: "(E 9 9 - (E 0 1)) = (E 9 8)" using minus_energy_def 
+  have A5: "\<not>(Game.weight c d1 (E 9 8) < (E 9 8))"
+  have A6: "Game.in_wina ((Game.weight c d1) (E 9 9)) d1"  by (meson Game.in_wina.simps defender.simps(4) defender.simps(6) moves(7) weight_opt.simps(38))
+  have A7: "Game.in_wina ((Game.weight c d2) (E 9 9)) d2" by (metis Game.in_wina.simps defender.simps(4) defender.simps(7) moves(8) weight_opt.simps(38)) 
+  show "Game.in_wina (E 9 9) c" using A1 A2 A3 A4 Game.in_wina.intros(3) energy.distinct(1) by blast 
 qed
 *)
-
 (* TODO
 lemma attacker_does_not_win_example:
   shows "\<not>Game.in_wina (E 0 0) c"
