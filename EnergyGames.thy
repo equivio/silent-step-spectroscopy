@@ -163,22 +163,22 @@ abbreviation "is_defender_turn p \<equiv> Gd (last p)"
 abbreviation "is_attacker_turn p \<equiv> Ga (last p)"
 
 definition won_by_defender:: "'gstate fplay \<Rightarrow> bool" where
-  "won_by_defender p \<equiv> (play_stuck p \<and> is_attacker_turn p) \<or> (energy_level p = defender_win_level)"
+  "won_by_defender p \<equiv> (play_stuck p \<and> is_attacker_turn p)"
 
 definition won_by_attacker:: "'gstate fplay \<Rightarrow> bool" where
-  "won_by_attacker p \<equiv> play_stuck p \<and> is_defender_turn p \<and> (energy_level p \<noteq> defender_win_level)"
+  "won_by_attacker p \<equiv> (play_stuck p \<and> is_defender_turn p)"
 
-abbreviation no_winner:: "'gstate fplay \<Rightarrow> bool" where
-  "no_winner p \<equiv> \<not>play_stuck p \<and> (energy_level p \<noteq> defender_win_level)"
+abbreviation not_won :: "'gstate fplay \<Rightarrow> bool" where
+  "not_won p \<equiv> \<not>play_stuck p"
 
 lemma play_won_cases:
-  shows "won_by_defender p \<or> won_by_attacker p \<or> no_winner p"
+  shows "won_by_defender p \<or> won_by_attacker p \<or> not_won p"
   unfolding won_by_attacker_def won_by_defender_def by blast
 
 lemma play_won_unique:
-  shows"won_by_defender p  \<longleftrightarrow>  \<not> (won_by_attacker p \<or> no_winner p)"
-  and  "won_by_attacker p  \<longleftrightarrow>  \<not> (won_by_defender p \<or> no_winner p)"
-  and  "no_winner p  \<longleftrightarrow>  \<not> (won_by_defender p \<or> won_by_attacker p)"
+  shows"won_by_defender p  \<longleftrightarrow>  \<not> (won_by_attacker p \<or> not_won p)"
+  and  "won_by_attacker p  \<longleftrightarrow>  \<not> (won_by_defender p \<or> not_won p)"
+  and  "not_won p  \<longleftrightarrow>  \<not> (won_by_defender p \<or> won_by_attacker p)"
   using  won_by_attacker_def won_by_defender_def by blast+
 
 subsection \<open>Winning Budgets\<close>
