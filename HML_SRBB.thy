@@ -4,6 +4,7 @@ begin
 
 datatype 
   ('act, 'i) hml_srbb =
+    TT |
     Internal "('act, 'i) hml_srbb_conjunction" |
     ImmConj "'i set" "'i \<Rightarrow> ('act, 'i) hml_srbb_conjunct"
 and
@@ -16,22 +17,17 @@ and
 and
   ('act, 'i) hml_srbb_conjunct =
     Pos "('act, 'i) hml_srbb_conjunction" |
-    Neg "('act, 'i) hml_srbb_conjunction" |
-    TT
+    Neg "('act, 'i) hml_srbb_conjunction"
 
-abbreviation HML_srbb_true :: "('a, 's) hml_srbb" where
-  "HML_srbb_true \<equiv> ImmConj {} (\<lambda>_. TT)"
 
 context Inhabited_Tau_LTS
 begin
-
-abbreviation HML_srbb_TT :: "('a, 's) hml_srbb" where
-  "HML_srbb_TT \<equiv> ImmConj {left} (\<lambda>_. TT)"
 
 primrec
       hml_srbb_to_hml :: "('a, 's) hml_srbb \<Rightarrow> ('a, 's) hml"
   and hml_srbb_conjunction_to_hml :: "('a, 's) hml_srbb_conjunction \<Rightarrow> ('a, 's) hml"
   and hml_srbb_conjunct_to_hml_neg :: "('a, 's) hml_srbb_conjunct \<Rightarrow> ('a, 's) hml_conjunct" where
+  "hml_srbb_to_hml TT = hml.TT" |
   "hml_srbb_to_hml (Internal \<chi>) = hml.Internal (hml_srbb_conjunction_to_hml \<chi>)" |
   "hml_srbb_to_hml (ImmConj I \<psi>s) = hml.Conj I (hml_srbb_conjunct_to_hml_neg \<circ> \<psi>s)" |
 
@@ -47,19 +43,12 @@ primrec
       \<and>hml hml_conjunct.Pos (hml.Conj I (hml_srbb_conjunct_to_hml_neg \<circ> \<psi>s)))" |
 
   "hml_srbb_conjunct_to_hml_neg (Pos \<chi>) = hml_conjunct.Pos (hml.Internal (hml_srbb_conjunction_to_hml \<chi>))" |
-  "hml_srbb_conjunct_to_hml_neg (Neg \<chi>) = hml_conjunct.Neg (hml.Internal (hml_srbb_conjunction_to_hml \<chi>))" |
-  "hml_srbb_conjunct_to_hml_neg TT      = hml_conjunct.Pos hml.TT"
+  "hml_srbb_conjunct_to_hml_neg (Neg \<chi>) = hml_conjunct.Neg (hml.Internal (hml_srbb_conjunction_to_hml \<chi>))"
 
 fun hml_srbb_models :: "('a, 's) hml_srbb \<Rightarrow> 's \<Rightarrow> bool" (infix "\<Turnstile>SRBB" 60)where
   "hml_srbb_models formula state = ((hml_srbb_to_hml formula) \<Turnstile> state)"
 
-lemma "HML_srbb_TT \<Turnstile>SRBB state = HML_srbb_true \<Turnstile>SRBB state"
-  by simp
-
-lemma "HML_srbb_true \<Turnstile>SRBB state" by simp
-
-lemma "Internal \<chi> \<Turnstile>SRBB state = ImmConj {left} (\<lambda>i. if i = left then Pos \<chi> else TT) \<Turnstile>SRBB state"
-  by simp
+(*TODO: add some sanity checks*)
 
 definition hml_preordered :: "(('a, 's) hml_srbb) set \<Rightarrow> 's \<Rightarrow> 's \<Rightarrow> bool" where
   "hml_preordered \<phi>s l r \<equiv> \<forall>\<phi> \<in> \<phi>s. \<phi> \<Turnstile>SRBB l \<longrightarrow> \<phi> \<Turnstile>SRBB r"
