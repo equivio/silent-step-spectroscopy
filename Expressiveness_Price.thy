@@ -59,6 +59,7 @@ modal_depth_srbb.simps
     and Sup_enat_def
   using enat_infinite
   by fastforce
+
 \<comment> \<open>==========================================================================================\<close>
 
 primrec branching_conjunction_depth :: "('a, 's) hml_srbb \<Rightarrow> enat"
