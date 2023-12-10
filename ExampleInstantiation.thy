@@ -17,27 +17,6 @@ lemma energy_minus[simp]:
   shows "E a b - E c d = E (a - c) (b - d)" using assms minus_energy_def by auto
 end
 
-instantiation energy :: order begin
-
-definition "e1 \<le> e2 \<equiv>
-  (case e1 of E a1 b1 \<Rightarrow> (
-    case e2 of E a2 b2  \<Rightarrow> 
-      (a1 \<le> a2 \<and> b1 \<le> b2 ) 
-    | eneg \<Rightarrow> False
-  ) | eneg \<Rightarrow> True)"
-
-definition "(x::energy) < y = (x \<le> y \<and> \<not> y \<le> x)"
-
-instance proof
-  fix x y z :: energy
-  show "x \<le> x" unfolding less_eq_energy_def by (simp add: energy.case_eq_if)
-  show "x \<le> y \<Longrightarrow> y \<le> z \<Longrightarrow> x \<le> z" unfolding less_eq_energy_def by (smt (z3) energy.case_eq_if order_trans)
-  show "x < y = (x \<le> y \<and> \<not> y \<le> x)" using less_energy_def .
-  show "x \<le> y \<Longrightarrow> y \<le> x \<Longrightarrow> x = y" unfolding less_eq_energy_def
-    by (smt (z3) energy.case_eq_if energy.expand nle_le)
-qed
-end
-
 definition "min_update e1 \<equiv> E (min (one e1) (two e1)) (two e1)" 
 
 lemma min_update[simp]:
@@ -162,39 +141,6 @@ using assms proof -
   thus "\<not>Game.play_stuck p" by simp
 qed
 
-lemma energy_length_1:
-  assumes "finite_play p" and "length p =1"
-  shows "p = [a]" and "energy_level p = E 10 10"
-using assms proof (-)
-  show "p = [a]" by (metis Game.finite_play.cases Suc_n_not_le_n assms(1) assms(2) energy_game.finite_play_min_len length_Suc_conv_rev)
-  thus "energy_level p = E 10 10" by simp
-qed
-
-(*
-lemma energy_length_2:
-  assumes "finite_play p" and "length p =2"
-  shows "p = [a,b1] \<or> p = [a, b2]" and "(energy_level p = E 10 9) \<or> (energy_level p = E 9 10)"
-  using assms energy_length_1 proof (-)
-  have "p=p'@[g]" and "length p' =1" using Game.finite_play.intros
-  have "p = [a,b1] \<or> p = [a, b2]" 
-  thus "energy_level p = E 10 10" by simp
-qed
-
-lemma energy_not_eneg:
-  assumes "finite_play p"
-  shows "energy_level p \<noteq> eneg"
-  sorry
-
-lemma no_winner_or_wba:
-  assumes "finite_play p"
-  shows "Game.no_winner p \<or> Game.won_by_attacker p"
-proof -
-  have "Game.is_attacker_turn p \<longrightarrow> \<not>Game.play_stuck p" using attacker_turn_not_stuck by simp
-  hence "\<not> Game.won_by_defender p" using assms energy_not_eneg Game.won_by_defender_def by auto
-  thus "Game.no_winner p \<or> Game.won_by_attacker p" using Game.play_won_cases by blast
-qed
-*)
-
 lemma attackers_winas_defender_stuck: 
   shows "Game.in_wina (E 9 8) e"
   by (simp add: energy_game.in_wina.intros(1))
@@ -235,7 +181,7 @@ proof -
   thus "Game.in_wina (E 8 9) d2" using Game.in_wina.intros(2) by blast 
 qed
 
-(*lemma defender_not_stuck_wina:
+lemma defender_not_stuck_wina:
   shows "Game.in_wina (E 9 9) c"
 proof -
   have A1: "defender c" by auto
@@ -243,14 +189,32 @@ proof -
     by (metis moves(9) state.exhaust weight_opt.simps(21) weight_opt.simps(22) weight_opt.simps(23) weight_opt.simps(24))
   have A3: "Game.in_wina (E 9 8) d1" using attacker_winas_example_attacker by blast
   have A4: "Game.in_wina (E 8 9) d2" using attacker_winas_example_attacker_2 by blast
-  have "E 9 8 \<le> (E 9 9)" using less_eq_energy_def
-  have A5: "(E 9 9 - (E 0 1)) = (E 9 8)" using minus_energy_def 
-  have A5: "\<not>(Game.weight c d1 (E 9 8) < (E 9 8))"
-  have A6: "Game.in_wina ((Game.weight c d1) (E 9 9)) d1"  by (meson Game.in_wina.simps defender.simps(4) defender.simps(6) moves(7) weight_opt.simps(38))
-  have A7: "Game.in_wina ((Game.weight c d2) (E 9 9)) d2" by (metis Game.in_wina.simps defender.simps(4) defender.simps(7) moves(8) weight_opt.simps(38)) 
-  show "Game.in_wina (E 9 9) c" using A1 A2 A3 A4 Game.in_wina.intros(3) energy.distinct(1) by blast 
+
+  have "\<not>somewhere_smaller (E 9 9) (E 0 1)" by simp
+  hence "(E 9 9 - (E 0 1)) = E ((one (E 9 9)) - (one (E 0 1))) ((two (E 9 9)) - (two (E 0 1)))" using minus_energy_def
+    by simp
+  hence "(E 9 9 - (E 0 1)) = E 9 (9 -1)" by simp
+  hence A5: "(E 9 9 - (E 0 1)) = E 9 8" using numeral_eq_enat one_enat_def
+    by (metis add_diff_cancel_right' idiff_enat_enat inc.simps(2) numeral_inc) 
+
+  have "(Game.weight c d1) (E 9 9) = (E 9 9) - (E 0 1)" using weight_opt.simps(5)by simp
+  hence "(Game.weight c d1) (E 9 9) = E 9 8" using A5 by simp
+  hence A6: "Game.in_wina ((Game.weight c d1) (E 9 9)) d1" using A3 by simp
+
+    have "\<not>somewhere_smaller (E 9 9) (E 1 0)" by simp
+  hence "(E 9 9 - (E 1 0)) = E ((one (E 9 9)) - (one (E 1 0))) ((two (E 9 9)) - (two (E 1 0)))" using minus_energy_def
+    by simp
+  hence "(E 9 9 - (E 1 0)) = E (9 -1) 9" by simp
+  hence A7: "(E 9 9 - (E 1 0)) = E 8 9" using numeral_eq_enat one_enat_def
+    by (metis add_diff_cancel_right' idiff_enat_enat inc.simps(2) numeral_inc) 
+
+  have "(Game.weight c d2) (E 9 9) = (E 9 9) - (E 1 0)" using weight_opt.simps(6)by simp
+  hence "(Game.weight c d2) (E 9 9) = E 8 9" using A7 by simp
+  hence A8: "Game.in_wina ((Game.weight c d2) (E 9 9)) d2" using A4 by simp
+
+  thus "Game.in_wina (E 9 9) c" using A7 Game.in_wina.intros(3) energy.distinct(1) A2 A1 A6 by blast  
 qed
-*)
+
 
 lemma attacker_does_not_win_example:
   shows "\<not>Game.in_wina (E 0 0) c"
