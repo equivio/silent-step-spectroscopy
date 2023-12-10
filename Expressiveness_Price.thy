@@ -52,12 +52,13 @@ lemma enat_infinite: "infinite {1 + enat i |i. i \<in> \<nat>}"
 
 lemma "modal_depth_srbb (ImmConj \<nat> (\<lambda>n. Pos (Obs \<alpha> (observe_n_alphas \<alpha> n)))) = \<infinity>"
   unfolding modal_depth_srbb.simps(2)
+modal_depth_srbb.simps
     and modal_depth_srbb_conjunct.simps(1)
     and modal_depth_srbb_conjunction.simps(1)
     and obs_n_\<alpha>_depth_n
     and Sup_enat_def
-  using enat_infinite (*TODO*)
-sorry
+  using enat_infinite
+  by fastforce
 \<comment> \<open>==========================================================================================\<close>
 
 primrec branching_conjunction_depth :: "('a, 's) hml_srbb \<Rightarrow> enat"
