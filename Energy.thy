@@ -114,10 +114,11 @@ proof-
   show "eight (x - s) \<le> eight (y - s)"  by (smt (verit, del_insts))
 qed
 
+(* Monotonicity *)
 lemma mono:
   fixes s :: energy
   assumes "s \<noteq> eneg"
-  shows "mono_on UNIV (\<lambda>x. x - s)"
+  shows "mono_on UNIV (\<lambda>x. x - s)" 
 proof
   fix x y :: energy
   assume "x \<le> y"
