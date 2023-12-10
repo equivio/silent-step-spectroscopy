@@ -145,6 +145,42 @@ proof
                  using minus_component_leq[OF xn yn assms \<open>x \<le> y\<close> \<open>s \<le> x\<close>] by blast
   qed
 qed
+
+find_theorems direct_minus
+
+lemma gets_smaller:
+  fixes s :: energy
+  assumes "s \<noteq> eneg"
+  shows "(\<lambda>x. x - s)x \<le> x" 
+proof(cases "s\<le>x")
+  case True
+  hence A0: "x-s = direct_minus x s" using direct_minus_eq by simp
+
+  have A1:  "(one x - one s) \<le> one x" using idiff_enat_enat diff_enat_def
+    by (smt (verit, ccfv_threshold) diff_le_self enat_ord_simps(1) enat_ord_simps(4) enat_ord_simps(6) idiff_infinity_right less_infinityE not_le_imp_less zero_le)
+  have A2: "(two x - two s) \<le> two x" using idiff_enat_enat diff_enat_def
+    by (smt (verit, ccfv_threshold) diff_le_self enat_ord_simps(1) enat_ord_simps(4) enat_ord_simps(6) idiff_infinity_right less_infinityE not_le_imp_less zero_le)
+  have A3: "(three x - three s) \<le> three x" using idiff_enat_enat diff_enat_def
+    by (smt (verit, ccfv_threshold) diff_le_self enat_ord_simps(1) enat_ord_simps(4) enat_ord_simps(6) idiff_infinity_right less_infinityE not_le_imp_less zero_le)
+  have A4: "(four x - four s) \<le> four x" using idiff_enat_enat diff_enat_def
+    by (smt (verit, ccfv_threshold) diff_le_self enat_ord_simps(1) enat_ord_simps(4) enat_ord_simps(6) idiff_infinity_right less_infinityE not_le_imp_less zero_le)
+   have A5: "(five x - five s) \<le> five x" using idiff_enat_enat diff_enat_def
+    by (smt (verit, ccfv_threshold) diff_le_self enat_ord_simps(1) enat_ord_simps(4) enat_ord_simps(6) idiff_infinity_right less_infinityE not_le_imp_less zero_le)
+   have A6: "(six x - six s) \<le> six x" using idiff_enat_enat diff_enat_def
+    by (smt (verit, ccfv_threshold) diff_le_self enat_ord_simps(1) enat_ord_simps(4) enat_ord_simps(6) idiff_infinity_right less_infinityE not_le_imp_less zero_le)
+   have A7: "(seven x - seven s) \<le> seven x" using idiff_enat_enat diff_enat_def
+    by (smt (verit, ccfv_threshold) diff_le_self enat_ord_simps(1) enat_ord_simps(4) enat_ord_simps(6) idiff_infinity_right less_infinityE not_le_imp_less zero_le)
+   have A8: "(eight x - eight s) \<le> eight x" using idiff_enat_enat diff_enat_def
+    by (smt (verit, ccfv_threshold) diff_le_self enat_ord_simps(1) enat_ord_simps(4) enat_ord_simps(6) idiff_infinity_right less_infinityE not_le_imp_less zero_le)
+  
+  thus ?thesis using assms A0 A1 A2 A3 A4 A5 A6 A7 A8
+    by (metis True antisym eneg_leq energy.sel(1) energy.sel(2) energy.sel(3) energy.sel(4) energy.sel(5) energy.sel(6) energy.sel(7) energy.sel(8) leq_not_eneg)
+next
+  case False
+  hence "x-s = eneg" by (simp add: minus_energy_def)
+  thus ?thesis by (simp add: eneg_leq) 
+qed
+
 end
 
 definition "min1_6 e \<equiv> case e of E a b c d e f g h \<Rightarrow> E (min a f) b c d e f g h | eneg \<Rightarrow> eneg "
@@ -213,6 +249,28 @@ proof
                  min_1_7_simps(4) min_1_7_simps(5) min_1_7_simps(6) min_1_7_simps(7) min_1_7_simps(8) 
                  min_def order.order_iff_strict order_le_less_trans verit_comp_simplify1(3))
   qed
+qed
+
+lemma gets_smaller_min_1_6: 
+  shows "min1_6 x \<le> x"
+proof(cases "x=eneg")
+  case True
+  thus ?thesis using min_eneg eneg_leq by simp
+next
+  case False
+  thus ?thesis
+    using min_1_6_simps min_less_iff_conj somwhere_larger_eq by fastforce
+qed
+
+lemma gets_smaller_min_1_7: 
+  shows "min1_7 x \<le> x"
+proof(cases "x=eneg")
+  case True
+  thus ?thesis using min_eneg eneg_leq by simp
+next
+  case False
+  thus ?thesis
+    using min_1_7_simps min_less_iff_conj somwhere_larger_eq by fastforce
 qed
 
 end
