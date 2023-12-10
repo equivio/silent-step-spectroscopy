@@ -48,7 +48,13 @@ primrec
 fun hml_srbb_models :: "('a, 's) hml_srbb \<Rightarrow> 's \<Rightarrow> bool" (infix "\<Turnstile>SRBB" 60)where
   "hml_srbb_models formula state = ((hml_srbb_to_hml formula) \<Turnstile> state)"
 
-(*TODO: add some sanity checks*)
+(*Some sanity checks*)
+
+lemma "(TT \<Turnstile>SRBB state) = (ImmConj {} \<psi>s \<Turnstile>SRBB state)"
+  by simp
+
+lemma "(Internal \<chi> \<Turnstile>SRBB state) = (ImmConj {left} (\<lambda>i. if i = left then Pos \<chi> else undefined) \<Turnstile>SRBB state)"
+  by simp
 
 definition hml_preordered :: "(('a, 's) hml_srbb) set \<Rightarrow> 's \<Rightarrow> 's \<Rightarrow> bool" where
   "hml_preordered \<phi>s l r \<equiv> \<forall>\<phi> \<in> \<phi>s. \<phi> \<Turnstile>SRBB l \<longrightarrow> \<phi> \<Turnstile>SRBB r"
