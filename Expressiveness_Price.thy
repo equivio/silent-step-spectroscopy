@@ -180,10 +180,6 @@ primrec
 context Inhabited_LTS
 begin
 
-lemma set_singleton:
-"\<forall>y::enat. {x |x. \<exists>i. (i = right \<longrightarrow> x = y) \<and> (i \<noteq> right \<longrightarrow> (i = left \<longrightarrow> x = y) \<and> i = left)} = {y}"
-  by blast
-
 lemma example_\<phi>_cp:
   fixes op::"'a" and a:: "'a" and b::"'a"
   defines \<phi>: "\<phi> \<equiv> 
