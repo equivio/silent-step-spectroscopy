@@ -1,5 +1,5 @@
 theory Energy
-  imports EnergyGames "HOL-Library.Extended_Nat" "HOL-Lattice.Orders"
+  imports Main "HOL-Library.Extended_Nat" "HOL-Lattice.Orders"
 begin
 
 datatype energy = E (one: "enat") (two: "enat") (three: "enat") (four: "enat")
@@ -145,8 +145,6 @@ proof
                  using minus_component_leq[OF xn yn assms \<open>x \<le> y\<close> \<open>s \<le> x\<close>] by blast
   qed
 qed
-
-find_theorems direct_minus
 
 lemma gets_smaller:
   fixes s :: energy
