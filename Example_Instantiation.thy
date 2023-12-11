@@ -1,5 +1,5 @@
-theory ExampleInstantiation      
-  imports EnergyGames "HOL-Library.Extended_Nat"
+theory Example_Instantiation      
+  imports Energy_Games "HOL-Library.Extended_Nat"
 begin
 
 datatype energy = E (one: "enat") (two: "enat") | eneg
@@ -67,7 +67,7 @@ qed
 
 lemma Game_finite_play_counterexample:
   shows "\<not>finite_play [a, b2, e, d1, e]"
-  using Game.finite_play.intros Game.finite_play_is_trace
+  using Game.finite_play.intros Game.finite_play_is_path
   by (metis append_Cons append_Nil last_snoc list.distinct(1) weight_opt.simps(20)) 
 
 abbreviation "energy_level \<equiv> Game.energy_level"
@@ -103,7 +103,7 @@ lemma energy_level_example_3:
 
 lemma play_stuck_example:
   shows "Game.play_stuck [a, b2, c, d1, e]"
-  by (metis (mono_tags, opaque_lifting) Game_finite_play_example append.assoc append_Cons energy_game.finite_play_is_trace last_ConsR list.distinct(1) self_append_conv2 snoc_eq_iff_butlast weight_opt.simps(38))
+  by (metis (mono_tags, opaque_lifting) Game_finite_play_example append.assoc append_Cons energy_game.finite_play_is_path last_ConsR list.distinct(1) self_append_conv2 snoc_eq_iff_butlast weight_opt.simps(38))
   
 lemma play_not_stuck_example:
   shows "\<not>(Game.play_stuck [a, b2, c])"

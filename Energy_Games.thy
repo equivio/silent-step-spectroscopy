@@ -1,13 +1,12 @@
 section "Energy Games"
 
-theory EnergyGames
+theory Energy_Games
   imports Main Misc
 begin
 
 section \<open>Energy Games\<close>
 
 type_synonym 'energy update = "'energy \<Rightarrow> 'energy"
-type_synonym 'gstate strategy = "'gstate \<Rightarrow> 'gstate \<Rightarrow> bool"
 type_synonym 'gstate fplay = "'gstate list"
 
 locale energy_game =
@@ -97,7 +96,7 @@ corollary finite_play_suffix:
 lemma finite_play_min_len: "finite_play p \<Longrightarrow> length p \<ge> 1"
   by (metis One_nat_def Suc_le_eq energy_game.finite_play.simps length_greater_0_conv not_Cons_self snoc_eq_iff_butlast)
 
-lemma finite_play_is_trace:
+lemma finite_play_is_path:
   fixes p
   assumes "finite_play p"
   shows "((p = ((a @ [g]) @ b)) \<and> a \<noteq>[]) \<longrightarrow> ((last a) \<Zinj> g)"
