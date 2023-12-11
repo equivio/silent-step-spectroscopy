@@ -181,6 +181,10 @@ primrec
 context Inhabited_LTS
 begin
 
+lemma set_singleton:
+"\<forall>y::enat. {x |x. \<exists>i. (i = right \<longrightarrow> x = y) \<and> (i \<noteq> right \<longrightarrow> (i = left \<longrightarrow> x = y) \<and> i = left)} = {y}"
+  by blast
+
 lemma example_\<phi>_cp:
   fixes op::"'a" and a:: "'a" and b::"'a"
   defines \<phi>: "\<phi> \<equiv> 
@@ -202,8 +206,41 @@ lemma example_\<phi>_cp:
   and "max_positive_conjunct_depth \<phi> = 1"
   and "max_negative_conjunct_depth \<phi> = 0"
   and "negation_depth              \<phi> = 0"
-  unfolding \<phi>
-  sorry
+proof-
+  have A1: "\<forall>y::enat. {x |x. \<exists>i. (i = right \<longrightarrow> x = y) \<and> (i \<noteq> right \<longrightarrow> (i = left \<longrightarrow> x = y) \<and> i = left)} = {y}"
+    by blast
+  have "Sup {x |x. \<exists>i. (i = right \<longrightarrow> x = 1) \<and> (i \<noteq> right \<longrightarrow> (i = left \<longrightarrow> x = 1) \<and> i = left)} = (1::enat)"
+    using A1 cSup_singleton by force
+  then show "modal_depth_srbb            \<phi> = 2" unfolding \<phi> by simp
+  show "branching_conjunction_depth \<phi> = 0" unfolding \<phi>
+    apply simp
+    using A1 cSup_singleton
+    by force
+  show "instable_conjunction_depth \<phi> = 1" unfolding \<phi>
+apply simp
+    using A1 cSup_singleton
+    by force
+  show "stable_conjunction_depth    \<phi> = 0" unfolding \<phi>
+apply simp
+    using A1 cSup_singleton
+    by force
+show "immediate_conjunction_depth \<phi> = 0" unfolding \<phi>
+apply simp
+    using A1 cSup_singleton
+    by force
+show "max_positive_conjunct_depth \<phi> = 1" unfolding \<phi>
+apply simp
+    using A1 cSup_singleton
+    by force
+show "max_negative_conjunct_depth \<phi> = 0" unfolding \<phi>
+apply simp
+    using A1 cSup_singleton
+    by force
+show "negation_depth \<phi> = 0" unfolding \<phi>
+apply simp
+    using A1 cSup_singleton
+    by force
+qed
 
 end
 
