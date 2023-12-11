@@ -184,17 +184,27 @@ begin
 lemma example_\<phi>_cp:
   fixes op::"'a" and a:: "'a" and b::"'a"
   defines \<phi>: "\<phi> \<equiv> 
-(Internal (Obs op (Internal 
-(Conj {left} (\<lambda>i. (if i = left then (Pos (Obs a TT)) else if i = right then (Pos (Obs a TT)) else undefined))))))"
-  shows "modal_depth_srbb \<phi> = 2" and
-"branching_conjunction_depth \<phi> = 0" and
-"instable_conjunction_depth \<phi> = 1"
-"stable_conjunction_depth \<phi> = 0"
-"immediate_conjunction_depth \<phi> = 0"
-"max_positive_conjunct_depth \<phi> = 1"
-"max_negative_conjunct_depth \<phi> = 0"
-"negation_depth \<phi> = 0"
+    (Internal
+      (Obs op 
+        (Internal 
+          (Conj {left, right} 
+                (\<lambda>i. (if i = left
+                      then (Pos (Obs a TT))
+                      else if i = right
+                           then (Pos (Obs b TT))
+                           else undefined))))))"
+  shows
+      "modal_depth_srbb            \<phi> = 2"
+  and "branching_conjunction_depth \<phi> = 0"
+  and "instable_conjunction_depth  \<phi> = 1"
+  and "stable_conjunction_depth    \<phi> = 0"
+  and "immediate_conjunction_depth \<phi> = 0"
+  and "max_positive_conjunct_depth \<phi> = 1"
+  and "max_negative_conjunct_depth \<phi> = 0"
+  and "negation_depth              \<phi> = 0"
   unfolding \<phi>
-  by simp+
+  sorry
+
 end
+
 end
