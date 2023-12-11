@@ -99,6 +99,9 @@ lemma "\<phi>s \<subseteq> \<phi>s' \<Longrightarrow> hml_equivalent \<phi>s' l 
 lemma "hml_preordered \<phi>s l r = (\<forall>\<phi> \<in> \<phi>s. \<not>(distinguishes \<phi> l r))"
   using distinguishes_def hml_preordered_def by auto
 
+lemma "hml_equivalent \<phi>s l r = (\<forall>\<phi> \<in> \<phi>s. \<not>(distinguishes \<phi> l r) \<and> \<not>(distinguishes \<phi> r l))"
+  using distinguishes_def hml_equivalent_def hml_preordered_def by auto
+
 end (* Inhabited_Tau_LTS *)
 
 end
