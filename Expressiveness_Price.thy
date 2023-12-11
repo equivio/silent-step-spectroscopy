@@ -8,15 +8,15 @@ primrec
   and modal_depth_srbb_conjunct :: "('act, 'i) hml_srbb_conjunct \<Rightarrow> enat" where
 "modal_depth_srbb TT = 0" |
  "modal_depth_srbb (Internal \<chi>) = modal_depth_srbb_conjunction \<chi>" |
- "modal_depth_srbb (ImmConj I \<psi>s) = Sup {modal_depth_srbb_conjunct (\<psi>s i) | i. i \<in> I}" |
+ "modal_depth_srbb (ImmConj I \<psi>s) = Sup ((modal_depth_srbb_conjunct \<circ> \<psi>s) ` I)" |
 
  "modal_depth_srbb_conjunction (Obs \<alpha> \<phi>) = 1 + modal_depth_srbb \<phi>" |
  "modal_depth_srbb_conjunction (Conj I \<psi>s) =
-    Sup {modal_depth_srbb_conjunct (\<psi>s i) | i. i \<in> I}" |
+    Sup ((modal_depth_srbb_conjunct \<circ> \<psi>s) ` I)" |
  "modal_depth_srbb_conjunction (StableConj I \<psi>s) = 
-    Sup {modal_depth_srbb_conjunct (\<psi>s i) | i. i \<in> I}" |
+    Sup ((modal_depth_srbb_conjunct \<circ> \<psi>s) ` I)" |
  "modal_depth_srbb_conjunction (BranchConj a \<phi> I \<psi>s) =
-    Sup ({1 + modal_depth_srbb \<phi>} \<union> {modal_depth_srbb_conjunct (\<psi>s i) | i. i \<in> I})" |
+    Sup ({1 + modal_depth_srbb \<phi>} \<union> ((modal_depth_srbb_conjunct \<circ> \<psi>s) ` I))" |
 
  "modal_depth_srbb_conjunct (Pos \<chi>) = modal_depth_srbb_conjunction \<chi>" |
  "modal_depth_srbb_conjunct (Neg \<chi>) = modal_depth_srbb_conjunction \<chi>" 
@@ -42,23 +42,20 @@ next
     using eSuc_enat plus_1_eSuc(1) by auto
 qed
 
-lemma inj_keeps_infinity: "infinite S \<Longrightarrow> inj f \<Longrightarrow> infinite {f(x) | x . x \<in> S}" 
-  by (smt (verit) finite_imageD finite_subset image_subsetI mem_Collect_eq subset_UNIV subset_inj_on)
+lemma sup_nats_in_enats_infinite: "(SUP x\<in>\<nat>. enat x) = \<infinity>"
+  by (metis Nats_infinite Sup_enat_def enat.inject finite.emptyI finite_imageD inj_on_def)
 
-lemma enat_infinite: "infinite {1 + enat i |i. i \<in> \<nat>}"
-  apply (rule inj_keeps_infinity)
-  apply (rule Nats_infinite)
-  by (simp add: inj_def)
+lemma sucs_of_nats_in_enats_sup_infinite: "(SUP x\<in>\<nat>. 1 + enat x) = \<infinity>"
+  using sup_nats_in_enats_infinite
+  by (metis Sup.SUP_cong eSuc_Sup eSuc_infinity image_image image_is_empty plus_1_eSuc(1))
 
 lemma "modal_depth_srbb (ImmConj \<nat> (\<lambda>n. Pos (Obs \<alpha> (observe_n_alphas \<alpha> n)))) = \<infinity>"
-  unfolding modal_depth_srbb.simps(2)
-modal_depth_srbb.simps
-    and modal_depth_srbb_conjunct.simps(1)
-    and modal_depth_srbb_conjunction.simps(1)
-    and obs_n_\<alpha>_depth_n
-    and Sup_enat_def
-  using enat_infinite
-  by fastforce
+  unfolding modal_depth_srbb.simps(3)
+        and o_def
+        and modal_depth_srbb_conjunct.simps(1)
+        and modal_depth_srbb_conjunction.simps(1)
+        and obs_n_\<alpha>_depth_n
+  by (rule sucs_of_nats_in_enats_sup_infinite)
 
 \<comment> \<open>==========================================================================================\<close>
 
@@ -67,12 +64,12 @@ primrec branching_conjunction_depth :: "('a, 's) hml_srbb \<Rightarrow> enat"
   and branch_conj_depth_\<psi> :: "('a, 's) hml_srbb_conjunct \<Rightarrow> enat" where
   "branching_conjunction_depth TT = 0" |
   "branching_conjunction_depth (Internal \<chi>) = branch_conj_depth_\<chi> \<chi>" |
-  "branching_conjunction_depth (ImmConj I \<psi>s) = Sup {branch_conj_depth_\<psi> (\<psi>s i) | i . i \<in> I}" |
+  "branching_conjunction_depth (ImmConj I \<psi>s) = Sup ((branch_conj_depth_\<psi> \<circ> \<psi>s) ` I)" |
 
   "branch_conj_depth_\<chi> (Obs _ \<phi>) = branching_conjunction_depth \<phi>" |
-  "branch_conj_depth_\<chi> (Conj I \<psi>s) = Sup {branch_conj_depth_\<psi> (\<psi>s i) | i . i \<in> I}" |
-  "branch_conj_depth_\<chi> (StableConj I \<psi>s) = Sup {branch_conj_depth_\<psi> (\<psi>s i) | i . i \<in> I}" |
-  "branch_conj_depth_\<chi> (BranchConj _ \<phi> I \<psi>s) = 1 + Sup ({branching_conjunction_depth \<phi>} \<union> {branch_conj_depth_\<psi> (\<psi>s i) | i . i \<in> I})" |
+  "branch_conj_depth_\<chi> (Conj I \<psi>s) = Sup ((branch_conj_depth_\<psi> \<circ> \<psi>s) ` I)" |
+  "branch_conj_depth_\<chi> (StableConj I \<psi>s) = Sup ((branch_conj_depth_\<psi> \<circ> \<psi>s) ` I)" |
+  "branch_conj_depth_\<chi> (BranchConj _ \<phi> I \<psi>s) = 1 + Sup ({branching_conjunction_depth \<phi>} \<union> ((branch_conj_depth_\<psi> \<circ> \<psi>s) ` I))" |
 
   "branch_conj_depth_\<psi> (Pos \<chi>) = branch_conj_depth_\<chi> \<chi>" |
   "branch_conj_depth_\<psi> (Neg \<chi>) = branch_conj_depth_\<chi> \<chi>" 
@@ -84,12 +81,12 @@ instable_conjunction_depth :: "('a, 's) hml_srbb \<Rightarrow> enat"
   and inst_conj_depth_\<psi> :: "('a, 's) hml_srbb_conjunct \<Rightarrow> enat" where
   "instable_conjunction_depth TT = 0" |
   "instable_conjunction_depth (Internal \<chi>) = inst_conj_depth_\<chi> \<chi>" |
-  "instable_conjunction_depth (ImmConj I \<psi>s) = 1 + Sup {inst_conj_depth_\<psi> (\<psi>s i) | i . i \<in> I}" |
+  "instable_conjunction_depth (ImmConj I \<psi>s) = 1 + Sup ((inst_conj_depth_\<psi> \<circ> \<psi>s) ` I)" |
 
   "inst_conj_depth_\<chi> (Obs _ \<phi>) = instable_conjunction_depth \<phi>" |
-  "inst_conj_depth_\<chi> (Conj I \<psi>s) = 1 + Sup {inst_conj_depth_\<psi> (\<psi>s i) | i . i \<in> I}" |
-  "inst_conj_depth_\<chi> (StableConj I \<psi>s) = Sup {inst_conj_depth_\<psi> (\<psi>s i) | i . i \<in> I}" |
-  "inst_conj_depth_\<chi> (BranchConj _ \<phi> I \<psi>s) = Sup ({instable_conjunction_depth \<phi>} \<union> {inst_conj_depth_\<psi> (\<psi>s i) | i . i \<in> I})" |
+  "inst_conj_depth_\<chi> (Conj I \<psi>s) = 1 + Sup ((inst_conj_depth_\<psi> \<circ> \<psi>s) ` I)" |
+  "inst_conj_depth_\<chi> (StableConj I \<psi>s) = Sup ((inst_conj_depth_\<psi> \<circ> \<psi>s) ` I)" |
+  "inst_conj_depth_\<chi> (BranchConj _ \<phi> I \<psi>s) = Sup ({instable_conjunction_depth \<phi>} \<union> ((inst_conj_depth_\<psi> \<circ> \<psi>s) ` I))" |
 
   "inst_conj_depth_\<psi> (Pos \<chi>) = inst_conj_depth_\<chi> \<chi>" |
   "inst_conj_depth_\<psi> (Neg \<chi>) = inst_conj_depth_\<chi> \<chi>" 
@@ -101,12 +98,12 @@ stable_conjunction_depth :: "('a, 's) hml_srbb \<Rightarrow> enat"
   and st_conj_depth_\<psi> :: "('a, 's) hml_srbb_conjunct \<Rightarrow> enat" where
   "stable_conjunction_depth TT = 0" |
   "stable_conjunction_depth (Internal \<chi>) = st_conj_depth_\<chi> \<chi>" |
-  "stable_conjunction_depth (ImmConj I \<psi>s) = Sup {st_conj_depth_\<psi> (\<psi>s i) | i . i \<in> I}" |
+  "stable_conjunction_depth (ImmConj I \<psi>s) = Sup ((st_conj_depth_\<psi> \<circ> \<psi>s) ` I)" |
 
   "st_conj_depth_\<chi> (Obs _ \<phi>) = stable_conjunction_depth \<phi>" |
-  "st_conj_depth_\<chi> (Conj I \<psi>s) = Sup {st_conj_depth_\<psi> (\<psi>s i) | i . i \<in> I}" |
-  "st_conj_depth_\<chi> (StableConj I \<psi>s) = 1 + Sup {st_conj_depth_\<psi> (\<psi>s i) | i . i \<in> I}" |
-  "st_conj_depth_\<chi> (BranchConj _ \<phi> I \<psi>s) = Sup ({stable_conjunction_depth \<phi>} \<union> {st_conj_depth_\<psi> (\<psi>s i) | i . i \<in> I})" |
+  "st_conj_depth_\<chi> (Conj I \<psi>s) = Sup ((st_conj_depth_\<psi> \<circ> \<psi>s) ` I)" |
+  "st_conj_depth_\<chi> (StableConj I \<psi>s) = 1 + Sup ((st_conj_depth_\<psi> \<circ> \<psi>s) ` I)" |
+  "st_conj_depth_\<chi> (BranchConj _ \<phi> I \<psi>s) = Sup ({stable_conjunction_depth \<phi>} \<union> ((st_conj_depth_\<psi> \<circ> \<psi>s) ` I))" |
 
   "st_conj_depth_\<psi> (Pos \<chi>) = st_conj_depth_\<chi> \<chi>" |
   "st_conj_depth_\<psi> (Neg \<chi>) = st_conj_depth_\<chi> \<chi>" 
@@ -118,12 +115,12 @@ primrec
   and imm_conj_depth_\<psi> :: "('a, 's) hml_srbb_conjunct \<Rightarrow> enat" where 
   "immediate_conjunction_depth TT = 0" |
   "immediate_conjunction_depth (Internal \<chi>) = imm_conj_depth_\<chi> \<chi>" |
-  "immediate_conjunction_depth (ImmConj I \<psi>s) = 1 + Sup {imm_conj_depth_\<psi> (\<psi>s i) | i . i \<in> I}" |
+  "immediate_conjunction_depth (ImmConj I \<psi>s) = 1 + Sup ((imm_conj_depth_\<psi> \<circ> \<psi>s) ` I)" |
 
   "imm_conj_depth_\<chi> (Obs _ \<phi>) = immediate_conjunction_depth \<phi>" |
-  "imm_conj_depth_\<chi> (Conj I \<psi>s) = Sup {imm_conj_depth_\<psi> (\<psi>s i) | i . i \<in> I}" |
-  "imm_conj_depth_\<chi> (StableConj I \<psi>s) = Sup {imm_conj_depth_\<psi> (\<psi>s i) | i . i \<in> I}" |
-  "imm_conj_depth_\<chi> (BranchConj _ \<phi> I \<psi>s) = Sup ({immediate_conjunction_depth \<phi>} \<union> {imm_conj_depth_\<psi> (\<psi>s i) | i . i \<in> I})" |
+  "imm_conj_depth_\<chi> (Conj I \<psi>s) = Sup ((imm_conj_depth_\<psi> \<circ> \<psi>s) ` I)" |
+  "imm_conj_depth_\<chi> (StableConj I \<psi>s) = Sup ((imm_conj_depth_\<psi> \<circ> \<psi>s) ` I)" |
+  "imm_conj_depth_\<chi> (BranchConj _ \<phi> I \<psi>s) = Sup ({immediate_conjunction_depth \<phi>} \<union> ((imm_conj_depth_\<psi> \<circ> \<psi>s) ` I))" |
 
   "imm_conj_depth_\<psi> (Pos \<chi>) = imm_conj_depth_\<chi> \<chi>" |
   "imm_conj_depth_\<psi> (Neg \<chi>) = imm_conj_depth_\<chi> \<chi>"
@@ -135,12 +132,12 @@ primrec
   and max_pos_conj_depth_\<psi> :: "('a, 's) hml_srbb_conjunct \<Rightarrow> enat" where
   "max_positive_conjunct_depth TT = 0"|
   "max_positive_conjunct_depth (Internal \<chi>) = max_pos_conj_depth_\<chi> \<chi>" |
-  "max_positive_conjunct_depth (ImmConj I \<psi>s) = Sup {max_pos_conj_depth_\<psi> (\<psi>s i) | i . i \<in> I}" |
+  "max_positive_conjunct_depth (ImmConj I \<psi>s) = Sup ((max_pos_conj_depth_\<psi> \<circ> \<psi>s) ` I)" |
 
   "max_pos_conj_depth_\<chi> (Obs _ \<phi>) = max_positive_conjunct_depth \<phi>" |
-  "max_pos_conj_depth_\<chi> (Conj I \<psi>s) = Sup {max_pos_conj_depth_\<psi> (\<psi>s i) | i . i \<in> I}" |
-  "max_pos_conj_depth_\<chi> (StableConj I \<psi>s) = Sup {max_pos_conj_depth_\<psi> (\<psi>s i) | i . i \<in> I}" |
-  "max_pos_conj_depth_\<chi> (BranchConj _ \<phi> I \<psi>s) = Sup ({max_positive_conjunct_depth \<phi>} \<union> {max_pos_conj_depth_\<psi> (\<psi>s i) | i . i \<in> I})" |
+  "max_pos_conj_depth_\<chi> (Conj I \<psi>s) = Sup ((max_pos_conj_depth_\<psi> \<circ> \<psi>s) ` I)" |
+  "max_pos_conj_depth_\<chi> (StableConj I \<psi>s) = Sup ((max_pos_conj_depth_\<psi> \<circ> \<psi>s) ` I)" |
+  "max_pos_conj_depth_\<chi> (BranchConj _ \<phi> I \<psi>s) = Sup ({max_positive_conjunct_depth \<phi>} \<union> ((max_pos_conj_depth_\<psi> \<circ> \<psi>s) ` I))" |
 
   "max_pos_conj_depth_\<psi> (Pos \<chi>) = modal_depth_srbb_conjunction \<chi>" |
   "max_pos_conj_depth_\<psi> (Neg \<chi>) = max_pos_conj_depth_\<chi> \<chi>"
@@ -152,12 +149,12 @@ primrec
   and max_neg_conj_depth_\<psi> :: "('a, 's) hml_srbb_conjunct \<Rightarrow> enat" where
   "max_negative_conjunct_depth TT = 0" |
   "max_negative_conjunct_depth (Internal \<chi>) = max_neg_conj_depth_\<chi> \<chi>" |
-  "max_negative_conjunct_depth (ImmConj I \<psi>s) = Sup {max_neg_conj_depth_\<psi> (\<psi>s i) | i . i \<in> I}" |
+  "max_negative_conjunct_depth (ImmConj I \<psi>s) = Sup ((max_neg_conj_depth_\<psi> \<circ> \<psi>s) ` I)" |
 
   "max_neg_conj_depth_\<chi> (Obs _ \<phi>) = max_negative_conjunct_depth \<phi>" |
-  "max_neg_conj_depth_\<chi> (Conj I \<psi>s) = Sup {max_neg_conj_depth_\<psi> (\<psi>s i) | i . i \<in> I}" |
-  "max_neg_conj_depth_\<chi> (StableConj I \<psi>s) = Sup {max_neg_conj_depth_\<psi> (\<psi>s i) | i . i \<in> I}" |
-  "max_neg_conj_depth_\<chi> (BranchConj _ \<phi> I \<psi>s) = Sup ({max_negative_conjunct_depth \<phi>} \<union> {max_neg_conj_depth_\<psi> (\<psi>s i) | i . i \<in> I})" |
+  "max_neg_conj_depth_\<chi> (Conj I \<psi>s) = Sup ((max_neg_conj_depth_\<psi> \<circ> \<psi>s) ` I)" |
+  "max_neg_conj_depth_\<chi> (StableConj I \<psi>s) = Sup ((max_neg_conj_depth_\<psi> \<circ> \<psi>s) ` I)" |
+  "max_neg_conj_depth_\<chi> (BranchConj _ \<phi> I \<psi>s) = Sup ({max_negative_conjunct_depth \<phi>} \<union> ((max_neg_conj_depth_\<psi> \<circ> \<psi>s) ` I))" |
 
   "max_neg_conj_depth_\<psi> (Pos \<chi>) = max_neg_conj_depth_\<chi> \<chi>" |
   "max_neg_conj_depth_\<psi> (Neg \<chi>) = modal_depth_srbb_conjunction \<chi>"
@@ -169,22 +166,18 @@ primrec
   and neg_depth_\<psi> :: "('a, 's) hml_srbb_conjunct \<Rightarrow> enat" where
   "negation_depth TT = 0" |
   "negation_depth (Internal \<chi>) = neg_depth_\<chi> \<chi>" |
-  "negation_depth (ImmConj I \<psi>s) = Sup {neg_depth_\<psi> (\<psi>s i) | i . i \<in> I}" |
+  "negation_depth (ImmConj I \<psi>s) = Sup ((neg_depth_\<psi> \<circ> \<psi>s) ` I)" |
 
   "neg_depth_\<chi> (Obs _ \<phi>) = negation_depth \<phi>" |
-  "neg_depth_\<chi> (Conj I \<psi>s) = Sup {neg_depth_\<psi> (\<psi>s i) | i . i \<in> I}" |
-  "neg_depth_\<chi> (StableConj I \<psi>s) = Sup {neg_depth_\<psi> (\<psi>s i) | i . i \<in> I}" |
-  "neg_depth_\<chi> (BranchConj _ \<phi> I \<psi>s) = Sup ({negation_depth \<phi>} \<union> {neg_depth_\<psi> (\<psi>s i) | i . i \<in> I})" |
+  "neg_depth_\<chi> (Conj I \<psi>s) = Sup ((neg_depth_\<psi> \<circ> \<psi>s) ` I)" |
+  "neg_depth_\<chi> (StableConj I \<psi>s) = Sup ((neg_depth_\<psi> \<circ> \<psi>s) ` I)" |
+  "neg_depth_\<chi> (BranchConj _ \<phi> I \<psi>s) = Sup ({negation_depth \<phi>} \<union> ((neg_depth_\<psi> \<circ> \<psi>s) ` I))" |
 
   "neg_depth_\<psi> (Pos \<chi>) = neg_depth_\<chi> \<chi>" |
   "neg_depth_\<psi> (Neg \<chi>) = 1 + neg_depth_\<chi> \<chi>" 
 
 context Inhabited_LTS
 begin
-
-lemma set_singleton:
-"\<forall>y::enat. {x |x. \<exists>i. (i = right \<longrightarrow> x = y) \<and> (i \<noteq> right \<longrightarrow> (i = left \<longrightarrow> x = y) \<and> i = left)} = {y}"
-  by blast
 
 lemma example_\<phi>_cp:
   fixes op::"'a" and a:: "'a" and b::"'a"
@@ -207,41 +200,8 @@ lemma example_\<phi>_cp:
   and "max_positive_conjunct_depth \<phi> = 1"
   and "max_negative_conjunct_depth \<phi> = 0"
   and "negation_depth              \<phi> = 0"
-proof-
-  have A1: "\<forall>y::enat. {x |x. \<exists>i. (i = right \<longrightarrow> x = y) \<and> (i \<noteq> right \<longrightarrow> (i = left \<longrightarrow> x = y) \<and> i = left)} = {y}"
-    by blast
-  have "Sup {x |x. \<exists>i. (i = right \<longrightarrow> x = 1) \<and> (i \<noteq> right \<longrightarrow> (i = left \<longrightarrow> x = 1) \<and> i = left)} = (1::enat)"
-    using A1 cSup_singleton by force
-  then show "modal_depth_srbb            \<phi> = 2" unfolding \<phi> by simp
-  show "branching_conjunction_depth \<phi> = 0" unfolding \<phi>
-    apply simp
-    using A1 cSup_singleton
-    by force
-  show "instable_conjunction_depth \<phi> = 1" unfolding \<phi>
-apply simp
-    using A1 cSup_singleton
-    by force
-  show "stable_conjunction_depth    \<phi> = 0" unfolding \<phi>
-apply simp
-    using A1 cSup_singleton
-    by force
-show "immediate_conjunction_depth \<phi> = 0" unfolding \<phi>
-apply simp
-    using A1 cSup_singleton
-    by force
-show "max_positive_conjunct_depth \<phi> = 1" unfolding \<phi>
-apply simp
-    using A1 cSup_singleton
-    by force
-show "max_negative_conjunct_depth \<phi> = 0" unfolding \<phi>
-apply simp
-    using A1 cSup_singleton
-    by force
-show "negation_depth \<phi> = 0" unfolding \<phi>
-apply simp
-    using A1 cSup_singleton
-    by force
-qed
+  unfolding \<phi>
+  by simp+
 
 end
 
