@@ -1,5 +1,5 @@
 theory SilentStepSpectroscopy
-  imports EnergyGames
+  imports Energy_Games
 begin
 
 end
