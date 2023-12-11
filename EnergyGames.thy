@@ -95,7 +95,9 @@ corollary finite_play_suffix:
   using assms finite_play_prefix by fast
 
 lemma finite_play_min_len: "finite_play p \<Longrightarrow> length p \<ge> 1"
-  by (metis One_nat_def Suc_le_eq energy_game.finite_play.simps length_greater_0_conv not_Cons_self snoc_eq_iff_butlast)
+  by (metis finite_play.simps leI length_0_conv less_one list.distinct(1) snoc_eq_iff_butlast)
+(*  by (metis One_nat_def Suc_le_eq energy_game.finite_play.simps length_greater_0_conv not_Cons_self snoc_eq_iff_butlast)
+*)
 
 lemma finite_play_is_trace:
   fixes p
@@ -178,6 +180,20 @@ lemma attacker_wins_last_wina_notempty:
   assumes "(finite_play p) \<and> (won_by_attacker p)"
   shows "\<exists>e. in_wina e (last p)"
   using assms won_by_attacker_def finite_play.intros(2) in_wina.intros(1) by meson
+
+thm in_wina.induct
+
+lemma win_a_upwards_closure: 
+  fixes ord::"'energy \<Rightarrow> 'energy \<Rightarrow> bool"
+  assumes transitive: "\<forall>e e' e''. (((ord e e') \<and> (ord e' e'')) \<longrightarrow> (ord e e''))" and
+          reflexive: "\<forall>e. (ord e e)" and
+          antysim: "\<forall>e e'. (((ord e e') \<and> (ord e' e)) \<longrightarrow> e=e')" and
+          dwl_min: "\<forall>e. (ord defender_win_level e)" and 
+          update_gets_smaller: "\<forall>g g' e. (((weight_opt g g') \<noteq> None) \<longrightarrow> (ord (the (weight_opt g g')e) e))" and
+          
+          "in_wina1 e g" and "ord e e'"
+  shows "in_wina1 e' g"
+using assms sorry
 
 
 end (*End of context energy_game*)
