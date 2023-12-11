@@ -42,21 +42,20 @@ next
     using eSuc_enat plus_1_eSuc(1) by auto
 qed
 
-lemma inj_keeps_infinity: "infinite S \<Longrightarrow> inj f \<Longrightarrow> infinite {f(x) | x . x \<in> S}" 
-  by (smt (verit) finite_imageD finite_subset image_subsetI mem_Collect_eq subset_UNIV subset_inj_on)
+lemma sup_nats_in_enats_infinite: "(SUP x\<in>\<nat>. enat x) = \<infinity>"
+  by (metis Nats_infinite Sup_enat_def enat.inject finite.emptyI finite_imageD inj_on_def)
 
-lemma enat_infinite: "infinite {1 + enat i |i. i \<in> \<nat>}"
-  apply (rule inj_keeps_infinity)
-  apply (rule Nats_infinite)
-  by (simp add: inj_def)
+lemma sucs_of_nats_in_enats_sup_infinite: "(SUP x\<in>\<nat>. 1 + enat x) = \<infinity>"
+  using sup_nats_in_enats_infinite
+  by (metis Sup.SUP_cong eSuc_Sup eSuc_infinity image_image image_is_empty plus_1_eSuc(1))
 
 lemma "modal_depth_srbb (ImmConj \<nat> (\<lambda>n. Pos (Obs \<alpha> (observe_n_alphas \<alpha> n)))) = \<infinity>"
   unfolding modal_depth_srbb.simps(3)
-  unfolding o_def
-  unfolding modal_depth_srbb_conjunct.simps(1)
-  unfolding modal_depth_srbb_conjunction.simps(1)
-  unfolding obs_n_\<alpha>_depth_n
-  by (metis Setcompr_eq_image Sup_enat_def enat_infinite equals0D finite_enat_bounded)
+        and o_def
+        and modal_depth_srbb_conjunct.simps(1)
+        and modal_depth_srbb_conjunction.simps(1)
+        and obs_n_\<alpha>_depth_n
+  by (rule sucs_of_nats_in_enats_sup_infinite)
 
 \<comment> \<open>==========================================================================================\<close>
 
