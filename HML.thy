@@ -1,5 +1,5 @@
 theory HML
-  imports Main "../LTS"
+  imports Main LTS
 begin
 
 datatype 
