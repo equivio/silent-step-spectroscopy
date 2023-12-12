@@ -16,6 +16,21 @@ inductive silent_reachable :: "'s \<Rightarrow> 's \<Rightarrow> bool"  (infix "
     "p \<Zsurj> p" |
     "p \<Zsurj> p''" if "p \<mapsto> \<tau> p'" and "p' \<Zsurj> p''"
 
+definition weak_step ("_ \<Zsurj>\<mapsto>\<Zsurj> _ _" [70, 70, 70] 80) where
+  "p  \<Zsurj>\<mapsto>\<Zsurj> \<alpha> p' \<equiv> if \<alpha> = \<tau> 
+                    then p \<Zsurj> p'
+                    else \<exists>p1 p2. p \<Zsurj> p1 \<and> p1 \<mapsto> \<alpha> p2 \<and> p2 \<Zsurj> p'"
+
+inductive weak_step_sequence :: "'s \<Rightarrow> 'a list \<Rightarrow> 's \<Rightarrow> bool" ("_ \<Zsurj>\<mapsto>\<Zsurj>$ _ _" [70,70,70] 80) where
+  "p \<Zsurj>\<mapsto>\<Zsurj>$ [] p" |
+  "p \<Zsurj>\<mapsto>\<Zsurj>$ (\<alpha>#rt) p''" if "p \<Zsurj>\<mapsto>\<Zsurj> \<alpha> p'" "p' \<Zsurj>\<mapsto>\<Zsurj>$ rt p''"
+
+abbreviation weak_traces :: "'s \<Rightarrow> 'a list set"
+  where "weak_traces p \<equiv> {tr. \<exists>p'. p \<Zsurj>\<mapsto>\<Zsurj>$ tr p'}"
+
+definition weakly_trace_preordered (infix "\<lesssim>WT" 60) where
+  "p \<lesssim>WT q \<equiv> weak_traces p \<subseteq> weak_traces q"
+
 end (* locale LTS_Tau *)
 
 locale Inhabited_LTS = LTS step

@@ -237,10 +237,11 @@ lemma "expressiveness_price (Internal
                            else undefined)))))) = E 2 0 1 0 0 1 0 0"
   by simp
 
+end
+
 \<comment> \<open>==========================================================================================
     ==========================================================================================\<close>
 
-end
 context Inhabited_Tau_LTS
 begin
 
@@ -249,6 +250,9 @@ definition expr_preord :: "'s \<Rightarrow> energy \<Rightarrow> 's \<Rightarrow
 
 definition expr_equiv :: "'s \<Rightarrow> energy \<Rightarrow> 's \<Rightarrow> bool" ("_ \<sim> _ _" 60) where
   "(p \<sim> e q) \<equiv> hml_equivalent (\<O> e) p q"
+
+lemma "(p \<lesssim>WT q) = (p \<preceq> (E \<infinity> 0 0 0 0 0 0 0) q)"
+  sorry
 
 end
 
