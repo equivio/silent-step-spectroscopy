@@ -1,5 +1,5 @@
 theory Expressiveness_Price
-  imports Main HML_SRBB "HOL-Library.Extended_Nat"
+  imports Main HML_SRBB "HOL-Library.Extended_Nat" Energy
 begin
 
 primrec
@@ -73,6 +73,7 @@ primrec branching_conjunction_depth :: "('a, 's) hml_srbb \<Rightarrow> enat"
 
   "branch_conj_depth_\<psi> (Pos \<chi>) = branch_conj_depth_\<chi> \<chi>" |
   "branch_conj_depth_\<psi> (Neg \<chi>) = branch_conj_depth_\<chi> \<chi>" 
+
 \<comment> \<open>==========================================================================================\<close>
 
 primrec
@@ -90,6 +91,7 @@ instable_conjunction_depth :: "('a, 's) hml_srbb \<Rightarrow> enat"
 
   "inst_conj_depth_\<psi> (Pos \<chi>) = inst_conj_depth_\<chi> \<chi>" |
   "inst_conj_depth_\<psi> (Neg \<chi>) = inst_conj_depth_\<chi> \<chi>" 
+
 \<comment> \<open>==========================================================================================\<close>
 
 primrec
@@ -107,6 +109,7 @@ stable_conjunction_depth :: "('a, 's) hml_srbb \<Rightarrow> enat"
 
   "st_conj_depth_\<psi> (Pos \<chi>) = st_conj_depth_\<chi> \<chi>" |
   "st_conj_depth_\<psi> (Neg \<chi>) = st_conj_depth_\<chi> \<chi>" 
+
 \<comment> \<open>==========================================================================================\<close>
 
 primrec
@@ -124,6 +127,7 @@ primrec
 
   "imm_conj_depth_\<psi> (Pos \<chi>) = imm_conj_depth_\<chi> \<chi>" |
   "imm_conj_depth_\<psi> (Neg \<chi>) = imm_conj_depth_\<chi> \<chi>"
+
 \<comment> \<open>==========================================================================================\<close>
 
 primrec
@@ -158,6 +162,7 @@ primrec
 
   "max_neg_conj_depth_\<psi> (Pos \<chi>) = max_neg_conj_depth_\<chi> \<chi>" |
   "max_neg_conj_depth_\<psi> (Neg \<chi>) = modal_depth_srbb_conjunction \<chi>"
+
 \<comment> \<open>==========================================================================================\<close>
 
 primrec
@@ -175,6 +180,24 @@ primrec
 
   "neg_depth_\<psi> (Pos \<chi>) = neg_depth_\<chi> \<chi>" |
   "neg_depth_\<psi> (Neg \<chi>) = 1 + neg_depth_\<chi> \<chi>" 
+
+\<comment> \<open>==========================================================================================\<close>
+
+fun expressiveness_price :: "('a, 's) hml_srbb \<Rightarrow> energy" where
+  "expressiveness_price \<phi> = E (modal_depth_srbb            \<phi>)
+                              (branching_conjunction_depth \<phi>)
+                              (instable_conjunction_depth  \<phi>)
+                              (stable_conjunction_depth    \<phi>)
+                              (immediate_conjunction_depth \<phi>)
+                              (max_positive_conjunct_depth \<phi>)
+                              (max_negative_conjunct_depth \<phi>)
+                              (negation_depth              \<phi>)"
+
+lemma srbb_price_never_neg : "expressiveness_price \<phi> \<noteq> eneg"
+  by simp
+
+definition \<O> :: "energy \<Rightarrow> (('a, 's) hml_srbb) set" where
+  "\<O> energy \<equiv> {\<phi> . expressiveness_price \<phi> \<le> energy}"
 
 context Inhabited_LTS
 begin
@@ -202,6 +225,30 @@ lemma example_\<phi>_cp:
   and "negation_depth              \<phi> = 0"
   unfolding \<phi>
   by simp+
+
+lemma "expressiveness_price (Internal
+      (Obs op 
+        (Internal 
+          (Conj {left, right} 
+                (\<lambda>i. (if i = left
+                      then (Pos (Obs a TT))
+                      else if i = right
+                           then (Pos (Obs b TT))
+                           else undefined)))))) = E 2 0 1 0 0 1 0 0"
+  by simp
+
+\<comment> \<open>==========================================================================================
+    ==========================================================================================\<close>
+
+end
+context Inhabited_Tau_LTS
+begin
+
+definition expr_preord :: "'s \<Rightarrow> energy \<Rightarrow> 's \<Rightarrow> bool" ("_ \<preceq> _ _" 60) where
+  "(p \<preceq> e q) \<equiv> hml_preordered (\<O> e) p q"
+
+definition expr_equiv :: "'s \<Rightarrow> energy \<Rightarrow> 's \<Rightarrow> bool" ("_ \<sim> _ _" 60) where
+  "(p \<sim> e q) \<equiv> hml_equivalent (\<O> e) p q"
 
 end
 
