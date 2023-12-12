@@ -1,5 +1,5 @@
 theory SilentStepSpectroscopy
-  imports EnergyGames
+  imports EnergyGames Expressiveness_Price
 begin
 
 end

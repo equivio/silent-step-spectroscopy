@@ -16,6 +16,9 @@ session LinearTimeBranchingTimeSpectroscopyAccountingForSilentSteps = HOL +
 (* Timeout (in sec) in case of non-termination problems *)
   options [timeout = 600]
 
+  sessions
+    "HOL-Library"
+
 (* To suppress document generation of some theories: *)
 (*
   theories [document = false]

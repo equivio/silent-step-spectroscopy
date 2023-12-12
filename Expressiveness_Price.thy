@@ -1,5 +1,5 @@
 theory Expressiveness_Price
-  imports Main "./HML_SRBB" "~~/src/HOL/Library/Extended_Nat"
+  imports Main HML_SRBB "HOL-Library.Extended_Nat"
 begin
 
 primrec
