@@ -91,6 +91,26 @@ corollary finite_play_suffix:
   shows "finite_play g0 p"
   using assms finite_play_prefix by fast
 
+lemma finite_play_check_gen:
+   assumes "x \<noteq> p1" and
+           "p = p1 # [pn]"
+   shows "\<not>finite_play x (p @ [gn])"
+proof (rule notI)
+  assume A1: "finite_play x (p @ [gn])"
+  from assms A1 have A2: "finite_play x p"
+    using finite_play_prefix by blast 
+  from assms(2) A2 have A3: "finite_play x ( p1 # [pn])"
+    by meson
+  from A3 have A4: "finite_play x ([p1] @ [pn])"
+    by simp
+  from A4 have A5: "finite_play x [p1]"
+    using finite_play_prefix by blast 
+  have A6: "\<not>finite_play x [p1]"
+    by (metis assms(1) butlast.simps(2) finite_play.simps list.distinct(1) snoc_eq_iff_butlast)
+  show "False"
+    using A5 A6 by auto 
+qed
+
 lemma finite_play_min_len: "finite_play g0 p \<Longrightarrow> length p \<ge> 1"
   by (metis One_nat_def Suc_le_eq energy_game.finite_play.simps length_greater_0_conv not_Cons_self snoc_eq_iff_butlast)
 
