@@ -1,5 +1,5 @@
 theory HML_SRBB
-  imports Main "./HML"
+  imports Main HML
 begin
 
 datatype 
