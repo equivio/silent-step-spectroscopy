@@ -75,52 +75,17 @@ lemma Game_finite_play_check:
   by (metis Game.finite_play.cases append1_eq_conv append_Cons append_Nil energy_game.finite_play_prefix list.distinct(1) weight_opt.simps(39))
 
 lemma Game_finite_play_check_2:
-   assumes "x\<noteq>a"
-   shows "\<not>finite_play x [a, b2, c, d1, e]"
+  assumes "x\<noteq>a"
+  shows "\<not>finite_play x [a, b2, c, d1, e]" 
 proof (rule notI)
   assume A1: "finite_play x [a, b2, c, d1, e]"
-   consider (m0) "x=a" | (m1) "x=b1" | (m2) "x=b2" | (m3) "x=c" | (m4) "x=d1" | (m5) "x=d2" | (m6) "x=e"
-     using state.exhaust by blast    
-   then show "False"
-   proof (cases)
-     case m0
-     from m0 assms show "False" by auto
-   next
-     case m1
-     from m1 A1 have A2: "finite_play b1 [a, b2, c, d1, e]" by auto
-     from A2 have A3: "finite_play b1 [a]"
-     using append_Cons energy_game.finite_play_prefix by force
-     show "False" using A3 Game.finite_play.cases by fastforce
-   next
-    case m2
-     show "False"
-       using A1 Game_finite_play_check m2 by auto
-   next
-     case m3
-     from m3 A1 have A2: "finite_play c [a, b2, c, d1, e]" by auto
-     from A2 have A3: "finite_play c [a]"
-     using append_Cons energy_game.finite_play_prefix by force
-      show "False" using A3 Game.finite_play.cases by fastforce
-    next
-     case m4
-     from m4 A1 have A2: "finite_play d1 [a, b2, c, d1, e]" by auto
-     from A2 have A3: "finite_play d1 [a]"
-     using append_Cons energy_game.finite_play_prefix by force
-      show "False" using A3 Game.finite_play.cases by fastforce
-    next
-     case m5
-       from m5 A1 have A2: "finite_play d2 [a, b2, c, d1, e]" by auto
-       from A2 have A3: "finite_play d2 [a]"
-       using append_Cons energy_game.finite_play_prefix by force
-     show "False" using A3 Game.finite_play.cases by fastforce
-   next
-    case m6
-     from m6 A1 have A2: "finite_play e [a, b2, c, d1, e]" by auto
-     from A2 have A3: "finite_play e [a]"
-     using append_Cons energy_game.finite_play_prefix by force
-      show "False" using A3 Game.finite_play.cases by fastforce
-    qed
+  from A1 have A2: "finite_play x ([a] @ [b2, c, d1, e])"
+    by simp
+  from A2 have A3: "\<not>finite_play x ([a] @ [b2, c, d1, e])"
+    by (metis Game.finite_play.cases Game.finite_play_prefix append1_eq_conv append_Nil assms neq_Nil_conv weight_opt.simps(39)) 
+  from A1 A3 show "False" by simp
 qed
+
 abbreviation "energy_level \<equiv> Game.energy_level"
 
 lemma energy_level_example:
