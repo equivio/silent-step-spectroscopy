@@ -48,6 +48,9 @@ primrec
 fun hml_srbb_models :: "('a, 's) hml_srbb \<Rightarrow> 's \<Rightarrow> bool" (infix "\<Turnstile>SRBB" 60)where
   "hml_srbb_models formula state = ((hml_srbb_to_hml formula) \<Turnstile> state)"
 
+fun hml_srbb_conjunction_models :: "('a, 's) hml_srbb_conjunction \<Rightarrow> 's \<Rightarrow> bool" where
+  "hml_srbb_conjunction_models \<chi> s = ((hml_srbb_conjunction_to_hml \<chi>) \<Turnstile> s)"
+
 (*Some sanity checks*)
 
 lemma "(TT \<Turnstile>SRBB state) = (ImmConj {} \<psi>s \<Turnstile>SRBB state)"

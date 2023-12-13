@@ -199,6 +199,38 @@ lemma srbb_price_never_neg : "expressiveness_price \<phi> \<noteq> eneg"
 definition \<O> :: "energy \<Rightarrow> (('a, 's) hml_srbb) set" where
   "\<O> energy \<equiv> {\<phi> . expressiveness_price \<phi> \<le> energy}"
 
+fun expr_pr_\<chi> :: "('a, 's) hml_srbb_conjunction \<Rightarrow> energy" where
+  "expr_pr_\<chi> \<chi> = E (modal_depth_srbb_conjunction \<chi>)
+                 (branch_conj_depth_\<chi> \<chi>)
+                 (inst_conj_depth_\<chi> \<chi>)
+                 (st_conj_depth_\<chi> \<chi>)
+                 (imm_conj_depth_\<chi> \<chi>)
+                 (max_pos_conj_depth_\<chi> \<chi>)
+                 (max_neg_conj_depth_\<chi> \<chi>)
+                 (neg_depth_\<chi> \<chi>)"
+
+lemma \<chi>_price_never_neg: "expr_pr_\<chi> \<chi> \<noteq> eneg"
+  by simp
+
+definition \<O>_\<chi> :: "energy \<Rightarrow> (('a, 's) hml_srbb_conjunction) set" where
+  "\<O>_\<chi> energy \<equiv> {\<chi> . expr_pr_\<chi> \<chi> \<le> energy}"
+
+
+context Inhabited_Tau_LTS
+begin
+
+definition expr_preord :: "'s \<Rightarrow> energy \<Rightarrow> 's \<Rightarrow> bool" ("_ \<preceq> _ _" 60) where
+  "(p \<preceq> e q) \<equiv> hml_preordered (\<O> e) p q"
+
+definition expr_equiv :: "'s \<Rightarrow> energy \<Rightarrow> 's \<Rightarrow> bool" ("_ \<sim> _ _" 60) where
+  "(p \<sim> e q) \<equiv> hml_equivalent (\<O> e) p q"
+
+end
+
+
+\<comment> \<open>==========================================================================================
+    ==========================================================================================\<close>
+
 context Inhabited_LTS
 begin
 
@@ -236,23 +268,6 @@ lemma "expressiveness_price (Internal
                            then (Pos (Obs b TT))
                            else undefined)))))) = E 2 0 1 0 0 1 0 0"
   by simp
-
-end
-
-\<comment> \<open>==========================================================================================
-    ==========================================================================================\<close>
-
-context Inhabited_Tau_LTS
-begin
-
-definition expr_preord :: "'s \<Rightarrow> energy \<Rightarrow> 's \<Rightarrow> bool" ("_ \<preceq> _ _" 60) where
-  "(p \<preceq> e q) \<equiv> hml_preordered (\<O> e) p q"
-
-definition expr_equiv :: "'s \<Rightarrow> energy \<Rightarrow> 's \<Rightarrow> bool" ("_ \<sim> _ _" 60) where
-  "(p \<sim> e q) \<equiv> hml_equivalent (\<O> e) p q"
-
-lemma "(p \<lesssim>WT q) = (p \<preceq> (E \<infinity> 0 0 0 0 0 0 0) q)"
-  sorry
 
 end
 
