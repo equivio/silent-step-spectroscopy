@@ -16,6 +16,15 @@ inductive silent_reachable :: "'s \<Rightarrow> 's \<Rightarrow> bool"  (infix "
     "p \<Zsurj> p" |
     "p \<Zsurj> p''" if "p \<mapsto> \<tau> p'" and "p' \<Zsurj> p''"
 
+lemma silent_reachable_trans:
+  assumes
+    \<open>p \<Zsurj> p'\<close>
+    \<open>p' \<Zsurj> p''\<close>
+  shows
+    \<open>p \<Zsurj> p''\<close>
+using assms silent_reachable.intros(2)
+by (induct, blast+)
+
 definition weak_step ("_ \<Zsurj>\<mapsto>\<Zsurj> _ _" [70, 70, 70] 80) where
   "p  \<Zsurj>\<mapsto>\<Zsurj> \<alpha> p' \<equiv> if \<alpha> = \<tau> 
                     then p \<Zsurj> p'

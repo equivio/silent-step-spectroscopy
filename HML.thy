@@ -112,6 +112,34 @@ termination
 lemma "(TT \<Turnstile> state) = (Conj {} \<psi> \<Turnstile> state)"
   by simp
 
+lemma internal_implies_internal_silent:
+  assumes "(Internal \<phi>) \<Turnstile> p"
+  shows "(Internal (Silent \<phi>)) \<Turnstile> p"
+  using assms hml_models.simps(3) hml_models.simps(4) by blast
+
+lemma internal_silent_implies_internal:
+  assumes "(Internal (Silent \<phi>)) \<Turnstile> p"
+  shows "(Internal \<phi>) \<Turnstile> p"
+  apply simp
+proof-
+  from assms obtain p' where p'_properties:"p \<Zsurj> p' \<and> ((\<exists>p'a. p' \<mapsto> \<tau> p'a \<and> \<phi> \<Turnstile> p'a) \<or> \<phi> \<Turnstile> p')"
+    using hml_models.simps(3) by auto
+  then have "(\<exists>p'a. p' \<mapsto> \<tau> p'a \<and> \<phi> \<Turnstile> p'a) \<or> \<phi> \<Turnstile> p'" by blast
+  then show "\<exists>p'. p \<Zsurj> p' \<and> \<phi> \<Turnstile> p'"
+  proof
+    assume "\<phi> \<Turnstile> p'"
+    then show ?thesis using p'_properties by blast
+  next
+    assume "\<exists>p'a. p' \<mapsto> \<tau> p'a \<and> \<phi> \<Turnstile> p'a"
+    then obtain p'a where p'a_properties: "p' \<mapsto> \<tau> p'a \<and> \<phi> \<Turnstile> p'a"
+      by blast
+    then have "p' \<Zsurj> p'a" using silent_reachable.intros
+      by blast
+    with p'_properties p'a_properties silent_reachable_trans show "\<exists>p'. p \<Zsurj> p' \<and> \<phi> \<Turnstile> p'"
+      by blast
+  qed
+qed
+
 end (* context LTS_Tau *)
 
 
