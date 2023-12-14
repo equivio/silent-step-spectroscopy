@@ -11,10 +11,13 @@ chapter AFP
 *)
 
 (* Session name, list base session: *)
-session LinearTimeBranchingTimeSpectroscopyAccountingForSilentSteps = HOL + 
-
-(* Timeout (in sec) in case of non-termination problems *)
+session LinearTimeBranchingTimeSpectroscopyAccountingForSilentSteps = HOL +
+  (* Timeout (in sec) in case of non-termination problems *)
   options [timeout = 600]
+
+  sessions
+    "HOL-Lattice"
+    "HOL-Library"
 
 (* To suppress document generation of some theories: *)
 (*
