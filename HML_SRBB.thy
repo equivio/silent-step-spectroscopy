@@ -45,31 +45,31 @@ primrec
   "hml_srbb_conjunct_to_hml_conjunct (Pos \<chi>) = hml_conjunct.Pos (hml.Internal (hml_srbb_conjunction_to_hml \<chi>))" |
   "hml_srbb_conjunct_to_hml_conjunct (Neg \<chi>) = hml_conjunct.Neg (hml.Internal (hml_srbb_conjunction_to_hml \<chi>))"
 
-fun hml_srbb_models :: "('a, 's) hml_srbb \<Rightarrow> 's \<Rightarrow> bool" (infix "\<Turnstile>SRBB" 60)where
-  "hml_srbb_models formula state = ((hml_srbb_to_hml formula) \<Turnstile> state)"
+fun hml_srbb_models :: "'s \<Rightarrow> ('a, 's) hml_srbb \<Rightarrow> bool" (infix "\<Turnstile>SRBB" 60)where
+  "hml_srbb_models state formula = (state \<Turnstile> (hml_srbb_to_hml formula))"
 
 (*Some sanity checks*)
 
-lemma "(TT \<Turnstile>SRBB state) = (ImmConj {} \<psi>s \<Turnstile>SRBB state)"
+lemma "(state \<Turnstile>SRBB TT) = (state \<Turnstile>SRBB ImmConj {} \<psi>s)"
   by simp
 
-lemma "(Internal \<chi> \<Turnstile>SRBB state) = (ImmConj {left} (\<lambda>i. if i = left then Pos \<chi> else undefined) \<Turnstile>SRBB state)"
+lemma "(state \<Turnstile>SRBB Internal \<chi>) = (state \<Turnstile>SRBB ImmConj {left} (\<lambda>i. if i = left then Pos \<chi> else undefined))"
   by simp
 
 definition hml_preordered :: "(('a, 's) hml_srbb) set \<Rightarrow> 's \<Rightarrow> 's \<Rightarrow> bool" where
-  "hml_preordered \<phi>s l r \<equiv> \<forall>\<phi> \<in> \<phi>s. \<phi> \<Turnstile>SRBB l \<longrightarrow> \<phi> \<Turnstile>SRBB r"
+  "hml_preordered \<phi>s p q \<equiv> \<forall>\<phi> \<in> \<phi>s. p \<Turnstile>SRBB \<phi> \<longrightarrow> q \<Turnstile>SRBB \<phi>"
 
 definition distinguishes :: "('a, 's) hml_srbb \<Rightarrow> 's \<Rightarrow> 's \<Rightarrow> bool" where
-  "distinguishes \<phi> l r \<equiv> \<phi> \<Turnstile>SRBB l \<and> \<not>(\<phi> \<Turnstile>SRBB r)"
+  "distinguishes \<phi> p q \<equiv> p \<Turnstile>SRBB \<phi> \<and> \<not>(q \<Turnstile>SRBB \<phi>)"
 
 definition hml_equivalent :: "(('a, 's) hml_srbb) set \<Rightarrow> 's \<Rightarrow> 's \<Rightarrow> bool" where
-  "hml_equivalent \<phi>s l r \<equiv> hml_preordered \<phi>s l r \<and> hml_preordered \<phi>s r l"
+  "hml_equivalent \<phi>s p q \<equiv> hml_preordered \<phi>s p q \<and> hml_preordered \<phi>s q p"
 
 
-lemma "hml_preordered \<phi>s l r = (\<forall>\<phi> \<in> \<phi>s. \<not>(distinguishes \<phi> l r))"
+lemma "hml_preordered \<phi>s p q = (\<forall>\<phi> \<in> \<phi>s. \<not>(distinguishes \<phi> p q))"
   by (simp add: distinguishes_def hml_preordered_def)
 
-lemma "hml_equivalent \<phi>s l r = (\<forall>\<phi> \<in> \<phi>s. \<not>(distinguishes \<phi> l r) \<and> \<not>(distinguishes \<phi> r l))"
+lemma "hml_equivalent \<phi>s p q = (\<forall>\<phi> \<in> \<phi>s. \<not>(distinguishes \<phi> p q) \<and> \<not>(distinguishes \<phi> q p))"
   using distinguishes_def hml_equivalent_def hml_preordered_def by auto
 
 lemma "equivp (hml_equivalent \<phi>s)"
@@ -93,13 +93,13 @@ next
     by (smt (verit, best) hml_preordered_def transpI)
 qed
 
-lemma "\<phi>s \<subseteq> \<phi>s' \<Longrightarrow> hml_equivalent \<phi>s' l r \<Longrightarrow> hml_equivalent \<phi>s l r"
+lemma "\<phi>s \<subseteq> \<phi>s' \<Longrightarrow> hml_equivalent \<phi>s' p q \<Longrightarrow> hml_equivalent \<phi>s p q"
   by (meson hml_equivalent_def hml_preordered_def subsetD)
 
-lemma "hml_preordered \<phi>s l r = (\<forall>\<phi> \<in> \<phi>s. \<not>(distinguishes \<phi> l r))"
+lemma "hml_preordered \<phi>s p q = (\<forall>\<phi> \<in> \<phi>s. \<not>(distinguishes \<phi> p q))"
   using distinguishes_def hml_preordered_def by auto
 
-lemma "hml_equivalent \<phi>s l r = (\<forall>\<phi> \<in> \<phi>s. \<not>(distinguishes \<phi> l r) \<and> \<not>(distinguishes \<phi> r l))"
+lemma "hml_equivalent \<phi>s p q = (\<forall>\<phi> \<in> \<phi>s. \<not>(distinguishes \<phi> p q) \<and> \<not>(distinguishes \<phi> q p))"
   using distinguishes_def hml_equivalent_def hml_preordered_def by auto
 
 end (* Inhabited_Tau_LTS *)

@@ -34,82 +34,21 @@ begin
 abbreviation HML_soft_poss :: "'a \<Rightarrow> ('a, 'i) hml \<Rightarrow> ('a, 'i) hml" where
   "HML_soft_poss \<alpha> \<phi> \<equiv> if \<alpha> = \<tau> then Silent \<phi> else Obs \<alpha> \<phi>"
 
-function
-      hml_models          :: "('a, 's) hml     \<Rightarrow> 's \<Rightarrow> bool" ("_ \<Turnstile> _" 60) 
-  and hml_conjunct_models :: "('a, 's) hml_conjunct \<Rightarrow> 's \<Rightarrow> bool"
+primrec
+      hml_models          :: "'s \<Rightarrow> ('a, 's) hml          \<Rightarrow> bool" ("_ \<Turnstile> _" 60) 
+  and hml_conjunct_models :: "'s \<Rightarrow> ('a, 's) hml_conjunct \<Rightarrow> bool"
 where
-  "(TT           \<Turnstile> _) = True" |
-  "((Obs a \<phi>)    \<Turnstile> p) = (\<exists>p'. p \<mapsto> a p' \<and> (\<phi> \<Turnstile> p'))" |
-  "((Internal \<phi>)   \<Turnstile> p) = (\<exists>p'. p \<Zsurj> p' \<and> (\<phi> \<Turnstile> p'))" |
-  "((Silent \<phi>) \<Turnstile> p) = ((\<exists>p'. p \<mapsto> \<tau> p' \<and> (\<phi> \<Turnstile> p')) \<or> (\<phi> \<Turnstile> p))" |
-  "((Conj I \<psi>s)  \<Turnstile> p) = (\<forall>i \<in> I. hml_conjunct_models (\<psi>s i) p)" |
+  "(_ \<Turnstile> TT) = True" |
+  "(p \<Turnstile> (Obs a \<phi>)) = (\<exists>p'. p \<mapsto> a p' \<and> (p' \<Turnstile> \<phi>))" |
+  "(p \<Turnstile> (Internal \<phi>)) = (\<exists>p'. p \<Zsurj> p' \<and> (p' \<Turnstile> \<phi>))" |
+  "(p \<Turnstile> (Silent \<phi>)) = ((\<exists>p'. p \<mapsto> \<tau> p' \<and> (p' \<Turnstile> \<phi>)) \<or> (p \<Turnstile> \<phi>))" |
+  "(p \<Turnstile> (Conj I \<psi>s)) = (\<forall>i \<in> I. hml_conjunct_models p (\<psi>s i))" |
 
-  "(hml_conjunct_models (Pos \<phi>) p) = (\<phi> \<Turnstile> p)" |
-  "(hml_conjunct_models (Neg \<phi>) p) = (\<not>(\<phi> \<Turnstile> p))"
-  by (metis hml.exhaust hml_conjunct.exhaust sumE surj_pair, auto)
-            
-inductive_set hml_models_wf_arg_space :: "(('a, 's) hml \<times> 's, ('a, 's) hml_conjunct \<times> 's) sum rel" where
-                          "(Inl (\<phi>, x), Inl (Obs    a \<phi>, p)) \<in> hml_models_wf_arg_space" |
-                          "(Inl (\<phi>, x), Inl (Silent   \<phi>, p)) \<in> hml_models_wf_arg_space" |
-                          "(Inl (\<phi>, x), Inl (Internal \<phi>, p)) \<in> hml_models_wf_arg_space" |
-  "i \<in> I \<Longrightarrow> \<psi> = \<psi>s i \<Longrightarrow> (Inr (\<psi>, p), Inl (Conj  I \<psi>s, p)) \<in> hml_models_wf_arg_space" |
-                          "(Inl (\<phi>, p), Inr (Pos      \<phi>, p)) \<in> hml_models_wf_arg_space" |
-                          "(Inl (\<phi>, p), Inr (Neg      \<phi>, p)) \<in> hml_models_wf_arg_space"
+  "(hml_conjunct_models p (Pos \<phi>)) = (p \<Turnstile> \<phi>)" |
+  "(hml_conjunct_models p (Neg \<phi>)) = (\<not>(p \<Turnstile> \<phi>))"
 
-lemma wf_hml_models_wf_arg_space: "wf hml_models_wf_arg_space"
-  unfolding wf_def
-proof safe
-  fix P \<phi>sOr\<psi>s
-  assume "\<forall>x. (\<forall>y. (y, x) \<in> hml_models_wf_arg_space \<longrightarrow> P y) \<longrightarrow> P x"
 
-  then show "P \<phi>sOr\<psi>s"
-  proof (induct \<phi>sOr\<psi>s)
-    fix \<phi>s :: "('a, 's) hml \<times> 's"
-    obtain \<phi> and sl where "\<phi>s = (\<phi>, sl)" by fastforce
-
-    fix \<psi>s :: "('a, 's) hml_conjunct \<times> 's"
-    obtain \<psi> and sr where "\<psi>s = (\<psi>, sr)" by fastforce
-
-    show "P (Inl \<phi>s)" and "P (Inr \<psi>s)"
-      unfolding \<open>\<phi>s = (\<phi>, sl)\<close> and \<open>\<psi>s = (\<psi>, sr)\<close>
-      using \<open>\<forall>x. (\<forall>y. (y, x) \<in> hml_models_wf_arg_space \<longrightarrow> P y) \<longrightarrow> P x\<close>
-    proof (induct \<phi> and \<psi> arbitrary: sl and sr)
-      case TT
-      then show ?case
-        by (smt (verit) hml.distinct(1) hml.distinct(3) hml.distinct(5) hml.distinct(7) Inl_inject Pair_inject hml_models_wf_arg_space.simps sum.distinct(1))
-    next
-      case (Obs a \<phi>)
-      then show ?case
-        by (smt (verit) hml.distinct(11) hml.distinct(13) hml.distinct(9) hml.inject(1) Inl_inject Pair_inject hml_models_wf_arg_space.simps sum.distinct(1))
-    next
-      case (Internal \<phi>)
-      then show ?case
-        by (smt (verit) hml.distinct(15) hml.distinct(17) hml.distinct(9) hml.inject(2) Inl_inject Pair_inject hml_models_wf_arg_space.simps sum.distinct(1))
-    next
-      case (Silent \<phi>)
-      then show ?case
-        by (smt (verit) hml.distinct(11) hml.distinct(15) hml.distinct(19) hml.inject(3) Inl_inject Pair_inject hml_models_wf_arg_space.simps sum.distinct(1))
-    next
-      case (Conj I \<psi>s)
-      then show ?case
-        by (smt (verit) hml.distinct(13) hml.distinct(17) hml.distinct(19) hml.inject(4) Inl_inject Pair_inject hml_models_wf_arg_space.simps range_eqI sum.distinct(1))
-    next
-      case (Pos \<phi>)
-      then show ?case
-        by (smt (verit) hml_conjunct.distinct(1) hml_conjunct.inject(1) Inr_inject Pair_inject hml_models_wf_arg_space.simps sum.distinct(1))
-    next
-      case (Neg \<phi>)
-      then show ?case
-        by (smt (verit) hml_conjunct.distinct(2) hml_conjunct.inject(2) Inr_inject Pair_inject hml_models_wf_arg_space.simps sum.distinct(1))
-    qed
-  qed
-qed
-
-termination
-  using wf_hml_models_wf_arg_space
-  by (standard) (simp add: hml_models_wf_arg_space.intros)+
-
-lemma "(TT \<Turnstile> state) = (Conj {} \<psi> \<Turnstile> state)"
+lemma "(state \<Turnstile> TT) = (state \<Turnstile> Conj {} \<psi>)"
   by simp
 
 end (* context LTS_Tau *)
@@ -121,13 +60,13 @@ begin
 abbreviation HML_not :: "('a, 's) hml \<Rightarrow> ('a, 's) hml" where
   "HML_not \<phi> \<equiv> Conj {left} (\<lambda>i. if i = left then (Neg \<phi>) else (Pos TT))"
 
-lemma "(\<phi> \<Turnstile> state) = (Conj {left}
+lemma "(state \<Turnstile> \<phi>) = (state \<Turnstile>Conj {left}
                             (\<lambda>i. if i = left
                                  then (Pos \<phi>)
-                                 else (Pos TT)) \<Turnstile> state)"
+                                 else (Pos TT)))"
   by simp
 
-lemma "(\<phi> \<Turnstile> state) = (HML_not (HML_not \<phi>) \<Turnstile> state)"
+lemma "(state \<Turnstile> \<phi>) = (state \<Turnstile> HML_not (HML_not \<phi>))"
   by simp
 
 end (* context Inhabited_Tau_LTS *)
