@@ -104,4 +104,19 @@ lemma "hml_equivalent \<phi>s l r = (\<forall>\<phi> \<in> \<phi>s. \<not>(disti
 
 end (* Inhabited_Tau_LTS *)
 
+inductive tau_obs_free :: "('act, 'i) hml_srbb \<Rightarrow> bool"
+  and tau_obs_free_\<chi> :: "('act, 'i) hml_srbb_conjunction \<Rightarrow> bool"
+  and tau_obs_free_\<psi> :: "('act, 'i) hml_srbb_conjunct \<Rightarrow> bool" where
+  "tau_obs_free TT" |
+  "tau_obs_free (Internal \<chi>)" if "tau_obs_free_\<chi> \<chi>" |
+  "tau_obs_free (ImmConj I \<psi>s)" if "\<forall>i \<in> I. tau_obs_free_\<psi> (\<psi>s i)" |
+
+  "tau_obs_free_\<chi> (Obs \<alpha> \<phi>)" if "\<alpha> \<noteq> \<tau>" and "tau_obs_free \<phi>" |
+  "tau_obs_free_\<chi> (Conj I \<psi>s)" if "\<forall>i \<in> I. tau_obs_free_\<psi> (\<psi>s i)" |
+  "tau_obs_free_\<chi> (StableConj I \<psi>s)" if "\<forall>i \<in> I. tau_obs_free_\<psi> (\<psi>s i)" |
+  "tau_obs_free_\<chi> (BranchConj _ \<phi> I \<psi>s)" if "tau_obs_free \<phi>" and "\<forall>i \<in> I. tau_obs_free_\<psi> (\<psi>s i)" |
+
+  "tau_obs_free_\<psi> (Pos \<chi>)" if "tau_obs_free_\<chi> \<chi>" |
+  "tau_obs_free_\<psi> (Neg \<chi>)" if "tau_obs_free_\<chi> \<chi>"
+
 end
