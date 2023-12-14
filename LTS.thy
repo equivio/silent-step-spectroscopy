@@ -16,6 +16,10 @@ inductive silent_reachable :: "'s \<Rightarrow> 's \<Rightarrow> bool"  (infix "
     "p \<Zsurj> p" |
     "p \<Zsurj> p''" if "p \<mapsto> \<tau> p'" and "p' \<Zsurj> p''"
 
+lemma silend_reachable_append: "p \<Zsurj> p' \<Longrightarrow> p' \<mapsto> \<tau> p'' \<Longrightarrow> p \<Zsurj> p''"
+  apply (induct rule: silent_reachable.induct)
+  using silent_reachable.intros by blast+
+
 end (* locale LTS_Tau *)
 
 locale Inhabited_LTS = LTS step
