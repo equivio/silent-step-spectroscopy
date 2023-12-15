@@ -1,5 +1,5 @@
 theory SilentStepSpectroscopy
-  imports EnergyGames Energy HML_SRBB Expressiveness_Price
+  imports Energy_Games Energy HML_SRBB Expressiveness_Price
 begin
 
 end
