@@ -75,19 +75,6 @@ lemma modal_depth_only_is_trace_form:
 context Inhabited_Tau_LTS
 begin
 
-lemma
-  assumes internal_sat: "hml_srbb.Internal \<chi> \<Turnstile>SRBB p" and rest_sat: "hml_srbb_conjunction_models \<chi> q"
-  shows "p \<Zsurj> q"
-proof-
-  have 1: "(hml_srbb_to_hml (hml_srbb.Internal \<chi>)) = hml.Internal (hml_srbb_conjunction_to_hml \<chi>)"
-    by simp
-  from internal_sat have 2: "((hml_srbb_to_hml (hml_srbb.Internal \<chi>)) \<Turnstile> p)"
-    by simp
-  with 1 have "(\<exists>p'. p \<Zsurj> p' \<and> hml_srbb_conjunction_models \<chi> p')"
-    using silent_reachable.intros(1) by auto
-  with assms show ?thesis sorry
-qed
-
 lemma trace_formula_implies_trace:
   fixes \<phi> :: "('a, 's) hml_srbb"
   fixes \<psi> ::"('a, 's) hml_srbb_conjunct"
@@ -104,7 +91,7 @@ next
                  hml_srbb_conjunction_models \<chi>r q \<Longrightarrow> \<exists>tr\<in>weak_traces q. wtrace_to_\<chi> tr = \<chi>r)"
 and is_trace_internal :"is_trace_formula (hml_srbb.Internal \<chi>r)"
 and internal_satisfied: "hml_srbb.Internal \<chi>r \<Turnstile>SRBB p"
-  from internal_satisfied have 2: "((hml_srbb_to_hml (hml_srbb.Internal \<chi>r)) \<Turnstile> p)"
+  from internal_satisfied have "((hml_srbb_to_hml (hml_srbb.Internal \<chi>r)) \<Turnstile> p)"
     by simp
   then obtain p' where wtrace_to_p': "p \<Zsurj> p'" and p'_models_\<chi>r: "hml_srbb_conjunction_models \<chi>r p'" 
     by auto
@@ -112,10 +99,26 @@ and internal_satisfied: "hml_srbb.Internal \<chi>r \<Turnstile>SRBB p"
     using is_trace_formula.cases by auto
   with p'_models_\<chi>r IH obtain tail where tail_in_traces_p': "tail \<in> weak_traces p'" "wtrace_to_\<chi> tail = \<chi>r"
     by blast
-  from tail_in_traces_p' wtrace_to_p' have "tail \<in> weak_traces p" 
-    using silent_reachable.simps silent_reachable_trans  sorry
+  from tail_in_traces_p' obtain p'' where "p' \<Zsurj>\<mapsto>\<Zsurj>$ tail p''"
+    by blast
   then show ?case
-    by (metis \<open>is_trace_formula_conjunction \<chi>r\<close> hml_srbb_conjunction.distinct(1) is_trace_formula_conjunction.cases tail_in_traces_p'(2) wtrace_to_\<chi>.elims wtrace_to_\<phi>.simps(2))
+  proof(cases tail)
+    case Nil
+    hence False
+      using \<open>is_trace_formula_conjunction \<chi>r\<close> is_trace_formula_conjunction.simps tail_in_traces_p'(2) by force
+    then show ?thesis by blast
+  next
+    case (Cons a list)
+    then obtain q' where q'_properties:"p' \<Zsurj>\<mapsto>\<Zsurj> a q' \<and> q' \<Zsurj>\<mapsto>\<Zsurj>$ list p''"
+      using \<open>p' \<Zsurj>\<mapsto>\<Zsurj>$ tail p''\<close> weak_step_sequence.cases 
+      by (metis list.discI list.inject)
+    hence "p \<Zsurj>\<mapsto>\<Zsurj> a q'" using wtrace_to_p' silent_reachable_trans weak_step_def
+      by metis
+    with q'_properties have "p \<Zsurj>\<mapsto>\<Zsurj>$ tail p''" 
+      using Cons weak_step_sequence.intros(2) by blast
+    then show ?thesis
+      using Cons tail_in_traces_p'(2) by auto 
+  qed
 next
   case (ImmConj x1 x2)
   then have False
@@ -126,19 +129,26 @@ next
   then show ?case sorry
 next
   case (Conj x1 x2)
-  then show ?case sorry
+  hence False
+    using is_trace_formula_conjunction.cases by blast
+  then show ?case by blast 
 next
   case (StableConj x1 x2)
-  then show ?case sorry
+  hence False 
+    using is_trace_formula_conjunction.cases by blast
+  then show ?case by by blast
 next
   case (BranchConj x1 x2 x3 x4)
-  then show ?case sorry
+  hence False 
+    by (simp add: is_trace_formula_conjunction.simps)
+  then show ?case by blast
 next
   case (Pos x)
-  then show ?case sorry
+  then show ?case 
+    by blast 
 next
   case (Neg x)
-  then show ?case sorry
+  then show ?case by blast
 qed
 
 lemma aux:

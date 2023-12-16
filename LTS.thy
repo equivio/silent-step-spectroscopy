@@ -35,6 +35,12 @@ inductive weak_step_sequence :: "'s \<Rightarrow> 'a list \<Rightarrow> 's \<Rig
   "p \<Zsurj>\<mapsto>\<Zsurj>$ [] p" |
   "p \<Zsurj>\<mapsto>\<Zsurj>$ (\<alpha>#rt) p''" if "p \<Zsurj>\<mapsto>\<Zsurj> \<alpha> p'" "p' \<Zsurj>\<mapsto>\<Zsurj>$ rt p''"
 
+lemma weak_step_sequence_trans:
+  assumes "p \<Zsurj>\<mapsto>\<Zsurj>$ tr_1 p'" and "p' \<Zsurj>\<mapsto>\<Zsurj>$ tr_2 p''"
+  shows "p \<Zsurj>\<mapsto>\<Zsurj>$ (tr_1 @ tr_2) p''"
+  using assms weak_step_sequence.intros(2)
+  by(induct, force+)
+
 abbreviation weak_traces :: "'s \<Rightarrow> 'a list set"
   where "weak_traces p \<equiv> {tr. \<exists>p'. p \<Zsurj>\<mapsto>\<Zsurj>$ tr p'}"
 
