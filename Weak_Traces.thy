@@ -85,45 +85,8 @@ lemma trace_formula_implies_trace:
   shows trace_case: "is_trace_formula \<phi> \<Longrightarrow> \<phi> \<Turnstile>SRBB p ==> (\<exists>tr. tr \<in> weak_traces p)" and
 conj_case: "is_trace_formula_conjunction \<chi> \<Longrightarrow> hml_srbb_conjunction_models \<chi> q \<Longrightarrow> \<exists>tr. tr \<in> weak_traces q"
 and True
-proof(induction \<phi> and \<chi> and \<psi> arbitrary: p and q)
-  case TT
-  then show ?case
-    using LTS_Tau.weak_step_sequence.intros(1) by force
-next
-  case (Internal \<chi>r)
-  assume IH: "(\<And>q. is_trace_formula_conjunction \<chi>r \<Longrightarrow>
-                 hml_srbb_conjunction_models \<chi>r q \<Longrightarrow> \<exists>tr. tr \<in> weak_traces q)"
-and "is_trace_formula (hml_srbb.Internal \<chi>r)"
-and "hml_srbb.Internal \<chi>r \<Turnstile>SRBB p"
-  then show ?case 
-    using weak_step_sequence.intros(1) by auto
-next
-  case (ImmConj I F)
-  then show ?case 
-    by (simp add: is_trace_formula.simps)
-next
-  case (Obs \<alpha> \<psi>r)
-  then show ?case
-    using LTS_Tau.weak_step_sequence.intros(1) by force
-next
-  case (Conj x1 x2)
-  then show ?case
-    using is_trace_formula_conjunction.cases by blast
-next
-  case (StableConj x1 x2)
-  then show ?case
-    by (simp add: is_trace_formula_conjunction.simps)
-next
-  case (BranchConj x1 x2 x3 x4)
-  then show ?case
-    by (simp add: is_trace_formula_conjunction.simps)
-next
-  case (Pos x)
-  then show ?case by blast
-next
-  case (Neg x)
-  then show ?case by blast
-qed
+    apply(induction \<phi> and \<chi> and \<psi> arbitrary: p and q)
+  using LTS_Tau.weak_step_sequence.intros(1) by force+
 
 lemma aux:
   fixes \<phi> :: "('a, 's) hml_srbb"
