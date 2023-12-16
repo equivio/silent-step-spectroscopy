@@ -75,18 +75,71 @@ lemma modal_depth_only_is_trace_form:
 context Inhabited_Tau_LTS
 begin
 
-find_theorems is_trace_formula
-thm hml_srbb_hml_srbb_conjunction_hml_srbb_conjunct.induct
-thm is_trace_formula_is_trace_formula_conjunction.induct
+lemma
+  assumes internal_sat: "hml_srbb.Internal \<chi> \<Turnstile>SRBB p" and rest_sat: "hml_srbb_conjunction_models \<chi> q"
+  shows "p \<Zsurj> q"
+proof-
+  have 1: "(hml_srbb_to_hml (hml_srbb.Internal \<chi>)) = hml.Internal (hml_srbb_conjunction_to_hml \<chi>)"
+    by simp
+  from internal_sat have 2: "((hml_srbb_to_hml (hml_srbb.Internal \<chi>)) \<Turnstile> p)"
+    by simp
+  with 1 have "(\<exists>p'. p \<Zsurj> p' \<and> hml_srbb_conjunction_models \<chi> p')"
+    using silent_reachable.intros(1) by auto
+  with assms show ?thesis sorry
+qed
 
 lemma trace_formula_implies_trace:
   fixes \<phi> :: "('a, 's) hml_srbb"
   fixes \<psi> ::"('a, 's) hml_srbb_conjunct"
-  shows trace_case: "is_trace_formula \<phi> \<Longrightarrow> \<phi> \<Turnstile>SRBB p ==> (\<exists>tr. tr \<in> weak_traces p)" and
-conj_case: "is_trace_formula_conjunction \<chi> \<Longrightarrow> hml_srbb_conjunction_models \<chi> q \<Longrightarrow> \<exists>tr. tr \<in> weak_traces q"
+  shows trace_case: "is_trace_formula \<phi> \<Longrightarrow> \<phi> \<Turnstile>SRBB p \<Longrightarrow> (\<exists>tr \<in> weak_traces p. wtrace_to_\<phi> tr = \<phi>)" and
+conj_case: "is_trace_formula_conjunction \<chi> \<Longrightarrow> hml_srbb_conjunction_models \<chi> q \<Longrightarrow> (\<exists>tr \<in> weak_traces q. wtrace_to_\<chi> tr = \<chi>)"
 and True
-    apply(induction \<phi> and \<chi> and \<psi> arbitrary: p and q)
-  using LTS_Tau.weak_step_sequence.intros(1) by force+
+proof(induction \<phi> and \<chi> and \<psi> arbitrary: p and q)
+  case TT
+  then show ?case 
+    using weak_step_sequence.intros(1) by fastforce 
+next
+  case (Internal \<chi>r)
+  assume IH: "(\<And>q. is_trace_formula_conjunction \<chi>r \<Longrightarrow>
+                 hml_srbb_conjunction_models \<chi>r q \<Longrightarrow> \<exists>tr\<in>weak_traces q. wtrace_to_\<chi> tr = \<chi>r)"
+and is_trace_internal :"is_trace_formula (hml_srbb.Internal \<chi>r)"
+and internal_satisfied: "hml_srbb.Internal \<chi>r \<Turnstile>SRBB p"
+  from internal_satisfied have 2: "((hml_srbb_to_hml (hml_srbb.Internal \<chi>r)) \<Turnstile> p)"
+    by simp
+  then obtain p' where wtrace_to_p': "p \<Zsurj> p'" and p'_models_\<chi>r: "hml_srbb_conjunction_models \<chi>r p'" 
+    by auto
+  from is_trace_internal have "is_trace_formula_conjunction \<chi>r"
+    using is_trace_formula.cases by auto
+  with p'_models_\<chi>r IH obtain tail where tail_in_traces_p': "tail \<in> weak_traces p'" "wtrace_to_\<chi> tail = \<chi>r"
+    by blast
+  from tail_in_traces_p' wtrace_to_p' have "tail \<in> weak_traces p" 
+    using silent_reachable.simps silent_reachable_trans  sorry
+  then show ?case
+    by (metis \<open>is_trace_formula_conjunction \<chi>r\<close> hml_srbb_conjunction.distinct(1) is_trace_formula_conjunction.cases tail_in_traces_p'(2) wtrace_to_\<chi>.elims wtrace_to_\<phi>.simps(2))
+next
+  case (ImmConj x1 x2)
+  then have False
+    using is_trace_formula.cases by auto
+  then show ?case by blast
+next
+  case (Obs x1 x2)
+  then show ?case sorry
+next
+  case (Conj x1 x2)
+  then show ?case sorry
+next
+  case (StableConj x1 x2)
+  then show ?case sorry
+next
+  case (BranchConj x1 x2 x3 x4)
+  then show ?case sorry
+next
+  case (Pos x)
+  then show ?case sorry
+next
+  case (Neg x)
+  then show ?case sorry
+qed
 
 lemma aux:
   fixes \<phi> :: "('a, 's) hml_srbb"
@@ -116,7 +169,7 @@ next
   proof-
     from \<phi>_eneg have "\<forall>\<phi>. is_trace_formula \<phi> \<longrightarrow> \<phi> \<Turnstile>SRBB p \<longrightarrow> \<phi> \<Turnstile>SRBB q"
       using expressiveness_to_trace_formula modal_depth_only_is_trace_form by blast
-    then show ?thesis unfolding weakly_trace_preordered_def
+    then show ?thesis unfolding weakly_trace_preordered_def using trace_formula_implies_trace
       sorry
   qed
 qed
