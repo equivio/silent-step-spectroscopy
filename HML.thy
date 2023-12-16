@@ -127,4 +127,21 @@ qed
 
 end
 
+context LTS_Tau
+begin
+
+primrec
+      remove_obs_\<tau> :: "('a, 's) hml \<Rightarrow> ('a, 's) hml"
+  and remove_obs_\<tau>_\<psi> :: "('a, 's) hml_conjunct \<Rightarrow> ('a, 's) hml_conjunct" where
+  "remove_obs_\<tau> TT = TT" |
+  "remove_obs_\<tau> (Obs \<alpha> \<phi>) = (if \<alpha> = \<tau> then (remove_obs_\<tau> \<phi>) else (Obs \<alpha> (remove_obs_\<tau> \<phi>)))" |
+  "remove_obs_\<tau> (Internal \<phi>) = (Internal (remove_obs_\<tau> \<phi>))" |
+  "remove_obs_\<tau> (Silent \<phi>) = (Silent (remove_obs_\<tau> \<phi>))" |
+  "remove_obs_\<tau> (Conj I \<psi>s) = (Conj I (remove_obs_\<tau>_\<psi> \<circ> \<psi>s))" |
+
+  "remove_obs_\<tau>_\<psi> (Pos \<phi>) = (Pos (remove_obs_\<tau> \<phi>))" |
+  "remove_obs_\<tau>_\<psi> (Neg \<phi>) = (Neg (remove_obs_\<tau> \<phi>))"
+
+end
+
 end

@@ -291,10 +291,22 @@ next
             hml_conjunct_models state'' (hml_srbb_conjunct_to_hml_conjunct' (hml_srbb_conjunct.Neg x))"
     by (simp add: tau_obs_free_\<psi>.simps)
 qed
+ 
+end
 
+context Inhabited_Tau_LTS
+begin
 
+lemma 
+  fixes \<phi> :: "('a, 's) hml_srbb"
+    and \<chi> :: "('a, 's) hml_srbb_conjunction"
+    and \<psi> :: "('a, 's) hml_srbb_conjunct"
+  shows "(\<forall>state. (state \<Turnstile> remove_obs_\<tau> (hml_srbb_to_hml \<phi>)) \<longleftrightarrow> (state \<Turnstile> (hml_srbb_to_hml' \<phi>)))
+       \<and> (\<forall>state'. (state' \<Turnstile> remove_obs_\<tau> (hml_srbb_conjunction_to_hml \<chi>)) \<longleftrightarrow> (state' \<Turnstile> (hml_srbb_conjunction_to_hml' \<chi>)))
+       \<and> (\<forall>state''. (hml_conjunct_models state'' (remove_obs_\<tau>_\<psi> (hml_srbb_conjunct_to_hml_conjunct \<psi>))) \<longleftrightarrow> (hml_conjunct_models state'' (hml_srbb_conjunct_to_hml_conjunct' \<psi>)))"
+  apply (rule hml_srbb_hml_srbb_conjunction_hml_srbb_conjunct.induct)
+  sorry
 
-  
 end
 
 end
