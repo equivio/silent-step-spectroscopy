@@ -31,6 +31,9 @@ abbreviation weak_traces :: "'s \<Rightarrow> 'a list set"
 definition weakly_trace_preordered (infix "\<lesssim>WT" 60) where
   "p \<lesssim>WT q \<equiv> weak_traces p \<subseteq> weak_traces q"
 
+definition weakly_trace_equivalent (infix "\<simeq>WT" 60) where
+"p \<simeq>WT q \<equiv> p \<lesssim>WT q \<and> q \<lesssim>WT p"
+
 end (* locale LTS_Tau *)
 
 locale Inhabited_LTS = LTS step
