@@ -73,7 +73,7 @@ lemma modal_depth_only_is_trace_form:
   using expressiveness_to_trace_formula trace_formula_to_expressiveness by blast
 
 context Inhabited_Tau_LTS
-begin
+begin                 
 
 lemma trace_formula_implies_trace:
   fixes \<phi> :: "('a, 's) hml_srbb"
@@ -125,8 +125,27 @@ next
     using is_trace_formula.cases by auto
   then show ?case by blast
 next
-  case (Obs x1 x2)
-  then show ?case sorry
+  case (Obs \<alpha> \<phi>r)
+  assume IH: "(\<And>p. is_trace_formula \<phi>r \<Longrightarrow> \<phi>r \<Turnstile>SRBB p \<Longrightarrow> \<exists>tr\<in>weak_traces p. wtrace_to_\<phi> tr = \<phi>r)"
+and obs_is_trace:"is_trace_formula_conjunction (hml_srbb_conjunction.Obs \<alpha> \<phi>r)"
+and obs_models_q: "hml_srbb_conjunction_models (hml_srbb_conjunction.Obs \<alpha> \<phi>r) q"
+  from obs_is_trace have \<phi>r_is_trace: "is_trace_formula \<phi>r"
+    using is_trace_formula_conjunction.cases by auto
+  from obs_models_q have "hml_srbb_conjunction_to_hml (Obs \<alpha> \<phi>r) \<Turnstile> q"
+    by simp
+  then obtain q' where \<alpha>_step: "q \<mapsto> \<alpha> q'" and \<phi>r_models_q': "(\<phi>r \<Turnstile>SRBB q')"
+    by auto
+  with IH \<phi>r_is_trace obtain tail where tail_in_wt_q': "tail \<in>weak_traces q'" "wtrace_to_\<phi> tail = \<phi>r"
+    by blast
+  from \<alpha>_step have "q \<Zsurj>\<mapsto>\<Zsurj> \<alpha> q'" 
+    unfolding weak_step_def using silent_reachable.simps by metis
+  hence wt_q_to_q': "q \<Zsurj>\<mapsto>\<Zsurj>$ [\<alpha>] q'" 
+    using weak_step_sequence.simps unfolding weak_step_def using silent_reachable.simps
+    by (smt (verit, best))
+  with tail_in_wt_q' have "(\<alpha>#tail) \<in> weak_traces q" using weak_step_sequence_trans
+    by fastforce
+  then show ?case 
+    using tail_in_wt_q'(2) by fastforce
 next
   case (Conj x1 x2)
   hence False
