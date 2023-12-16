@@ -297,6 +297,31 @@ end
 context Inhabited_Tau_LTS
 begin
 
+\<comment> \<open> This does not hold!
+lemma "(state \<Turnstile> Silent (hml_srbb_to_hml' \<phi>)) = (state \<Turnstile> hml_srbb_to_hml' \<phi>)"
+proof (cases \<phi>)
+  case TT
+  then show ?thesis 
+    by simp
+next
+  case (Internal \<chi>)
+  then show ?thesis 
+    using silent_reachable.intros(2) by auto
+next
+  case (ImmConj I \<psi>s)
+  hence "\<phi> = ImmConj I \<psi>s".
+  show ?thesis
+  proof (rule iffI)
+    assume "state \<Turnstile> hml_srbb_to_hml' \<phi>"
+    then show "state \<Turnstile> Silent (hml_srbb_to_hml' \<phi>)" 
+      by simp
+  next
+    assume "state \<Turnstile> Silent (hml_srbb_to_hml' \<phi>)"
+    then show "state \<Turnstile> hml_srbb_to_hml' \<phi>" sorry
+  qed
+qed
+\<close>
+
 lemma 
   fixes \<phi> :: "('a, 's) hml_srbb"
     and \<chi> :: "('a, 's) hml_srbb_conjunction"
@@ -304,8 +329,62 @@ lemma
   shows "(\<forall>state. (state \<Turnstile> remove_obs_\<tau> (hml_srbb_to_hml \<phi>)) \<longleftrightarrow> (state \<Turnstile> (hml_srbb_to_hml' \<phi>)))
        \<and> (\<forall>state'. (state' \<Turnstile> remove_obs_\<tau> (hml_srbb_conjunction_to_hml \<chi>)) \<longleftrightarrow> (state' \<Turnstile> (hml_srbb_conjunction_to_hml' \<chi>)))
        \<and> (\<forall>state''. (hml_conjunct_models state'' (remove_obs_\<tau>_\<psi> (hml_srbb_conjunct_to_hml_conjunct \<psi>))) \<longleftrightarrow> (hml_conjunct_models state'' (hml_srbb_conjunct_to_hml_conjunct' \<psi>)))"
-  apply (rule hml_srbb_hml_srbb_conjunction_hml_srbb_conjunct.induct)
-  sorry
+proof (rule hml_srbb_hml_srbb_conjunction_hml_srbb_conjunct.induct)
+  show "\<forall>state. state \<Turnstile> remove_obs_\<tau> (hml_srbb_to_hml TT) = state \<Turnstile> hml_srbb_to_hml' TT"
+    by simp
+next
+  fix \<chi>
+  assume "\<forall>state'. state' \<Turnstile> remove_obs_\<tau> (hml_srbb_conjunction_to_hml \<chi>) = state' \<Turnstile> hml_srbb_conjunction_to_hml' \<chi>"
+  then show "\<forall>state. state \<Turnstile> remove_obs_\<tau> (hml_srbb_to_hml (Internal \<chi>)) = state \<Turnstile> hml_srbb_to_hml' (Internal \<chi>)"
+    by simp
+next
+  fix I :: "'s set" and \<psi>s :: "'s \<Rightarrow> ('a, 's) hml_srbb_conjunct"
+  assume "(\<And>\<psi>. \<psi> \<in> range \<psi>s \<Longrightarrow>
+               \<forall>state''.
+                  hml_conjunct_models state'' (remove_obs_\<tau>_\<psi> (hml_srbb_conjunct_to_hml_conjunct \<psi>)) =
+                  hml_conjunct_models state'' (hml_srbb_conjunct_to_hml_conjunct' \<psi>))"
+  then show "\<forall>state. state \<Turnstile> remove_obs_\<tau> (hml_srbb_to_hml (ImmConj I \<psi>s)) = state \<Turnstile> hml_srbb_to_hml' (ImmConj I \<psi>s)"
+    by simp
+next
+  fix \<alpha> \<phi>
+  assume IH: "\<forall>state. state \<Turnstile> remove_obs_\<tau> (hml_srbb_to_hml \<phi>) = state \<Turnstile> hml_srbb_to_hml' \<phi>"
+
+  have "\<forall>state'.
+       (state' \<Turnstile> if \<alpha> = \<tau> then remove_obs_\<tau> (hml_srbb_to_hml \<phi>) else hml.Obs \<alpha> (remove_obs_\<tau> (hml_srbb_to_hml \<phi>))) =
+       (state' \<Turnstile> if \<alpha> = \<tau> then hml.Silent (hml_srbb_to_hml' \<phi>) else hml.Obs \<alpha> (hml_srbb_to_hml' \<phi>))"
+  proof (cases \<open>\<alpha> = \<tau>\<close>)
+    case True
+    hence "\<alpha> = \<tau>".
+
+    have "\<forall>state'.
+       (state' \<Turnstile> remove_obs_\<tau> (hml_srbb_to_hml \<phi>)) =
+       (state' \<Turnstile> hml.Silent (hml_srbb_to_hml' \<phi>))"
+    proof (rule allI, rule iffI)
+      fix state'
+      assume "state' \<Turnstile> remove_obs_\<tau> (hml_srbb_to_hml \<phi>)"
+      then show "state' \<Turnstile> Silent (hml_srbb_to_hml' \<phi>)" 
+        using IH hml_models.simps(4) by blast
+    next
+      fix state'
+      assume "state' \<Turnstile> Silent (hml_srbb_to_hml' \<phi>)"
+      then show "state' \<Turnstile> remove_obs_\<tau> (hml_srbb_to_hml \<phi>)" sorry
+    qed
+
+    then show ?thesis
+      using \<open>\<alpha> = \<tau>\<close> by auto
+  next
+    case False
+    hence "\<alpha> \<noteq> \<tau>".
+    then show ?thesis sorry
+  qed
+
+  then show "\<forall>state'.
+          state' \<Turnstile> remove_obs_\<tau> (hml_srbb_conjunction_to_hml (hml_srbb_conjunction.Obs \<alpha> \<phi>)) =
+          state' \<Turnstile> hml_srbb_conjunction_to_hml' (hml_srbb_conjunction.Obs \<alpha> \<phi>)"
+    unfolding hml_srbb_conjunction_to_hml.simps
+          and remove_obs_\<tau>.simps
+          and hml_srbb_conjunction_to_hml'.simps.
+  oops
 
 end
 
