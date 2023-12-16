@@ -104,9 +104,12 @@ lemma "hml_equivalent \<phi>s l r = (\<forall>\<phi> \<in> \<phi>s. \<not>(disti
 
 end (* Inhabited_Tau_LTS *)
 
-inductive tau_obs_free :: "('act, 'i) hml_srbb \<Rightarrow> bool"
-  and tau_obs_free_\<chi> :: "('act, 'i) hml_srbb_conjunction \<Rightarrow> bool"
-  and tau_obs_free_\<psi> :: "('act, 'i) hml_srbb_conjunct \<Rightarrow> bool" where
+context LTS_Tau
+begin
+
+inductive tau_obs_free :: "('a, 's) hml_srbb \<Rightarrow> bool"
+  and tau_obs_free_\<chi> :: "('a, 's) hml_srbb_conjunction \<Rightarrow> bool"
+  and tau_obs_free_\<psi> :: "('a, 's) hml_srbb_conjunct \<Rightarrow> bool" where
   "tau_obs_free TT" |
   "tau_obs_free (Internal \<chi>)" if "tau_obs_free_\<chi> \<chi>" |
   "tau_obs_free (ImmConj I \<psi>s)" if "\<forall>i \<in> I. tau_obs_free_\<psi> (\<psi>s i)" |
@@ -118,6 +121,12 @@ inductive tau_obs_free :: "('act, 'i) hml_srbb \<Rightarrow> bool"
 
   "tau_obs_free_\<psi> (Pos \<chi>)" if "tau_obs_free_\<chi> \<chi>" |
   "tau_obs_free_\<psi> (Neg \<chi>)" if "tau_obs_free_\<chi> \<chi>"
+
+lemma tau_free_so_\<alpha>_not_\<tau>: "tau_obs_free_\<chi> (Obs \<alpha> \<phi>) \<Longrightarrow> \<alpha> \<noteq> \<tau>"
+  using hml_srbb_conjunction.distinct(5) tau_obs_free_\<chi>.cases by auto
+
+end
+  
 
 context Inhabited_Tau_LTS
 begin
@@ -144,17 +153,146 @@ primrec
   "hml_srbb_conjunct_to_hml_conjunct' (Pos \<chi>) = hml_conjunct.Pos (hml.Internal (hml_srbb_conjunction_to_hml' \<chi>))" |
   "hml_srbb_conjunct_to_hml_conjunct' (Neg \<chi>) = hml_conjunct.Neg (hml.Internal (hml_srbb_conjunction_to_hml' \<chi>))"
 
+
 lemma
   fixes \<phi> :: "('a, 's) hml_srbb"
     and \<chi> :: "('a, 's) hml_srbb_conjunction"
-    and \<psi>
-  assumes "tau_obs_free \<phi>"
-    and "tau_obs_free_\<chi> \<chi>"
-    and "tau_obs_free_\<psi> \<psi>"
-  shows "((state \<Turnstile> (hml_srbb_to_hml \<phi>)) \<longleftrightarrow> (state \<Turnstile> (hml_srbb_to_hml' \<phi>)))
-        \<and> ((state' \<Turnstile> (hml_srbb_conjunction_to_hml \<chi>)) \<longleftrightarrow> (state' \<Turnstile> (hml_srbb_conjunction_to_hml' \<chi>)))
-        \<and> ((hml_conjunct_models state'' (hml_srbb_conjunct_to_hml_conjunct \<psi>)) \<longleftrightarrow> (hml_conjunct_models state'' (hml_srbb_conjunct_to_hml_conjunct' \<psi>)))"
-  sorry
+    and \<psi> :: "('a, 's) hml_srbb_conjunct"
+  shows "(\<forall>state. tau_obs_free \<phi> \<longrightarrow> ((state \<Turnstile> (hml_srbb_to_hml \<phi>)) \<longleftrightarrow> (state \<Turnstile> (hml_srbb_to_hml' \<phi>))))
+        \<and> (\<forall>state'. tau_obs_free_\<chi> \<chi> \<longrightarrow> ((state' \<Turnstile> (hml_srbb_conjunction_to_hml \<chi>)) \<longleftrightarrow> (state' \<Turnstile> (hml_srbb_conjunction_to_hml' \<chi>))))
+        \<and> (\<forall>state''. tau_obs_free_\<psi> \<psi> \<longrightarrow> ((hml_conjunct_models state'' (hml_srbb_conjunct_to_hml_conjunct \<psi>)) \<longleftrightarrow> (hml_conjunct_models state'' (hml_srbb_conjunct_to_hml_conjunct' \<psi>))))"
+  apply (rule hml_srbb_hml_srbb_conjunction_hml_srbb_conjunct.induct)
+  apply simp 
+  apply (metis LTS_Tau.hml_models.simps(3) hml_srbb.distinct(1) hml_srbb.distinct(5) hml_srbb.inject(1) hml_srbb_to_hml'.simps(2) hml_srbb_to_hml.simps(2) tau_obs_free.cases)
+  apply (smt (verit) comp_apply hml_models.simps(5) hml_srbb.distinct(3) hml_srbb.distinct(5) hml_srbb.inject(2) hml_srbb_to_hml'.simps(3) hml_srbb_to_hml.simps(3) range_eqI tau_obs_free.cases)
+  apply (smt (verit) hml_models.simps(2) hml_srbb_conjunction.distinct(1) hml_srbb_conjunction.distinct(3) hml_srbb_conjunction.distinct(5) hml_srbb_conjunction.inject(1) hml_srbb_conjunction_to_hml'.simps(1) hml_srbb_conjunction_to_hml.simps(1) tau_obs_free_\<chi>.cases)
+  apply (smt (verit) comp_apply hml_models.simps(5) hml_srbb_conjunction.distinct(1) hml_srbb_conjunction.distinct(7) hml_srbb_conjunction.distinct(9) hml_srbb_conjunction.inject(2) hml_srbb_conjunction_to_hml'.simps(2) hml_srbb_conjunction_to_hml.simps(2) range_eqI tau_obs_free_\<chi>.cases)
+  apply (smt (verit) comp_def hml_conjunct_models.simps(1) hml_models.simps(5) hml_srbb_conjunction.distinct(11) hml_srbb_conjunction.distinct(3) hml_srbb_conjunction.distinct(7) hml_srbb_conjunction.inject(3) hml_srbb_conjunction_to_hml'.simps(3) hml_srbb_conjunction_to_hml.simps(3) range_eqI tau_obs_free_\<chi>.cases)
+proof -
+  fix \<alpha> :: 'a 
+    and \<phi> :: "('a, 's) hml_srbb" 
+    and I :: "'s set"
+    and \<psi>s :: "'s \<Rightarrow> ('a, 's) hml_srbb_conjunct"
+  assume IH1: "\<forall>state. tau_obs_free \<phi> \<longrightarrow> state \<Turnstile> hml_srbb_to_hml \<phi> = state \<Turnstile> hml_srbb_to_hml' \<phi>"
+    and IH2: "(\<And>\<psi>. \<psi> \<in> range \<psi>s \<Longrightarrow>
+               \<forall>state''.
+                  tau_obs_free_\<psi> \<psi> \<longrightarrow>
+                  hml_conjunct_models state'' (hml_srbb_conjunct_to_hml_conjunct \<psi>) =
+                  hml_conjunct_models state'' (hml_srbb_conjunct_to_hml_conjunct' \<psi>))"
+  show "\<forall>state'.
+          tau_obs_free_\<chi> (BranchConj \<alpha> \<phi> I \<psi>s) \<longrightarrow>
+          (state' \<Turnstile> hml_srbb_conjunction_to_hml (BranchConj \<alpha> \<phi> I \<psi>s)) =
+          (state' \<Turnstile> hml_srbb_conjunction_to_hml' (BranchConj \<alpha> \<phi> I \<psi>s))"
+  proof (rule allI, rule impI, cases \<open>\<alpha> = \<tau>\<close>)
+    fix state'
+    assume "tau_obs_free_\<chi> (BranchConj \<alpha> \<phi> I \<psi>s)"
+      and "\<alpha> = \<tau>"
+    show "state' \<Turnstile> hml_srbb_conjunction_to_hml (BranchConj \<alpha> \<phi> I \<psi>s) =
+       state' \<Turnstile> hml_srbb_conjunction_to_hml' (BranchConj \<alpha> \<phi> I \<psi>s)"
+    proof (rule iffI)
+      assume "state' \<Turnstile> hml_srbb_conjunction_to_hml (BranchConj \<alpha> \<phi> I \<psi>s)"
+      hence "hml_conjunct_models state' (hml_conjunct.Pos (HML_soft_poss \<alpha> (hml_srbb_to_hml \<phi>)))"
+        and "hml_conjunct_models state' (hml_conjunct.Pos (hml.Conj I (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s)))"
+        unfolding hml_srbb_conjunction_to_hml.simps
+        using HML_and_logic_and 
+        by blast+
+
+      show "state' \<Turnstile> hml_srbb_conjunction_to_hml' (BranchConj \<alpha> \<phi> I \<psi>s)" 
+        unfolding hml_srbb_conjunction_to_hml'.simps
+        unfolding HML_and_logic_and
+      proof (rule conjI)
+        show "hml_conjunct_models state' (hml_conjunct.Pos (HML_soft_poss \<alpha> (hml_srbb_to_hml' \<phi>)))"
+          using \<open>hml_conjunct_models state' (hml_conjunct.Pos (HML_soft_poss \<alpha> (hml_srbb_to_hml \<phi>)))\<close>
+            and IH1 
+          using \<open>\<alpha> = \<tau>\<close> \<open>tau_obs_free_\<chi> (BranchConj \<alpha> \<phi> I \<psi>s)\<close> hml_conjunct_models.simps(1) hml_models.simps(4) hml_srbb_conjunction.distinct(11) hml_srbb_conjunction.inject(4) tau_obs_free_\<chi>.simps by auto
+      next
+        show "hml_conjunct_models state' (hml_conjunct.Pos (hml.Conj I (hml_srbb_conjunct_to_hml_conjunct' \<circ> \<psi>s)))"
+          using \<open>hml_conjunct_models state' (hml_conjunct.Pos (hml.Conj I (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s)))\<close>
+            and IH2 rangeI 
+          by (smt (verit) \<open>tau_obs_free_\<chi> (BranchConj \<alpha> \<phi> I \<psi>s)\<close> comp_def hml_conjunct_models.simps(1) hml_models.simps(5) hml_srbb_conjunction.distinct(11) hml_srbb_conjunction.distinct(5) hml_srbb_conjunction.distinct(9) hml_srbb_conjunction.inject(4) tau_obs_free_\<chi>.cases)
+      qed        
+    next
+      assume "state' \<Turnstile> hml_srbb_conjunction_to_hml' (BranchConj \<alpha> \<phi> I \<psi>s)"
+      hence "hml_conjunct_models state' (hml_conjunct.Pos (HML_soft_poss \<alpha> (hml_srbb_to_hml' \<phi>)))"
+         and "hml_conjunct_models state' (hml_conjunct.Pos (hml.Conj I (hml_srbb_conjunct_to_hml_conjunct' \<circ> \<psi>s)))"
+        unfolding hml_srbb_conjunction_to_hml'.simps
+        unfolding HML_and_logic_and by blast+
+      show "state' \<Turnstile> hml_srbb_conjunction_to_hml (BranchConj \<alpha> \<phi> I \<psi>s)"
+        unfolding hml_srbb_conjunction_to_hml.simps
+        unfolding HML_and_logic_and
+      proof (rule conjI)
+        show "hml_conjunct_models state' (hml_conjunct.Pos (HML_soft_poss \<alpha> (hml_srbb_to_hml \<phi>)))"
+          using \<open>hml_conjunct_models state' (hml_conjunct.Pos (HML_soft_poss \<alpha> (hml_srbb_to_hml' \<phi>)))\<close>
+            and IH1 
+            and \<open>\<alpha> = \<tau>\<close>
+            and \<open>tau_obs_free_\<chi> (BranchConj \<alpha> \<phi> I \<psi>s)\<close> 
+          using hml_srbb_conjunction.distinct(11) hml_srbb_conjunction.distinct(5) hml_srbb_conjunction.distinct(9) tau_obs_free_\<chi>.cases by fastforce
+      next
+        show "hml_conjunct_models state' (hml_conjunct.Pos (hml.Conj I (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s)))"
+          using \<open>hml_conjunct_models state' (hml_conjunct.Pos (hml.Conj I (hml_srbb_conjunct_to_hml_conjunct' \<circ> \<psi>s)))\<close>
+            and IH2 
+            and \<open>tau_obs_free_\<chi> (BranchConj \<alpha> \<phi> I \<psi>s)\<close> 
+          by (smt (verit) comp_apply hml_conjunct_models.simps(1) hml_models.simps(5) hml_srbb_conjunction.distinct(11) hml_srbb_conjunction.distinct(5) hml_srbb_conjunction.distinct(9) hml_srbb_conjunction.inject(4) rangeI tau_obs_free_\<chi>.cases)
+      qed
+    qed
+  next
+    fix state'
+    assume "tau_obs_free_\<chi> (BranchConj \<alpha> \<phi> I \<psi>s)"
+      and "\<alpha> \<noteq> \<tau>"
+    hence "tau_obs_free \<phi>"
+      and "\<forall>i \<in> I. tau_obs_free_\<psi> (\<psi>s i)"   
+      using tau_obs_free_\<chi>.cases by blast+
+
+    show "state' \<Turnstile> hml_srbb_conjunction_to_hml (BranchConj \<alpha> \<phi> I \<psi>s) =
+       state' \<Turnstile> hml_srbb_conjunction_to_hml' (BranchConj \<alpha> \<phi> I \<psi>s)"
+    proof (rule iffI)
+      assume "state' \<Turnstile> hml_srbb_conjunction_to_hml (BranchConj \<alpha> \<phi> I \<psi>s)"
+      hence "hml_conjunct_models state' (hml_conjunct.Pos (HML_soft_poss \<alpha> (hml_srbb_to_hml \<phi>)))"
+        and "hml_conjunct_models state' (hml_conjunct.Pos (hml.Conj I (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s)))"
+        using hml_srbb_conjunction_to_hml.simps and HML_and_logic_and apply simp
+        using hml_srbb_conjunction_to_hml.simps and HML_and_logic_and 
+          and \<open>state' \<Turnstile> hml_srbb_conjunction_to_hml (BranchConj \<alpha> \<phi> I \<psi>s)\<close> by presburger
+
+      show "state' \<Turnstile> hml_srbb_conjunction_to_hml' (BranchConj \<alpha> \<phi> I \<psi>s)"
+        unfolding hml_srbb_conjunction_to_hml'.simps
+              and HML_and_logic_and
+      proof (rule conjI)
+        show "hml_conjunct_models state' (hml_conjunct.Pos (HML_soft_poss \<alpha> (hml_srbb_to_hml' \<phi>)))"
+          using \<open>hml_conjunct_models state' (hml_conjunct.Pos (HML_soft_poss \<alpha> (hml_srbb_to_hml \<phi>)))\<close>
+            and IH1 and \<open>\<alpha> \<noteq> \<tau>\<close>
+            and \<open>tau_obs_free \<phi>\<close> 
+          by simp
+      next
+        show "hml_conjunct_models state' (hml_conjunct.Pos (hml.Conj I (hml_srbb_conjunct_to_hml_conjunct' \<circ> \<psi>s)))"
+          using \<open>hml_conjunct_models state' (hml_conjunct.Pos (hml.Conj I (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s)))\<close>
+            and IH2
+            and \<open>\<forall>i \<in> I. tau_obs_free_\<psi> (\<psi>s i)\<close> 
+          by simp
+      qed
+    next
+      assume "state' \<Turnstile> hml_srbb_conjunction_to_hml' (BranchConj \<alpha> \<phi> I \<psi>s)"
+      then show "state' \<Turnstile> hml_srbb_conjunction_to_hml (BranchConj \<alpha> \<phi> I \<psi>s)" 
+        using IH1 IH2 \<open>\<alpha> \<noteq> \<tau>\<close> \<open>\<forall>i\<in>I. tau_obs_free_\<psi> (\<psi>s i)\<close> \<open>tau_obs_free \<phi>\<close> comp_apply hml_conjunct_models.simps(1) hml_models.simps(2) hml_models.simps(5) hml_srbb_conjunction_to_hml'.simps(4) hml_srbb_conjunction_to_hml.simps(4) rangeI by auto
+    qed
+  qed
+next
+  show "\<And>x. \<forall>state'. tau_obs_free_\<chi> x \<longrightarrow> state' \<Turnstile> hml_srbb_conjunction_to_hml x = state' \<Turnstile> hml_srbb_conjunction_to_hml' x \<Longrightarrow>
+         \<forall>state''.
+            tau_obs_free_\<psi> (hml_srbb_conjunct.Pos x) \<longrightarrow>
+            hml_conjunct_models state'' (hml_srbb_conjunct_to_hml_conjunct (hml_srbb_conjunct.Pos x)) =
+            hml_conjunct_models state'' (hml_srbb_conjunct_to_hml_conjunct' (hml_srbb_conjunct.Pos x))"
+    
+    by (metis LTS_Tau.hml_conjunct_models.simps(1) LTS_Tau.hml_models.simps(3) hml_srbb_conjunct.inject(1) hml_srbb_conjunct.simps(4) hml_srbb_conjunct_to_hml_conjunct'.simps(1) hml_srbb_conjunct_to_hml_conjunct.simps(1) tau_obs_free_\<psi>.cases)
+next
+  show "\<And>x. \<forall>state'. tau_obs_free_\<chi> x \<longrightarrow> state' \<Turnstile> hml_srbb_conjunction_to_hml x = state' \<Turnstile> hml_srbb_conjunction_to_hml' x \<Longrightarrow>
+         \<forall>state''.
+            tau_obs_free_\<psi> (hml_srbb_conjunct.Neg x) \<longrightarrow>
+            hml_conjunct_models state'' (hml_srbb_conjunct_to_hml_conjunct (hml_srbb_conjunct.Neg x)) =
+            hml_conjunct_models state'' (hml_srbb_conjunct_to_hml_conjunct' (hml_srbb_conjunct.Neg x))"
+    by (simp add: tau_obs_free_\<psi>.simps)
+qed
+
+
 
   
 end

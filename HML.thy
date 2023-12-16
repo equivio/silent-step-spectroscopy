@@ -102,4 +102,29 @@ qed
 
 end
 
+context Inhabited_Tau_LTS
+begin
+
+lemma HML_and_logic_and: "(state \<Turnstile> HML_and \<psi>1 \<psi>2) = ((hml_conjunct_models state \<psi>1) \<and> (hml_conjunct_models state \<psi>2))"
+proof (rule iffI)
+  assume "state \<Turnstile> \<psi>1 \<and>hml \<psi>2"
+  hence "\<forall>i \<in> {left, right}. hml_conjunct_models state ((\<lambda>i. if i = left
+                                          then \<psi>1
+                                          else if i = right
+                                               then \<psi>2
+                                               else Pos TT) i)" by simp
+  hence "hml_conjunct_models state \<psi>1"
+    and "hml_conjunct_models state \<psi>2" apply simp 
+    by (smt (verit, ccfv_SIG) Inhabited_LTS_axioms Inhabited_LTS_def \<open>\<forall>i\<in>{left, right}. hml_conjunct_models state (if i = left then \<psi>1 else if i = right then \<psi>2 else Pos TT)\<close> insertCI)
+  then show "hml_conjunct_models state \<psi>1 \<and> hml_conjunct_models state \<psi>2" by auto
+next
+  assume "hml_conjunct_models state \<psi>1 \<and> hml_conjunct_models state \<psi>2"
+  hence "hml_conjunct_models state \<psi>1"
+    and "hml_conjunct_models state \<psi>2" by auto
+  then show "state \<Turnstile> \<psi>1 \<and>hml \<psi>2" 
+    by simp
+qed
+
+end
+
 end
