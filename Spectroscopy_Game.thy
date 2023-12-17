@@ -13,7 +13,7 @@ datatype ('s, 'a) spectroscopy_position =
                           Defender_Stable_Conj (attacker_state: "'s") (defender_states: "'s set")
 context LTS_Tau begin
 
-(*define moves in a spectroscopy game*)
+(*define moves in a spectroscopy game dependend on a LTS*)
 fun weight_opt :: "('s, 'a) spectroscopy_position \<Rightarrow> ('s, 'a) spectroscopy_position \<Rightarrow> energy update option" where 
   delay: 
     "weight_opt (Attacker_Immediate p Q) (Attacker_Delayed p' Q') 
@@ -38,7 +38,7 @@ fun weight_opt :: "('s, 'a) spectroscopy_position \<Rightarrow> ('s, 'a) spectro
     "weight_opt (Attacker_Delayed p Q) (Defender_Conj p' Q') 
       = (if p = p' \<and> Q = Q' then Some id else None)" |
 
-  conj_awns: 
+  conj_answer: 
     "weight_opt (Defender_Conj p Q) (Attacker_Clause p' q) 
       = (if p = p' \<and> q \<in> Q then (subtract 0 0 1 0 0 0 0 0) else None)" |
   
@@ -52,7 +52,7 @@ fun weight_opt :: "('s, 'a) spectroscopy_position \<Rightarrow> ('s, 'a) spectro
     "weight_opt (Attacker_Delayed p Q) (Defender_Stable_Conj p' Q') 
       = (if (p = p' \<and> Q' = { q \<in> Q. (\<nexists>q'. q \<mapsto>\<tau> q')} \<and> (\<nexists>p''. p \<mapsto>\<tau> p'')) then Some id else None)" |
 
-  conj_s_awns: 
+  conj_s_answer: 
     "weight_opt (Defender_Stable_Conj p Q) (Attacker_Clause p' q) 
       = (if p = p' \<and> q \<in> Q then (subtract 0 0 0 1 0 0 0 0) else None)" |
 
@@ -60,7 +60,7 @@ fun weight_opt :: "('s, 'a) spectroscopy_position \<Rightarrow> ('s, 'a) spectro
     "weight_opt (Attacker_Delayed p Q) (Defender_Branch p' \<alpha> p'' Q' Q\<alpha>) 
       = (if (p = p' \<and> Q' = Q - Q\<alpha> \<and> p \<mapsto>\<alpha> p'' \<and> Q\<alpha> \<noteq> {} \<and> Q\<alpha> \<subseteq> Q)then Some id else None)" |
 
-  br_awns: 
+  br_answer: 
     "weight_opt (Defender_Branch p \<alpha> p' Q Q\<alpha>) (Attacker_Clause p'' q) 
       = (if (p = p'' \<and> q \<in> Q) then (subtract 0 1 1 0 0 0 0 0) else None)" |
 
@@ -74,6 +74,7 @@ fun weight_opt :: "('s, 'a) spectroscopy_position \<Rightarrow> ('s, 'a) spectro
 
   others: "weight_opt _ _ = None"
 
+(*define defender positions in a spectroscopy game dependent on a LTS*)
 fun defender where
   "defender (Attacker_Immediate _ _) = False" |
   "defender (Attacker_Branch _ _) = False" |
