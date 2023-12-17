@@ -70,6 +70,22 @@ lemma Game_finite_play_counterexample:
   using Game.finite_play.intros Game.finite_play_is_path
   by (metis append_Cons append_Nil last_snoc list.distinct(1) weight_opt.simps(20)) 
 
+lemma Game_finite_play_check:
+  shows "\<not>finite_play b2 [a, b2, c, d1, e]"
+  by (metis Game.finite_play.cases append1_eq_conv append_Cons append_Nil energy_game.finite_play_prefix list.distinct(1) weight_opt.simps(39))
+
+lemma Game_finite_play_check_2:
+  assumes "x\<noteq>a"
+  shows "\<not>finite_play x [a, b2, c, d1, e]" 
+proof (rule notI)
+  assume A1: "finite_play x [a, b2, c, d1, e]"
+  from A1 have A2: "finite_play x ([a] @ [b2, c, d1, e])"
+    by simp
+  from A2 have A3: "\<not>finite_play x ([a] @ [b2, c, d1, e])"
+    by (metis Game.finite_play.cases Game.finite_play_prefix append1_eq_conv append_Nil assms neq_Nil_conv weight_opt.simps(39)) 
+  from A1 A3 show "False" by simp
+qed
+
 abbreviation "energy_level \<equiv> Game.energy_level"
 
 lemma energy_level_example:

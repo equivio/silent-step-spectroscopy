@@ -26,4 +26,17 @@ abbreviation silent_reachable_set (infix "\<Zsurj>S" 80) where "P \<Zsurj>S Q \<
 abbreviation non_tau_step_set ("_ \<mapsto>aS _ _" [70,70,70] 80) where "P \<mapsto>aS \<alpha> Q \<equiv> \<forall>p \<in> P. \<forall>q \<in> Q. p \<mapsto>a \<alpha> q"
 
 end (* locale LTS_Tau *)
+
+locale Inhabited_LTS = LTS step
+  for step :: "'s \<Rightarrow> 'a \<Rightarrow> 's \<Rightarrow> bool" ("_ \<mapsto> _ _" [70,70,70] 80) +
+  fixes left :: 's
+    and right :: 's
+  assumes "(left::'s) \<noteq> (right::'s)"
+
+locale Inhabited_Tau_LTS = Inhabited_LTS step left right + LTS_Tau step \<tau>
+  for step :: "'s \<Rightarrow> 'a \<Rightarrow> 's \<Rightarrow> bool" ("_ \<mapsto> _ _" [70,70,70] 80)
+  and left :: 's
+  and right :: 's
+  and \<tau> :: 'a
+
 end (* theory LTS *)
