@@ -76,7 +76,6 @@ context Inhabited_Tau_LTS
 begin                 
 
 lemma trace_formula_implies_trace:
-  fixes \<phi> :: "('a, 's) hml_srbb"
   fixes \<psi> ::"('a, 's) hml_srbb_conjunct"
   shows trace_case: "is_trace_formula \<phi> \<Longrightarrow> \<phi> \<Turnstile>SRBB p \<Longrightarrow> (\<exists>tr \<in> weak_traces p. wtrace_to_\<phi> tr = \<phi>)" and
 conj_case: "is_trace_formula_conjunction \<chi> \<Longrightarrow> hml_srbb_conjunction_models \<chi> q \<Longrightarrow> (\<exists>tr \<in> weak_traces q. wtrace_to_\<chi> tr = \<chi>)"
@@ -91,15 +90,11 @@ next
                  hml_srbb_conjunction_models \<chi>r q \<Longrightarrow> \<exists>tr\<in>weak_traces q. wtrace_to_\<chi> tr = \<chi>r)"
 and is_trace_internal :"is_trace_formula (hml_srbb.Internal \<chi>r)"
 and internal_satisfied: "hml_srbb.Internal \<chi>r \<Turnstile>SRBB p"
-  from internal_satisfied have "((hml_srbb_to_hml (hml_srbb.Internal \<chi>r)) \<Turnstile> p)"
-    by simp
-  then obtain p' where wtrace_to_p': "p \<Zsurj> p'" and p'_models_\<chi>r: "hml_srbb_conjunction_models \<chi>r p'" 
+  from Internal(3) obtain p' where wtrace_to_p': "p \<Zsurj> p'" and p'_models_\<chi>r: "hml_srbb_conjunction_models \<chi>r p'" 
     by auto
-  from is_trace_internal have "is_trace_formula_conjunction \<chi>r"
+  from Internal(2) have "is_trace_formula_conjunction \<chi>r"
     using is_trace_formula.cases by auto
-  with p'_models_\<chi>r IH obtain tail where tail_in_traces_p': "tail \<in> weak_traces p'" "wtrace_to_\<chi> tail = \<chi>r"
-    by blast
-  from tail_in_traces_p' obtain p'' where "p' \<Zsurj>\<mapsto>\<Zsurj>$ tail p''"
+  with p'_models_\<chi>r IH obtain tail p'' where tail_in_traces_p': "tail \<in> weak_traces p'" "wtrace_to_\<chi> tail = \<chi>r" "p' \<Zsurj>\<mapsto>\<Zsurj>$ tail p''"
     by blast
   then show ?case
   proof(cases tail)
@@ -155,7 +150,7 @@ next
   case (StableConj x1 x2)
   hence False 
     using is_trace_formula_conjunction.cases by blast
-  then show ?case by by blast
+  then show ?case by blast
 next
   case (BranchConj x1 x2 x3 x4)
   hence False 
@@ -180,6 +175,59 @@ lemma aux:
       \<and> (\<lambda>x. True) \<psi>"
   sorry
 
+lemma "t \<in> weak_traces p = ((wtrace_to_\<phi> t) \<Turnstile>SRBB p)"
+proof
+  define \<phi>:: "('a, 'b) hml_srbb" where "\<phi> \<equiv> (wtrace_to_\<phi> t)"
+  assume "t \<in> weak_traces p"
+  show "((wtrace_to_\<phi> t) \<Turnstile>SRBB p)"
+    using \<open>t \<in> weak_traces p\<close>
+  proof(induction t arbitrary: p)
+    case Nil
+    then show ?case
+      by simp
+  next
+    case (Cons a tail)
+    then obtain p'' p' where "p \<Zsurj>\<mapsto>\<Zsurj> a p''" "p'' \<Zsurj>\<mapsto>\<Zsurj>$ tail p'" using weak_step_sequence.simps 
+      by (smt (verit, best) list.discI list.inject mem_Collect_eq)
+    with Cons(1) have "wtrace_to_\<phi> tail \<Turnstile>SRBB p''"
+      by blast
+    have "wtrace_to_\<phi> (a # tail) = (Internal (Obs a (wtrace_to_\<phi> tail)))" 
+      using wtrace_to_\<phi>.simps(2) wtrace_to_\<chi>.simps(2) 
+      by force
+    have "(wtrace_to_\<phi> (a # tail) \<Turnstile>SRBB p) = 
+(\<exists>p'. p \<Zsurj> p' \<and> ((\<exists>p''. p' \<mapsto> a p'' \<and> wtrace_to_\<phi> tail \<Turnstile>SRBB p'')))" by simp
+    with \<open>wtrace_to_\<phi> tail \<Turnstile>SRBB p''\<close> \<open>p \<Zsurj>\<mapsto>\<Zsurj> a p''\<close> eq show ?case sorry
+  qed
+next
+  assume "((wtrace_to_\<phi> t) \<Turnstile>SRBB p)"
+  then show "t \<in> weak_traces p"
+  proof(induction t arbitrary: p)
+    case Nil
+    then show ?case
+      using weak_step_sequence.intros(1) by fastforce
+  next
+    case (Cons a tail)
+    hence "(Internal (Obs a (wtrace_to_\<phi> tail))) \<Turnstile>SRBB p"
+      by simp
+    hence "((hml_srbb_to_hml (Internal (Obs a (wtrace_to_\<phi> tail)))) \<Turnstile> p)" 
+      by simp
+    hence "hml.Internal (hml.Obs a (hml_srbb_to_hml (wtrace_to_\<phi> tail))) \<Turnstile> p" 
+      by simp
+    hence "(\<exists>p'. p \<Zsurj> p' \<and> ((\<exists>p''. p' \<mapsto> a p'' \<and> (((hml_srbb_to_hml (wtrace_to_\<phi> tail))) \<Turnstile> p''))))" 
+      by simp
+    then obtain p' p'' where "p \<Zsurj> p'" "p' \<mapsto> a p''" "((hml_srbb_to_hml (wtrace_to_\<phi> tail))) \<Turnstile> p''"
+      by blast
+    from this(1, 2) have "p \<Zsurj>\<mapsto>\<Zsurj> a p''" unfolding weak_step_def using silent_reachable.intros 
+      by (metis silent_reachable_trans)
+    from \<open>((hml_srbb_to_hml (wtrace_to_\<phi> tail))) \<Turnstile> p''\<close> have "wtrace_to_\<phi> tail \<Turnstile>SRBB p''"
+      by simp
+    with Cons(1) have "tail \<in> weak_traces p''"
+      by blast
+    with \<open>p \<Zsurj>\<mapsto>\<Zsurj> a p''\<close> show "(a#tail) \<in> weak_traces p" 
+      using weak_step_sequence.intros(2) by fastforce
+  qed
+qed
+
 lemma "(p \<lesssim>WT q) = (p \<preceq> (E \<infinity> 0 0 0 0 0 0 0) q)"
   unfolding expr_preord_def hml_preordered_def
 proof
@@ -196,9 +244,14 @@ next
   assume \<phi>_eneg: "\<forall>\<phi>\<in>\<O> (E \<infinity> 0 0 0 0 0 0 0). \<phi> \<Turnstile>SRBB p \<longrightarrow> \<phi> \<Turnstile>SRBB q"
   show "p \<lesssim>WT q"
   proof-
-    from \<phi>_eneg have "\<forall>\<phi>. is_trace_formula \<phi> \<longrightarrow> \<phi> \<Turnstile>SRBB p \<longrightarrow> \<phi> \<Turnstile>SRBB q"
+    from \<phi>_eneg have 1: "\<forall>\<phi>. is_trace_formula \<phi> \<longrightarrow> \<phi> \<Turnstile>SRBB p \<longrightarrow> \<phi> \<Turnstile>SRBB q"
       using expressiveness_to_trace_formula modal_depth_only_is_trace_form by blast
-    then show ?thesis unfolding weakly_trace_preordered_def using trace_formula_implies_trace
+    hence "\<forall>\<phi>. is_trace_formula \<phi> \<and> \<phi> \<Turnstile>SRBB p \<longrightarrow> (\<exists>tr\<in>weak_traces p. wtrace_to_\<phi> tr = \<phi>)" 
+      using trace_formula_implies_trace
+      by blast
+    from 1 have "\<forall>\<phi>. is_trace_formula \<phi> \<and> \<phi> \<Turnstile>SRBB p \<longrightarrow> (\<exists>tr\<in>weak_traces q. wtrace_to_\<phi> tr = \<phi>)"
+      using trace_case by blast
+    then show ?thesis unfolding weakly_trace_preordered_def
       sorry
   qed
 qed
