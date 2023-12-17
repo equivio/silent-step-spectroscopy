@@ -1,5 +1,5 @@
-theory ExampleInstantiation      
-  imports EnergyGames "HOL-Library.Extended_Nat"
+theory Example_Instantiation      
+  imports Energy_Games "HOL-Library.Extended_Nat"
 begin
 
 datatype energy = E (one: "enat") (two: "enat") | eneg
@@ -42,7 +42,7 @@ fun defender :: "state \<Rightarrow> bool" where
   "defender e = True" |
   "defender _ = False"
 
-interpretation Game: energy_game "a" "E 10 10" "weight_opt" "defender" "eneg" .
+interpretation Game: energy_game "weight_opt" "defender" "eneg" .
 
 notation Game.moves (infix "\<Zinj>" 70)
 abbreviation "finite_play \<equiv> Game.finite_play"
@@ -56,28 +56,42 @@ lemma moves:
   by simp+
 
 lemma Game_finite_play_example:
-  shows "finite_play [a, b2, c, d1, e]"
+  shows "finite_play a [a, b2, c, d1, e]"
 proof-
-  have "finite_play [a]" by (rule Game.finite_play.intros(1))
-  hence "finite_play [a, b2]" using Game.finite_play.intros(2) by fastforce
-  hence "finite_play [a, b2, c]" using Game.finite_play.intros(2) by fastforce
-  hence "finite_play [a, b2, c, d1]" using Game.finite_play.intros(2) by fastforce
-  thus "finite_play [a, b2, c, d1, e]" using  Game.finite_play.intros(2) by fastforce
+  have "finite_play a [a]" by (rule Game.finite_play.intros(1))
+  hence "finite_play a [a, b2]" using Game.finite_play.intros(2) by fastforce
+  hence "finite_play a [a, b2, c]" using Game.finite_play.intros(2) by fastforce
+  hence "finite_play a [a, b2, c, d1]" using Game.finite_play.intros(2) by fastforce
+  thus "finite_play a [a, b2, c, d1, e]" using  Game.finite_play.intros(2) by fastforce
 qed
 
 lemma Game_finite_play_counterexample:
-  shows "\<not>finite_play [a, b2, e, d1, e]"
-  using Game.finite_play.intros Game.finite_play_is_trace
+  shows "\<not>finite_play a [a, b2, e, d1, e]"
+  using Game.finite_play.intros Game.finite_play_is_path
   by (metis append_Cons append_Nil last_snoc list.distinct(1) weight_opt.simps(20)) 
+
+lemma Game_finite_play_check:
+  shows "\<not>finite_play b2 [a, b2, c, d1, e]"
+  by (metis Game.finite_play.cases append1_eq_conv append_Cons append_Nil energy_game.finite_play_prefix list.distinct(1) weight_opt.simps(39))
+
+lemma Game_finite_play_check_2:
+  assumes "x\<noteq>a"
+  shows "\<not>finite_play x [a, b2, c, d1, e]" 
+proof (rule notI)
+  assume A1: "finite_play x [a, b2, c, d1, e]"
+  from A1 have A2: "finite_play x ([a] @ [b2, c, d1, e])"
+    by simp
+  from A2 have A3: "\<not>finite_play x ([a] @ [b2, c, d1, e])"
+    by (metis Game.finite_play.cases Game.finite_play_prefix append1_eq_conv append_Nil assms neq_Nil_conv weight_opt.simps(39)) 
+  from A1 A3 show "False" by simp
+qed
 
 abbreviation "energy_level \<equiv> Game.energy_level"
 
 lemma energy_level_example:
-  shows "energy_level [a, b2, c, d1, e] = E 9 8"
+  shows "energy_level a (E 10 10) [a, b2, c, d1, e] = E 9 8"
 proof-
-  let ?p="[a, b2, c, d1, e]"
-  from Game_finite_play_example Game.energy_level_fold_eq[of "?p"] have "energy_level ?p = 
-    id ((min_update (E 10 10 - E 0 1)) - E 0 1)" by simp
+  have "energy_level a (E 10 10) [a, b2, c, d1, e] =id ((min_update (E 10 10 - E 0 1)) - E 0 1)" by simp
   also have "... = id ((min_update (E 10 9)) - E 0 1)" by (simp add: numeral_eq_enat one_enat_def)
   also have "... = id (E 9 9 - E 0 1)" by simp
   also have "... = id (E 9 8)" by (simp add: numeral_eq_enat one_enat_def)
@@ -86,59 +100,59 @@ proof-
 qed
 
 lemma energy_level_example_1:
-  shows "energy_level [a, b2, c] = E 9 9"
+  shows "energy_level a (E 10 10) [a, b2, c] = E 9 9"
 proof-
-  have "energy_level [a, b2, c] = min_update (E 10 10 - E 0 1)" by simp
+  have "energy_level a (E 10 10) [a, b2, c] = min_update (E 10 10 - E 0 1)" by simp
   also have "... = E 9 9" by (simp add: numeral_eq_enat one_enat_def)
-  finally show "energy_level [a, b2, c] = E 9 9".
+  finally show "energy_level a (E 10 10) [a, b2, c] = E 9 9".
 qed
 
 lemma energy_level_example_2:
-  shows "energy_level [a, b2, d1] = undefined"
+  shows "energy_level a (E 10 10) [a, b2, d1] = undefined"
   using Game.energy_level.elims Game.energy_level.pelims by simp
 
 lemma energy_level_example_3:
-  shows "energy_level [a, b2, b1] = undefined"
+  shows "energy_level a (E 10 10) [a, b2, b1] = undefined"
   using Game.energy_level.elims Game.energy_level.pelims by simp
 
 lemma play_stuck_example:
-  shows "Game.play_stuck [a, b2, c, d1, e]"
-  by (metis (mono_tags, opaque_lifting) Game_finite_play_example append.assoc append_Cons energy_game.finite_play_is_trace last_ConsR list.distinct(1) self_append_conv2 snoc_eq_iff_butlast weight_opt.simps(38))
+  shows "Game.play_stuck a [a, b2, c, d1, e]"
+  by (metis (mono_tags, opaque_lifting) Game_finite_play_example append.assoc append_Cons energy_game.finite_play_is_path last_ConsR list.distinct(1) self_append_conv2 snoc_eq_iff_butlast weight_opt.simps(38))
   
 lemma play_not_stuck_example:
-  shows "\<not>(Game.play_stuck [a, b2, c])"
+  shows "\<not>(Game.play_stuck a [a, b2, c])"
 proof (-) 
-  have "finite_play ([a, b2, c] @ [d1])"
+  have "finite_play a ([a, b2, c] @ [d1])"
     by (metis Game.finite_play_suffix Game_finite_play_example append_Cons append_Nil list.distinct(1))
-  thus "\<not>(Game.play_stuck [a, b2, c])" by auto
+  thus "\<not>(Game.play_stuck a [a, b2, c])" by auto
 qed
 
 lemma play_stuck_invalid_game: 
-  shows "\<not>(Game.play_stuck [a, b2, d1])"
+  shows "\<not>(Game.play_stuck a [a, b2, d1])"
   by (smt (verit, best) Game.finite_play.simps butlast.simps(2) butlast_snoc distinct_adj_Cons distinct_adj_Cons_Cons last.simps last_snoc weight_opt.simps(18))
 
 lemma play_stuck_invalid_game_1: 
-  shows "\<not>Game.play_stuck [a, b2, b1]"
+  shows "\<not>Game.play_stuck a [a, b2, b1]"
   by (metis Game.finite_play.cases butlast.simps(2) butlast_snoc last.simps last_snoc list.discI weight_opt.simps(16))
 
 lemma attacker_wins_example:
-  shows "Game.won_by_attacker [a, b2, c, d1, e]"
+  shows "Game.won_by_attacker a (E 10 10) [a, b2, c, d1, e]"
   using play_stuck_example energy_level_example
   by (simp add: Game.won_by_attacker_def)
 
 lemma no_winner_example: 
-  shows "Game.no_winner [a, b2, c]"
+  shows "Game.no_winner a (E 10 10) [a, b2, c]"
   using play_not_stuck_example energy_level_example_1 by simp
 
 lemma attacker_turn_not_stuck:
-  assumes "finite_play p" and "Game.is_attacker_turn p"
-  shows "\<not>Game.play_stuck p"
+  assumes "finite_play a p" and "Game.is_attacker_turn p"
+  shows "\<not>Game.play_stuck a p"
 using assms proof - 
   from assms have "last p = a \<or> last p = d1 \<or> last p = d2"
     using defender.elims(3) by blast
   hence "(last p)\<Zinj> b1 \<or> (last p) \<Zinj> e" by auto
-  hence "(\<exists>gn. finite_play (p @ [gn]))" using assms(1) Game.finite_play.intros(2) by auto
-  thus "\<not>Game.play_stuck p" by simp
+  hence "(\<exists>gn. finite_play a (p @ [gn]))" using assms(1) Game.finite_play.intros(2) by blast 
+  thus "\<not>Game.play_stuck a p" by simp
 qed
 
 lemma attackers_winas_defender_stuck: 
