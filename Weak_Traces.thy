@@ -227,33 +227,16 @@ qed
 lemma "(p \<lesssim>WT q) = (p \<preceq> (E \<infinity> 0 0 0 0 0 0 0) q)"
   unfolding expr_preord_def hml_preordered_def
 proof
-  assume "p \<lesssim>WT q"
+  assume assm: "p \<lesssim>WT q"
   show "\<forall>\<phi>\<in>\<O> (E \<infinity> 0 0 0 0 0 0 0). \<phi> \<Turnstile>SRBB p \<longrightarrow> \<phi> \<Turnstile>SRBB q"
-  proof
-    fix \<phi>:: "('a, 's) hml_srbb"
-    assume "\<phi>\<in>\<O> (E \<infinity> 0 0 0 0 0 0 0)"
-    hence "is_trace_formula \<phi>" using expressiveness_to_trace_formula by blast
-    thus "\<phi> \<Turnstile>SRBB p \<longrightarrow> \<phi> \<Turnstile>SRBB q" 
-      using aux \<open>p \<lesssim>WT q\<close> weakly_trace_preordered_def by blast
-  qed
+    using assm aux expressiveness_to_trace_formula weakly_trace_preordered_def
+    by blast+
 next
   assume \<phi>_eneg: "\<forall>\<phi>\<in>\<O> (E \<infinity> 0 0 0 0 0 0 0). \<phi> \<Turnstile>SRBB p \<longrightarrow> \<phi> \<Turnstile>SRBB q"
   show "p \<lesssim>WT q"
     unfolding weakly_trace_preordered_def
-  proof(safe)
-    fix tr p'
-    assume "p \<Zsurj>\<mapsto>\<Zsurj>$ tr p'"
-    hence "(wtrace_to_\<phi> tr) \<Turnstile>SRBB p"
-      using trace_equals_trace_to_formula by blast
-    have "(wtrace_to_\<phi> tr)\<in> \<O> (E \<infinity> 0 0 0 0 0 0 0)" 
-      using trace_formula_to_expressiveness trace_to_\<phi>_is_trace_formula
-      by blast
-    with \<phi>_eneg \<open>(wtrace_to_\<phi> tr) \<Turnstile>SRBB p\<close> have "wtrace_to_\<phi> tr \<Turnstile>SRBB q"
-      by blast
-    hence "tr \<in> weak_traces q" using trace_equals_trace_to_formula by blast
-    thus "\<exists>p'. q \<Zsurj>\<mapsto>\<Zsurj>$ tr p'" 
-      by blast
-  qed
+    using \<phi>_eneg trace_equals_trace_to_formula trace_formula_to_expressiveness trace_to_\<phi>_is_trace_formula
+    by (simp, blast+)
 qed
 
 lemma "p \<Zsurj>\<mapsto>\<Zsurj>$ t p' \<Longrightarrow> \<exists>\<phi>. is_trace_formula \<phi> \<and> \<phi> \<Turnstile>SRBB p \<and> wtrace_to_\<phi> t = \<phi>"
