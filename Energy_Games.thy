@@ -28,11 +28,11 @@ fun energy_level :: "'gstate \<Rightarrow> 'energy \<Rightarrow>'gstate fplay \<
   "energy_level g0 e0 p = (
     if p = [g0] then 
       e0 
-    else 
-      (if (p \<noteq> [] \<and> ((weight_opt (last (butlast p))(last p)) \<noteq> None)) then 
-        ((weight (last (butlast p)) (last p)) (energy_level g0 e0 (butlast p))) 
-       else 
-        undefined))"
+    else ( if (length p \<ge> 2) then ( if ((weight_opt (last (butlast p))(last p)) \<noteq> None) then ((weight (last (butlast p)) (last p)) (energy_level g0 e0 (butlast p)))
+                                    else undefined)
+          else undefined))"
+
+
 
 lemma %invisible energy_level_def1:
   shows "energy_level g0 e0 [g0] = e0"
@@ -41,7 +41,7 @@ lemma %invisible energy_level_def1:
 lemma %invisible energy_level_def2:
   assumes "p' \<noteq> []" and "energy_level g0 e0 p' \<noteq> undefined" and "weight_opt (last p') gn \<noteq> None"  
   shows "energy_level g0 e0 (p' @ [gn]) = weight (last p') gn (energy_level g0 e0 p')"
-  using assms by simp
+  using assms by (simp add: not_less_eq_eq) 
 
 lemma %invisible energy_level_def3:
   shows "energy_level g0 e0 [] = undefined"
@@ -64,7 +64,7 @@ next
   next
     case False
     then show ?thesis 
-      using energy_level_def2 weight_well_def by simp
+      using energy_level_def2 weight_well_def e0 snoc.hyps snoc.prems(2) by auto 
   qed
 qed
 
@@ -132,11 +132,12 @@ next
   case (2 g0 p gn)
   have "length p \<ge> 1" using 2(1) finite_play_min_len by auto
   hence pred_eq: "(pairs (p @ [gn])) = (pairs p) @ [(last p, gn)]" using pairs_append_single by metis
+  have L: "length (p @ [gn]) \<ge> 2" using \<open>1 \<le> length p\<close> by auto 
 
   have "fold (\<lambda>(g1, g2). weight g1 g2) [(last p, gn)] = weight (last p) gn" by simp
   hence "fold (\<lambda>(g1, g2). weight g1 g2) ((pairs p) @ [(last p, gn)]) = (weight (last p) gn) \<circ> (fold (\<lambda>(g1, g2). weight g1 g2) (pairs p))" 
     using fold_append by simp
-  with 2 show ?case using pred_eq by fastforce
+  with 2 show ?case using pred_eq L energy_level_def2 energy_level_def3 energy_level_def4 comp_apply energy_level.simps snoc_eq_iff_butlast by auto
 qed
 
 subsection \<open>Winning\<close>
