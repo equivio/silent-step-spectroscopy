@@ -313,7 +313,7 @@ next
           by simp
         then obtain p' p'' where "(p \<Zsurj> p' \<and> (p' \<mapsto> \<tau> p'' \<and> 
 ((hml_srbb_to_hml (wtrace_to_\<phi> tail)) \<Turnstile> p'')) \<or> 
-(p \<Zsurj> p' \<and> (hml_srbb_to_hml (wtrace_to_\<phi> tail)) \<Turnstile> p'))" 
+(p \<Zsurj> p' \<and> ((hml_srbb_to_hml (wtrace_to_\<phi> tail)) \<Turnstile> p')))" 
           by fastforce
         then show ?thesis
         proof
@@ -369,108 +369,20 @@ lemma aux:
   fixes \<psi> :: "('a, 's) hml_srbb_conjunct"
   assumes "p \<lesssim>WT q"
   shows "(is_trace_formula \<phi> \<Longrightarrow> (\<phi> \<Turnstile>SRBB p \<longrightarrow> \<phi> \<Turnstile>SRBB q))"
-      "(is_trace_formula_conjunction \<chi> \<Longrightarrow> (hml_srbb_conjunction_models \<chi> p \<Longrightarrow> hml_srbb_conjunction_models \<chi> q))"
-      "(\<lambda>x. True) \<psi>"
-  sorry
-
-(*TODO: cleanup*)
-lemma trace_equals_trace_to_formula: 
-  "t \<in> weak_traces p = ((wtrace_to_\<phi> (remove_\<tau>_from_wtrace t)) \<Turnstile>SRBB p)"
 proof
-  assume "t \<in> weak_traces p"
-  define wtrace_wo_\<tau> where "wtrace_wo_\<tau> \<equiv> remove_\<tau>_from_wtrace t"
-  show "((wtrace_to_\<phi> (remove_\<tau>_from_wtrace t)) \<Turnstile>SRBB p)"
-    using \<open>t \<in> weak_traces p\<close>
-  proof(induction t arbitrary: p)
-    case Nil
-    then show ?case 
-      by simp
-  next
-    case (Cons a tail)
-    from Cons obtain p'' p' where "p \<Zsurj>\<mapsto>\<Zsurj> a p''" "p'' \<Zsurj>\<mapsto>\<Zsurj>$ tail p'" using weak_step_sequence.simps 
-      by (smt (verit, best) list.discI list.inject mem_Collect_eq) 
-    with Cons(1) have IS: "wtrace_to_\<phi> (remove_\<tau>_from_wtrace tail) \<Turnstile>SRBB p''"
+  assume \<phi>_trace: "is_trace_formula \<phi>" and p_sat_\<phi>: "\<phi> \<Turnstile>SRBB p"
+  show "\<phi> \<Turnstile>SRBB q"
+  proof-
+    from assms have p_trace_implies_q_trace: "\<forall>tr p'. (p \<Zsurj>\<mapsto>\<Zsurj>$ tr p') \<longrightarrow> (\<exists>q'. q \<Zsurj>\<mapsto>\<Zsurj>$ tr q')" 
+      unfolding weakly_trace_preordered_def by auto
+    from p_sat_\<phi> trace_formula_implies_trace obtain tr p' where 
+      "(p \<Zsurj>\<mapsto>\<Zsurj>$ tr p')" "wtrace_to_\<phi> tr = \<phi>"
+      using \<phi>_trace by blast
+    with p_trace_implies_q_trace obtain q' where "q \<Zsurj>\<mapsto>\<Zsurj>$ tr q'" 
       by blast
-    hence IS_2: "((hml_srbb_to_hml (wtrace_to_\<phi> (remove_\<tau>_from_wtrace tail))) \<Turnstile> p'')" by simp
-    show ?case
-    proof(cases \<open>a = \<tau>\<close>)
-      case True
-      with \<open>p \<Zsurj>\<mapsto>\<Zsurj> a p''\<close> have "p \<Zsurj> p''"
-        by (simp add: weak_step_def)
-      then show ?thesis 
-        by (metis (no_types, lifting) LTS_Tau.hml_models.simps LTS_Tau.silent_reachable_trans 
-True IS_2 hml_srbb_models.elims(3) hml_srbb_to_hml.simps remove_\<tau>_from_wtrace.simps(2) 
-wtrace_to_\<phi>.elims)
-    next
-      case False
-      hence "wtrace_to_\<phi> (remove_\<tau>_from_wtrace (a # tail)) = 
-(Internal (Obs a (wtrace_to_\<phi> (remove_\<tau>_from_wtrace tail))))"
-        by simp
-      hence converted_srbb_sat:  "(wtrace_to_\<phi> (remove_\<tau>_from_wtrace (a # tail)) \<Turnstile>SRBB p) =
-(\<exists>p'. p \<Zsurj> p' \<and> ((\<exists>p''. p' \<mapsto> a p'' \<and> wtrace_to_\<phi> (remove_\<tau>_from_wtrace tail) \<Turnstile>SRBB p'')))"
-        by auto
-      then show ?thesis 
-        proof(cases tail)
-          case Nil
-          hence "wtrace_to_\<phi> (remove_\<tau>_from_wtrace tail) = TT"
-            by simp
-          with \<open>p \<Zsurj>\<mapsto>\<Zsurj> a p''\<close> show ?thesis 
-            using False local.Nil weak_step_def by auto
-        next
-          case (Cons b list)
-          with IS have "\<exists>q q'. (p'' \<Zsurj>\<mapsto>\<Zsurj> b q \<and> q \<Zsurj>\<mapsto>\<Zsurj>$ list q')"
-            using \<open>p'' \<Zsurj>\<mapsto>\<Zsurj>$ tail p'\<close> weak_step_sequence.cases by fastforce
-          hence "\<exists>p'. p \<Zsurj> p' \<and> (\<exists>p''. p' \<mapsto> a p'')" 
-            using False \<open>p \<Zsurj>\<mapsto>\<Zsurj> a p''\<close> weak_step_def by auto
-          with IS show ?thesis 
-            by (smt (verit, best) False IS_2 LTS_Tau.hml_models.simps(1) LTS_Tau.hml_models.simps(3) 
-LTS_Tau.silent_reachable_trans \<open>p \<Zsurj>\<mapsto>\<Zsurj> a p''\<close> 
-converted_srbb_sat hml_srbb_models.elims(3) hml_srbb_to_hml.simps(1) hml_srbb_to_hml.simps(2) 
-weak_step_def wtrace_to_\<phi>.elims)
-        qed 
-    qed
+    with trace_equals_trace_to_formula show ?thesis 
+      using \<open>wtrace_to_\<phi> tr = \<phi>\<close> by blast
   qed
-next
-  assume "wtrace_to_\<phi> (remove_\<tau>_from_wtrace t) \<Turnstile>SRBB p"
-  then show "t \<in> weak_traces p"
-  proof(induction t arbitrary: p)
-    case Nil
-    then show ?case
-      using weak_step_sequence.intros(1) by fastforce
-  next
-    case (Cons a tail)
-    show ?case
-      proof(cases \<open>a = \<tau>\<close>)
-        case True
-        then have "wtrace_to_\<phi> (remove_\<tau>_from_wtrace tail) \<Turnstile>SRBB p"
-          using Cons.prems by force
-        hence "tail \<in> weak_traces p" using Cons(1) by simp
-        then show ?thesis 
-          using LTS_Tau.silent_reachable.intros(1) LTS_Tau.weak_step_sequence.intros(2) True weak_step_def 
-          by fastforce
-      next
-        case False
-        with Cons(2) have "wtrace_to_\<phi> ((a # remove_\<tau>_from_wtrace tail)) \<Turnstile>SRBB p"
-        using remove_\<tau>_from_wtrace.simps(2)
-        by auto
-      hence restructure: "(Internal (Obs a (wtrace_to_\<phi> (remove_\<tau>_from_wtrace tail)))) \<Turnstile>SRBB p" 
-        by force
-      have "((wtrace_to_\<phi> (remove_\<tau>_from_wtrace tail)) \<Turnstile>SRBB p )= 
-((hml_srbb_to_hml (wtrace_to_\<phi> (remove_\<tau>_from_wtrace tail))) \<Turnstile> p)"
-        by simp
-        with Cons(2) restructure obtain p' p'' where 
-"p \<Zsurj> p'" "p' \<mapsto> a p''" "((hml_srbb_to_hml (wtrace_to_\<phi> (remove_\<tau>_from_wtrace tail)))) \<Turnstile> p''" 
-          using False by auto
-from this(1, 2) have "p \<Zsurj>\<mapsto>\<Zsurj> a p''" unfolding weak_step_def using silent_reachable.intros 
-      by (metis silent_reachable_trans)
-    from \<open>((hml_srbb_to_hml (wtrace_to_\<phi> (remove_\<tau>_from_wtrace tail)))) \<Turnstile> p''\<close> 
-    have "wtrace_to_\<phi> (remove_\<tau>_from_wtrace tail) \<Turnstile>SRBB p''"
-      by simp
-    with \<open>p \<Zsurj>\<mapsto>\<Zsurj> a p''\<close> show "(a#tail) \<in> weak_traces p" 
-      using weak_step_sequence.intros(2) 
-      using Cons.IH by fastforce
-  qed
-qed
 qed
 
 lemma "(p \<lesssim>WT q) = (p \<preceq> (E \<infinity> 0 0 0 0 0 0 0) q)"
