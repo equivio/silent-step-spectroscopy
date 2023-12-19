@@ -1,9 +1,12 @@
 theory Example_Instantiation      
   imports Energy_Games "HOL-Library.Extended_Nat"
 begin
-
+text \<open>In this theory we create an instantiation of energy game to test our definitions.\<close>
+text \<open>Based on our definition of energy  with eight dimensions, we first define energy..\<close>
 datatype energy = E (one: "enat") (two: "enat") | eneg
 
+text \<open>We define the following definitions and abbreviations to update our energy levels.
+Note that we always use "eneg" when the energy level is equal to or lower than the "defender win level".\<close>
 instantiation energy :: minus
 begin
 abbreviation "somewhere_smaller e1 e2 \<equiv> ((one e1)<(one e2)) \<or> ((two e1) < (two e2))"
@@ -22,6 +25,7 @@ definition "min_update e1 \<equiv> E (min (one e1) (two e1)) (two e1)"
 lemma min_update[simp]:
   shows "min_update (E a b) = E (min a b) b" unfolding min_update_def using energy.sel by fastforce
 
+text \<open>In preparation for our instantiation we define our states, the updates for our energy levels and which states are defender positions.\<close>
 datatype state = a | b1 | b2 | c | d1 | d2 | e
 
 fun weight_opt :: "state \<Rightarrow> state \<Rightarrow> energy update option" where
