@@ -59,6 +59,8 @@ lemma moves:
        "\<not>(c \<Zinj> e)" "\<not>(e \<Zinj> d1)"
   by simp+
 
+text\<open>In the following we check our definition of finite play with two examples: one that is a finite play and one that is not.
+We also look at the "behavior" of our finite game definition if we change the starting position.\<close>
 lemma Game_finite_play_example:
   shows "finite_play a [a, b2, c, d1, e]"
 proof-
@@ -91,7 +93,7 @@ proof (rule notI)
 qed
 
 abbreviation "energy_level \<equiv> Game.energy_level"
-
+text \<open>To check our calculation of energy levels, we look at different games and their energy levels using the following lemmas.\<close>
 lemma energy_level_example:
   shows "energy_level a (E 10 10) [a, b2, c, d1, e] = E 9 8"
 proof-
@@ -123,6 +125,8 @@ lemma energy_level_example_4:
   shows "energy_level a (E 10 10) [c] = undefined"
   using Game.energy_level.elims Game.energy_level.pelims by simp
 
+text \<open>We also take a look at our definition of play stuck using different examples of plays.
+In particular we check our definition regarding invalid games.\<close>
 lemma play_stuck_example:
   shows "Game.play_stuck a [a, b2, c, d1, e]"
   by (metis (mono_tags, opaque_lifting) Game_finite_play_example append.assoc append_Cons energy_game.finite_play_is_path last_ConsR list.distinct(1) self_append_conv2 snoc_eq_iff_butlast weight_opt.simps(38))
@@ -134,7 +138,7 @@ proof (-)
     by (metis Game.finite_play_suffix Game_finite_play_example append_Cons append_Nil list.distinct(1))
   thus "\<not>(Game.play_stuck a [a, b2, c])" by auto
 qed
-
+text \<open>\<close>
 lemma play_stuck_invalid_game: 
   shows "\<not>(Game.play_stuck a [a, b2, d1])"
   by (smt (verit, best) Game.finite_play.simps butlast.simps(2) butlast_snoc distinct_adj_Cons distinct_adj_Cons_Cons last.simps last_snoc weight_opt.simps(18))
@@ -143,6 +147,7 @@ lemma play_stuck_invalid_game_1:
   shows "\<not>Game.play_stuck a [a, b2, b1]"
   by (metis Game.finite_play.cases butlast.simps(2) butlast_snoc last.simps last_snoc list.discI weight_opt.simps(16))
 
+text \<open>In the following we look at play examples and check who wins the corresponding game.\<close>
 lemma attacker_wins_example:
   shows "Game.won_by_attacker a (E 10 10) [a, b2, c, d1, e]"
   using play_stuck_example energy_level_example
