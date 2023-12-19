@@ -158,11 +158,180 @@ proof -
   qed
 qed
 
+lemma conj_congs: "\<forall>i \<in> I. \<psi>sl i = \<psi>sr i \<Longrightarrow> \<forall>i \<in> I'. (\<psi>sl i) \<Lleftarrow>\<and>\<Rrightarrow> (\<psi>sr i) \<Longrightarrow> (Conj (I \<union> I') \<psi>sl) \<Lleftarrow>\<Rrightarrow> (Conj (I \<union> I') \<psi>sr)"
+proof -
+  assume "\<forall>i \<in> I. \<psi>sl i = \<psi>sr i"
+     and "\<forall>i \<in> I'. (\<psi>sl i) \<Lleftarrow>\<and>\<Rrightarrow> (\<psi>sr i)"
+  hence conjunct_eq: "\<forall>i\<in>I'. (\<forall>p. hml_conjunct_models p (\<psi>sl i) \<longrightarrow> hml_conjunct_models p (\<psi>sr i))
+                   \<and> (\<forall>p. hml_conjunct_models p (\<psi>sr i) \<longrightarrow> hml_conjunct_models p (\<psi>sl i))"
+    unfolding hml_conjunct_eq_def and hml_conjunct_impl_def by auto
+  show "(Conj (I \<union> I') \<psi>sl) \<Lleftarrow>\<Rrightarrow> (Conj (I \<union> I') \<psi>sr)"
+    unfolding hml_eq_def and hml_impl_def
+  proof (rule conjI)
+    show "\<forall>p. p \<Turnstile> Conj (I \<union> I') \<psi>sl \<longrightarrow> p \<Turnstile> Conj (I \<union> I') \<psi>sr"
+    proof (rule allI, rule impI)
+      fix p
+      assume "p \<Turnstile> Conj (I \<union> I') \<psi>sl"
+      hence "(\<forall>i\<in>I. hml_conjunct_models p (\<psi>sl i))
+           \<and> (\<forall>i\<in>I'. hml_conjunct_models p (\<psi>sl i))" 
+        by simp
+      then have "\<forall>i\<in>I. hml_conjunct_models p (\<psi>sl i)"
+            and "\<forall>i\<in>I'. hml_conjunct_models p (\<psi>sl i)" by blast+
+
+      from \<open>\<forall>i\<in>I. hml_conjunct_models p (\<psi>sl i)\<close>
+       and \<open>\<forall>i\<in>I. \<psi>sl i = \<psi>sr i\<close>
+      have "\<forall>i\<in>I. hml_conjunct_models p (\<psi>sr i)" 
+        by force
+
+      from conjunct_eq
+       and \<open>\<forall>i\<in>I'. hml_conjunct_models p (\<psi>sl i)\<close>
+      have "\<forall>i\<in>I'. hml_conjunct_models p (\<psi>sr i)" 
+        by blast
+
+      from \<open>\<forall>i\<in>I. hml_conjunct_models p (\<psi>sr i)\<close>
+       and \<open>\<forall>i\<in>I'. hml_conjunct_models p (\<psi>sr i)\<close>
+      show "p \<Turnstile> Conj (I \<union> I') \<psi>sr"
+        unfolding hml_models.simps 
+        by blast
+    qed
+  next
+    show "\<forall>p. p \<Turnstile> Conj (I \<union> I') \<psi>sr \<longrightarrow> p \<Turnstile> Conj (I \<union> I') \<psi>sl" 
+      using Un_iff \<open>\<forall>i\<in>I. \<psi>sl i = \<psi>sr i\<close> conjunct_eq by auto
+  qed
+qed
+
 lemma pos_cong: "\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r \<Longrightarrow> (Pos \<phi>l) \<Lleftarrow>\<and>\<Rrightarrow> (Pos \<phi>r)"
   by (simp add: hml_conjunct_eq_def hml_conjunct_impl_def hml_eq_def hml_impl_def)
 
 lemma neg_cong: "\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r \<Longrightarrow> (Neg \<phi>l) \<Lleftarrow>\<and>\<Rrightarrow> (Neg \<phi>r)"
   by (meson hml_conjunct_eq_def hml_conjunct_impl_def hml_conjunct_models.simps(2) hml_eq_def hml_impl_def)
+
+end
+
+datatype 
+  ('act, 'i) hml_context =
+    Hole |
+    ObsC 'act "('act, 'i) hml_context" |
+    InternalC "('act, 'i) hml_context" |
+    SilentC "('act, 'i) hml_context" |
+    ConjC "'i set" "'i \<Rightarrow> ('act, 'i) hml_conjunct" "'i set" "'i \<Rightarrow> ('act, 'i) hml_conjunct_context"
+and
+  ('act, 'i) hml_conjunct_context =
+    PosC "('act, 'i) hml_context" |
+    NegC "('act, 'i) hml_context"
+
+primrec 
+      fill :: "('act, 'i) hml \<Rightarrow> ('act, 'i) hml_context \<Rightarrow> ('act, 'i) hml"
+  and fill_conjunct :: "('act, 'i) hml \<Rightarrow> ('act, 'i) hml_conjunct_context \<Rightarrow> ('act, 'i) hml_conjunct" where
+  "fill \<phi> Hole = \<phi>" |
+  "fill \<phi> (ObsC \<alpha> \<phi>') = (Obs \<alpha> (fill \<phi> \<phi>'))" |
+  "fill \<phi> (InternalC \<phi>') = (Internal (fill \<phi> \<phi>'))" |
+  "fill \<phi> (SilentC \<phi>') = (Silent (fill \<phi> \<phi>'))" |
+  "fill \<phi> (ConjC I \<psi>s I' \<psi>s') = (Conj (I \<union> I') (\<lambda>i. if i \<in> I'
+                                                     then fill_conjunct \<phi> (\<psi>s' i)
+                                                     else \<psi>s i))" |
+
+  "fill_conjunct \<phi> (PosC \<phi>') = (Pos (fill \<phi> \<phi>'))" |
+  "fill_conjunct \<phi> (NegC \<phi>') = (Neg (fill \<phi> \<phi>'))"
+
+context LTS_Tau
+begin
+
+lemma hml_cong: "\<forall>\<phi>l \<phi>r. \<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r \<longrightarrow> fill \<phi>l C \<Lleftarrow>\<Rrightarrow> fill \<phi>r C"
+  and hml_conj_cong: "\<forall>\<phi>l \<phi>r. \<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r \<longrightarrow> fill_conjunct \<phi>l C' \<Lleftarrow>\<and>\<Rrightarrow> fill_conjunct \<phi>r C'"
+  apply (induct C and C')
+  apply simp
+  apply (simp add: obs_cong)
+  apply (simp add: internal_cong)
+  apply (simp add: silent_cong)
+proof -
+  fix I :: "'s set"
+  and \<psi>s :: "'s \<Rightarrow> ('a, 's) hml_conjunct"
+  and I' :: "'s set"
+  and \<psi>s' :: "'s \<Rightarrow> ('a, 's) hml_conjunct_context"
+  assume "\<And>\<psi>'. \<psi>' \<in> range \<psi>s' \<Longrightarrow> \<forall>\<phi>l \<phi>r. \<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r \<longrightarrow> fill_conjunct \<phi>l \<psi>' \<Lleftarrow>\<and>\<Rrightarrow> fill_conjunct \<phi>r \<psi>'"
+  hence IH: "\<forall>i\<in>I'. \<forall>\<phi>l \<phi>r. \<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r \<longrightarrow> fill_conjunct \<phi>l (\<psi>s' i) \<Lleftarrow>\<and>\<Rrightarrow> fill_conjunct \<phi>r (\<psi>s' i)" 
+    by simp
+  show "\<forall>\<phi>l \<phi>r. \<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r \<longrightarrow> fill \<phi>l (ConjC I \<psi>s I' \<psi>s') \<Lleftarrow>\<Rrightarrow> fill \<phi>r (ConjC I \<psi>s I' \<psi>s')"
+  proof (rule allI, rule allI, rule impI)
+    fix \<phi>l \<phi>r
+    assume "\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r"
+
+    show "fill \<phi>l (ConjC I \<psi>s I' \<psi>s') \<Lleftarrow>\<Rrightarrow> fill \<phi>r (ConjC I \<psi>s I' \<psi>s')"
+      unfolding hml_eq_def and hml_impl_def
+    proof (rule conjI)
+      show "\<forall>p. p \<Turnstile> fill \<phi>l (ConjC I \<psi>s I' \<psi>s') \<longrightarrow> p \<Turnstile> fill \<phi>r (ConjC I \<psi>s I' \<psi>s')"
+      proof (rule allI, rule impI)
+        fix p
+        assume "p \<Turnstile> fill \<phi>l (ConjC I \<psi>s I' \<psi>s')"
+        hence "\<forall>i\<in>I \<union> I'. hml_conjunct_models p (if i \<in> I' then fill_conjunct \<phi>l (\<psi>s' i) else \<psi>s i)"
+          unfolding fill.simps and hml_models.simps.
+        then have "(\<forall>i\<in>I'. hml_conjunct_models p (fill_conjunct \<phi>l (\<psi>s' i)))
+                 \<and> (\<forall>i\<in>I - I'. hml_conjunct_models p (\<psi>s i))" 
+          by (metis DiffD1 DiffD2 Un_iff)
+        then have "\<forall>i\<in>I'. hml_conjunct_models p (fill_conjunct \<phi>l (\<psi>s' i))"
+              and "\<forall>i\<in>I - I'. hml_conjunct_models p (\<psi>s i)" by auto
+
+        from \<open>\<forall>i\<in>I'. hml_conjunct_models p (fill_conjunct \<phi>l (\<psi>s' i))\<close>
+         and \<open>\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r\<close>
+         and IH
+        have "\<forall>i\<in>I'. hml_conjunct_models p (fill_conjunct \<phi>r (\<psi>s' i))" 
+          using hml_conjunct_eq_def hml_conjunct_impl_def by blast
+
+        from \<open>\<forall>i\<in>I - I'. hml_conjunct_models p (\<psi>s i)\<close>
+        have "\<forall>i\<in>I - I'. hml_conjunct_models p (\<psi>s i)".
+
+        from \<open>\<forall>i\<in>I'. hml_conjunct_models p (fill_conjunct \<phi>r (\<psi>s' i))\<close>
+         and \<open>\<forall>i\<in>I - I'. hml_conjunct_models p (\<psi>s i)\<close>
+        have "\<forall>i\<in>I \<union> I'. hml_conjunct_models p (if i \<in> I' then fill_conjunct \<phi>r (\<psi>s' i) else \<psi>s i)" 
+          by auto
+
+        then show "p \<Turnstile> fill \<phi>r (ConjC I \<psi>s I' \<psi>s')"
+          unfolding fill.simps and hml_models.simps.
+      qed
+    next
+      show " \<forall>p. p \<Turnstile> fill \<phi>r (ConjC I \<psi>s I' \<psi>s') \<longrightarrow> p \<Turnstile> fill \<phi>l (ConjC I \<psi>s I' \<psi>s')"
+      proof (rule allI, rule impI)
+        fix p
+        assume "p \<Turnstile> fill \<phi>r (ConjC I \<psi>s I' \<psi>s')"
+        hence "\<forall>i\<in>I \<union> I'. hml_conjunct_models p (if i \<in> I' then fill_conjunct \<phi>r (\<psi>s' i) else \<psi>s i)"
+          unfolding fill.simps and hml_models.simps.
+        then have "(\<forall>i\<in>I'. hml_conjunct_models p (fill_conjunct \<phi>r (\<psi>s' i)))
+                 \<and> (\<forall>i\<in>I - I'. hml_conjunct_models p (\<psi>s i))" 
+          by (metis DiffD1 DiffD2 Un_iff)
+        hence "\<forall>i\<in>I'. hml_conjunct_models p (fill_conjunct \<phi>r (\<psi>s' i))"
+          and "\<forall>i\<in>I - I'. hml_conjunct_models p (\<psi>s i)" by auto
+
+        from \<open>\<forall>i\<in>I'. hml_conjunct_models p (fill_conjunct \<phi>r (\<psi>s' i))\<close>
+         and \<open>\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r\<close>
+         and IH
+        have "\<forall>i\<in>I'. hml_conjunct_models p (fill_conjunct \<phi>l (\<psi>s' i))" 
+          using hml_conjunct_eq_def hml_conjunct_impl_def by blast
+
+        from \<open>\<forall>i\<in>I - I'. hml_conjunct_models p (\<psi>s i)\<close>
+        have "\<forall>i\<in>I - I'. hml_conjunct_models p (\<psi>s i)".
+
+        from \<open>\<forall>i\<in>I'. hml_conjunct_models p (fill_conjunct \<phi>l (\<psi>s' i))\<close>
+         and \<open>\<forall>i\<in>I - I'. hml_conjunct_models p (\<psi>s i)\<close>
+        have "\<forall>i\<in>I \<union> I'. hml_conjunct_models p (if i \<in> I' then fill_conjunct \<phi>l (\<psi>s' i) else \<psi>s i)" 
+          by auto
+
+        then show "p \<Turnstile> fill \<phi>l (ConjC I \<psi>s I' \<psi>s')"
+          unfolding fill.simps and hml_models.simps.
+      qed
+    qed
+  qed
+next
+  fix \<phi>'
+  assume "\<forall>\<phi>l \<phi>r. \<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r \<longrightarrow> fill \<phi>l \<phi>' \<Lleftarrow>\<Rrightarrow> fill \<phi>r \<phi>'"
+  then show "\<forall>\<phi>l \<phi>r. \<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r \<longrightarrow> fill_conjunct \<phi>l (PosC \<phi>') \<Lleftarrow>\<and>\<Rrightarrow> fill_conjunct \<phi>r (PosC \<phi>')"
+    using pos_cong by force
+next
+  fix \<phi>'
+  assume "\<forall>\<phi>l \<phi>r. \<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r \<longrightarrow> fill \<phi>l \<phi>' \<Lleftarrow>\<Rrightarrow> fill \<phi>r \<phi>'"
+  then show "\<forall>\<phi>l \<phi>r. \<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r \<longrightarrow> fill_conjunct \<phi>l (NegC \<phi>') \<Lleftarrow>\<and>\<Rrightarrow> fill_conjunct \<phi>r (NegC \<phi>')"
+    using neg_cong by force
+qed
 
 end
 
