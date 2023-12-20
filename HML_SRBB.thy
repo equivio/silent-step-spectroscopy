@@ -31,7 +31,8 @@ primrec
   "hml_srbb_to_hml (Internal \<chi>) = hml.Internal (hml_srbb_conjunction_to_hml \<chi>)" |
   "hml_srbb_to_hml (ImmConj I \<psi>s) = hml.Conj I (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s)" |
 
-  "hml_srbb_conjunction_to_hml (Obs a \<phi>) = hml.Obs a (hml_srbb_to_hml \<phi>)" |
+  "hml_srbb_conjunction_to_hml (Obs a \<phi>) = HML_soft_poss a (hml_srbb_to_hml \<phi>)" |
+(*equivalent to? (if a = \<tau> then hml_srbb_to_hml \<phi> else hml.Obs a (hml_srbb_to_hml \<phi>))*)
   "hml_srbb_conjunction_to_hml (Conj I \<psi>s) = hml.Conj I (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s)" |
 
   "hml_srbb_conjunction_to_hml (StableConj I \<psi>s) =
@@ -47,6 +48,9 @@ primrec
 
 fun hml_srbb_models :: "'s \<Rightarrow> ('a, 's) hml_srbb \<Rightarrow> bool" (infix "\<Turnstile>SRBB" 60)where
   "hml_srbb_models state formula = (state \<Turnstile> (hml_srbb_to_hml formula))"
+
+fun hml_srbb_conjunction_models :: "('a, 's) hml_srbb_conjunction \<Rightarrow> 's \<Rightarrow> bool" where
+  "hml_srbb_conjunction_models \<chi> s = (s \<Turnstile> (hml_srbb_conjunction_to_hml \<chi>))"
 
 (*Some sanity checks*)
 
