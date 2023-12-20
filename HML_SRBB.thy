@@ -50,7 +50,7 @@ fun hml_srbb_models :: "'s \<Rightarrow> ('a, 's) hml_srbb \<Rightarrow> bool" (
   "hml_srbb_models state formula = (state \<Turnstile> (hml_srbb_to_hml formula))"
 
 fun hml_srbb_conjunction_models :: "('a, 's) hml_srbb_conjunction \<Rightarrow> 's \<Rightarrow> bool" where
-  "hml_srbb_conjunction_models \<chi> s = ((hml_srbb_conjunction_to_hml \<chi>) \<Turnstile> s)"
+  "hml_srbb_conjunction_models \<chi> s = (s \<Turnstile> (hml_srbb_conjunction_to_hml \<chi>))"
 
 (*Some sanity checks*)
 

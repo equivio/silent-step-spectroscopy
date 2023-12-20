@@ -79,10 +79,10 @@ begin
 lemma trace_formula_implies_trace:
   fixes \<psi> ::"('a, 's) hml_srbb_conjunct"
   shows
-       trace_case: "is_trace_formula \<phi> \<Longrightarrow> \<phi> \<Turnstile>SRBB p \<Longrightarrow> (\<exists>tr \<in> weak_traces p. wtrace_to_\<phi> tr = \<phi>)"
+       trace_case: "is_trace_formula \<phi> \<Longrightarrow> p \<Turnstile>SRBB \<phi> \<Longrightarrow> (\<exists>tr \<in> weak_traces p. wtrace_to_\<phi> tr = \<phi>)"
     and conj_case: "is_trace_formula_conjunction \<chi> \<Longrightarrow> hml_srbb_conjunction_models \<chi> q \<Longrightarrow> (\<exists>tr \<in> weak_traces q. wtrace_to_\<chi> tr = \<chi>)"
     and            True
-    apply (induction \<phi> and \<chi> and \<psi> arbitrary: p and q)
+  apply (induction \<phi> and \<chi> and \<psi> arbitrary: p and q)
   using weak_step_sequence.intros(1) apply fastforce
   prefer 2 using is_trace_formula.cases apply blast
   prefer 3 prefer 4 prefer 6 prefer 7
@@ -93,7 +93,7 @@ proof-
   assume IH: "(\<And>q. is_trace_formula_conjunction \<chi>r \<Longrightarrow>
                  hml_srbb_conjunction_models \<chi>r q \<Longrightarrow> \<exists>tr\<in>weak_traces q. wtrace_to_\<chi> tr = \<chi>r)"
 and is_trace_internal :"is_trace_formula (hml_srbb.Internal \<chi>r)"
-and internal_satisfied: "hml_srbb.Internal \<chi>r \<Turnstile>SRBB p"
+and internal_satisfied: "p \<Turnstile>SRBB hml_srbb.Internal \<chi>r"
   from Internal(3) obtain p' where wtrace_to_p': "p \<Zsurj> p'" and p'_models_\<chi>r: "hml_srbb_conjunction_models \<chi>r p'" 
     by auto
   from Internal(2) have "is_trace_formula_conjunction \<chi>r"
@@ -120,41 +120,41 @@ and internal_satisfied: "hml_srbb.Internal \<chi>r \<Turnstile>SRBB p"
   qed
 next
   case (Obs \<alpha> \<phi>r)
-  assume IH: "(\<And>p. is_trace_formula \<phi>r \<Longrightarrow> \<phi>r \<Turnstile>SRBB p \<Longrightarrow> \<exists>tr\<in>weak_traces p. wtrace_to_\<phi> tr = \<phi>r)"
+  assume IH: "(\<And>p. is_trace_formula \<phi>r \<Longrightarrow> p \<Turnstile>SRBB \<phi>r \<Longrightarrow> \<exists>tr\<in>weak_traces p. wtrace_to_\<phi> tr = \<phi>r)"
 and obs_is_trace:"is_trace_formula_conjunction (hml_srbb_conjunction.Obs \<alpha> \<phi>r)"
 and obs_models_q: "hml_srbb_conjunction_models (hml_srbb_conjunction.Obs \<alpha> \<phi>r) q"
   from obs_is_trace have \<phi>r_is_trace: "is_trace_formula \<phi>r"
     using is_trace_formula_conjunction.cases by auto
-  from obs_models_q have hml_models: "hml_srbb_conjunction_to_hml (Obs \<alpha> \<phi>r) \<Turnstile> q"
+  from obs_models_q have hml_models: "q \<Turnstile> hml_srbb_conjunction_to_hml (Obs \<alpha> \<phi>r)"
     by simp
   then show ?case
   proof(cases \<open>\<alpha> = \<tau>\<close>)
     case True
-    with hml_models have "hml.Silent (hml_srbb_to_hml \<phi>r) \<Turnstile> q" 
+    with hml_models have "q \<Turnstile> hml.Silent (hml_srbb_to_hml \<phi>r)" 
       using hml_srbb_conjunction_to_hml.simps 
       by force
-    then obtain q' where "(q \<mapsto> \<tau> q' \<and> (\<phi>r \<Turnstile>SRBB q')) \<or> (\<phi>r \<Turnstile>SRBB q)"
+    then obtain q' where "(q \<mapsto> \<tau> q' \<and> (q' \<Turnstile>SRBB \<phi>r)) \<or> (q \<Turnstile>SRBB \<phi>r)"
       using hml_models.simps(4)
       by fastforce
     then show ?thesis 
     proof
-      assume assm: "q \<mapsto> \<tau> q' \<and> \<phi>r \<Turnstile>SRBB q'"
+      assume assm: "q \<mapsto> \<tau> q' \<and> q' \<Turnstile>SRBB \<phi>r"
       with IH \<phi>r_is_trace  obtain tail where "tail\<in>weak_traces q'" "wtrace_to_\<phi> tail = \<phi>r"
         by blast
       with assm show ?thesis
         using LTS_Tau.weak_step_sequence.intros(2) True silent_reachable.intros weak_step_def 
         by fastforce
     next
-      assume "\<phi>r \<Turnstile>SRBB q"
+      assume "q \<Turnstile>SRBB \<phi>r"
       with IH \<phi>r_is_trace show ?thesis 
         using LTS_Tau.weak_step_sequence.intros(2) True silent_reachable.intros(1) weak_step_def 
         by fastforce
     qed
   next
     case False
-    hence "hml.Obs \<alpha> (hml_srbb_to_hml \<phi>r) \<Turnstile> q" 
+    hence "q \<Turnstile> hml.Obs \<alpha> (hml_srbb_to_hml \<phi>r)" 
       using hml_srbb_conjunction_to_hml.simps hml_models by presburger
-    then obtain q' where \<alpha>_step: "q \<mapsto> \<alpha> q'" and \<phi>r_models_q': "(\<phi>r \<Turnstile>SRBB q')"
+    then obtain q' where \<alpha>_step: "q \<mapsto> \<alpha> q'" and \<phi>r_models_q': "q' \<Turnstile>SRBB \<phi>r"
       by auto
     with IH \<phi>r_is_trace obtain tail where tail_in_wt_q': "tail \<in>weak_traces q'" "wtrace_to_\<phi> tail = \<phi>r"
       by blast
@@ -171,10 +171,10 @@ and obs_models_q: "hml_srbb_conjunction_models (hml_srbb_conjunction.Obs \<alpha
 qed
 
 lemma trace_equals_trace_to_formula: 
-  "t \<in> weak_traces p = ((wtrace_to_\<phi> t) \<Turnstile>SRBB p)"
+  "t \<in> weak_traces p = (p \<Turnstile>SRBB (wtrace_to_\<phi> t))"
 proof
   assume "t \<in> weak_traces p"
-  show "((wtrace_to_\<phi> t) \<Turnstile>SRBB p)"
+  show "p \<Turnstile>SRBB (wtrace_to_\<phi> t)"
     using \<open>t \<in> weak_traces p\<close>
   proof(induction t arbitrary: p)
     case Nil
@@ -184,20 +184,20 @@ proof
     case (Cons a tail)
     from Cons obtain p'' p' where "p \<Zsurj>\<mapsto>\<Zsurj> a p''" "p'' \<Zsurj>\<mapsto>\<Zsurj>$ tail p'" using weak_step_sequence.simps 
       by (smt (verit, best) list.discI list.inject mem_Collect_eq) 
-    with Cons(1) have IS: "wtrace_to_\<phi> tail \<Turnstile>SRBB p''"
+    with Cons(1) have IS: "p'' \<Turnstile>SRBB wtrace_to_\<phi> tail"
       by blast
-    hence IS_2: "((hml_srbb_to_hml (wtrace_to_\<phi> tail)) \<Turnstile> p'')" by simp
+    hence IS_2: "p'' \<Turnstile> (hml_srbb_to_hml (wtrace_to_\<phi> tail))" by simp
     from Cons have goal_eq: "wtrace_to_\<phi> (a # tail) = (Internal (Obs a (wtrace_to_\<phi> tail)))"
       by simp
     show ?case
     proof(cases \<open>a = \<tau>\<close>)
       case True
-      with goal_eq have "(wtrace_to_\<phi> (a # tail) \<Turnstile>SRBB p) = 
-(hml.Internal (hml.Silent (hml_srbb_to_hml (wtrace_to_\<phi> tail))) \<Turnstile> p)"
+      with goal_eq have "p \<Turnstile>SRBB (wtrace_to_\<phi> (a # tail)) = 
+(p \<Turnstile> hml.Internal (hml.Silent (hml_srbb_to_hml (wtrace_to_\<phi> tail))))"
         by force
       also have "... = 
-(\<exists>p'. p \<Zsurj> p' \<and> (((\<exists>p''. p' \<mapsto> \<tau> p'' \<and> ((hml_srbb_to_hml (wtrace_to_\<phi> tail)) \<Turnstile> p'')) \<or> 
-((hml_srbb_to_hml (wtrace_to_\<phi> tail)) \<Turnstile> p'))))"
+(\<exists>p'. p \<Zsurj> p' \<and> (((\<exists>p''. p' \<mapsto> \<tau> p'' \<and> (p'' \<Turnstile> (hml_srbb_to_hml (wtrace_to_\<phi> tail)))) \<or> 
+(p' \<Turnstile> (hml_srbb_to_hml (wtrace_to_\<phi> tail))))))"
         by force
       with \<open>p \<Zsurj>\<mapsto>\<Zsurj> a p''\<close> True IS_2 show ?thesis 
         using weak_step_def by auto
@@ -206,8 +206,8 @@ proof
       hence "wtrace_to_\<phi> (a#tail) = 
 (Internal (Obs a (wtrace_to_\<phi> tail)))"
         by simp
-      hence converted_srbb_sat:  "(wtrace_to_\<phi> (a # tail) \<Turnstile>SRBB p) =
-(\<exists>p'. p \<Zsurj> p' \<and> ((\<exists>p''. p' \<mapsto> a p'' \<and> wtrace_to_\<phi> tail \<Turnstile>SRBB p'')))"
+      hence converted_srbb_sat:  "(p \<Turnstile>SRBB wtrace_to_\<phi> (a # tail)) =
+(\<exists>p'. p \<Zsurj> p' \<and> ((\<exists>p''. p' \<mapsto> a p'' \<and> p'' \<Turnstile>SRBB wtrace_to_\<phi> tail)))"
         by (simp add: False)
       with IS_2 False \<open>p \<Zsurj>\<mapsto>\<Zsurj> a p''\<close> show ?thesis 
         by (smt (verit, best) LTS_Tau.hml_models.simps(1) LTS_Tau.hml_models.simps(3) 
@@ -216,7 +216,7 @@ hml_srbb_to_hml.simps(2) weak_step_def wtrace_to_\<phi>.elims)
     qed
   qed
 next
-  assume "wtrace_to_\<phi> t \<Turnstile>SRBB p"
+  assume "p \<Turnstile>SRBB wtrace_to_\<phi> t"
   then show "t \<in> weak_traces p"
   proof(induction t arbitrary: p)
     case Nil
@@ -224,22 +224,22 @@ next
       using weak_step_sequence.intros(1) by fastforce
   next
     case (Cons a tail)
-    hence "(Internal (Obs a (wtrace_to_\<phi> tail))) \<Turnstile>SRBB p"
+    hence "p \<Turnstile>SRBB (Internal (Obs a (wtrace_to_\<phi> tail)))"
       by simp
-    hence 1: "((hml_srbb_to_hml (Internal (Obs a (wtrace_to_\<phi> tail)))) \<Turnstile> p)"
+    hence 1: "p \<Turnstile> (hml_srbb_to_hml (Internal (Obs a (wtrace_to_\<phi> tail))))"
       by simp
     show ?case
       proof(cases \<open>a = \<tau>\<close>)
         case True
-        with 1 have "(hml.Internal (hml.Silent (hml_srbb_to_hml (wtrace_to_\<phi> tail)))) \<Turnstile> p"
+        with 1 have "p \<Turnstile> (hml.Internal (hml.Silent (hml_srbb_to_hml (wtrace_to_\<phi> tail))))"
           by simp
         then obtain p' p'' where "(p \<Zsurj> p' \<and> (p' \<mapsto> \<tau> p'' \<and> 
-((hml_srbb_to_hml (wtrace_to_\<phi> tail)) \<Turnstile> p'')) \<or> 
-(p \<Zsurj> p' \<and> ((hml_srbb_to_hml (wtrace_to_\<phi> tail)) \<Turnstile> p')))" 
+(p'' \<Turnstile> (hml_srbb_to_hml (wtrace_to_\<phi> tail)))) \<or> 
+(p \<Zsurj> p' \<and> (p' \<Turnstile> (hml_srbb_to_hml (wtrace_to_\<phi> tail)))))" 
           by fastforce
         then show ?thesis
         proof
-          assume assms: "(p \<Zsurj> p') \<and> p' \<mapsto> \<tau> p'' \<and> (hml_srbb_to_hml (wtrace_to_\<phi> tail) \<Turnstile> p'')"
+          assume assms: "(p \<Zsurj> p') \<and> p' \<mapsto> \<tau> p'' \<and> (p'' \<Turnstile> hml_srbb_to_hml (wtrace_to_\<phi> tail))"
           with Cons have "tail \<in> weak_traces p''"
             using hml_srbb_models.simps by blast
           from assms have "p \<Zsurj>\<mapsto>\<Zsurj> \<tau> p''" 
@@ -248,7 +248,7 @@ next
           with True \<open>tail \<in> weak_traces p''\<close> show ?thesis 
             using weak_step_sequence.intros(2) by fastforce
         next
-          assume assms: "p \<Zsurj> p' \<and> (hml_srbb_to_hml (wtrace_to_\<phi> tail) \<Turnstile> p')"
+          assume assms: "p \<Zsurj> p' \<and> (p' \<Turnstile> hml_srbb_to_hml (wtrace_to_\<phi> tail))"
           show "a # tail \<in> weak_traces p"
           proof-
             from assms Cons have "tail \<in> weak_traces p'" 
@@ -262,20 +262,20 @@ next
         qed
       next
         case False
-        with Cons(2) have "wtrace_to_\<phi> ((a # tail)) \<Turnstile>SRBB p"
+        with Cons(2) have "p \<Turnstile>SRBB wtrace_to_\<phi> ((a # tail))"
         by auto
-      hence restructure: "(Internal (Obs a (wtrace_to_\<phi> tail))) \<Turnstile>SRBB p" 
+      hence restructure: "p \<Turnstile>SRBB (Internal (Obs a (wtrace_to_\<phi> tail)))" 
         by force
-      have "((wtrace_to_\<phi> tail) \<Turnstile>SRBB p )= 
-((hml_srbb_to_hml (wtrace_to_\<phi> tail)) \<Turnstile> p)"
+      have "(p \<Turnstile>SRBB (wtrace_to_\<phi> tail))= 
+(p \<Turnstile> (hml_srbb_to_hml (wtrace_to_\<phi> tail)))"
         by simp
         with Cons(2) restructure obtain p' p'' where 
-"p \<Zsurj> p'" "p' \<mapsto> a p''" "((hml_srbb_to_hml (wtrace_to_\<phi> tail))) \<Turnstile> p''" 
+"p \<Zsurj> p'" "p' \<mapsto> a p''" "p'' \<Turnstile> ((hml_srbb_to_hml (wtrace_to_\<phi> tail)))" 
           using False by auto
 from this(1, 2) have "p \<Zsurj>\<mapsto>\<Zsurj> a p''" unfolding weak_step_def using silent_reachable.intros 
       by (metis silent_reachable_trans)
-    from \<open>((hml_srbb_to_hml (wtrace_to_\<phi> tail))) \<Turnstile> p''\<close> 
-    have "wtrace_to_\<phi> tail \<Turnstile>SRBB p''"
+    from \<open>p'' \<Turnstile> ((hml_srbb_to_hml (wtrace_to_\<phi> tail)))\<close> 
+    have "p'' \<Turnstile>SRBB wtrace_to_\<phi> tail"
       by simp
     with \<open>p \<Zsurj>\<mapsto>\<Zsurj> a p''\<close> show "(a#tail) \<in> weak_traces p" 
       using weak_step_sequence.intros(2) 
@@ -288,10 +288,10 @@ lemma aux:
   fixes \<phi> :: "('a, 's) hml_srbb"
   fixes \<chi> :: "('a, 's) hml_srbb_conjunction"
   fixes \<psi> :: "('a, 's) hml_srbb_conjunct"
-  shows "p \<lesssim>WT q \<Longrightarrow> is_trace_formula \<phi> \<Longrightarrow> \<phi> \<Turnstile>SRBB p \<Longrightarrow> \<phi> \<Turnstile>SRBB q"
+  shows "p \<lesssim>WT q \<Longrightarrow> is_trace_formula \<phi> \<Longrightarrow> p \<Turnstile>SRBB \<phi> \<Longrightarrow> q \<Turnstile>SRBB \<phi>"
 proof -
-  assume \<phi>_trace: "is_trace_formula \<phi>" and p_sat_\<phi>: "\<phi> \<Turnstile>SRBB p" and assms: "p \<lesssim>WT q"
-  show "\<phi> \<Turnstile>SRBB q"
+  assume \<phi>_trace: "is_trace_formula \<phi>" and p_sat_\<phi>: "p \<Turnstile>SRBB \<phi>" and assms: "p \<lesssim>WT q"
+  show "q \<Turnstile>SRBB \<phi>"
   proof-
     from assms have p_trace_implies_q_trace: "\<forall>tr p'. (p \<Zsurj>\<mapsto>\<Zsurj>$ tr p') \<longrightarrow> (\<exists>q'. q \<Zsurj>\<mapsto>\<Zsurj>$ tr q')" 
       unfolding weakly_trace_preordered_def by auto
@@ -309,11 +309,11 @@ lemma expr_preorder_characterizes_relational_preorder_traces: "(p \<lesssim>WT q
   unfolding expr_preord_def hml_preordered_def
 proof
   assume "p \<lesssim>WT q"
-  then show "\<forall>\<phi>\<in>\<O> (E \<infinity> 0 0 0 0 0 0 0). \<phi> \<Turnstile>SRBB p \<longrightarrow> \<phi> \<Turnstile>SRBB q"
+  then show "\<forall>\<phi>\<in>\<O> (E \<infinity> 0 0 0 0 0 0 0). p \<Turnstile>SRBB \<phi> \<longrightarrow> q \<Turnstile>SRBB \<phi>"
     using aux expressiveness_to_trace_formula weakly_trace_preordered_def
     by blast+
 next
-  assume \<phi>_eneg: "\<forall>\<phi>\<in>\<O> (E \<infinity> 0 0 0 0 0 0 0). \<phi> \<Turnstile>SRBB p \<longrightarrow> \<phi> \<Turnstile>SRBB q"
+  assume \<phi>_eneg: "\<forall>\<phi>\<in>\<O> (E \<infinity> 0 0 0 0 0 0 0). p \<Turnstile>SRBB \<phi> \<longrightarrow> q \<Turnstile>SRBB \<phi>"
   show "p \<lesssim>WT q"
     unfolding weakly_trace_preordered_def
     using \<phi>_eneg trace_equals_trace_to_formula trace_formula_to_expressiveness trace_to_\<phi>_is_trace_formula
