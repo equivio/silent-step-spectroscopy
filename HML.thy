@@ -51,6 +51,9 @@ where
 lemma "(state \<Turnstile> TT) = (state \<Turnstile> Conj {} \<psi>)"
   by simp
 
+lemma opt_\<tau>_is_or: "(p \<Turnstile> (Silent \<phi>)) = ((p \<Turnstile> (Obs \<tau> \<phi>)) \<or> (p \<Turnstile> \<phi>))"
+  by simp
+
 end (* context LTS_Tau *)
 
 
@@ -73,20 +76,20 @@ end (* context Inhabited_Tau_LTS *)
 
 datatype 
   ('act, 'i) hml_precontext =
-    Hole |
-    ObsC 'act "('act, 'i) hml_precontext" |
-    InternalC "('act, 'i) hml_precontext" |
-    SilentC "('act, 'i) hml_precontext" |
-    ConjC "'i set" "'i \<Rightarrow> ('act, 'i) hml_conjunct" "'i set" "'i \<Rightarrow> ('act, 'i) hml_precontext"
+    PCHole |
+    ObsPC 'act "('act, 'i) hml_precontext" |
+    InternalPC "('act, 'i) hml_precontext" |
+    SilentPC "('act, 'i) hml_precontext" |
+    ConjPC "'i set" "'i \<Rightarrow> ('act, 'i) hml_conjunct" "'i set" "'i \<Rightarrow> ('act, 'i) hml_precontext"
 
 
 primrec 
       fill_pre :: "('act, 'i) hml \<Rightarrow> ('act, 'i) hml_precontext \<Rightarrow> ('act, 'i) hml" where
-  "fill_pre \<phi> Hole = \<phi>" |
-  "fill_pre \<phi> (ObsC \<alpha> \<phi>') = (Obs \<alpha> (fill_pre \<phi> \<phi>'))" |
-  "fill_pre \<phi> (InternalC \<phi>') = (Internal (fill_pre \<phi> \<phi>'))" |
-  "fill_pre \<phi> (SilentC \<phi>') = (Silent (fill_pre \<phi> \<phi>'))" |
-  "fill_pre \<phi> (ConjC I \<psi>s I' \<psi>s') = (Conj (I \<union> I') (\<lambda>i. if i \<in> I'
+  "fill_pre \<phi> PCHole = \<phi>" |
+  "fill_pre \<phi> (ObsPC \<alpha> \<phi>') = (Obs \<alpha> (fill_pre \<phi> \<phi>'))" |
+  "fill_pre \<phi> (InternalPC \<phi>') = (Internal (fill_pre \<phi> \<phi>'))" |
+  "fill_pre \<phi> (SilentPC \<phi>') = (Silent (fill_pre \<phi> \<phi>'))" |
+  "fill_pre \<phi> (ConjPC I \<psi>s I' \<psi>s') = (Conj (I \<union> I') (\<lambda>i. if i \<in> I'
                                                      then (Pos (fill_pre \<phi> (\<psi>s' i)))
                                                      else \<psi>s i))"
 
@@ -97,6 +100,9 @@ begin
 
 definition hml_impl :: "('a, 's) hml \<Rightarrow> ('a, 's) hml \<Rightarrow> bool" (infix "\<Rrightarrow>" 60)  where
   "\<phi>l \<Rrightarrow> \<phi>r \<equiv> (\<forall>p. (p \<Turnstile> \<phi>l) \<longrightarrow> (p \<Turnstile> \<phi>r))"
+
+lemma hml_impl_iffI: "\<phi>l \<Rrightarrow> \<phi>r = (\<forall>p. (p \<Turnstile> \<phi>l) \<longrightarrow> (p \<Turnstile> \<phi>r))"
+  using hml_impl_def by force
 
 lemma hml_impl_preord: "reflp (\<Rrightarrow>) \<and> transp (\<Rrightarrow>)"
   by (metis hml_impl_def reflpI transpI)
@@ -119,6 +125,12 @@ lemma "\<phi>l \<Rrightarrow> \<phi>r \<Longrightarrow> Neg \<phi>r \<and>\<Rrig
 
 lemma pre_\<epsilon>: "\<phi> \<Rrightarrow> (Internal \<phi>)"
   using silent_reachable.intros(1) hml_impl_def by fastforce
+
+lemma pre_\<tau>: "\<phi> \<Rrightarrow> (Silent \<phi>)"
+  using hml_impl_def by fastforce
+
+lemma \<epsilon>_eats_\<tau>: "(Internal (Obs \<tau> \<phi>)) \<Rrightarrow> (Internal \<phi>)"
+  using silent_reachable_append_\<tau> hml_impl_def by fastforce
 
 \<comment> \<open> Equivalence \<close>
 
@@ -367,6 +379,34 @@ next
   assume "\<forall>\<phi>l \<phi>r. \<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r \<longrightarrow> fill \<phi>l \<phi>' \<Lleftarrow>\<Rrightarrow> fill \<phi>r \<phi>'"
   then show "\<forall>\<phi>l \<phi>r. \<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r \<longrightarrow> fill_conjunct \<phi>l (NegC \<phi>') \<Lleftarrow>\<and>\<Rrightarrow> fill_conjunct \<phi>r (NegC \<phi>')"
     using neg_cong by force
+qed
+
+\<comment> \<open> Know Equivalence Elements\<close>
+
+lemma "(Internal (Silent \<phi>)) \<Lleftarrow>\<Rrightarrow> (Internal \<phi>)"
+  unfolding hml_eq_def
+proof (rule conjI)
+  from pre_\<tau>
+  have "\<phi> \<Rrightarrow> (Silent \<phi>)".
+  then have "fill_pre \<phi> (InternalPC PCHole) \<Rrightarrow> fill_pre (Silent \<phi>) (InternalPC PCHole)"
+    by (rule pre_cong)
+  then show "Internal \<phi> \<Rrightarrow> Internal (Silent \<phi>)"
+    unfolding fill_pre.simps.
+next
+  show "Internal (Silent \<phi>) \<Rrightarrow> Internal \<phi>"
+    unfolding hml_impl_def
+  proof (rule allI, rule impI)
+    fix p
+    assume "p \<Turnstile> Internal (Silent \<phi>)"
+    hence "p \<Turnstile> Internal \<phi> \<or> p \<Turnstile> Internal (Obs \<tau> \<phi>)" by auto
+    then show "p \<Turnstile> Internal \<phi>"
+      apply (rule disjE) apply assumption
+    proof -
+      assume "p \<Turnstile> Internal (Obs \<tau> \<phi>)"
+      then show "p \<Turnstile> Internal \<phi>"
+        using \<epsilon>_eats_\<tau> and hml_impl_iffI by simp
+    qed
+  qed
 qed
 
 end
