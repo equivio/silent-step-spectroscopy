@@ -9,28 +9,6 @@ inductive
   "is_trace_formula (Internal \<chi>)" if "is_trace_formula_conjunction \<chi>" |
   "is_trace_formula_conjunction (Obs \<alpha> \<phi>)" if "is_trace_formula \<phi>"
 
-primrec \<phi>_wtraces :: "('act, 'i) hml_srbb \<Rightarrow> 'act list set"
-  and \<chi>_wtraces :: "('act, 'i) hml_srbb_conjunction \<Rightarrow> 'act list set"
-  and \<psi>_wtraces :: "('act, 'i) hml_srbb_conjunct \<Rightarrow> 'act list set" where
-  "\<phi>_wtraces TT = {[]}" |
-  "\<phi>_wtraces (Internal \<chi>) = \<chi>_wtraces \<chi>" |
-  "\<phi>_wtraces (ImmConj I \<psi>s) = \<Union>((\<psi>_wtraces \<circ> \<psi>s) ` I)" |
-
-  "\<chi>_wtraces (Obs \<alpha> \<phi>) = (\<lambda>tr. \<alpha> # tr) ` (\<phi>_wtraces \<phi>)" |
-  "\<chi>_wtraces (Conj I \<psi>s) = \<Union>((\<psi>_wtraces \<circ> \<psi>s) ` I)" |
-  "\<chi>_wtraces (StableConj I \<psi>s) = \<Union>((\<psi>_wtraces \<circ> \<psi>s) ` I)" |
-  "\<chi>_wtraces (BranchConj \<alpha> \<phi> I \<psi>s) = (\<lambda>tr. \<alpha> # tr) ` (\<phi>_wtraces \<phi>) \<union> \<Union>((\<psi>_wtraces \<circ> \<psi>s) ` I)" |
-
-  "\<psi>_wtraces (Pos \<chi>) = \<chi>_wtraces \<chi>" |
-  "\<psi>_wtraces (Neg \<chi>) = \<chi>_wtraces \<chi>" \<comment> \<open> This case is problematic! Actually, I want to reject all those traces... \<close>
-
-lemma 
-  fixes \<phi> :: "('act, 'i) hml_srbb"
-  fixes \<chi> :: "('act, 'i) hml_srbb_conjunction"
-  shows "(is_trace_formula \<phi> \<longrightarrow> (\<exists>tr. \<phi>_wtraces \<phi> = {tr}))
-       \<and> (is_trace_formula_conjunction \<chi> \<longrightarrow> (\<exists>tr. \<chi>_wtraces \<chi> = {tr}))"
-  apply (induct rule: is_trace_formula_is_trace_formula_conjunction.induct)
-  by fastforce+
 
 fun wtrace_to_\<phi> :: "'act list \<Rightarrow> ('act, 'i) hml_srbb"
   and wtrace_to_\<chi> :: "'act list \<Rightarrow> ('act, 'i) hml_srbb_conjunction"
