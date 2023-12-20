@@ -78,14 +78,17 @@ begin
 
 lemma trace_formula_implies_trace:
   fixes \<psi> ::"('a, 's) hml_srbb_conjunct"
-  shows trace_case: "is_trace_formula \<phi> \<Longrightarrow> \<phi> \<Turnstile>SRBB p \<Longrightarrow> (\<exists>tr \<in> weak_traces p. wtrace_to_\<phi> tr = \<phi>)" and
-conj_case: "is_trace_formula_conjunction \<chi> \<Longrightarrow> hml_srbb_conjunction_models \<chi> q \<Longrightarrow> (\<exists>tr \<in> weak_traces q. wtrace_to_\<chi> tr = \<chi>)"
-and True
-proof(induction \<phi> and \<chi> and \<psi> arbitrary: p and q)
-  case TT
-  then show ?case 
-    using weak_step_sequence.intros(1) by fastforce 
-next
+  shows
+       trace_case: "is_trace_formula \<phi> \<Longrightarrow> \<phi> \<Turnstile>SRBB p \<Longrightarrow> (\<exists>tr \<in> weak_traces p. wtrace_to_\<phi> tr = \<phi>)"
+    and conj_case: "is_trace_formula_conjunction \<chi> \<Longrightarrow> hml_srbb_conjunction_models \<chi> q \<Longrightarrow> (\<exists>tr \<in> weak_traces q. wtrace_to_\<chi> tr = \<chi>)"
+    and            True
+    apply (induction \<phi> and \<chi> and \<psi> arbitrary: p and q)
+  using weak_step_sequence.intros(1) apply fastforce
+  prefer 2 using is_trace_formula.cases apply blast
+  prefer 3 prefer 4 prefer 6 prefer 7
+  using is_trace_formula_conjunction.cases apply blast+
+  prefer 3 apply (simp add: is_trace_formula_conjunction.simps)
+proof-
   case (Internal \<chi>r)
   assume IH: "(\<And>q. is_trace_formula_conjunction \<chi>r \<Longrightarrow>
                  hml_srbb_conjunction_models \<chi>r q \<Longrightarrow> \<exists>tr\<in>weak_traces q. wtrace_to_\<chi> tr = \<chi>r)"
@@ -115,11 +118,6 @@ and internal_satisfied: "hml_srbb.Internal \<chi>r \<Turnstile>SRBB p"
     then show ?thesis
       using Cons tail_in_traces_p'(2) by auto 
   qed
-next
-  case (ImmConj x1 x2)
-  then have False
-    using is_trace_formula.cases by auto
-  then show ?case by blast
 next
   case (Obs \<alpha> \<phi>r)
   assume IH: "(\<And>p. is_trace_formula \<phi>r \<Longrightarrow> \<phi>r \<Turnstile>SRBB p \<Longrightarrow> \<exists>tr\<in>weak_traces p. wtrace_to_\<phi> tr = \<phi>r)"
@@ -170,28 +168,6 @@ and obs_models_q: "hml_srbb_conjunction_models (hml_srbb_conjunction.Obs \<alpha
     then show ?thesis 
       using tail_in_wt_q'(2) by fastforce
   qed
-next
-  case (Conj x1 x2)
-  hence False
-    using is_trace_formula_conjunction.cases by blast
-  then show ?case by blast 
-next
-  case (StableConj x1 x2)
-  hence False 
-    using is_trace_formula_conjunction.cases by blast
-  then show ?case by blast
-next
-  case (BranchConj x1 x2 x3 x4)
-  hence False 
-    by (simp add: is_trace_formula_conjunction.simps)
-  then show ?case by blast
-next
-  case (Pos x)
-  then show ?case 
-    by blast 
-next
-  case (Neg x)
-  then show ?case by blast
 qed
 
 lemma trace_equals_trace_to_formula: 
