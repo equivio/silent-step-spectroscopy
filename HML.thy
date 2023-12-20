@@ -115,8 +115,12 @@ lemma pre_cong: "\<phi>l \<Rrightarrow> \<phi>r \<Longrightarrow> fill_pre \<phi
 lemma "\<phi>l \<Rrightarrow> \<phi>r \<Longrightarrow> Neg \<phi>r \<and>\<Rrightarrow> Neg \<phi>l"
   using hml_conjunct_impl_def hml_impl_def by auto
 
+\<comment> \<open> Know Pre-Order Elements\<close>
+
+lemma pre_\<epsilon>: "\<phi> \<Rrightarrow> (Internal \<phi>)"
+  using silent_reachable.intros(1) hml_impl_def by fastforce
+
 \<comment> \<open> Equivalence \<close>
-  
 
 definition hml_eq :: "('a, 's) hml \<Rightarrow> ('a, 's) hml \<Rightarrow> bool" (infix "\<Lleftarrow>\<Rrightarrow>" 60)  where
   "\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r \<equiv> \<phi>l \<Rrightarrow> \<phi>r \<and> \<phi>r \<Rrightarrow> \<phi>l"
