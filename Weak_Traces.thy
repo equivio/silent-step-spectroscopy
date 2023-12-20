@@ -312,10 +312,9 @@ lemma aux:
   fixes \<phi> :: "('a, 's) hml_srbb"
   fixes \<chi> :: "('a, 's) hml_srbb_conjunction"
   fixes \<psi> :: "('a, 's) hml_srbb_conjunct"
-  assumes "p \<lesssim>WT q"
-  shows "(is_trace_formula \<phi> \<Longrightarrow> (\<phi> \<Turnstile>SRBB p \<longrightarrow> \<phi> \<Turnstile>SRBB q))"
-proof
-  assume \<phi>_trace: "is_trace_formula \<phi>" and p_sat_\<phi>: "\<phi> \<Turnstile>SRBB p"
+  shows "p \<lesssim>WT q \<Longrightarrow> is_trace_formula \<phi> \<Longrightarrow> \<phi> \<Turnstile>SRBB p \<Longrightarrow> \<phi> \<Turnstile>SRBB q"
+proof -
+  assume \<phi>_trace: "is_trace_formula \<phi>" and p_sat_\<phi>: "\<phi> \<Turnstile>SRBB p" and assms: "p \<lesssim>WT q"
   show "\<phi> \<Turnstile>SRBB q"
   proof-
     from assms have p_trace_implies_q_trace: "\<forall>tr p'. (p \<Zsurj>\<mapsto>\<Zsurj>$ tr p') \<longrightarrow> (\<exists>q'. q \<Zsurj>\<mapsto>\<Zsurj>$ tr q')" 
@@ -333,9 +332,9 @@ qed
 lemma expr_preorder_characterizes_relational_preorder_traces: "(p \<lesssim>WT q) = (p \<preceq> (E \<infinity> 0 0 0 0 0 0 0) q)"
   unfolding expr_preord_def hml_preordered_def
 proof
-  assume assm: "p \<lesssim>WT q"
-  show "\<forall>\<phi>\<in>\<O> (E \<infinity> 0 0 0 0 0 0 0). \<phi> \<Turnstile>SRBB p \<longrightarrow> \<phi> \<Turnstile>SRBB q"
-    using assm aux expressiveness_to_trace_formula weakly_trace_preordered_def
+  assume "p \<lesssim>WT q"
+  then show "\<forall>\<phi>\<in>\<O> (E \<infinity> 0 0 0 0 0 0 0). \<phi> \<Turnstile>SRBB p \<longrightarrow> \<phi> \<Turnstile>SRBB q"
+    using aux expressiveness_to_trace_formula weakly_trace_preordered_def
     by blast+
 next
   assume \<phi>_eneg: "\<forall>\<phi>\<in>\<O> (E \<infinity> 0 0 0 0 0 0 0). \<phi> \<Turnstile>SRBB p \<longrightarrow> \<phi> \<Turnstile>SRBB q"
