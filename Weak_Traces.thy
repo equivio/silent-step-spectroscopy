@@ -287,7 +287,6 @@ next
       next
         case False
         with Cons(2) have "wtrace_to_\<phi> ((a # tail)) \<Turnstile>SRBB p"
-        using remove_\<tau>_from_wtrace.simps(2)
         by auto
       hence restructure: "(Internal (Obs a (wtrace_to_\<phi> tail))) \<Turnstile>SRBB p" 
         by force
@@ -331,7 +330,7 @@ proof
   qed
 qed
 
-lemma "(p \<lesssim>WT q) = (p \<preceq> (E \<infinity> 0 0 0 0 0 0 0) q)"
+lemma expr_preorder_characterizes_relational_preorder_traces: "(p \<lesssim>WT q) = (p \<preceq> (E \<infinity> 0 0 0 0 0 0 0) q)"
   unfolding expr_preord_def hml_preordered_def
 proof
   assume assm: "p \<lesssim>WT q"
@@ -346,6 +345,10 @@ next
     by (simp, blast+)
 qed
 
+lemma "(p \<simeq>WT q) = (p \<sim> (E \<infinity> 0 0 0 0 0 0 0) q)"
+  unfolding weakly_trace_equivalent_def expr_equiv_def \<O>_def hml_equivalent_def hml_preordered_def
+  using expr_preorder_characterizes_relational_preorder_traces
+  by (simp add: \<O>_def expr_preord_def hml_preordered_def) 
 end
 
 end
