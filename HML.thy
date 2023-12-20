@@ -71,8 +71,29 @@ lemma "(state \<Turnstile> \<phi>) = (state \<Turnstile> HML_not (HML_not \<phi>
 
 end (* context Inhabited_Tau_LTS *)
 
+datatype 
+  ('act, 'i) hml_precontext =
+    Hole |
+    ObsC 'act "('act, 'i) hml_precontext" |
+    InternalC "('act, 'i) hml_precontext" |
+    SilentC "('act, 'i) hml_precontext" |
+    ConjC "'i set" "'i \<Rightarrow> ('act, 'i) hml_conjunct" "'i set" "'i \<Rightarrow> ('act, 'i) hml_precontext"
+
+
+primrec 
+      fill_pre :: "('act, 'i) hml \<Rightarrow> ('act, 'i) hml_precontext \<Rightarrow> ('act, 'i) hml" where
+  "fill_pre \<phi> Hole = \<phi>" |
+  "fill_pre \<phi> (ObsC \<alpha> \<phi>') = (Obs \<alpha> (fill_pre \<phi> \<phi>'))" |
+  "fill_pre \<phi> (InternalC \<phi>') = (Internal (fill_pre \<phi> \<phi>'))" |
+  "fill_pre \<phi> (SilentC \<phi>') = (Silent (fill_pre \<phi> \<phi>'))" |
+  "fill_pre \<phi> (ConjC I \<psi>s I' \<psi>s') = (Conj (I \<union> I') (\<lambda>i. if i \<in> I'
+                                                     then (Pos (fill_pre \<phi> (\<psi>s' i)))
+                                                     else \<psi>s i))"
+
 context LTS_Tau
 begin
+
+\<comment> \<open> Pre-Order \<close>
 
 definition hml_impl :: "('a, 's) hml \<Rightarrow> ('a, 's) hml \<Rightarrow> bool" (infix "\<Rrightarrow>" 60)  where
   "\<phi>l \<Rrightarrow> \<phi>r \<equiv> (\<forall>p. (p \<Turnstile> \<phi>l) \<longrightarrow> (p \<Turnstile> \<phi>r))"
@@ -86,6 +107,17 @@ definition hml_conjunct_impl :: "('a, 's) hml_conjunct \<Rightarrow> ('a, 's) hm
 lemma hml_conjunct_impl_preord: "reflp (\<and>\<Rrightarrow>) \<and> transp (\<and>\<Rrightarrow>)"
   by (metis hml_conjunct_impl_def reflpI transpI)
 
+\<comment> \<open> Pre-Congruence \<close>
+
+lemma pre_cong: "\<phi>l \<Rrightarrow> \<phi>r \<Longrightarrow> fill_pre \<phi>l C \<Rrightarrow> fill_pre \<phi>r C"
+  using hml_impl_def by (induct C) auto[5]
+
+lemma "\<phi>l \<Rrightarrow> \<phi>r \<Longrightarrow> Neg \<phi>r \<and>\<Rrightarrow> Neg \<phi>l"
+  using hml_conjunct_impl_def hml_impl_def by auto
+
+\<comment> \<open> Equivalence \<close>
+  
+
 definition hml_eq :: "('a, 's) hml \<Rightarrow> ('a, 's) hml \<Rightarrow> bool" (infix "\<Lleftarrow>\<Rrightarrow>" 60)  where
   "\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r \<equiv> \<phi>l \<Rrightarrow> \<phi>r \<and> \<phi>r \<Rrightarrow> \<phi>l"
 
@@ -98,7 +130,38 @@ definition hml_conjunct_eq :: "('a, 's) hml_conjunct \<Rightarrow> ('a, 's) hml_
 lemma hml_conjunct_eq_equiv: "equivp (\<Lleftarrow>\<and>\<Rrightarrow>)"
   by (smt (verit, best) equivpI hml_conjunct_eq_def hml_conjunct_impl_def reflpI sympI transpI)
 
+end
+
 \<comment> \<open> Congruence Properties\<close>
+
+datatype 
+  ('act, 'i) hml_context =
+    Hole |
+    ObsC 'act "('act, 'i) hml_context" |
+    InternalC "('act, 'i) hml_context" |
+    SilentC "('act, 'i) hml_context" |
+    ConjC "'i set" "'i \<Rightarrow> ('act, 'i) hml_conjunct" "'i set" "'i \<Rightarrow> ('act, 'i) hml_conjunct_context"
+and
+  ('act, 'i) hml_conjunct_context =
+    PosC "('act, 'i) hml_context" |
+    NegC "('act, 'i) hml_context"
+
+primrec 
+      fill :: "('act, 'i) hml \<Rightarrow> ('act, 'i) hml_context \<Rightarrow> ('act, 'i) hml"
+  and fill_conjunct :: "('act, 'i) hml \<Rightarrow> ('act, 'i) hml_conjunct_context \<Rightarrow> ('act, 'i) hml_conjunct" where
+  "fill \<phi> Hole = \<phi>" |
+  "fill \<phi> (ObsC \<alpha> \<phi>') = (Obs \<alpha> (fill \<phi> \<phi>'))" |
+  "fill \<phi> (InternalC \<phi>') = (Internal (fill \<phi> \<phi>'))" |
+  "fill \<phi> (SilentC \<phi>') = (Silent (fill \<phi> \<phi>'))" |
+  "fill \<phi> (ConjC I \<psi>s I' \<psi>s') = (Conj (I \<union> I') (\<lambda>i. if i \<in> I'
+                                                     then fill_conjunct \<phi> (\<psi>s' i)
+                                                     else \<psi>s i))" |
+
+  "fill_conjunct \<phi> (PosC \<phi>') = (Pos (fill \<phi> \<phi>'))" |
+  "fill_conjunct \<phi> (NegC \<phi>') = (Neg (fill \<phi> \<phi>'))"
+
+context LTS_Tau
+begin
 
 lemma obs_cong: "\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r \<Longrightarrow> (Obs \<alpha> \<phi>l) \<Lleftarrow>\<Rrightarrow> (Obs \<alpha> \<phi>r)"
   by (meson hml_eq_def hml_impl_def hml_models.simps(2))
@@ -205,37 +268,6 @@ lemma pos_cong: "\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r \<Longrightarrow> (
 
 lemma neg_cong: "\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r \<Longrightarrow> (Neg \<phi>l) \<Lleftarrow>\<and>\<Rrightarrow> (Neg \<phi>r)"
   by (meson hml_conjunct_eq_def hml_conjunct_impl_def hml_conjunct_models.simps(2) hml_eq_def hml_impl_def)
-
-end
-
-datatype 
-  ('act, 'i) hml_context =
-    Hole |
-    ObsC 'act "('act, 'i) hml_context" |
-    InternalC "('act, 'i) hml_context" |
-    SilentC "('act, 'i) hml_context" |
-    ConjC "'i set" "'i \<Rightarrow> ('act, 'i) hml_conjunct" "'i set" "'i \<Rightarrow> ('act, 'i) hml_conjunct_context"
-and
-  ('act, 'i) hml_conjunct_context =
-    PosC "('act, 'i) hml_context" |
-    NegC "('act, 'i) hml_context"
-
-primrec 
-      fill :: "('act, 'i) hml \<Rightarrow> ('act, 'i) hml_context \<Rightarrow> ('act, 'i) hml"
-  and fill_conjunct :: "('act, 'i) hml \<Rightarrow> ('act, 'i) hml_conjunct_context \<Rightarrow> ('act, 'i) hml_conjunct" where
-  "fill \<phi> Hole = \<phi>" |
-  "fill \<phi> (ObsC \<alpha> \<phi>') = (Obs \<alpha> (fill \<phi> \<phi>'))" |
-  "fill \<phi> (InternalC \<phi>') = (Internal (fill \<phi> \<phi>'))" |
-  "fill \<phi> (SilentC \<phi>') = (Silent (fill \<phi> \<phi>'))" |
-  "fill \<phi> (ConjC I \<psi>s I' \<psi>s') = (Conj (I \<union> I') (\<lambda>i. if i \<in> I'
-                                                     then fill_conjunct \<phi> (\<psi>s' i)
-                                                     else \<psi>s i))" |
-
-  "fill_conjunct \<phi> (PosC \<phi>') = (Pos (fill \<phi> \<phi>'))" |
-  "fill_conjunct \<phi> (NegC \<phi>') = (Neg (fill \<phi> \<phi>'))"
-
-context LTS_Tau
-begin
 
 lemma hml_cong: "\<forall>\<phi>l \<phi>r. \<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r \<longrightarrow> fill \<phi>l C \<Lleftarrow>\<Rrightarrow> fill \<phi>r C"
   and hml_conj_cong: "\<forall>\<phi>l \<phi>r. \<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r \<longrightarrow> fill_conjunct \<phi>l C' \<Lleftarrow>\<and>\<Rrightarrow> fill_conjunct \<phi>r C'"
