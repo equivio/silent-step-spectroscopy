@@ -288,10 +288,13 @@ lemma neg_cong: "\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r \<Longrightarrow> (
 lemma hml_cong: "\<forall>\<phi>l \<phi>r. \<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r \<longrightarrow> fill \<phi>l C \<Lleftarrow>\<Rrightarrow> fill \<phi>r C"
   and hml_conj_cong: "\<forall>\<phi>l \<phi>r. \<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r \<longrightarrow> fill_conjunct \<phi>l C' \<Lleftarrow>\<and>\<Rrightarrow> fill_conjunct \<phi>r C'"
   apply (induct C and C')
-  apply simp
-  apply (simp add: obs_cong)
-  apply (simp add: internal_cong)
-  apply (simp add: silent_cong)
+  prefer 6 prefer 7
+  using obs_cong
+    and internal_cong
+    and silent_cong
+    and pos_cong
+    and neg_cong
+  apply auto[6]
 proof -
   fix I :: "'s set"
   and \<psi>s :: "'s \<Rightarrow> ('a, 's) hml_conjunct"
@@ -369,16 +372,6 @@ proof -
       qed
     qed
   qed
-next
-  fix \<phi>'
-  assume "\<forall>\<phi>l \<phi>r. \<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r \<longrightarrow> fill \<phi>l \<phi>' \<Lleftarrow>\<Rrightarrow> fill \<phi>r \<phi>'"
-  then show "\<forall>\<phi>l \<phi>r. \<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r \<longrightarrow> fill_conjunct \<phi>l (PosC \<phi>') \<Lleftarrow>\<and>\<Rrightarrow> fill_conjunct \<phi>r (PosC \<phi>')"
-    using pos_cong by force
-next
-  fix \<phi>'
-  assume "\<forall>\<phi>l \<phi>r. \<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r \<longrightarrow> fill \<phi>l \<phi>' \<Lleftarrow>\<Rrightarrow> fill \<phi>r \<phi>'"
-  then show "\<forall>\<phi>l \<phi>r. \<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r \<longrightarrow> fill_conjunct \<phi>l (NegC \<phi>') \<Lleftarrow>\<and>\<Rrightarrow> fill_conjunct \<phi>r (NegC \<phi>')"
-    using neg_cong by force
 qed
 
 \<comment> \<open> Know Equivalence Elements\<close>
