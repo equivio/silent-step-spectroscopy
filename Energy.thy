@@ -271,4 +271,6 @@ next
     using min_1_7_simps min_less_iff_conj somwhere_larger_eq by fastforce
 qed
 
+abbreviation "subtract a b c d e f g h \<equiv> Some (\<lambda>x. x - (E a b c d e f g h))"
+
 end
