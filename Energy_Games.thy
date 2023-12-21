@@ -275,9 +275,67 @@ lemma in_wina_Ga:
   shows "\<exists>g'. ((g \<Zinj> g') \<and> (in_wina ((weight g g') e) g'))"
   using assms(1) assms(2) in_wina.simps by blast
 
+(*gets stuck from defenders perspective \<equiv> attacker controls or gets stuck*)
+inductive dstate_gets_stuck::"'gstate \<Rightarrow> bool" where 
+  "dstate_gets_stuck g" if "((\<nexists>g'. (g \<Zinj> g')) \<and> (Gd g)) \<or> (Ga g) " |
+  "dstate_gets_stuck g" if "(Gd g) \<and>( \<forall>g'.( (g \<Zinj> g') \<longrightarrow>(dstate_gets_stuck g')))"
+
+lemma winning_state_is_stuck:
+  assumes "in_wina e g"
+  shows "dstate_gets_stuck g"
+proof (rule in_wina.induct)
+  show "in_wina e g" using assms by simp
+next
+  show "\<And>g e. Gd g \<and> (\<forall>g'. \<not> g \<Zinj> g') \<and> e \<noteq> defender_win_level \<Longrightarrow> dstate_gets_stuck g"
+    by (simp add: dstate_gets_stuck.intros(1)) 
+next 
+  show "\<And>g e. Ga g \<and> (\<exists>g'. g \<Zinj> g' \<and> in_wina (weight g g' e) g' \<and> dstate_gets_stuck g') \<and> e \<noteq> defender_win_level \<Longrightarrow>
+           dstate_gets_stuck g" by (simp add: dstate_gets_stuck.intros(1)) 
+next
+  show "\<And>g e. Gd g \<and>
+           (\<forall>g'. g \<Zinj> g' \<longrightarrow> in_wina (weight g g' e) g' \<and> dstate_gets_stuck g') \<and> e \<noteq> defender_win_level \<Longrightarrow>
+           dstate_gets_stuck g" using dstate_gets_stuck.intros(2) by simp
+qed
+
+definition attacker_order_relation:: "(('gstate \<times> 'energy) \<times> 'gstate \<times> 'energy) set" where
+  "attacker_order_relation \<equiv> {((g', e'), (g, e)). (\<exists>up. weight_opt g g' = Some up \<and> up e = e') \<and> (in_wina e g) \<and> (Ga g \<longrightarrow> in_wina e' g')}"
+
+definition attacker_order_order:: "'gstate \<Rightarrow> 'energy \<Rightarrow> 'gstate \<Rightarrow> 'energy \<Rightarrow> bool" ("_ _ \<prec>  _ _" [60,60,60] 70) where
+  "(g' e' \<prec> g e) \<equiv> (\<exists>up. weight_opt g g' = Some up \<and> up e = e') \<and> (in_wina e g) \<and> (Ga g \<longrightarrow> in_wina e' g')"
+
+lemma orderd_implies_wina:
+  fixes g::"'gstate" and g'::"'gstate" and e:: "'energy" and e'::"'energy"
+  assumes "(g' e' \<prec> g e)"
+  shows "in_wina e' g'"
+proof-
+  from assms have O: "(\<exists>up. weight_opt g g' = Some up \<and> up e = e') \<and> (in_wina e g) \<and> (Ga g \<longrightarrow> in_wina e' g')" using attacker_order_order_def by simp  
+  consider (Ga) "Ga g" | (Gd) "Gd g" by auto
+  then show ?thesis proof cases
+    case Ga
+    then show ?thesis using O by simp
+  next
+    case Gd
+    then show ?thesis using O by (metis energy_game.in_wina.cases option.discI option.sel)
+  qed
+qed
+
+corollary ordered_implies_stuck:
+  fixes g::"'gstate" and g'::"'gstate" and e:: "'energy" and e'::"'energy"
+  assumes "(g' e' \<prec> g e)"
+  shows "dstate_gets_stuck g'"
+  using assms orderd_implies_wina winning_state_is_stuck by blast
+
+
+
+
 inductive consistent_with_wina :: "'gstate \<Rightarrow> 'energy \<Rightarrow> 'gstate fplay \<Rightarrow> bool" where
   "consistent_with_wina g0 e0 [g0]" if "in_wina e0 g0" | 
   "consistent_with_wina g0 e0 ([g0]@([g1]@p))" if "(finite_play g0 ([g0]@([g1]@p))) \<and> (in_wina e0 g0) \<and> (consistent_with_wina g1 ((weight g0 g1)e0) ([g1]@p))"
+
+
+
+
+
 
 lemma 
   assumes "consistent_with_wina g0 e0 p"
@@ -318,6 +376,10 @@ proof -
   qed
 qed
 
+
+
+
+
 lemma ind_beg:
   fixes ord::"'energy \<Rightarrow> 'energy \<Rightarrow> bool"
   assumes transitive: "\<forall>e e' e''. (((ord e e') \<and> (ord e' e'')) \<longrightarrow> (ord e e''))" and
@@ -327,7 +389,7 @@ lemma ind_beg:
           update_gets_smaller: "\<forall>g g' e. (((weight_opt g g') \<noteq> None) \<longrightarrow> (ord (the (weight_opt g g')e) e))" and
           
           "(Gd g) \<and> (\<forall>g'. \<not>(g \<Zinj> g')) \<and> (e \<noteq> defender_win_level)" and "ord e e'"
-  shows "in_wina e' g" by (metis antysim assms(6) assms(7) dwl_min in_wina.intros(1)) 
+        shows "in_wina e' g" by (metis antysim assms(6) assms(7) dwl_min in_wina.intros(1)) 
 
 lemma ind_step_Ga: 
   fixes ord::"'energy \<Rightarrow> 'energy \<Rightarrow> bool"
@@ -338,11 +400,10 @@ lemma ind_step_Ga:
           monotonicity:"\<forall>g g' e e'. (((weight_opt g g') \<noteq> None \<and> (ord e e'))  \<longrightarrow> (ord (the (weight_opt g g')e) (the (weight_opt g g')e')))" and
           update_gets_smaller: "\<forall>g g' e. (((weight_opt g g') \<noteq> None) \<longrightarrow> (ord (the (weight_opt g g')e) e))" and
 
-          ind_hyp: "\<forall>g'.((g \<Zinj> g') \<longrightarrow> (\<forall>e e'.( ((in_wina e g') \<and> (ord e e'))\<longrightarrow> (in_wina e' g'))))" and
-          "(Ga g) \<and> (\<exists>g'. ((g \<Zinj> g') \<and> (in_wina ((weight g g') e) g')))\<and> (e \<noteq> defender_win_level)" 
+          "(Ga g) \<and> (\<exists>g'. ((g \<Zinj> g') \<and> (in_wina ((weight g g') e) g') \<and>  (\<forall>e e'.( ((in_wina e g') \<and> (ord e e'))\<longrightarrow> (in_wina e' g')))))\<and> (e \<noteq> defender_win_level)" 
           and "ord e e'"
   shows "in_wina e' g"
-  by (metis assms(8) assms(9) defender_win_level_not_in_wina energy_game.in_wina.intros(2) ind_hyp monotonicity update_gets_smaller) 
+  by (metis assms(7) assms(8) in_wina.simps monotonicity update_gets_smaller)
 
 lemma ind_step_Gd: 
   fixes ord::"'energy \<Rightarrow> 'energy \<Rightarrow> bool"
@@ -353,14 +414,44 @@ lemma ind_step_Gd:
           monotonicity:"\<forall>g g' e e'. (((weight_opt g g') \<noteq> None \<and> (ord e e'))  \<longrightarrow> (ord (the (weight_opt g g')e) (the (weight_opt g g')e')))" and
           update_gets_smaller: "\<forall>g g' e. (((weight_opt g g') \<noteq> None) \<longrightarrow> (ord (the (weight_opt g g')e) e))" and
 
-          ind_hyp: "\<forall>g'.((g \<Zinj> g') \<longrightarrow> (\<forall>e e'.( ((in_wina e g') \<and> (ord e e'))\<longrightarrow> (in_wina e' g'))))" and
-          "(Gd g) \<and>(\<forall>g'. ((g \<Zinj> g') \<longrightarrow> (in_wina ((weight g g') e) g'))) \<and> (e \<noteq> defender_win_level)" 
+          "(Gd g) \<and>(\<forall>g'. ((g \<Zinj> g') \<longrightarrow> (in_wina ((weight g g') e) g')) \<and> ((g \<Zinj> g') \<longrightarrow> (\<forall>e e'.( ((in_wina e g') \<and> (ord e e'))\<longrightarrow> (in_wina e' g'))))) \<and> (e \<noteq> defender_win_level)" 
           and "ord e e'"
   shows "in_wina e' g"
-  using antysim assms(8) assms(9) dwl_min in_wina.intros(3) ind_hyp monotonicity by blast
-  
-find_theorems in_wina
-thm in_wina.cases
+  by (metis antysim assms(7) assms(8) dwl_min in_wina.intros(3) monotonicity)
+
+
+thm in_wina.induct
+
+lemma win_a_upwards_closure: 
+  fixes ord::"'energy \<Rightarrow> 'energy \<Rightarrow> bool"
+  assumes transitive: "\<forall>e e' e''. (((ord e e') \<and> (ord e' e'')) \<longrightarrow> (ord e e''))" and
+          reflexive: "\<forall>e. (ord e e)" and
+          antysim: "\<forall>e e'. (((ord e e') \<and> (ord e' e)) \<longrightarrow> e=e')" and
+          dwl_min: "\<forall>e. (ord defender_win_level e)" and 
+          monotonicity:"\<forall>g g' e e'. (((weight_opt g g') \<noteq> None \<and> (ord e e'))  \<longrightarrow> (ord (the (weight_opt g g')e) (the (weight_opt g g')e')))" and
+          update_gets_smaller: "\<forall>g g' e. (((weight_opt g g') \<noteq> None) \<longrightarrow> (ord (the (weight_opt g g')e) e))" and
+          
+          "in_wina e g"
+        shows "(\<forall>e'.((ord e e')\<longrightarrow> (in_wina e' g)))"
+proof-
+  have IB: "(\<And>g e. Gd g \<and> (\<forall>g'. \<not> g \<Zinj> g') \<and> e \<noteq> defender_win_level \<Longrightarrow> (\<forall>e'.((ord e e')\<longrightarrow> (in_wina e' g))))"
+    using ind_beg antysim dwl_min local.reflexive local.transitive update_gets_smaller by blast
+  have ISA: "\<And>g e. Ga g \<and> (\<exists>g'. g \<Zinj> g' \<and> in_wina (weight g g' e) g' \<and> (\<forall>e'. ord (weight g g' e) e' \<longrightarrow> in_wina e' g')) \<and> e \<noteq> defender_win_level \<Longrightarrow>
+           \<forall>e'. ord e e' \<longrightarrow> in_wina e' g" using ind_step_Ga
+    by (metis antysim dwl_min in_wina.simps monotonicity)
+  have ISD: "\<And>g e. Gd g \<and>
+          (\<forall>g'. g \<Zinj> g' \<longrightarrow> in_wina (weight g g' e) g' \<and> (\<forall>e'. ord (weight g g' e) e' \<longrightarrow> in_wina e' g')) \<and> e \<noteq> defender_win_level \<Longrightarrow>
+          \<forall>e'. ord e e' \<longrightarrow> in_wina e' g" using ind_step_Gd
+    by (metis antysim dwl_min in_wina.simps monotonicity)
+
+  show "(\<forall>e'.((ord e e')\<longrightarrow> (in_wina e' g)))" apply (rule_tac x1.0=e and x2.0=g in in_wina.induct)
+
+  from assms(7) IB ISA ISD show "(\<forall>e'.((ord e e')\<longrightarrow> (in_wina e' g)))" apply (rule_tac in in_wina.induct)
+
+  from in_wina.induct assms(7) IB ISA ISD show "(\<forall>e'.((ord e e')\<longrightarrow> (in_wina e' g)))"
+
+
+
 
 (* TODO *)
 lemma win_a_upwards_closure: 
