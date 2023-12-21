@@ -1,9 +1,9 @@
-name: Build Isabelle
+name: Check Isabelle for PRs
 
 on:
-  push:
-  workflow_dispatch:
   pull_request:
+    branches: [ main ]
+  workflow_dispatch:
 
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
@@ -32,13 +32,4 @@ jobs:
         with:
           name: document
           path: ./out/AFP/LinearTimeBranchingTimeSpectroscopyAccountingForSilentSteps/document.pdf
-
-      - uses: actions/upload-artifact@v3
-        with:
-          name: outline
-          path: ./out/AFP/LinearTimeBranchingTimeSpectroscopyAccountingForSilentSteps/outline.pdf
-
-      - uses: actions/upload-artifact@v3
-        with:
-          name: out
-          path: ./out
+          
