@@ -217,43 +217,6 @@ lemma play_won_unique:
   and  "no_winner g0 e0 p  \<longleftrightarrow>  \<not> (won_by_defender g0 e0 p \<or> won_by_attacker g0 e0 p)"
   using  won_by_attacker_def won_by_defender_def by blast+
 
-(* TODO *)
-lemma  won_by_defender_suffix:
-  assumes "won_by_defender g0 e0 ([g0]@([g1]@p))" 
-  shows "won_by_defender g1 ((weight g0 g1)e0) ([g1]@p)"  
-  using assms proof(cases "energy_level g0 e0 ([g0]@([g1]@p)) = defender_win_level")
-  case True
-  have "energy_level g1 ((weight g0 g1)e0) ([g1]@p) = energy_level g0 e0 ([g0]@([g1]@p))" sorry
-  then show ?thesis oops
-next
-  case False
-  hence X: "(play_stuck g0 ([g0]@([g1]@p))) \<and> (is_attacker_turn ([g0]@([g1]@p)))" using assms
-    by (simp add: won_by_defender_def)
-  hence "(finite_play g0 ([g0]@([g1]@p))) \<and> (\<nexists>gn. finite_play g0 (([g0]@([g1]@p)) @ [gn]))" by simp 
-  hence "(finite_play g1 ([g1]@p)) \<and> (\<nexists>gn. finite_play g1 ((([g1]@p)) @ [gn]))" using finite_play_suffix2
-    by (metis append.assoc append_Cons append_Nil energy_game.finite_play.intros(2) energy_game.finite_play_is_path last_ConsR list.distinct(1))
-  hence "(play_stuck g1 ([g1]@p)) \<and> (is_attacker_turn ([g1]@p))" using X by simp 
-  then show ?thesis by (simp add: won_by_defender_def) 
-qed
-
-(* TODO *)
-lemma  won_by_defender_add_prefix:
-  assumes "finite_play g0 ([g0]@([g1]@p))" and "won_by_defender g1 ((weight g0 g1)e0) ([g1]@p)"
-  shows "won_by_defender g0 e0 ([g0]@([g1]@p))" 
-  using assms proof(cases "energy_level g1 ((weight g0 g1)e0) ([g1]@p) = defender_win_level")
-  case True
-  have "energy_level g1 ((weight g0 g1)e0) ([g1]@p) = energy_level g0 e0 ([g0]@([g1]@p))" sorry
-  then show ?thesis oops
-next
-  case False
-  hence X: "(play_stuck g1 ([g1]@p)) \<and> (is_attacker_turn ([g1]@p))" using assms
-    by (simp add: won_by_defender_def)
-  hence "(\<nexists>gn. finite_play g1 ((([g1]@p)) @ [gn]))" by simp 
-  hence "(\<nexists>gn. finite_play g0 (([g0]@([g1]@p)) @ [gn]))" by (metis append_assoc finite_play_suffix2) 
-  hence "(play_stuck g0 ([g0]@([g1]@p))) \<and> (is_attacker_turn ([g0]@([g1]@p)))" using X assms by auto
-  then show ?thesis by (simp add: won_by_defender_def) 
-qed
-
 subsection \<open>Winning Budgets\<close>
 
 inductive in_wina:: "'energy \<Rightarrow> 'gstate \<Rightarrow> bool " where
@@ -275,6 +238,7 @@ lemma in_wina_Ga:
   shows "\<exists>g'. ((g \<Zinj> g') \<and> (in_wina ((weight g g') e) g'))"
   using assms(1) assms(2) in_wina.simps by blast
 
+(*
 (*gets stuck from defenders perspective \<equiv> attacker controls or gets stuck*)
 inductive dstate_gets_stuck::"'gstate \<Rightarrow> bool" where 
   "dstate_gets_stuck g" if "((\<nexists>g'. (g \<Zinj> g')) \<and> (Gd g)) \<or> (Ga g) " |
@@ -325,60 +289,10 @@ corollary ordered_implies_stuck:
   shows "dstate_gets_stuck g'"
   using assms orderd_implies_wina winning_state_is_stuck by blast
 
-
-
-
 inductive consistent_with_wina :: "'gstate \<Rightarrow> 'energy \<Rightarrow> 'gstate fplay \<Rightarrow> bool" where
   "consistent_with_wina g0 e0 [g0]" if "in_wina e0 g0" | 
   "consistent_with_wina g0 e0 ([g0]@([g1]@p))" if "(finite_play g0 ([g0]@([g1]@p))) \<and> (in_wina e0 g0) \<and> (consistent_with_wina g1 ((weight g0 g1)e0) ([g1]@p))"
-
-
-
-
-
-
-lemma 
-  assumes "consistent_with_wina g0 e0 p"
-  shows "\<not>(won_by_defender g0 e0 p)"
-proof - 
-  from assms have "finite_play g0 p"
-    using consistent_with_wina.simps finite_play.simps by blast 
-  thus "\<not>(won_by_defender g0 e0 p)" using assms proof (induct "p" arbitrary: g0 e0 rule: List.list.induct)
-    case Nil
-    thus ?case using finite_play.cases by auto 
-  next
-    case (Cons x1 x2) 
-    thus ?case proof(cases "x2 = []")
-      case True
-      assume X1:"(\<And>g0 e0. finite_play g0 x2 \<Longrightarrow> consistent_with_wina g0 e0 x2 \<Longrightarrow> \<not> won_by_defender g0 e0 x2)" 
-                and X2: "x2 = []" and X3: "finite_play g0 (x1 # x2)"
-                and X4: "consistent_with_wina g0 e0 (x1 # x2)" 
-      hence "(x1 # x2) = [g0]"
-        using consistent_with_wina.cases list.sel(1) by fastforce   
-      thus ?thesis using X1 X2 X3 X4
-        by (metis consistent_with_wina.cases defender_win_level_not_in_wina energy_game.energy_level_def1 energy_game.finite_play.intros(2) energy_game.won_by_defender_def in_wina_Ga last_ConsL)
-    next
-      case False
-      hence "\<exists>x x3. (x2= (x# x3))" using list.exhaust_sel by auto
-      then obtain x x3 where X2: "x2= (x# x3)" by auto 
-
-      have "consistent_with_wina g0 e0 ([x1]@([x]@x3))" using X2 Cons(3) by simp
-      hence X4: "(consistent_with_wina x ((weight g0 x)e0) ([x]@x3))"
-        by (smt (verit, ccfv_threshold) Nil_is_append_conv append_self_conv2 consistent_with_wina.simps hd_append2 list.sel(1) list.sel(3) not_Cons_self2 tl_append2)
-
-      have X3: "finite_play x x2" using X2 finite_play_suffix2 X4 Cons(2)
-        by (metis Cons_eq_appendI append_self_conv2 consistent_with_wina.simps finite_play.simps)
-      
-      have "\<not> won_by_defender x ((weight g0 x)e0) x2" using X2 X3 X4 Cons(1) by auto
-      then show ?thesis using won_by_defender_suffix Cons
-        by (metis Cons_eq_appendI X2 append_self_conv2 consistent_with_wina.simps list.inject)
-    qed
-  qed
-qed
-
-
-
-
+*)
 
 lemma ind_beg:
   fixes ord::"'energy \<Rightarrow> 'energy \<Rightarrow> bool"
@@ -419,9 +333,6 @@ lemma ind_step_Gd:
   shows "in_wina e' g"
   by (metis antysim assms(7) assms(8) dwl_min in_wina.intros(3) monotonicity)
 
-
-thm in_wina.induct
-
 lemma win_a_upwards_closure: 
   fixes ord::"'energy \<Rightarrow> 'energy \<Rightarrow> bool"
   assumes transitive: "\<forall>e e' e''. (((ord e e') \<and> (ord e' e'')) \<longrightarrow> (ord e e''))" and
@@ -433,43 +344,18 @@ lemma win_a_upwards_closure:
           
           "in_wina e g"
         shows "(\<forall>e'.((ord e e')\<longrightarrow> (in_wina e' g)))"
-proof-
-  have IB: "(\<And>g e. Gd g \<and> (\<forall>g'. \<not> g \<Zinj> g') \<and> e \<noteq> defender_win_level \<Longrightarrow> (\<forall>e'.((ord e e')\<longrightarrow> (in_wina e' g))))"
-    using ind_beg antysim dwl_min local.reflexive local.transitive update_gets_smaller by blast
-  have ISA: "\<And>g e. Ga g \<and> (\<exists>g'. g \<Zinj> g' \<and> in_wina (weight g g' e) g' \<and> (\<forall>e'. ord (weight g g' e) e' \<longrightarrow> in_wina e' g')) \<and> e \<noteq> defender_win_level \<Longrightarrow>
-           \<forall>e'. ord e e' \<longrightarrow> in_wina e' g" using ind_step_Ga
+using assms(7) proof (induct rule: in_wina.induct)
+  case (1 g e)
+  then show ?case using ind_beg antysim dwl_min local.reflexive local.transitive update_gets_smaller by blast
+next
+  case (2 g e)
+  then show ?case  using ind_step_Ga
     by (metis antysim dwl_min in_wina.simps monotonicity)
-  have ISD: "\<And>g e. Gd g \<and>
-          (\<forall>g'. g \<Zinj> g' \<longrightarrow> in_wina (weight g g' e) g' \<and> (\<forall>e'. ord (weight g g' e) e' \<longrightarrow> in_wina e' g')) \<and> e \<noteq> defender_win_level \<Longrightarrow>
-          \<forall>e'. ord e e' \<longrightarrow> in_wina e' g" using ind_step_Gd
+next
+  case (3 g e)
+  then show ?case using ind_step_Gd
     by (metis antysim dwl_min in_wina.simps monotonicity)
-
-  from in_wina.induct assms(7) IB ISA ISD show "(\<forall>e'.((ord e e')\<longrightarrow> (in_wina e' g)))" sorry
-
-
-
-
-(* TODO *)
-lemma win_a_upwards_closure: 
-  fixes ord::"'energy \<Rightarrow> 'energy \<Rightarrow> bool"
-  assumes transitive: "\<forall>e e' e''. (((ord e e') \<and> (ord e' e'')) \<longrightarrow> (ord e e''))" and
-          reflexive: "\<forall>e. (ord e e)" and
-          antysim: "\<forall>e e'. (((ord e e') \<and> (ord e' e)) \<longrightarrow> e=e')" and
-          dwl_min: "\<forall>e. (ord defender_win_level e)" and 
-          monotonicity:"\<forall>g g' e e'. (((weight_opt g g') \<noteq> None \<and> (ord e e'))  \<longrightarrow> (ord (the (weight_opt g g')e) (the (weight_opt g g')e')))" and
-          update_gets_smaller: "\<forall>g g' e. (((weight_opt g g') \<noteq> None) \<longrightarrow> (ord (the (weight_opt g g')e) e))" and
-          
-          "in_wina e g" and "ord e e'"
-  shows "in_wina e' g"
-proof - 
-  have "\<And>g e. Gd g \<and> (\<forall>g'. \<not> g \<Zinj> g') \<and> e \<noteq> defender_win_level \<Longrightarrow> in_wina e' g" using ind_beg
-    by (metis antysim assms(7) assms(8) dwl_min in_wina.simps)
-  show  "in_wina e' g" oops
-
-(* Beweisidee war, von den "blättern" durchzugehen und zu färben. 
-   Damit dieser Beweis aufgeht, brauche ich aber Kreisfreiheit oder sowas *)
-    
-
+qed
 
 end (*End of context energy_game*)
 end
