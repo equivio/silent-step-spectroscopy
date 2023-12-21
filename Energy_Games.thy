@@ -214,46 +214,6 @@ lemma in_wina_Ga:
   shows "\<exists>g'. ((g \<Zinj> g') \<and> (in_wina ((weight g g') e) g'))"
   using assms(1) assms(2) in_wina.simps by blast
 
-(* Start working on upwards closure of Winning Budgets*)
-lemma ind_beg:
-  fixes ord::"'energy \<Rightarrow> 'energy \<Rightarrow> bool"
-  assumes transitive: "\<forall>e e' e''. (((ord e e') \<and> (ord e' e'')) \<longrightarrow> (ord e e''))" and
-          reflexive: "\<forall>e. (ord e e)" and
-          antysim: "\<forall>e e'. (((ord e e') \<and> (ord e' e)) \<longrightarrow> e=e')" and
-          dwl_min: "\<forall>e. (ord defender_win_level e)" and 
-          update_gets_smaller: "\<forall>g g' e. (((weight_opt g g') \<noteq> None) \<longrightarrow> (ord (the (weight_opt g g')e) e))" and
-          
-          "(Gd g) \<and> (\<forall>g'. \<not>(g \<Zinj> g')) \<and> (e \<noteq> defender_win_level)" and "ord e e'"
-        shows "in_wina e' g" by (metis antysim assms(6) assms(7) dwl_min in_wina.intros(1)) 
-
-lemma ind_step_Ga: 
-  fixes ord::"'energy \<Rightarrow> 'energy \<Rightarrow> bool"
-  assumes transitive: "\<forall>e e' e''. (((ord e e') \<and> (ord e' e'')) \<longrightarrow> (ord e e''))" and
-          reflexive: "\<forall>e. (ord e e)" and
-          antysim: "\<forall>e e'. (((ord e e') \<and> (ord e' e)) \<longrightarrow> e=e')" and
-          dwl_min: "\<forall>e. (ord defender_win_level e)" and 
-          monotonicity:"\<forall>g g' e e'. (((weight_opt g g') \<noteq> None \<and> (ord e e'))  \<longrightarrow> (ord (the (weight_opt g g')e) (the (weight_opt g g')e')))" and
-          update_gets_smaller: "\<forall>g g' e. (((weight_opt g g') \<noteq> None) \<longrightarrow> (ord (the (weight_opt g g')e) e))" and
-
-          "(Ga g) \<and> (\<exists>g'. ((g \<Zinj> g') \<and> (in_wina ((weight g g') e) g') \<and>  (\<forall>e e'.( ((in_wina e g') \<and> (ord e e'))\<longrightarrow> (in_wina e' g')))))\<and> (e \<noteq> defender_win_level)" 
-          and "ord e e'"
-  shows "in_wina e' g"
-  by (metis assms(7) assms(8) in_wina.simps monotonicity update_gets_smaller)
-
-lemma ind_step_Gd: 
-  fixes ord::"'energy \<Rightarrow> 'energy \<Rightarrow> bool"
-  assumes transitive: "\<forall>e e' e''. (((ord e e') \<and> (ord e' e'')) \<longrightarrow> (ord e e''))" and
-          reflexive: "\<forall>e. (ord e e)" and
-          antysim: "\<forall>e e'. (((ord e e') \<and> (ord e' e)) \<longrightarrow> e=e')" and
-          dwl_min: "\<forall>e. (ord defender_win_level e)" and 
-          monotonicity:"\<forall>g g' e e'. (((weight_opt g g') \<noteq> None \<and> (ord e e'))  \<longrightarrow> (ord (the (weight_opt g g')e) (the (weight_opt g g')e')))" and
-          update_gets_smaller: "\<forall>g g' e. (((weight_opt g g') \<noteq> None) \<longrightarrow> (ord (the (weight_opt g g')e) e))" and
-
-          "(Gd g) \<and>(\<forall>g'. ((g \<Zinj> g') \<longrightarrow> (in_wina ((weight g g') e) g')) \<and> ((g \<Zinj> g') \<longrightarrow> (\<forall>e e'.( ((in_wina e g') \<and> (ord e e'))\<longrightarrow> (in_wina e' g'))))) \<and> (e \<noteq> defender_win_level)" 
-          and "ord e e'"
-  shows "in_wina e' g"
-  by (metis antysim assms(7) assms(8) dwl_min in_wina.intros(3) monotonicity)
-
 lemma win_a_upwards_closure: 
   fixes ord::"'energy \<Rightarrow> 'energy \<Rightarrow> bool"
   assumes transitive: "\<forall>e e' e''. (((ord e e') \<and> (ord e' e'')) \<longrightarrow> (ord e e''))" and
@@ -267,15 +227,16 @@ lemma win_a_upwards_closure:
         shows "(\<forall>e'.((ord e e')\<longrightarrow> (in_wina e' g)))"
 using assms(7) proof (induct rule: in_wina.induct)
   case (1 g e)
-  then show ?case using ind_beg antysim dwl_min local.reflexive local.transitive update_gets_smaller by blast
+  then show ?case using antysim dwl_min local.reflexive local.transitive update_gets_smaller
+    by (metis in_wina.intros(1)) 
 next
   case (2 g e)
-  then show ?case  using ind_step_Ga
-    by (metis antysim dwl_min in_wina.simps monotonicity)
+  then show ?case
+    using antysim dwl_min in_wina.intros(2) monotonicity by blast 
 next
   case (3 g e)
-  then show ?case using ind_step_Gd
-    by (metis antysim dwl_min in_wina.simps monotonicity)
+  then show ?case
+    using antysim dwl_min in_wina.intros(3) monotonicity by blast 
 qed
 
 end (*End of context energy_game*)
