@@ -115,6 +115,10 @@ lemma energy_level_example_3:
   shows "energy_level a (E 10 10) [a, b2, b1] = undefined"
   using Game.energy_level.elims Game.energy_level.pelims by simp
 
+lemma energy_level_example_4:
+  shows "energy_level a (E 10 10) [c] = undefined"
+  using Game.energy_level.elims Game.energy_level.pelims by simp
+
 lemma play_stuck_example:
   shows "Game.play_stuck a [a, b2, c, d1, e]"
   by (metis (mono_tags, opaque_lifting) Game_finite_play_example append.assoc append_Cons energy_game.finite_play_is_path last_ConsR list.distinct(1) self_append_conv2 snoc_eq_iff_butlast weight_opt.simps(38))
