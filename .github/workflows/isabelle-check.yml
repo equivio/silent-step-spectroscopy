@@ -32,4 +32,4 @@ jobs:
         with:
           name: document
           path: ./out/AFP/LinearTimeBranchingTimeSpectroscopyAccountingForSilentSteps/document.pdf
-          
+          retention-days: 7
