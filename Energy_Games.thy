@@ -444,11 +444,7 @@ proof-
           \<forall>e'. ord e e' \<longrightarrow> in_wina e' g" using ind_step_Gd
     by (metis antysim dwl_min in_wina.simps monotonicity)
 
-  show "(\<forall>e'.((ord e e')\<longrightarrow> (in_wina e' g)))" apply (rule_tac x1.0=e and x2.0=g in in_wina.induct)
-
-  from assms(7) IB ISA ISD show "(\<forall>e'.((ord e e')\<longrightarrow> (in_wina e' g)))" apply (rule_tac in in_wina.induct)
-
-  from in_wina.induct assms(7) IB ISA ISD show "(\<forall>e'.((ord e e')\<longrightarrow> (in_wina e' g)))"
+  from in_wina.induct assms(7) IB ISA ISD show "(\<forall>e'.((ord e e')\<longrightarrow> (in_wina e' g)))" sorry
 
 
 
