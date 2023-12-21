@@ -90,7 +90,9 @@ interpretation Game: energy_game "spectroscopy_moves" "spectroscopy_defender" "e
 
 end
 
-locale full_spec_game = LTS: Inhabited_Tau_LTS step left right \<tau> + energy_game "LTS.spectroscopy_moves" "LTS.spectroscopy_defender" "eneg"
+locale full_spec_game =
+  Inhabited_Tau_LTS step left right \<tau>
+  + energy_game "spectroscopy_moves" "spectroscopy_defender" "eneg"
   for step :: \<open>'s \<Rightarrow> 'a \<Rightarrow> 's \<Rightarrow> bool\<close> (\<open>_ \<mapsto>_ _\<close> [70, 70, 70] 80) and
       left :: 's and
       right :: 's and
