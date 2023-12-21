@@ -1,6 +1,9 @@
 theory Expressiveness_Price
-  imports Main HML_SRBB "HOL-Library.Extended_Nat"
+  imports Main HML_SRBB "HOL-Library.Extended_Nat" Energy
 begin
+
+section \<open>The expressiveness price function\<close>
+subsection \<open>Modal depth\<close>
 
 primrec
       modal_depth_srbb :: "('act, 'i) hml_srbb \<Rightarrow> enat"
@@ -57,7 +60,7 @@ lemma "modal_depth_srbb (ImmConj \<nat> (\<lambda>n. Pos (Obs \<alpha> (observe_
         and obs_n_\<alpha>_depth_n
   by (rule sucs_of_nats_in_enats_sup_infinite)
 
-\<comment> \<open>==========================================================================================\<close>
+subsection \<open>Depth of branching conjunctions\<close>
 
 primrec branching_conjunction_depth :: "('a, 's) hml_srbb \<Rightarrow> enat"
   and branch_conj_depth_\<chi> :: "('a, 's) hml_srbb_conjunction \<Rightarrow> enat"
@@ -73,7 +76,8 @@ primrec branching_conjunction_depth :: "('a, 's) hml_srbb \<Rightarrow> enat"
 
   "branch_conj_depth_\<psi> (Pos \<chi>) = branch_conj_depth_\<chi> \<chi>" |
   "branch_conj_depth_\<psi> (Neg \<chi>) = branch_conj_depth_\<chi> \<chi>" 
-\<comment> \<open>==========================================================================================\<close>
+
+subsection \<open>Depth of instable conjunctions\<close>
 
 primrec
 instable_conjunction_depth :: "('a, 's) hml_srbb \<Rightarrow> enat"
@@ -90,7 +94,8 @@ instable_conjunction_depth :: "('a, 's) hml_srbb \<Rightarrow> enat"
 
   "inst_conj_depth_\<psi> (Pos \<chi>) = inst_conj_depth_\<chi> \<chi>" |
   "inst_conj_depth_\<psi> (Neg \<chi>) = inst_conj_depth_\<chi> \<chi>" 
-\<comment> \<open>==========================================================================================\<close>
+
+subsection \<open>Depth of stable conjunctions\<close>
 
 primrec
 stable_conjunction_depth :: "('a, 's) hml_srbb \<Rightarrow> enat"
@@ -107,7 +112,8 @@ stable_conjunction_depth :: "('a, 's) hml_srbb \<Rightarrow> enat"
 
   "st_conj_depth_\<psi> (Pos \<chi>) = st_conj_depth_\<chi> \<chi>" |
   "st_conj_depth_\<psi> (Neg \<chi>) = st_conj_depth_\<chi> \<chi>" 
-\<comment> \<open>==========================================================================================\<close>
+
+subsection \<open>Depth of immediate conjunctions\<close>
 
 primrec
       immediate_conjunction_depth :: "('a, 's) hml_srbb \<Rightarrow> enat"
@@ -124,7 +130,8 @@ primrec
 
   "imm_conj_depth_\<psi> (Pos \<chi>) = imm_conj_depth_\<chi> \<chi>" |
   "imm_conj_depth_\<psi> (Neg \<chi>) = imm_conj_depth_\<chi> \<chi>"
-\<comment> \<open>==========================================================================================\<close>
+
+section \<open>Maximal modal depth of positive clauses in conjunctions\<close>
 
 primrec
       max_positive_conjunct_depth :: "('a, 's) hml_srbb \<Rightarrow> enat"
@@ -141,7 +148,8 @@ primrec
 
   "max_pos_conj_depth_\<psi> (Pos \<chi>) = modal_depth_srbb_conjunction \<chi>" |
   "max_pos_conj_depth_\<psi> (Neg \<chi>) = max_pos_conj_depth_\<chi> \<chi>"
-\<comment> \<open>==========================================================================================\<close>
+
+subsection \<open>Maximal modal depth of negative clauses in conjunctions\<close>
 
 primrec
       max_negative_conjunct_depth :: "('a, 's) hml_srbb \<Rightarrow> enat"
@@ -158,7 +166,8 @@ primrec
 
   "max_neg_conj_depth_\<psi> (Pos \<chi>) = max_neg_conj_depth_\<chi> \<chi>" |
   "max_neg_conj_depth_\<psi> (Neg \<chi>) = modal_depth_srbb_conjunction \<chi>"
-\<comment> \<open>==========================================================================================\<close>
+
+subsection \<open>Depth of negations\<close>
 
 primrec
       negation_depth :: "('a, 's) hml_srbb \<Rightarrow> enat"
@@ -175,6 +184,54 @@ primrec
 
   "neg_depth_\<psi> (Pos \<chi>) = neg_depth_\<chi> \<chi>" |
   "neg_depth_\<psi> (Neg \<chi>) = 1 + neg_depth_\<chi> \<chi>" 
+
+subsection \<open>Expressiveness price function\<close>
+
+fun expressiveness_price :: "('a, 's) hml_srbb \<Rightarrow> energy" where
+  "expressiveness_price \<phi> = E (modal_depth_srbb            \<phi>)
+                              (branching_conjunction_depth \<phi>)
+                              (instable_conjunction_depth  \<phi>)
+                              (stable_conjunction_depth    \<phi>)
+                              (immediate_conjunction_depth \<phi>)
+                              (max_positive_conjunct_depth \<phi>)
+                              (max_negative_conjunct_depth \<phi>)
+                              (negation_depth              \<phi>)"
+
+lemma srbb_price_never_neg : "expressiveness_price \<phi> \<noteq> eneg"
+  by simp
+
+definition \<O> :: "energy \<Rightarrow> (('a, 's) hml_srbb) set" where
+  "\<O> energy \<equiv> {\<phi> . expressiveness_price \<phi> \<le> energy}"
+
+fun expr_pr_\<chi> :: "('a, 's) hml_srbb_conjunction \<Rightarrow> energy" where
+  "expr_pr_\<chi> \<chi> = E (modal_depth_srbb_conjunction \<chi>)
+                 (branch_conj_depth_\<chi> \<chi>)
+                 (inst_conj_depth_\<chi> \<chi>)
+                 (st_conj_depth_\<chi> \<chi>)
+                 (imm_conj_depth_\<chi> \<chi>)
+                 (max_pos_conj_depth_\<chi> \<chi>)
+                 (max_neg_conj_depth_\<chi> \<chi>)
+                 (neg_depth_\<chi> \<chi>)"
+
+lemma \<chi>_price_never_neg: "expr_pr_\<chi> \<chi> \<noteq> eneg"
+  by simp
+
+definition \<O>_\<chi> :: "energy \<Rightarrow> (('a, 's) hml_srbb_conjunction) set" where
+  "\<O>_\<chi> energy \<equiv> {\<chi> . expr_pr_\<chi> \<chi> \<le> energy}"
+
+subsection \<open>characterizing equivalence by energy coordinates\<close>
+
+context Inhabited_Tau_LTS
+begin
+
+definition expr_preord :: "'s \<Rightarrow> energy \<Rightarrow> 's \<Rightarrow> bool" ("_ \<preceq> _ _" 60) where
+  "(p \<preceq> e q) \<equiv> hml_preordered (\<O> e) p q"
+
+definition expr_equiv :: "'s \<Rightarrow> energy \<Rightarrow> 's \<Rightarrow> bool" ("_ \<sim> _ _" 60) where
+  "(p \<sim> e q) \<equiv> hml_equivalent (\<O> e) p q"
+
+end
+
 
 context Inhabited_LTS
 begin
@@ -202,6 +259,17 @@ lemma example_\<phi>_cp:
   and "negation_depth              \<phi> = 0"
   unfolding \<phi>
   by simp+
+
+lemma "expressiveness_price (Internal
+      (Obs op 
+        (Internal 
+          (Conj {left, right} 
+                (\<lambda>i. (if i = left
+                      then (Pos (Obs a TT))
+                      else if i = right
+                           then (Pos (Obs b TT))
+                           else undefined)))))) = E 2 0 1 0 0 1 0 0"
+  by simp
 
 end
 
