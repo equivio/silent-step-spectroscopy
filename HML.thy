@@ -255,6 +255,9 @@ proof -
   qed
 qed
 
+lemma conj_cong': "s \<notin> I \<Longrightarrow> \<psi>sl ` I = \<psi>sr ` I \<Longrightarrow> (\<psi>sl s) \<Lleftarrow>\<and>\<Rrightarrow> (\<psi>sr s) \<Longrightarrow> (Conj (I \<union> {s}) \<psi>sl) \<Lleftarrow>\<Rrightarrow> (Conj (I \<union> {s}) \<psi>sr)"
+  using local.conj_cong by presburger
+
 lemma conj_congs: "\<forall>i \<in> I. \<psi>sl i = \<psi>sr i \<Longrightarrow> \<forall>i \<in> I'. (\<psi>sl i) \<Lleftarrow>\<and>\<Rrightarrow> (\<psi>sr i) \<Longrightarrow> (Conj (I \<union> I') \<psi>sl) \<Lleftarrow>\<Rrightarrow> (Conj (I \<union> I') \<psi>sr)"
 proof -
   assume "\<forall>i \<in> I. \<psi>sl i = \<psi>sr i"
@@ -296,6 +299,9 @@ proof -
       using Un_iff \<open>\<forall>i\<in>I. \<psi>sl i = \<psi>sr i\<close> conjunct_eq by auto
   qed
 qed
+
+lemma conj_congs': "I \<inter> I' = {} \<Longrightarrow> \<forall>i \<in> I. \<psi>sl i = \<psi>sr i \<Longrightarrow> \<forall>i \<in> I'. (\<psi>sl i) \<Lleftarrow>\<and>\<Rrightarrow> (\<psi>sr i) \<Longrightarrow> (Conj (I \<union> I') \<psi>sl) \<Lleftarrow>\<Rrightarrow> (Conj (I \<union> I') \<psi>sr)"
+  using conj_congs by presburger
 
 lemma pos_cong: "\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r \<Longrightarrow> (Pos \<phi>l) \<Lleftarrow>\<and>\<Rrightarrow> (Pos \<phi>r)"
   by (simp add: hml_conjunct_eq_def hml_conjunct_impl_def hml_eq_def hml_impl_def)
@@ -419,6 +425,14 @@ next
     qed
   qed
 qed
+
+\<comment> \<open> Distinguishing Formulas \<close>
+
+definition dist :: "'s \<Rightarrow> ('a, 's) hml \<Rightarrow> 's \<Rightarrow> bool" ("_ <> _ _" [70, 70, 70] 80) where
+  "(p <> \<phi> q) \<equiv> (p \<Turnstile> \<phi>) \<and> \<not>(q \<Turnstile> \<phi>)"
+
+definition distFrom :: "'s \<Rightarrow> ('a, 's) hml \<Rightarrow> 's set \<Rightarrow> bool" ("_ <> _ _" [70, 70, 70] 80) where
+  "(p <> \<phi> Q) \<equiv> (\<forall>q \<in> Q. p <> \<phi> q)"
 
 end
 
