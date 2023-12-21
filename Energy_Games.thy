@@ -151,30 +151,6 @@ next
   with 2 show ?case using pred_eq by fastforce
 qed
 
-(*
-lemma %invisible energy_level_def5:
-  assumes "energy_level g0 e0 ([g0]@([g1]@p)) \<noteq> undefined " and "weigth_opt g0 g1 \<noteq> None" and "((weight g0 g1)e0) \<noteq> undefined" and "finite_play g0 ([g0]@([g1]@p))" 
-  shows "energy_level g0 e0 ([g0]@([g1]@p))= energy_level g1 ((weight g0 g1)e0) ([g1]@p)"
-  using assms proof (induct p rule: rev_induct)
-  case Nil
-  then show ?case by fastforce
-next
-  case (snoc x xs)
-  from snoc(5) have F: "finite_play g0 ([g0] @ [g1] @ xs)" using finite_play_suffix by auto
-  from snoc(2) have "energy_level g0 e0 ([g0] @ [g1] @ xs @ [x]) =  ((weight (last ([g0] @ [g1] @ xs)) x) (energy_level g0 e0 ([g0] @ [g1] @ xs))) "
-    by (smt (verit) Nil_is_append_conv butlast_append butlast_snoc energy_game.energy_level.simps last.simps last_append list.distinct(1) self_append_conv)
-  hence "energy_level g0 e0 ([g0] @ [g1] @ xs) \<noteq> undefined" using snoc(2) sorry
-  from this snoc(3) snoc(4) F have "energy_level g0 e0 ([g0] @ [g1] @ xs) = energy_level g1 (weight g0 g1 e0) ([g1] @ xs)" using snoc(1) by simp
-  
-  from snoc(2) have "energy_level g0 e0 ([g0] @ [g1] @ xs @ [x]) =  ((weight (last ([g0] @ [g1] @ xs)) x) (energy_level g0 e0 ([g0] @ [g1] @ xs))) "
-    by (smt (verit) Nil_is_append_conv butlast_append butlast_snoc energy_game.energy_level.simps last.simps last_append list.distinct(1) self_append_conv)
-  have "energy_level g1 (weight g0 g1 e0) ([g1] @ xs @ [x]) =  ((weight (last ([g1] @ xs)) x) (energy_level g1 (weight g0 g1 e0) ([g1] @ xs))) "
-    by (smt (verit) Nil_is_append_conv butlast_append butlast_snoc energy_game.energy_level.simps last.simps last_append list.distinct(1) self_append_conv snoc.prems(1))
-  have " ((weight (last ([g0] @ [g1] @ xs)) x) (energy_level g0 e0 ([g0] @ [g1] @ xs))) = ((weight (last ([g1] @ xs)) x) (energy_level g1 (weight g0 g1 e0) ([g1] @ xs)))" sorry
-  then show ?case oops
-qed
-*)
-
 subsection \<open>Winning\<close>
 abbreviation "play_stuck g0 p \<equiv> (finite_play g0 p) \<and> (\<nexists>gn. finite_play g0 (p @ [gn]))"
 
@@ -238,62 +214,7 @@ lemma in_wina_Ga:
   shows "\<exists>g'. ((g \<Zinj> g') \<and> (in_wina ((weight g g') e) g'))"
   using assms(1) assms(2) in_wina.simps by blast
 
-(*
-(*gets stuck from defenders perspective \<equiv> attacker controls or gets stuck*)
-inductive dstate_gets_stuck::"'gstate \<Rightarrow> bool" where 
-  "dstate_gets_stuck g" if "((\<nexists>g'. (g \<Zinj> g')) \<and> (Gd g)) \<or> (Ga g) " |
-  "dstate_gets_stuck g" if "(Gd g) \<and>( \<forall>g'.( (g \<Zinj> g') \<longrightarrow>(dstate_gets_stuck g')))"
-
-lemma winning_state_is_stuck:
-  assumes "in_wina e g"
-  shows "dstate_gets_stuck g"
-proof (rule in_wina.induct)
-  show "in_wina e g" using assms by simp
-next
-  show "\<And>g e. Gd g \<and> (\<forall>g'. \<not> g \<Zinj> g') \<and> e \<noteq> defender_win_level \<Longrightarrow> dstate_gets_stuck g"
-    by (simp add: dstate_gets_stuck.intros(1)) 
-next 
-  show "\<And>g e. Ga g \<and> (\<exists>g'. g \<Zinj> g' \<and> in_wina (weight g g' e) g' \<and> dstate_gets_stuck g') \<and> e \<noteq> defender_win_level \<Longrightarrow>
-           dstate_gets_stuck g" by (simp add: dstate_gets_stuck.intros(1)) 
-next
-  show "\<And>g e. Gd g \<and>
-           (\<forall>g'. g \<Zinj> g' \<longrightarrow> in_wina (weight g g' e) g' \<and> dstate_gets_stuck g') \<and> e \<noteq> defender_win_level \<Longrightarrow>
-           dstate_gets_stuck g" using dstate_gets_stuck.intros(2) by simp
-qed
-
-definition attacker_order_relation:: "(('gstate \<times> 'energy) \<times> 'gstate \<times> 'energy) set" where
-  "attacker_order_relation \<equiv> {((g', e'), (g, e)). (\<exists>up. weight_opt g g' = Some up \<and> up e = e') \<and> (in_wina e g) \<and> (Ga g \<longrightarrow> in_wina e' g')}"
-
-definition attacker_order_order:: "'gstate \<Rightarrow> 'energy \<Rightarrow> 'gstate \<Rightarrow> 'energy \<Rightarrow> bool" ("_ _ \<prec>  _ _" [60,60,60] 70) where
-  "(g' e' \<prec> g e) \<equiv> (\<exists>up. weight_opt g g' = Some up \<and> up e = e') \<and> (in_wina e g) \<and> (Ga g \<longrightarrow> in_wina e' g')"
-
-lemma orderd_implies_wina:
-  fixes g::"'gstate" and g'::"'gstate" and e:: "'energy" and e'::"'energy"
-  assumes "(g' e' \<prec> g e)"
-  shows "in_wina e' g'"
-proof-
-  from assms have O: "(\<exists>up. weight_opt g g' = Some up \<and> up e = e') \<and> (in_wina e g) \<and> (Ga g \<longrightarrow> in_wina e' g')" using attacker_order_order_def by simp  
-  consider (Ga) "Ga g" | (Gd) "Gd g" by auto
-  then show ?thesis proof cases
-    case Ga
-    then show ?thesis using O by simp
-  next
-    case Gd
-    then show ?thesis using O by (metis energy_game.in_wina.cases option.discI option.sel)
-  qed
-qed
-
-corollary ordered_implies_stuck:
-  fixes g::"'gstate" and g'::"'gstate" and e:: "'energy" and e'::"'energy"
-  assumes "(g' e' \<prec> g e)"
-  shows "dstate_gets_stuck g'"
-  using assms orderd_implies_wina winning_state_is_stuck by blast
-
-inductive consistent_with_wina :: "'gstate \<Rightarrow> 'energy \<Rightarrow> 'gstate fplay \<Rightarrow> bool" where
-  "consistent_with_wina g0 e0 [g0]" if "in_wina e0 g0" | 
-  "consistent_with_wina g0 e0 ([g0]@([g1]@p))" if "(finite_play g0 ([g0]@([g1]@p))) \<and> (in_wina e0 g0) \<and> (consistent_with_wina g1 ((weight g0 g1)e0) ([g1]@p))"
-*)
-
+(* Start working on upwards closure of Winning Budgets*)
 lemma ind_beg:
   fixes ord::"'energy \<Rightarrow> 'energy \<Rightarrow> bool"
   assumes transitive: "\<forall>e e' e''. (((ord e e') \<and> (ord e' e'')) \<longrightarrow> (ord e e''))" and
