@@ -115,11 +115,29 @@ lemma hml_conjunct_impl_preord: "reflp (\<and>\<Rrightarrow>) \<and> transp (\<a
 
 \<comment> \<open> Pre-Congruence \<close>
 
+lemma obs_pre_cong: "\<phi>l \<Rrightarrow> \<phi>r \<Longrightarrow> (Obs \<alpha> \<phi>l) \<Rrightarrow> (Obs \<alpha> \<phi>r)"
+  using hml_impl_iffI by auto
+
+lemma internal_pre_cong: "\<phi>l \<Rrightarrow> \<phi>r \<Longrightarrow> (Internal \<phi>l) \<Rrightarrow> (Internal \<phi>r)"
+  using hml_impl_iffI by auto
+
+lemma silent_pre_cong: "\<phi>l \<Rrightarrow> \<phi>r \<Longrightarrow> (Silent \<phi>l) \<Rrightarrow> (Silent \<phi>r)"
+  using hml_impl_iffI by auto
+
+lemma conj_pre_cong: "\<psi>sl ` I = \<psi>sr ` I \<Longrightarrow> \<psi>sl l \<and>\<Rrightarrow> \<psi>sr r \<Longrightarrow> (Conj (I \<union> {l}) \<psi>sl) \<Rrightarrow> (Conj (I \<union> {r}) \<psi>sr)"
+  by (smt (verit) Un_insert_right hml_conjunct_impl_def hml_impl_def hml_models.simps(5) image_iff insert_iff sup_bot.right_neutral)
+
+lemma conj_pre_congs: "\<psi>sl ` I = \<psi>sr ` I \<Longrightarrow> \<forall>i \<in> I'. \<psi>sl i \<and>\<Rrightarrow> \<psi>sr i \<Longrightarrow> (Conj (I \<union> I') \<psi>sl) \<Rrightarrow> (Conj (I \<union> I') \<psi>sr)"
+  by (smt (verit, ccfv_threshold) LTS_Tau.hml_conjunct_impl_def UnE UnI1 hml_impl_iffI hml_models.simps(5) imageE imageI)
+
+lemma pos_pre_cong: "\<phi>l \<Rrightarrow> \<phi>r \<Longrightarrow> Pos \<phi>l \<and>\<Rrightarrow> Pos \<phi>r"
+  by (simp add: hml_conjunct_impl_def hml_impl_iffI)
+
+lemma neg_pre_cong: "\<phi>l \<Rrightarrow> \<phi>r \<Longrightarrow> Neg \<phi>r \<and>\<Rrightarrow> Neg \<phi>l"
+  using hml_conjunct_impl_def hml_impl_def by auto
+
 lemma pre_cong: "\<phi>l \<Rrightarrow> \<phi>r \<Longrightarrow> fill_pre \<phi>l C \<Rrightarrow> fill_pre \<phi>r C"
   using hml_impl_def by (induct C) auto[5]
-
-lemma "\<phi>l \<Rrightarrow> \<phi>r \<Longrightarrow> Neg \<phi>r \<and>\<Rrightarrow> Neg \<phi>l"
-  using hml_conjunct_impl_def hml_impl_def by auto
 
 \<comment> \<open> Know Pre-Order Elements\<close>
 
