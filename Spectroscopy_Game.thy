@@ -11,7 +11,7 @@ datatype ('s, 'a) spectroscopy_position =
                           Defender_Branch (attacker_state: "'s") (attack_action: "'a") (attacker_state_succ: "'s") (defender_states: "'s set") (defender_branch_states: "'s set") |
                           Defender_Conj (attacker_state: "'s") (defender_states: "'s set") |
                           Defender_Stable_Conj (attacker_state: "'s") (defender_states: "'s set")
-
+                  
 context Inhabited_Tau_LTS begin
 
 (*define moves in a spectroscopy game dependend on a LTS*)
@@ -85,19 +85,7 @@ fun spectroscopy_defender where
   "spectroscopy_defender (Defender_Conj _ _) = True" |
   "spectroscopy_defender (Defender_Stable_Conj _ _) = True"
 
-  
-interpretation Game: energy_game "spectroscopy_moves" "spectroscopy_defender" "eneg" .
-
-end
-
-locale full_spec_game =
-  Inhabited_Tau_LTS step left right \<tau>
-  + energy_game "spectroscopy_moves" "spectroscopy_defender" "eneg"
-  for step :: \<open>'s \<Rightarrow> 'a \<Rightarrow> 's \<Rightarrow> bool\<close> (\<open>_ \<mapsto>_ _\<close> [70, 70, 70] 80) and
-      left :: 's and
-      right :: 's and
-      \<tau> :: 'a
-begin
+sublocale energy_game "spectroscopy_moves" "spectroscopy_defender" "eneg" .
 
 end
 
