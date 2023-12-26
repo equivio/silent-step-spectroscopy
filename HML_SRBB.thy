@@ -113,7 +113,7 @@ lemma "hml_equivalent \<phi>s p q = (\<forall>\<phi> \<in> \<phi>s. \<not>(disti
   using distinguishes_def hml_equivalent_def hml_preordered_def by auto
 
 
-subsection \<open> HML_SRBB Implication \<close>
+subsection \<open> HML\_SRBB Implication \<close>
 
 definition hml_srbb_impl :: "('a, 's) hml_srbb \<Rightarrow> ('a, 's) hml_srbb \<Rightarrow> bool" (infix "\<Rrightarrow>" 70) where
   "\<phi>l \<Rrightarrow> \<phi>r \<equiv> \<forall>p. p \<Turnstile>SRBB \<phi>l \<longrightarrow> p \<Turnstile>SRBB \<phi>r"
@@ -139,7 +139,7 @@ lemma srbb_impl_\<psi>_to_hml_impl: "\<psi>l \<psi>\<Rrightarrow> \<psi>r \<Long
 subsection \<open> Pre-Congruence \<close>
 
 
-subsection \<open> HML_SRBB Equivalence \<close>
+subsection \<open> HML\_SRBB Equivalence \<close>
 
 definition hml_srbb_eq :: "('a, 's) hml_srbb \<Rightarrow> ('a, 's) hml_srbb \<Rightarrow> bool" (infix "\<Lleftarrow>srbb\<Rrightarrow>" 70) where
   "\<phi>l \<Lleftarrow>srbb\<Rrightarrow> \<phi>r \<equiv> \<phi>l \<Rrightarrow> \<phi>r \<and> \<phi>r \<Rrightarrow> \<phi>l"

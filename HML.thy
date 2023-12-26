@@ -113,6 +113,42 @@ definition hml_conjunct_impl :: "('a, 's) hml_conjunct \<Rightarrow> ('a, 's) hm
 lemma hml_conjunct_impl_preord: "reflp (\<and>\<Rrightarrow>) \<and> transp (\<and>\<Rrightarrow>)"
   by (metis hml_conjunct_impl_def reflpI transpI)
 
+\<comment> \<open> Pre-Substitution \<close>
+
+lemma obs_pre_subst: "\<phi>l \<Rrightarrow> \<phi>r \<Longrightarrow> \<phi> \<Rrightarrow> (Obs \<alpha> \<phi>l) \<Longrightarrow> \<phi> \<Rrightarrow> (Obs \<alpha> \<phi>r)"
+  using hml_impl_def by force
+
+lemma internal_pre_subst: "\<phi>l \<Rrightarrow> \<phi>r \<Longrightarrow> \<phi> \<Rrightarrow> (Internal \<phi>l) \<Longrightarrow> \<phi> \<Rrightarrow> (Internal \<phi>r)"
+  using hml_impl_iffI by force
+
+lemma silent_pre_subst: "\<phi>l \<Rrightarrow> \<phi>r \<Longrightarrow> \<phi> \<Rrightarrow> (Silent \<phi>l) \<Longrightarrow> \<phi> \<Rrightarrow> (Silent \<phi>r)"
+  using hml_impl_iffI by force
+
+lemma conj_pre_subst: "\<phi>l \<Rrightarrow> \<phi>r \<Longrightarrow> \<phi> \<Rrightarrow> (Conj (I \<union> {s}) (\<lambda>i. if i = s then Pos \<phi>l else \<psi>s i))
+                                \<Longrightarrow> \<phi> \<Rrightarrow> (Conj (I \<union> {s}) (\<lambda>i. if i = s then Pos \<phi>r else \<psi>s i))"
+  using hml_impl_iffI by fastforce
+
+lemma pos_pre_subst: "\<phi>l \<Rrightarrow> \<phi>r \<Longrightarrow> \<psi> \<and>\<Rrightarrow> (Pos \<phi>l) \<Longrightarrow> \<psi> \<and>\<Rrightarrow> (Pos \<phi>r)" 
+  by (simp add: hml_conjunct_impl_def hml_impl_iffI)
+
+lemma pre_subst: "\<phi>l \<Rrightarrow> \<phi>r \<Longrightarrow> \<phi> \<Rrightarrow> fill_pre \<phi>l C \<Longrightarrow> \<phi> \<Rrightarrow> fill_pre \<phi>r C"
+  apply (induct C arbitrary: \<phi>)
+  using hml_impl_iffI apply auto[1]
+  using hml_impl_iffI apply force
+  using hml_impl_preord internal_pre_subst reflpD apply fastforce
+  using hml_impl_preord reflpD silent_pre_subst apply fastforce
+proof -
+  fix I \<psi>s I' \<psi>s' \<phi> 
+  assume IH: "\<And>\<psi>' \<phi>. \<psi>' \<in> range \<psi>s' \<Longrightarrow> \<phi>l \<Rrightarrow> \<phi>r \<Longrightarrow> \<phi> \<Rrightarrow> fill_pre \<phi>l \<psi>' \<Longrightarrow> \<phi> \<Rrightarrow> fill_pre \<phi>r \<psi>'"
+         and "\<phi>l \<Rrightarrow> \<phi>r"
+         and "\<phi> \<Rrightarrow> fill_pre \<phi>l (ConjPC I \<psi>s I' \<psi>s')"
+  then show "\<phi> \<Rrightarrow> fill_pre \<phi>r (ConjPC I \<psi>s I' \<psi>s')"
+    unfolding fill_pre.simps
+    oops
+
+lemma neg_pre_subst: "\<phi>l \<Rrightarrow> \<phi>r \<Longrightarrow> (Neg \<phi>l) \<and>\<Rrightarrow> \<psi> \<Longrightarrow> (Neg \<phi>r) \<and>\<Rrightarrow> \<psi>"
+  using hml_conjunct_impl_def hml_impl_iffI by auto
+
 \<comment> \<open> Pre-Congruence \<close>
 
 lemma obs_pre_cong: "\<phi>l \<Rrightarrow> \<phi>r \<Longrightarrow> (Obs \<alpha> \<phi>l) \<Rrightarrow> (Obs \<alpha> \<phi>r)"
@@ -158,6 +194,9 @@ definition hml_eq :: "('a, 's) hml \<Rightarrow> ('a, 's) hml \<Rightarrow> bool
 lemma hml_eq_equiv: "equivp (\<Lleftarrow>\<Rrightarrow>)"
   by (smt (verit, del_insts) equivpI hml_eq_def hml_impl_def reflpI sympI transpI)
 
+lemma hml_eq_equality: "(\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r) = (\<forall>p.( p \<Turnstile> \<phi>l) = (p \<Turnstile> \<phi>r))"
+  using hml_eq_def hml_impl_iffI by blast
+
 definition hml_conjunct_eq :: "('a, 's) hml_conjunct \<Rightarrow> ('a, 's) hml_conjunct \<Rightarrow> bool" (infix "\<Lleftarrow>\<and>\<Rrightarrow>" 60)  where
   "\<psi>l \<Lleftarrow>\<and>\<Rrightarrow> \<psi>r \<equiv> \<psi>l \<and>\<Rrightarrow> \<psi>r \<and> \<psi>r \<and>\<Rrightarrow> \<psi>l"
 
@@ -166,7 +205,6 @@ lemma hml_conjunct_eq_equiv: "equivp (\<Lleftarrow>\<and>\<Rrightarrow>)"
 
 end
 
-\<comment> \<open> Congruence Properties\<close>
 
 datatype 
   ('act, 'i) hml_context =
@@ -196,6 +234,121 @@ primrec
 
 context LTS_Tau
 begin
+
+\<comment> \<open> Substitution \<close>
+
+lemma obs_subst: "\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r \<Longrightarrow> (Obs \<alpha> \<phi>l) \<Lleftarrow>\<Rrightarrow> \<phi> \<Longrightarrow> (Obs \<alpha> \<phi>r) \<Lleftarrow>\<Rrightarrow> \<phi>"
+  by (meson hml_eq_def hml_impl_iffI obs_pre_cong)
+
+lemma internal_subst: "\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r \<Longrightarrow> (Internal \<phi>l) \<Lleftarrow>\<Rrightarrow> \<phi> \<Longrightarrow> (Internal \<phi>r) \<Lleftarrow>\<Rrightarrow> \<phi>"
+  by (simp add: hml_eq_equality)
+
+lemma silent_subst: "\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r \<Longrightarrow> (Silent \<phi>l) \<Lleftarrow>\<Rrightarrow> \<phi> \<Longrightarrow> (Silent \<phi>r) \<Lleftarrow>\<Rrightarrow> \<phi>"
+  by (meson LTS_Tau.hml_impl_def LTS_Tau.silent_pre_cong hml_eq_def)
+
+lemma conj_subst: "\<psi>l \<Lleftarrow>\<and>\<Rrightarrow> \<psi>r \<Longrightarrow> (Conj (I \<union> {s}) (\<lambda>i. if i = s then \<psi>l else \<psi>s i)) \<Lleftarrow>\<Rrightarrow> \<phi>
+                              \<Longrightarrow> (Conj (I \<union> {s}) (\<lambda>i. if i = s then \<psi>r else \<psi>s i)) \<Lleftarrow>\<Rrightarrow> \<phi>"
+  by (smt (verit) LTS_Tau.hml_impl_iffI hml_conjunct_eq_def hml_conjunct_impl_def hml_eq_def hml_models.simps(5))
+
+lemma pos_subst: "\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r \<Longrightarrow> (Pos \<phi>l) \<Lleftarrow>\<and>\<Rrightarrow> \<psi> \<Longrightarrow> (Pos \<phi>r) \<Lleftarrow>\<and>\<Rrightarrow> \<psi>"
+  by (meson LTS_Tau.hml_conjunct_eq_def LTS_Tau.hml_eq_def LTS_Tau.pos_pre_cong hml_conjunct_impl_preord transpE)
+
+lemma neg_subst: "\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r \<Longrightarrow> (Neg \<phi>l) \<Lleftarrow>\<and>\<Rrightarrow> \<psi> \<Longrightarrow> (Neg \<phi>r) \<Lleftarrow>\<and>\<Rrightarrow> \<psi>"
+  by (meson LTS_Tau.neg_pre_subst hml_conjunct_eq_def hml_conjunct_impl_def hml_eq_def)
+
+lemma hml_subst: "\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r \<Longrightarrow> (fill \<phi>l C) \<Lleftarrow>\<Rrightarrow> \<phi> \<Longrightarrow> (fill \<phi>r C) \<Lleftarrow>\<Rrightarrow> \<phi>"
+             and "\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r \<Longrightarrow> (fill_conjunct \<phi>l C') \<Lleftarrow>\<and>\<Rrightarrow> \<psi> \<Longrightarrow> (fill_conjunct \<phi>r C') \<Lleftarrow>\<and>\<Rrightarrow> \<psi>"
+  apply (induct C and C' arbitrary: \<phi> and \<psi>)
+  using hml_eq_equality apply force
+  using LTS_Tau.hml_eq_equiv LTS_Tau.obs_subst equivp_reflp equivp_symp apply fastforce
+  using LTS_Tau.hml_eq_equiv LTS_Tau.internal_subst equivp_reflp equivp_symp apply fastforce
+  using hml_eq_equality apply fastforce
+  defer
+  apply (metis equivp_reflp fill_conjunct.simps(1) hml_eq_def hml_eq_equiv pos_subst)
+  apply (metis LTS_Tau.neg_subst fill_conjunct.simps(2) hml_eq_equality)
+proof -
+  fix I \<psi>s I' \<psi>s' \<phi>
+  assume IH: "\<And>\<psi>' \<psi>. \<psi>' \<in> range \<psi>s' \<Longrightarrow> \<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r \<Longrightarrow> fill_conjunct \<phi>l \<psi>' \<Lleftarrow>\<and>\<Rrightarrow> \<psi> \<Longrightarrow> fill_conjunct \<phi>r \<psi>' \<Lleftarrow>\<and>\<Rrightarrow> \<psi>"
+        and "\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r" 
+        and "fill \<phi>l (ConjC I \<psi>s I' \<psi>s') \<Lleftarrow>\<Rrightarrow> \<phi>"
+  then have "(\<forall>p. p \<Turnstile> \<phi>l = p \<Turnstile> \<phi>r)
+           \<and> (\<forall>p. p \<Turnstile> Conj (I \<union> I') (\<lambda>i. if i \<in> I' then fill_conjunct \<phi>l (\<psi>s' i) else \<psi>s i) = p \<Turnstile> \<phi>)"
+    unfolding fill.simps and hml_eq_equality
+    by force
+  then have "\<forall>p. p \<Turnstile> \<phi>l = p \<Turnstile> \<phi>r"
+        and thing: "\<forall>p. p \<Turnstile> Conj (I \<union> I') (\<lambda>i. if i \<in> I' then fill_conjunct \<phi>l (\<psi>s' i) else \<psi>s i) = p \<Turnstile> \<phi>"
+    by auto
+
+  from IH
+  have IH2: "\<forall>i \<in> I'. \<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r \<longrightarrow> fill_conjunct \<phi>l (\<psi>s' i) \<Lleftarrow>\<and>\<Rrightarrow> \<psi> \<longrightarrow> fill_conjunct \<phi>r (\<psi>s' i) \<Lleftarrow>\<and>\<Rrightarrow> \<psi>"
+    by blast
+
+  show "fill \<phi>r (ConjC I \<psi>s I' \<psi>s') \<Lleftarrow>\<Rrightarrow> \<phi>"
+    unfolding fill.simps and hml_eq_equality
+  proof (rule allI)
+    fix p
+    show "p \<Turnstile> Conj (I \<union> I') (\<lambda>i. if i \<in> I' then fill_conjunct \<phi>r (\<psi>s' i) else \<psi>s i) = p \<Turnstile> \<phi>"
+    proof (rule iffI)
+      assume "p \<Turnstile> Conj (I \<union> I') (\<lambda>i. if i \<in> I' then fill_conjunct \<phi>r (\<psi>s' i) else \<psi>s i)"
+      then have "(p \<Turnstile> Conj (I - I') \<psi>s)
+               \<and> (p \<Turnstile> Conj I' (\<lambda>i. fill_conjunct \<phi>r (\<psi>s' i)))" 
+        by (smt (verit, ccfv_threshold) Diff_iff UnI1 UnI2 hml_models.simps(5))
+      then have "p \<Turnstile> Conj (I - I') \<psi>s"
+            and "p \<Turnstile> Conj I' ((fill_conjunct \<phi>r) \<circ> \<psi>s')" by auto
+
+      from thing
+      have "p \<Turnstile> Conj (I \<union> I') (\<lambda>i. if i \<in> I' then fill_conjunct \<phi>l (\<psi>s' i) else \<psi>s i) = p \<Turnstile> \<phi>" by (rule spec)
+      then have "((p \<Turnstile> Conj (I - I') \<psi>s) \<and> (p \<Turnstile> Conj I' (\<lambda>i. fill_conjunct \<phi>l (\<psi>s' i)))) = p \<Turnstile> \<phi>"  
+        by (smt (z3) Un_iff \<open>p \<Turnstile> Conj (I - I') \<psi>s\<close> \<open>p \<Turnstile> Conj (I \<union> I') (\<lambda>i. if i \<in> I' then fill_conjunct \<phi>r (\<psi>s' i) else \<psi>s i)\<close> hml_models.simps(5))
+      then have nthing: "((p \<Turnstile> Conj (I - I') \<psi>s) \<and> (p \<Turnstile> Conj I' ((fill_conjunct \<phi>l) \<circ> \<psi>s'))) = p \<Turnstile> \<phi>"
+        by auto
+
+      from \<open>p \<Turnstile> Conj I' ((fill_conjunct \<phi>r) \<circ> \<psi>s')\<close>
+       and \<open>\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r\<close>
+       and IH2
+      have "p \<Turnstile> Conj I' ((fill_conjunct \<phi>l) \<circ> \<psi>s')" 
+        by (smt (verit) IH LTS_Tau.hml_conjunct_eq_def hml_conjunct_impl_def hml_models.simps(5) o_def rangeI)
+
+      from \<open>((p \<Turnstile> Conj (I - I') \<psi>s) \<and> (p \<Turnstile> Conj I' ((fill_conjunct \<phi>l) \<circ> \<psi>s'))) = p \<Turnstile> \<phi>\<close>
+       and \<open>p \<Turnstile> Conj (I - I') \<psi>s\<close>
+       and \<open>p \<Turnstile> Conj I' ((fill_conjunct \<phi>l) \<circ> \<psi>s')\<close>
+      show "p \<Turnstile> \<phi>" 
+        by blast
+    next
+      assume "p \<Turnstile> \<phi>"
+
+      with thing
+      have "p \<Turnstile> Conj (I \<union> I') (\<lambda>i. if i \<in> I' then fill_conjunct \<phi>l (\<psi>s' i) else \<psi>s i)"
+        by blast
+      then have "(p \<Turnstile> Conj (I - I') \<psi>s)
+               \<and> (p \<Turnstile> Conj I' (\<lambda>i. fill_conjunct \<phi>l (\<psi>s' i)))" 
+        by (smt (verit, ccfv_threshold) Diff_iff UnI1 UnI2 hml_models.simps(5))
+      then have "p \<Turnstile> Conj (I - I') \<psi>s"
+            and "p \<Turnstile> Conj I' (\<lambda>i. fill_conjunct \<phi>l (\<psi>s' i))" by auto
+      then have "p \<Turnstile> Conj I' ((fill_conjunct \<phi>l) \<circ> \<psi>s')" by simp
+      hence "\<forall>i\<in>I'. hml_conjunct_models p ((fill_conjunct \<phi>l \<circ> \<psi>s') i)"
+        unfolding hml_models.simps.
+
+      have "p \<Turnstile> Conj I' ((fill_conjunct \<phi>r) \<circ> \<psi>s')"
+        unfolding hml_models.simps
+      proof (rule ballI)
+        fix i
+        assume "i \<in> I'"
+        with \<open>\<forall>i\<in>I'. hml_conjunct_models p ((fill_conjunct \<phi>l \<circ> \<psi>s') i)\<close>
+          and IH2
+          and \<open>\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r\<close>
+        show "hml_conjunct_models p ((fill_conjunct \<phi>r \<circ> \<psi>s') i)" 
+          by (metis IH comp_def hml_conjunct_eq_def hml_conjunct_impl_def rangeI)
+      qed
+
+      with \<open>p \<Turnstile> Conj (I - I') \<psi>s\<close>
+      show "p \<Turnstile> Conj (I \<union> I') (\<lambda>i. if i \<in> I' then fill_conjunct \<phi>r (\<psi>s' i) else \<psi>s i)" 
+        by auto
+    qed
+  qed
+qed
+
+\<comment> \<open> Congruence Properties\<close>
 
 lemma obs_cong: "\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r \<Longrightarrow> (Obs \<alpha> \<phi>l) \<Lleftarrow>\<Rrightarrow> (Obs \<alpha> \<phi>r)"
   by (meson hml_eq_def hml_impl_def hml_models.simps(2))
@@ -400,7 +553,7 @@ qed
 
 \<comment> \<open> Know Equivalence Elements\<close>
 
-lemma "(Internal (Silent \<phi>)) \<Lleftarrow>\<Rrightarrow> (Internal \<phi>)"
+lemma \<epsilon>\<tau>_is_\<tau>: "(Internal (Silent \<phi>)) \<Lleftarrow>\<Rrightarrow> (Internal \<phi>)"
   unfolding hml_eq_def
 proof (rule conjI)
   from pre_\<tau>
@@ -425,6 +578,35 @@ next
     qed
   qed
 qed
+
+lemma \<epsilon>T_is_T: "(Internal TT) \<Lleftarrow>\<Rrightarrow> TT"
+  by (simp add: LTS_Tau.pre_\<epsilon> hml_eq_def hml_impl_def)
+
+fun n_\<epsilon>\<tau>s_then :: "nat \<Rightarrow> ('a, 's) hml \<Rightarrow> ('a, 's) hml" where
+  "n_\<epsilon>\<tau>s_then 0 cont = cont" |
+  "n_\<epsilon>\<tau>s_then (Suc n) cont = (Internal (Silent (n_\<epsilon>\<tau>s_then n cont)))"
+
+lemma \<epsilon>\<tau>_stack_reduces: "n_\<epsilon>\<tau>s_then n (Internal \<phi>) \<Lleftarrow>\<Rrightarrow> (Internal \<phi>)"
+  apply (induct n)
+  apply (simp add: LTS_Tau.hml_impl_iffI hml_eq_def)
+  unfolding n_\<epsilon>\<tau>s_then.simps(2)
+  using \<epsilon>\<tau>_is_\<tau>
+  by (smt (verit, del_insts) hml_eq_def hml_impl_iffI hml_models.simps(3) pre_\<epsilon> silent_reachable_trans)
+
+lemma n_\<epsilon>\<tau>s_then_cong: "\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r \<Longrightarrow> n_\<epsilon>\<tau>s_then n \<phi>l \<Lleftarrow>\<Rrightarrow> n_\<epsilon>\<tau>s_then n \<phi>r"
+  by (induct n) (simp add: internal_cong silent_cong)+
+
+lemma "n_\<epsilon>\<tau>s_then n TT \<Lleftarrow>\<Rrightarrow> TT"
+  using n_\<epsilon>\<tau>s_then_cong
+    and \<epsilon>\<tau>_stack_reduces
+    and \<epsilon>T_is_T
+    and equivp_def
+    and hml_eq_equiv
+  by metis
+
+lemma "s \<notin> I \<Longrightarrow> Conj (I \<union> {s}) (\<lambda>i. if i = s then Pos TT else \<psi>s i) \<Lleftarrow>\<Rrightarrow> Conj I \<psi>s"
+  oops
+
 
 \<comment> \<open> Distinguishing Formulas \<close>
 
