@@ -28,7 +28,7 @@ session LinearTimeBranchingTimeSpectroscopyAccountingForSilentSteps = HOL +
 
 (* The top-level theories of the submission: *)
   theories
-    SilentStepSpectroscopy
+    Silent_Step_Spectroscopy
 
 
 (* Dependencies on document source files: *)

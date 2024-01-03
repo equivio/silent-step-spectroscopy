@@ -1,4 +1,4 @@
-name: Isabelle Pages
+name: Check and deploy Isabelle theory
 
 on:
   push:

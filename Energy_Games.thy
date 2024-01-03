@@ -91,6 +91,18 @@ corollary finite_play_suffix:
   shows "finite_play g0 p"
   using assms finite_play_prefix by fast
 
+lemma finite_play_suffix2:
+  assumes "finite_play g0 ([g0] @ ([g1]@p))"
+  shows "finite_play g1 ([g1]@p)"
+using assms proof (induct p rule: rev_induct)
+  case Nil
+  then show ?case by (simp add: finite_play.intros(1)) 
+next
+  case (snoc x xs)
+  then show ?case
+    by (smt (verit) Cons_eq_appendI append_assoc append_same_eq distinct_adj_Cons distinct_adj_Cons_Cons eq_Nil_appendI finite_play.simps last.simps last_appendR)
+qed
+
 lemma finite_play_check_gen:
    assumes "x \<noteq> p1" and
            "p = p1 # [pn]"
@@ -187,17 +199,46 @@ subsection \<open>Winning Budgets\<close>
 inductive in_wina:: "'energy \<Rightarrow> 'gstate \<Rightarrow> bool " where
  "in_wina e g" if "(Gd g) \<and> (\<forall>g'. \<not>(g \<Zinj> g')) \<and> (e \<noteq> defender_win_level)" |
  "in_wina e g" if "(Ga g) \<and> (\<exists>g'. ((g \<Zinj> g') \<and> (in_wina ((weight g g') e) g')))\<and> (e \<noteq> defender_win_level)" |
- "in_wina e g" if "(Gd g) \<and>(\<forall>g'. ((g \<Zinj> g') \<longrightarrow> (in_wina ((weight g g') e) g'))) \<and> (e \<noteq> defender_win_level)" 
+ "in_wina e g" if "(Gd g) \<and> (\<forall>g'. ((g \<Zinj> g') \<longrightarrow> (in_wina ((weight g g') e) g'))) \<and> (e \<noteq> defender_win_level)" 
 
 lemma defender_win_level_not_in_wina:
   shows "\<forall>g. \<not>in_wina defender_win_level g"
   by (metis in_wina.cases)
 
 lemma attacker_wins_last_wina_notempty:
-  assumes "(finite_play g0 p) \<and> (won_by_attacker g0 e0 p)"
+  assumes "won_by_attacker g0 e0 p"
   shows "\<exists>e. in_wina e (last p)"
   using assms won_by_attacker_def finite_play.intros(2) in_wina.intros(1) by meson
 
+lemma in_wina_Ga:
+  assumes "in_wina e g" and "Ga g" 
+  shows "\<exists>g'. ((g \<Zinj> g') \<and> (in_wina ((weight g g') e) g'))"
+  using assms(1) assms(2) in_wina.simps by blast
+
+lemma win_a_upwards_closure: 
+  fixes ord::"'energy \<Rightarrow> 'energy \<Rightarrow> bool"
+  assumes transitive: "\<forall>e e' e''. (((ord e e') \<and> (ord e' e'')) \<longrightarrow> (ord e e''))" and
+          reflexive: "\<forall>e. (ord e e)" and
+          antysim: "\<forall>e e'. (((ord e e') \<and> (ord e' e)) \<longrightarrow> e=e')" and
+          dwl_min: "\<forall>e. (ord defender_win_level e)" and 
+          monotonicity:"\<forall>g g' e e'. (((weight_opt g g') \<noteq> None \<and> (ord e e'))  \<longrightarrow> (ord (the (weight_opt g g')e) (the (weight_opt g g')e')))" and
+          update_gets_smaller: "\<forall>g g' e. (((weight_opt g g') \<noteq> None) \<longrightarrow> (ord (the (weight_opt g g')e) e))" and
+          
+          "in_wina e g"
+        shows "(\<forall>e'.((ord e e')\<longrightarrow> (in_wina e' g)))"
+using assms(7) proof (induct rule: in_wina.induct)
+  case (1 g e)
+  then show ?case using antysim dwl_min local.reflexive local.transitive update_gets_smaller
+    by (metis in_wina.intros(1)) 
+next
+  case (2 g e)
+  then show ?case
+    using antysim dwl_min in_wina.intros(2) monotonicity by blast 
+next
+  case (3 g e)
+  then show ?case
+    using antysim dwl_min in_wina.intros(3) monotonicity by blast 
+qed
 
 end (*End of context energy_game*)
 end
