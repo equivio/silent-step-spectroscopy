@@ -704,6 +704,77 @@ definition dist :: "'s \<Rightarrow> ('a, 's) hml \<Rightarrow> 's \<Rightarrow>
 definition distFrom :: "'s \<Rightarrow> ('a, 's) hml \<Rightarrow> 's set \<Rightarrow> bool" ("_ <> _ _" [70, 70, 70] 80) where
   "(p <> \<phi> Q) \<equiv> (\<forall>q \<in> Q. p <> \<phi> q)"
 
-end
+lemma "p <> (Conj I \<psi>s) Q \<Longrightarrow> \<exists>\<psi>s'. p <> (Conj Q \<psi>s') Q"
+  unfolding distFrom_def and dist_def
+proof -
+  assume "\<forall>q\<in>Q. (p \<Turnstile> Conj I \<psi>s \<and> \<not> q \<Turnstile> Conj I \<psi>s)"
+
+  define \<psi>s' :: "'s \<Rightarrow> ('a, 's) hml_conjunct" where
+    "\<psi>s' \<equiv> (\<lambda>_. Pos (Conj I \<psi>s))"
+
+  from \<open>\<forall>q\<in>Q. (p \<Turnstile> Conj I \<psi>s \<and> \<not> q \<Turnstile> Conj I \<psi>s)\<close>
+  have "\<forall>q\<in>Q. (p \<Turnstile> Conj Q \<psi>s' \<and> \<not> q \<Turnstile> Conj Q \<psi>s')"
+    by (simp add: \<psi>s'_def)
+
+  then show "\<exists>\<psi>s'. \<forall>q\<in>Q. p \<Turnstile> Conj Q \<psi>s' \<and> \<not> q \<Turnstile> Conj Q \<psi>s'" by auto
+qed
+
+lemma "p <> (Conj I \<psi>s) Q \<Longrightarrow> p <> (Conj Q (\<lambda>q. \<psi>s (SOME i. i \<in> I \<and> \<not>(hml_conjunct_models q (\<psi>s i))))) Q"
+proof -
+  assume "p <> Conj I \<psi>s Q"
+  hence conj_dist_from_Q: "\<forall>q\<in>Q. p \<Turnstile> Conj I \<psi>s \<and> \<not> q \<Turnstile> Conj I \<psi>s"
+    unfolding distFrom_def and dist_def.
+
+  show "p <> (Conj Q (\<lambda>q. \<psi>s (SOME i. i \<in> I \<and> \<not>(hml_conjunct_models q (\<psi>s i))))) Q"
+    unfolding distFrom_def and dist_def
+  proof (rule ballI, rule conjI)
+    fix q
+    assume "q \<in> Q"
+    with conj_dist_from_Q
+    have "p \<Turnstile> Conj I \<psi>s" and "\<not> q \<Turnstile> Conj I \<psi>s" by auto
+
+    from \<open>\<not> q \<Turnstile> Conj I \<psi>s\<close>
+    have "\<exists>i. i \<in> I \<and> \<not> hml_conjunct_models q (\<psi>s i)"
+      using hml_models.simps(5) by blast
+
+    from \<open>p \<Turnstile> Conj I \<psi>s\<close>
+    have "\<forall>i\<in>I. hml_conjunct_models p (\<psi>s i)"
+      unfolding hml_models.simps.
+
+    have "\<forall>q'\<in>Q. hml_conjunct_models p (\<psi>s (SOME i. i \<in> I \<and> \<not> hml_conjunct_models q' (\<psi>s i)))"
+    proof (rule ballI)
+      fix q'
+      assume "q' \<in> Q"
+      with \<open>\<forall>i\<in>I. hml_conjunct_models p (\<psi>s i)\<close>
+       and \<open>\<exists>i. i \<in> I \<and> \<not> hml_conjunct_models q (\<psi>s i)\<close>
+      show "hml_conjunct_models p (\<psi>s (SOME i. i \<in> I \<and> \<not> hml_conjunct_models q' (\<psi>s i)))" 
+        by (metis (no_types, lifting) LTS_Tau.hml_models.simps(5) conj_dist_from_Q tfl_some)
+    qed
+
+    then show "p \<Turnstile> Conj Q (\<lambda>q. \<psi>s (SOME i. i \<in> I \<and> \<not> hml_conjunct_models q (\<psi>s i)))"
+      unfolding hml_models.simps.
+  next
+    fix q
+    assume "q \<in> Q"
+    with conj_dist_from_Q
+    have "p \<Turnstile> Conj I \<psi>s" and "\<not> q \<Turnstile> Conj I \<psi>s" by auto
+
+    from \<open>\<not> q \<Turnstile> Conj I \<psi>s\<close>
+    have "\<exists>i. i \<in> I \<and> \<not> hml_conjunct_models q (\<psi>s i)"
+      using hml_models.simps(5) by blast
+
+    then have "\<not>(hml_conjunct_models q (\<psi>s (SOME i. i \<in> I \<and> \<not> hml_conjunct_models q (\<psi>s i))))"
+      by (metis (no_types, lifting) tfl_some)
+
+    then have "\<exists>q'\<in>Q. \<not>(hml_conjunct_models q (\<psi>s (SOME i. i \<in> I \<and> \<not> hml_conjunct_models q' (\<psi>s i))))"
+      using \<open>q \<in> Q\<close> by auto
+
+    then show "\<not> q \<Turnstile> Conj Q (\<lambda>q. \<psi>s (SOME i. i \<in> I \<and> \<not> hml_conjunct_models q (\<psi>s i)))"
+      unfolding hml_models.simps by auto
+  qed
+qed
+
+
+end (* LTS_Tau *)
 
 end
