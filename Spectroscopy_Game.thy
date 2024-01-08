@@ -196,22 +196,101 @@ next
   then show ?thesis using assms(2) mono_subtract by simp
 qed
   
+lemma update_gets_smaller: 
+  fixes g g' e 
+  assumes "(spectroscopy_moves g g') \<noteq> None"
+  shows "(the (spectroscopy_moves g g')e)\<le> e"
+using assms proof (cases g)
+  case (Attacker_Immediate x11 x12)
+  then have "(\<exists>p' Q'. g'=(Attacker_Delayed p' Q')) \<or> (\<exists> p' Q'. g'= (Defender_Conj p' Q'))" using assms
+    by (metis (no_types, lifting) spectroscopy_defender.elims(2) spectroscopy_defender.elims(3) spectroscopy_moves.simps(45) spectroscopy_moves.simps(50) spectroscopy_moves.simps(56) spectroscopy_moves.simps(60) spectroscopy_moves.simps(71))
 
+  then consider (A_Delayed) "(\<exists>p' Q'. g'=(Attacker_Delayed p' Q'))" | (D_Conj) "(\<exists> p' Q'. g'= (Defender_Conj p' Q'))" by auto
+  then show ?thesis proof (cases)
+    case A_Delayed (*delay*)
+    then have "spectroscopy_moves g g' = Some id"
+      by (metis Attacker_Immediate assms(1) local.delay)
+    then show ?thesis by simp
+  next
+    case D_Conj (*finishing_or_early_conj*)
+    then have "spectroscopy_moves g g' = Some id \<or> spectroscopy_moves g g' = (subtract 0 0 0 0 1 0 0 0)" using assms(1)
+      by (metis Attacker_Immediate local.finishing_or_early_conj)
+    then show ?thesis using gets_smaller by auto 
+  qed
+next
+  case (Attacker_Branch x21 x22) (*br_acct*)
+  then have "\<exists>p' Q'. g'= (Attacker_Immediate p' Q')" using assms(1) spectroscopy_moves.simps
+    by (metis (no_types, lifting) spectroscopy_defender.elims(2) spectroscopy_defender.elims(3))
+  then have "spectroscopy_moves g g' = subtract 1 0 0 0 0 0 0 0"
+    by (metis Attacker_Branch assms(1) local.br_acct) 
+  then show ?thesis using gets_smaller by auto 
+next
+  case (Attacker_Clause x31 x32) (*pos_neg_clause *)
+  then have "\<exists>p' Q'. g'= (Attacker_Delayed p' Q')" using assms(1) spectroscopy_moves.simps
+    by (metis (no_types, lifting) spectroscopy_defender.elims(2) spectroscopy_defender.elims(3))
+  then have "spectroscopy_moves g g' = Some min1_6 \<or> spectroscopy_moves g g' = Some (min1_7 \<circ> (\<lambda>x. x- E 0 0 0 0 0 0 0 1))" using assms(1)
+    by (metis Attacker_Clause local.pos_neg_clause)
+  then show ?thesis using gets_smaller
+    using dual_order.trans gets_smaller_min_1_6 gets_smaller_min_1_7 option.sel by fastforce 
+next
+  case (Attacker_Delayed x41 x42)
+  then have "(\<exists>p' Q'. g'=(Attacker_Delayed p' Q')) \<or> (\<exists>p' Q'. g'=(Attacker_Immediate p' Q')) \<or> (\<exists>p' Q'. g'=(Defender_Conj p' Q')) \<or> (\<exists>p' Q'. g'=(Defender_Stable_Conj p' Q')) \<or> (\<exists>p' p'' Q' \<alpha> Q\<alpha> . g'= (Defender_Branch p' \<alpha> p'' Q' Q\<alpha>))"
+    using assms
+    by (metis spectroscopy_defender.cases spectroscopy_moves.simps(26) spectroscopy_moves.simps(27))
+
+  then consider (A_Delayed) "(\<exists>p' Q'. g'=(Attacker_Delayed p' Q'))" | (A_Immediate) "(\<exists>p' Q'. g'=(Attacker_Immediate p' Q'))" | (D_Conj) "(\<exists>p' Q'. g'=(Defender_Conj p' Q'))" | (D_Stable_Conj) "(\<exists>p' Q'. g'=(Defender_Stable_Conj p' Q'))" | (D_Branch) "(\<exists>p' p'' Q' \<alpha> Q\<alpha> . g'= (Defender_Branch p' \<alpha> p'' Q' Q\<alpha>))"
+    by blast
+  then show ?thesis proof (cases)
+    case A_Delayed (* procrastination *)
+    then show ?thesis using assms
+      by (metis Attacker_Delayed Orderings.order_eq_iff id_apply local.procrastination option.sel)
+  next
+    case A_Immediate (* observation *)
+    then have "spectroscopy_moves g g' = (subtract 1 0 0 0 0 0 0 0)"
+      by (metis (no_types, lifting) Attacker_Delayed assms(1) local.observation) 
+    then show ?thesis using gets_smaller by simp
+  next
+    case D_Conj (* late_inst_conj *)
+    then show ?thesis
+      by (metis Attacker_Delayed assms eq_id_iff local.late_inst_conj option.sel order_refl)
+  next
+    case D_Stable_Conj (* late_stbl_conj *)
+    then show ?thesis using assms
+      by (metis (no_types, lifting) Attacker_Delayed Orderings.order_eq_iff id_apply local.late_stbl_conj option.sel)
+  next
+    case D_Branch (* br_conj *)
+    then show ?thesis using assms
+      by (metis Attacker_Delayed Orderings.order_eq_iff id_apply local.br_conj option.sel) 
+  qed
+next
+  case (Defender_Branch x51 x52 x53 x54 x55) (* br_answer or br_obsv *)
+  then have "(\<exists>p'' q. g' = (Attacker_Clause p'' q)) \<or> (\<exists>p'' Q'. g'=(Attacker_Branch p'' Q'))" using assms(1)
+    by (metis spectroscopy_defender.cases spectroscopy_moves.simps(28) spectroscopy_moves.simps(29) spectroscopy_moves.simps(31) spectroscopy_moves.simps(32) spectroscopy_moves.simps(63))
+  then have "spectroscopy_moves g g' = (subtract 0 1 1 0 0 0 0 0) \<or> spectroscopy_moves g g' = Some (min1_6 \<circ> (\<lambda>x. x- E 0 1 1 0 0 0 0 0))"
+    by (smt (verit, del_insts) Defender_Branch assms(1) local.br_answer local.br_obsv) 
+  then show ?thesis using gets_smaller gets_smaller_min_1_6
+    using dual_order.trans by fastforce
+next
+  case (Defender_Conj x61 x62) (* conj_answer *)
+  then have "\<exists>p' q. g'=(Attacker_Clause p' q)" using assms(1)
+    by (metis spectroscopy_defender.cases spectroscopy_moves.simps(33) spectroscopy_moves.simps(34) spectroscopy_moves.simps(35) spectroscopy_moves.simps(36) spectroscopy_moves.simps(38) spectroscopy_moves.simps(69))
+  then have "spectroscopy_moves g g' = (subtract 0 0 1 0 0 0 0 0)"
+    by (metis Defender_Conj assms(1) local.conj_answer)
+  then show ?thesis using gets_smaller by auto
+next
+  case (Defender_Stable_Conj x71 x72) (* conj_s_answer *)
+  then have "\<exists>p' q. g'=(Attacker_Clause p' q)" using assms(1)
+    by (metis spectroscopy_defender.cases spectroscopy_moves.simps(39) spectroscopy_moves.simps(40) spectroscopy_moves.simps(41) spectroscopy_moves.simps(42) spectroscopy_moves.simps(43) spectroscopy_moves.simps(76))
+  then have "spectroscopy_moves g g' = (subtract 0 0 0 1 0 0 0 0)"
+    by (metis Defender_Stable_Conj assms(1) local.conj_s_answer)
+  then show ?thesis using gets_smaller by auto
+qed
 
 lemma win_a_upwards_closure_spec:          
   assumes "in_wina e g"
   shows "(\<forall>e'.((e \<le> e')\<longrightarrow> (in_wina e' g)))"
-proof- 
-  have transitive: "\<forall>e e' e''::energy. (((e \<le> e') \<and> (e' \<le> e'')) \<longrightarrow> (e \<le> e''))" by auto
-  have reflexive: "\<forall>e::energy. (e \<le> e)" by simp  
-  have antysim: "\<forall>e e'::energy. (((e \<le> e') \<and> (e'\<le> e)) \<longrightarrow> e=e')" by (simp add: order_antisym)
-  have dwl_min: "\<forall>e. (eneg \<le> e)" using  eneg_leq by simp
-  have monotonicity: "\<forall>g g' e e'. (((spectroscopy_moves g g') \<noteq> None \<and> (e \<le> e'))  \<longrightarrow> ((the (spectroscopy_moves g g')e) \<le> (the (spectroscopy_moves g g')e')))" using update_monotonicity by simp
-  have update_gets_smaller: "\<forall>g g' e. (((spectroscopy_moves g g') \<noteq> None) \<longrightarrow> ((the (spectroscopy_moves g g')e)\<le> e))" sorry
-
-  then show "(\<forall>e'.((e \<le> e')\<longrightarrow> (in_wina e' g)))" using win_a_upwards_closure
-    using antysim assms dwl_min local.transitive monotonicity by blast 
-  qed
+  using win_a_upwards_closure update_monotonicity update_gets_smaller
+  by (smt (verit) antisym assms eneg_leq order_refl order_trans)
 
 end
 
