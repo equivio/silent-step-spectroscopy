@@ -719,7 +719,7 @@ proof -
   then show "\<exists>\<psi>s'. \<forall>q\<in>Q. p \<Turnstile> Conj Q \<psi>s' \<and> \<not> q \<Turnstile> Conj Q \<psi>s'" by auto
 qed
 
-lemma "p <> (Conj I \<psi>s) Q \<Longrightarrow> p <> (Conj Q (\<lambda>q. \<psi>s (SOME i. i \<in> I \<and> \<not>(hml_conjunct_models q (\<psi>s i))))) Q"
+lemma dist_conj_thinning: "p <> (Conj I \<psi>s) Q \<Longrightarrow> p <> (Conj Q (\<lambda>q. \<psi>s (SOME i. i \<in> I \<and> \<not>(hml_conjunct_models q (\<psi>s i))))) Q"
 proof -
   assume "p <> Conj I \<psi>s Q"
   hence conj_dist_from_Q: "\<forall>q\<in>Q. p \<Turnstile> Conj I \<psi>s \<and> \<not> q \<Turnstile> Conj I \<psi>s"

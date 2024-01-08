@@ -228,6 +228,39 @@ proof -
   qed
 qed
 
+subsection \<open> Distinguishing Conjunction Thinning \<close>
+
+lemma extract_converter:
+  assumes "p <> (hml.Conj Q (\<lambda>q. (f \<circ> \<psi>s) (SOME i. i \<in> I \<and> \<not>(hml_conjunct_models q ((f \<circ> \<psi>s) i))))) Q"
+  shows "p <> (hml.Conj Q (f \<circ> (\<lambda>q. \<psi>s (SOME i. i \<in> I \<and> \<not>(hml_conjunct_models q ((f \<circ> \<psi>s) i)))))) Q"
+  using assms and comp_apply
+  by (simp add: LTS_Tau.dist_def distFrom_def)
+
+lemma "distinguishes_from (ImmConj I \<psi>s) p Q
+     \<Longrightarrow> distinguishes_from (ImmConj Q (\<lambda>q. \<psi>s (SOME i. i \<in> I \<and> \<not>(hml_srbb_conjunct_models (\<psi>s i) q)))) p Q"
+  unfolding distinguishes_from_def and distinguishes_def and hml_srbb_models.simps and hml_srbb_to_hml.simps
+proof -
+  assume "\<forall>q\<in>Q. p \<Turnstile> hml.Conj I (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s) \<and>
+           \<not> q \<Turnstile> hml.Conj I (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s)"
+  hence "p <> (hml.Conj I (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s)) Q"
+    by (simp add: LTS_Tau.dist_def distFrom_def)
+
+  with dist_conj_thinning
+  have "p <> (hml.Conj Q (\<lambda>q. (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s) (SOME i. i \<in> I \<and> \<not>(hml_conjunct_models q ((hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s) i))))) Q"
+    by blast
+
+  with extract_converter
+  have "p <> (hml.Conj Q (hml_srbb_conjunct_to_hml_conjunct \<circ> (\<lambda>q. \<psi>s (SOME i. i \<in> I \<and> \<not>(hml_conjunct_models q ((hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s) i)))))) Q"
+    by auto
+
+  then show "\<forall>q\<in>Q. p \<Turnstile> hml.Conj Q
+                (hml_srbb_conjunct_to_hml_conjunct \<circ> (\<lambda>q. \<psi>s (SOME i. i \<in> I \<and> \<not> hml_srbb_conjunct_models (\<psi>s i) q))) \<and>
+           \<not> q \<Turnstile> hml.Conj Q
+                   (hml_srbb_conjunct_to_hml_conjunct \<circ> (\<lambda>q. \<psi>s (SOME i. i \<in> I \<and> \<not> hml_srbb_conjunct_models (\<psi>s i) q)))"
+    unfolding distFrom_def and dist_def and hml_srbb_conjunct_models.simps and comp_apply
+    by blast
+qed
+
 end (* Inhabited_Tau_LTS *)
 
 end
