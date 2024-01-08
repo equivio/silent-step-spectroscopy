@@ -56,6 +56,25 @@ lemma opt_\<tau>_is_or: "(p \<Turnstile> (Silent \<phi>)) = ((p \<Turnstile> (Ob
 
 end (* context LTS_Tau *)
 
+context Inhabited_Tau_LTS
+begin
+
+lemma hml_and_and: "p \<Turnstile> (\<psi>l \<and>hml \<psi>r) = (hml_conjunct_models p \<psi>l \<and> hml_conjunct_models p \<psi>r)"
+  unfolding hml_models.simps and hml_conjunct_models.simps
+proof (rule iffI)
+  assume "\<forall>i\<in>{left, right}. hml_conjunct_models p (if i = left then \<psi>l else if i = right then \<psi>r else Pos TT)"
+  then have for_all_l_and_r: "\<forall>i\<in>{left, right}. (if i = left then hml_conjunct_models p \<psi>l else if i = right then hml_conjunct_models p \<psi>r else hml_conjunct_models p (Pos TT))"
+    by presburger
+  then show "hml_conjunct_models p \<psi>l \<and> hml_conjunct_models p \<psi>r"
+    by (metis Inhabited_LTS_axioms Inhabited_LTS_def insertCI)
+next
+  assume "hml_conjunct_models p \<psi>l \<and> hml_conjunct_models p \<psi>r"
+  then show "\<forall>i\<in>{left, right}. hml_conjunct_models p (if i = left then \<psi>l else if i = right then \<psi>r else Pos TT)"
+    by auto
+qed
+
+end (* Inhabited_Tau_LTS *)
+
 
 context Inhabited_Tau_LTS
 begin
@@ -604,11 +623,80 @@ lemma "n_\<epsilon>\<tau>s_then n TT \<Lleftarrow>\<Rrightarrow> TT"
     and hml_eq_equiv
   by metis
 
-lemma "s \<notin> I \<Longrightarrow> Conj (I \<union> {s}) (\<lambda>i. if i = s then Pos TT else \<psi>s i) \<Lleftarrow>\<Rrightarrow> Conj I \<psi>s"
-  oops
+end
 
+context Inhabited_Tau_LTS
+begin
+
+lemma hml_and_commutative: "(\<phi>l \<and>hml \<phi>r) \<Lleftarrow>\<Rrightarrow> (\<phi>r \<and>hml \<phi>l)"
+  using Inhabited_LTS_axioms Inhabited_LTS_def hml_eq_equality by fastforce
+
+lemma hml_and_left_tt: "(Pos TT \<and>hml Pos \<phi>) \<Lleftarrow>\<Rrightarrow> \<phi>"
+  using Inhabited_LTS_axioms Inhabited_LTS_def hml_eq_equality by fastforce
+
+lemma hml_and_right_tt: "(Pos \<phi> \<and>hml Pos TT) \<Lleftarrow>\<Rrightarrow> \<phi>"
+  using hml_and_commutative and hml_and_left_tt
+  by (simp add: hml_eq_equality)
+
+lemma hml_and_same_no_and: "(Pos \<phi> \<and>hml Pos \<phi>) \<Lleftarrow>\<Rrightarrow> \<phi>"
+  by (simp add: hml_eq_equality)
+
+lemma conj_extract_conjunct: "s \<notin> I \<Longrightarrow> Conj (I \<union> {s}) (\<lambda>i. if i = s then \<psi> else \<psi>s i) \<Lleftarrow>\<Rrightarrow> (\<psi> \<and>hml Pos (Conj I \<psi>s))"
+proof -
+  assume "s \<notin> I"
+  show "Conj (I \<union> {s}) (\<lambda>i. if i = s then \<psi> else \<psi>s i) \<Lleftarrow>\<Rrightarrow> (\<psi> \<and>hml Pos (Conj I \<psi>s))"
+    unfolding hml_eq_def and hml_impl_def
+  proof (rule conjI)
+    show "\<forall>p. p \<Turnstile> Conj (I \<union> {s}) (\<lambda>i. if i = s then \<psi> else \<psi>s i) \<longrightarrow> p \<Turnstile> \<psi> \<and>hml Pos (Conj I \<psi>s)"
+    proof (rule allI, rule impI)
+      fix p
+      assume "p \<Turnstile> Conj (I \<union> {s}) (\<lambda>i. if i = s then \<psi> else \<psi>s i)"
+      with \<open>s \<notin> I\<close>
+      have "p \<Turnstile> Conj I \<psi>s \<and> hml_conjunct_models p \<psi>"
+        by (smt (verit, ccfv_threshold) IntE Un_Int_eq(3) Un_upper2 hml_models.simps(5) singletonI subsetD)
+      then have "p \<Turnstile> Conj I \<psi>s" and "hml_conjunct_models p \<psi>"
+        by auto
+
+      show "p \<Turnstile> \<psi> \<and>hml Pos (Conj I \<psi>s)"
+        unfolding hml_and_and
+      proof (rule conjI)
+        from \<open>hml_conjunct_models p \<psi>\<close>
+        show "hml_conjunct_models p \<psi>".
+      next
+        from \<open>p \<Turnstile> Conj I \<psi>s\<close>
+        show "hml_conjunct_models p (Pos (Conj I \<psi>s))"
+          unfolding hml_conjunct_models.simps.
+      qed
+    qed
+  next
+    show "\<forall>p. p \<Turnstile> \<psi> \<and>hml Pos (Conj I \<psi>s) \<longrightarrow> p \<Turnstile> Conj (I \<union> {s}) (\<lambda>i. if i = s then \<psi> else \<psi>s i)"
+    proof (rule allI, rule impI)
+      fix p
+      assume "p \<Turnstile> \<psi> \<and>hml Pos (Conj I \<psi>s)"
+      then have "hml_conjunct_models p \<psi> \<and> hml_conjunct_models p (Pos (Conj I \<psi>s))"
+        using hml_and_and by simp
+      then show "p \<Turnstile> Conj (I \<union> {s}) (\<lambda>i. if i = s then \<psi> else \<psi>s i)" 
+        by simp
+    qed
+  qed
+qed
+
+lemma "s \<notin> I \<Longrightarrow> Conj (I \<union> {s}) (\<lambda>i. if i = s then Pos TT else \<psi>s i) \<Lleftarrow>\<Rrightarrow> Conj I \<psi>s"
+proof -
+  assume "s \<notin> I"
+  then have "Conj (I \<union> {s}) (\<lambda>i. if i = s then Pos TT else \<psi>s i) \<Lleftarrow>\<Rrightarrow> (Pos TT \<and>hml Pos (Conj I \<psi>s))"
+    by (rule conj_extract_conjunct)
+  with hml_and_left_tt
+  show "Conj (I \<union> {s}) (\<lambda>i. if i = s then Pos TT else \<psi>s i) \<Lleftarrow>\<Rrightarrow> Conj I \<psi>s"
+    by (meson equivp_transp hml_eq_equiv)
+qed
+
+end (* Inhabited_Tau_LTS *)
 
 \<comment> \<open> Distinguishing Formulas \<close>
+
+context LTS_Tau
+begin
 
 definition dist :: "'s \<Rightarrow> ('a, 's) hml \<Rightarrow> 's \<Rightarrow> bool" ("_ <> _ _" [70, 70, 70] 80) where
   "(p <> \<phi> q) \<equiv> (p \<Turnstile> \<phi>) \<and> \<not>(q \<Turnstile> \<phi>)"
