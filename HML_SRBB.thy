@@ -328,7 +328,25 @@ proof -
                    (hml_srbb_conjunct_to_hml_conjunct \<circ> (\<lambda>q. \<psi>s (SOME i. i \<in> I \<and> \<not> hml_srbb_conjunct_models (\<psi>s i) q)))"
     unfolding distFrom_def and dist_def by auto
 qed
-  
+
+
+lemma dist_stableconj_thinn:
+  defines 
+    "distinguishing_conjunct \<equiv> (\<lambda>I.\<lambda>\<psi>s.
+       \<lambda>q. \<psi>s (SOME i. i \<in> I \<and> \<not>(hml_srbb_conjunct_models (\<psi>s i) q)))"
+  assumes "distinguishes_from_\<chi> (StableConj I \<psi>s) p Q"
+  shows "distinguishes_from_\<chi> (StableConj Q (distinguishing_conjunct I \<psi>s)) p Q"
+  oops
+
+
+lemma dist_branchconj_thinn:
+  defines 
+    "distinguishing_conjunct \<equiv> (\<lambda>I.\<lambda>\<psi>s.
+       \<lambda>q. \<psi>s (SOME i. i \<in> I \<and> \<not>(hml_srbb_conjunct_models (\<psi>s i) q)))"
+  assumes "distinguishes_from_\<chi> (BranchConj \<alpha> \<phi> I \<psi>s) p Q"
+  shows "distinguishes_from_\<chi> (BranchConj \<alpha> \<phi> Q (distinguishing_conjunct I \<psi>s)) p Q"
+  oops
+
 end (* Inhabited_Tau_LTS *)
 
 end

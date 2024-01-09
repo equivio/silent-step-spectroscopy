@@ -704,6 +704,7 @@ definition dist :: "'s \<Rightarrow> ('a, 's) hml \<Rightarrow> 's \<Rightarrow>
 definition distFrom :: "'s \<Rightarrow> ('a, 's) hml \<Rightarrow> 's set \<Rightarrow> bool" ("_ <> _ _" [70, 70, 70] 80) where
   "(p <> \<phi> Q) \<equiv> (\<forall>q \<in> Q. p <> \<phi> q)"
 
+
 lemma "p <> (Conj I \<psi>s) Q \<Longrightarrow> \<exists>\<psi>s'. p <> (Conj Q \<psi>s') Q"
   unfolding distFrom_def and dist_def
 proof -
@@ -774,7 +775,14 @@ proof -
   qed
 qed
 
-
 end (* LTS_Tau *)
+
+context Inhabited_Tau_LTS
+begin
+
+lemma hml_and_dist_disj: "p <> (\<psi>l \<and>hml \<psi>r) q = (p \<Turnstile> (\<psi>l \<and>hml \<psi>r) \<and> (\<not>hml_conjunct_models q \<psi>l \<or> \<not>hml_conjunct_models q \<psi>r))"
+  using Inhabited_Tau_LTS.hml_and_and Inhabited_Tau_LTS_axioms LTS_Tau.dist_def by fastforce
+
+end
 
 end
