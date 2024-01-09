@@ -102,8 +102,8 @@ begin
 
 text \<open>
   Next we show that the lemma win_a_upwards_closure, which shows that with more energy the 
-  attacker will win at least as much as before, applies to spectroscopy games. To apply the lemma we 
-  first show that  the given order \<open>\<le>\<close> on energies fullfills the following properties:  
+  attacker will win at least as much as before, applies to spectroscopy games. To apply the lemma 
+  we first show that  the given order \<open>\<le>\<close> on energies fullfills the following properties:  
   all updates are monotonic w.r.t. \<open>\<le>\<close> 
   and  \<open>e \<le> Upd(e)\<close> holds for all energies and updates. 
 \<close> 
