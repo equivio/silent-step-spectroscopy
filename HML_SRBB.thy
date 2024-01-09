@@ -333,16 +333,19 @@ qed
 lemma dist_stableconj_thinn:
   defines 
     "distinguishing_conjunct \<equiv> (\<lambda>I.\<lambda>\<psi>s.
-       \<lambda>q. \<psi>s (SOME i. i \<in> I \<and> \<not>(hml_srbb_conjunct_models (\<psi>s i) q)))"
+       \<lambda>q. if \<exists>i \<in> I. \<not>(hml_srbb_conjunct_models (\<psi>s i) q)
+           then \<psi>s (SOME i. i \<in> I \<and> \<not>(hml_srbb_conjunct_models (\<psi>s i) q))
+           else \<psi>s (SOME i. i \<in> I))" (* This if-then-else is necessary, as the distinction might come from the stability condition, thereby allowing q to satisfy all conjuncts. *)
   assumes "distinguishes_from_\<chi> (StableConj I \<psi>s) p Q"
   shows "distinguishes_from_\<chi> (StableConj Q (distinguishing_conjunct I \<psi>s)) p Q"
   oops
 
-
 lemma dist_branchconj_thinn:
   defines 
     "distinguishing_conjunct \<equiv> (\<lambda>I.\<lambda>\<psi>s.
-       \<lambda>q. \<psi>s (SOME i. i \<in> I \<and> \<not>(hml_srbb_conjunct_models (\<psi>s i) q)))"
+       \<lambda>q. if \<exists>i \<in> I. \<not>(hml_srbb_conjunct_models (\<psi>s i) q)
+           then \<psi>s (SOME i. i \<in> I \<and> \<not>(hml_srbb_conjunct_models (\<psi>s i) q))
+           else \<psi>s (SOME i. i \<in> I))" (* This if-then-else is necessary, as the distinction might come from the stability condition, thereby allowing q to satisfy all conjuncts. *)
   assumes "distinguishes_from_\<chi> (BranchConj \<alpha> \<phi> I \<psi>s) p Q"
   shows "distinguishes_from_\<chi> (BranchConj \<alpha> \<phi> Q (distinguishing_conjunct I \<psi>s)) p Q"
   oops
