@@ -3,9 +3,13 @@ theory Spectroscopy_Game
 begin
 
 text \<open>In this theory the full spectroscopy game is defined (as a locale). 
-The definition corresponds to definition 16 in the paper. (Definition 16 is an extension of definition 14, which extends definition 12, which is a energy game depending on a LTS. We omit these steps and give a definition directly.) 
+The definition corresponds to definition 16 in the paper. (Definition 16 is an extension of 
+definition 14, which extends definition 12, which is a energy game depending on a LTS. We omit these 
+steps and give a definition directly.) 
 
-The full spectroscopy game is an energy game that can be constructed by adding stable and branching conjunctions to a delay bisimulation game, which is  dependend on a LTS. In the following we differentiate the positions accordingly:\<close>
+The full spectroscopy game is an energy game that can be constructed by adding stable and branching 
+conjunctions to a delay bisimulation game, which is  dependend on a LTS. In the following we 
+differentiate the positions accordingly:\<close>
 
 datatype ('s, 'a) spectroscopy_position = 
                           Attacker_Immediate (attacker_state: "'s") (defender_states: "'s set") |
@@ -80,7 +84,8 @@ fun spectroscopy_moves :: "('s, 'a) spectroscopy_position \<Rightarrow> ('s, 'a)
 
   others: "spectroscopy_moves _ _ = None"
 
-text \<open>The definition of defender positions in a full spectroscopy game is implicitly given by the possible positions. Now we make them explicit:\<close>
+text \<open>The definition of defender positions in a full spectroscopy game is implicitly given by the 
+possible positions. Now we make them explicit:\<close>
 fun spectroscopy_defender where
   "spectroscopy_defender (Attacker_Immediate _ _) = False" |
   "spectroscopy_defender (Attacker_Branch _ _) = False" |
@@ -90,7 +95,8 @@ fun spectroscopy_defender where
   "spectroscopy_defender (Defender_Conj _ _) = True" |
   "spectroscopy_defender (Defender_Stable_Conj _ _) = True"
 
-text \<open>To check whether these definitions are compatible with our definition of energy games we proof an interpretation:\<close>
+text \<open>To check whether these definitions are compatible with our definition of energy games we proof 
+an interpretation:\<close>
 interpretation Game: energy_game "spectroscopy_moves" "spectroscopy_defender" "eneg" .
 
 end

@@ -252,7 +252,7 @@ lemma in_wina_Ga:
 
 text\<open>The intuitively true statement "with more energy the attacker will win at least as much as 
 before" can be proven when given a partial order on energies such that the defender_win_level is the minimal energy,
-updates are monotonic and e \<ge> Upd(e) holds for all energies and updates:\<close>
+updates are monotonic and \<open>e \<ge> Upd(e)\<close> holds for all energies and updates:\<close>
 
 lemma win_a_upwards_closure: 
   fixes ord::"'energy \<Rightarrow> 'energy \<Rightarrow> bool"
