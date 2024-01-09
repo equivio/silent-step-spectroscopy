@@ -9,22 +9,7 @@ inductive Strat :: "('s, 'a) spectroscopy_position \<Rightarrow> ('a, 's) hml_sr
 lemma upwards_closure:
   assumes "in_wina e p" "e \<le> e'"
   shows "in_wina e' p"
-proof-
-  {
-    have "\<forall>(e::energy) (e'::energy) (e''::energy). e \<le> e' \<and> e' \<le> e'' \<longrightarrow> e \<le> e''" by force
-    moreover have "\<forall>e :: energy. e \<le> e" by simp
-    moreover have "\<forall>(e :: energy) (e' :: energy). e \<le> e' \<and> e' \<le> e \<longrightarrow> e = e'" by auto
-    moreover have "\<forall>e. eneg \<le> e" by (simp add: eneg_leq)
-    moreover have "\<forall>g g' e e'. spectroscopy_moves g g' \<noteq> None \<and> e \<le> e' \<longrightarrow> weight g g' e \<le> weight g g' e'" sorry
-    moreover have "\<forall>g g' e. spectroscopy_moves g g' \<noteq> None \<longrightarrow> weight g g' e \<le> e" sorry
-    moreover assume "in_wina e p"
-    ultimately have "\<forall>e'\<ge>e. in_wina e' p" by(rule win_a_upwards_closure[of "Orderings.ord_class.less_eq" "e" "p"])
-    moreover assume "e \<le> e'"
-    ultimately have "in_wina e' p" by simp
-  }
-  with assms show "in_wina e' p" by simp
-qed
-
+  using win_a_upwards_closure_spec assms by simp
 
 lemma one:
   assumes "distinguishes_from \<phi> p Q"
