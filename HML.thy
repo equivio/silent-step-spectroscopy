@@ -775,6 +775,39 @@ proof -
   qed
 qed
 
+
+lemma dist_conjunct_image_subset_all_conjuncts:
+  defines 
+    "distinguishing_conjunct \<equiv> (\<lambda>I.\<lambda>\<psi>s.
+       \<lambda>q. if \<exists>i \<in> I. \<not>(hml_conjunct_models q (\<psi>s i))
+           then \<psi>s (SOME i. i \<in> I \<and> \<not>(hml_conjunct_models q (\<psi>s i)))
+           else \<psi>s (SOME i. i \<in> I))"
+  assumes "I \<noteq> {}"
+  shows "(distinguishing_conjunct I \<psi>s) ` Q \<subseteq> \<psi>s ` I"
+  using assms
+  unfolding distinguishing_conjunct_def
+  by (smt (verit) image_eqI image_is_empty image_subsetI subset_empty tfl_some)
+
+lemma models_full_models_dist_subset:
+  defines 
+    "distinguishing_conjunct \<equiv> (\<lambda>I.\<lambda>\<psi>s.
+       \<lambda>q. if \<exists>i \<in> I. \<not>(hml_conjunct_models q (\<psi>s i))
+           then \<psi>s (SOME i. i \<in> I \<and> \<not>(hml_conjunct_models q (\<psi>s i)))
+           else \<psi>s (SOME i. i \<in> I))"
+  assumes "I \<noteq> {}"
+      and "p \<Turnstile> (Conj I \<psi>s)"
+  shows "p \<Turnstile> (Conj Q (distinguishing_conjunct I \<psi>s))"
+  using assms and dist_conjunct_image_subset_all_conjuncts
+  unfolding hml_models.simps
+  by (smt (verit, ccfv_SIG) image_iff subsetD)
+
+
+lemma dist_conj_non_empty_conj:
+  fixes p :: 's and q :: 's
+  assumes "p <> (Conj I \<psi>s) q"
+  shows "I \<noteq> {}"
+  by (metis dist_def assms empty_iff hml_models.simps(5))
+
 end (* LTS_Tau *)
 
 context Inhabited_Tau_LTS
