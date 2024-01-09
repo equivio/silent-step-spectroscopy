@@ -102,9 +102,9 @@ begin
 
 text\<open>Next we show that the lemma win_a_upwards_closure ("with more energy the attacker will win at 
 least as much as before") applies to spectroscopy games. To apply the lemma we first show that  the 
-given order \<le> on energies fullfills the following properties:  
-- all updates are monotonic w.r.t. \<le> 
-- e \<le> Upd(e) holds for all energies and updates. \<close>
+given order \<open>\<le>\<close> on energies fullfills the following properties:  
+- all updates are monotonic w.r.t. \<open>\<le>\<close> 
+- \<open>e \<le> Upd(e)\<close> holds for all energies and updates. \<close>
 
 lemma update_monotonicity: 
   fixes g g' e e'
