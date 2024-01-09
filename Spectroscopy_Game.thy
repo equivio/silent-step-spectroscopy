@@ -1,5 +1,5 @@
 theory Spectroscopy_Game
-  imports Energy_Games Energy LTS
+  imports Energy_Games Energy LTS HML_SRBB Energy_Games
 begin
 
 datatype ('s, 'a) spectroscopy_position = 
@@ -98,6 +98,19 @@ locale full_spec_game =
       right :: 's and
       \<tau> :: 'a
 begin
+
+primrec 
+strategy_formula :: "('s, 'a) spectroscopy_position \<Rightarrow> energy \<Rightarrow> ('a, 's)hml_srbb \<Rightarrow> bool"
+and strategy_formula_conjunction 
+  :: "('s, 'a) spectroscopy_position \<Rightarrow> energy \<Rightarrow> ('a, 's)hml_srbb_conjunction \<Rightarrow> bool"
+and strategy_formula_conjunct
+  :: "('s, 'a) spectroscopy_position \<Rightarrow> energy \<Rightarrow> ('a, 's)hml_srbb_conjunct \<Rightarrow> bool"
+  where
+delay:
+"strategy_formula (Attacker_Immediate p Q) e (Internal \<chi>) = 
+    ((\<exists>Q'. (spectroscopy_moves (Attacker_Immediate p Q) (Attacker_Delayed p Q') = (Some (id:: energy \<Rightarrow> energy)))
+\<and> (in_wina e (Attacker_Delayed p Q')) 
+\<and> strategy_formula_conjunction (Attacker_Delayed p Q') e \<chi>))"
 
 end
 
