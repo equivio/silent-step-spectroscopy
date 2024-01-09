@@ -46,6 +46,7 @@ primrec
   "hml_srbb_conjunct_to_hml_conjunct (Pos \<chi>) = hml_conjunct.Pos (hml.Internal (hml_srbb_conjunction_to_hml \<chi>))" |
   "hml_srbb_conjunct_to_hml_conjunct (Neg \<chi>) = hml_conjunct.Neg (hml.Internal (hml_srbb_conjunction_to_hml \<chi>))"
 
+
 fun hml_srbb_models :: "'s \<Rightarrow> ('a, 's) hml_srbb \<Rightarrow> bool" (infix "\<Turnstile>SRBB" 60)where
   "hml_srbb_models state formula = (state \<Turnstile> (hml_srbb_to_hml formula))"
 
@@ -63,14 +64,22 @@ lemma "(state \<Turnstile>SRBB TT) = (state \<Turnstile>SRBB ImmConj {} \<psi>s)
 lemma "(state \<Turnstile>SRBB Internal \<chi>) = (state \<Turnstile>SRBB ImmConj {left} (\<lambda>i. if i = left then Pos \<chi> else undefined))"
   by simp
 
-definition hml_preordered :: "(('a, 's) hml_srbb) set \<Rightarrow> 's \<Rightarrow> 's \<Rightarrow> bool" where
-  "hml_preordered \<phi>s p q \<equiv> \<forall>\<phi> \<in> \<phi>s. p \<Turnstile>SRBB \<phi> \<longrightarrow> q \<Turnstile>SRBB \<phi>"
 
 definition distinguishes :: "('a, 's) hml_srbb \<Rightarrow> 's \<Rightarrow> 's \<Rightarrow> bool" where
   "distinguishes \<phi> p q \<equiv> p \<Turnstile>SRBB \<phi> \<and> \<not>(q \<Turnstile>SRBB \<phi>)"
 
+definition distinguishes_\<chi> :: "('a, 's) hml_srbb_conjunction \<Rightarrow> 's \<Rightarrow> 's \<Rightarrow> bool" where
+  "distinguishes_\<chi> \<chi> p q \<equiv> hml_srbb_conjunction_models \<chi> p \<and> \<not>(hml_srbb_conjunction_models \<chi> q)"
+
 definition distinguishes_from :: "('a, 's) hml_srbb \<Rightarrow> 's \<Rightarrow> 's set \<Rightarrow> bool" where
   "distinguishes_from \<phi> p Q \<equiv> \<forall>q \<in> Q. distinguishes \<phi> p q"
+
+definition distinguishes_from_\<chi> :: "('a, 's) hml_srbb_conjunction \<Rightarrow> 's \<Rightarrow> 's set \<Rightarrow> bool" where
+  "distinguishes_from_\<chi> \<chi> p Q \<equiv> \<forall>q \<in> Q. distinguishes_\<chi> \<chi> p q"
+
+
+definition hml_preordered :: "(('a, 's) hml_srbb) set \<Rightarrow> 's \<Rightarrow> 's \<Rightarrow> bool" where
+  "hml_preordered \<phi>s p q \<equiv> \<forall>\<phi> \<in> \<phi>s. p \<Turnstile>SRBB \<phi> \<longrightarrow> q \<Turnstile>SRBB \<phi>"
 
 definition hml_equivalent :: "(('a, 's) hml_srbb) set \<Rightarrow> 's \<Rightarrow> 's \<Rightarrow> bool" where
   "hml_equivalent \<phi>s p q \<equiv> hml_preordered \<phi>s p q \<and> hml_preordered \<phi>s q p"
@@ -230,15 +239,34 @@ qed
 
 subsection \<open> Distinguishing Conjunction Thinning \<close>
 
+text \<open>
+The following four lemmata (dist_..._thinn) lift the result
+  [that a conjunction which distinguishes
+   a process p from a set of processes Q may be reduced (thinned) to have at most one conjunct per
+   element of Q while still being able to distinguish p from Q]
+  (dist_conj_thinning)
+from unrestricted hml to hml_srbb.
+\<close>
+
 lemma extract_converter:
   assumes "p <> (hml.Conj Q (\<lambda>q. (f \<circ> \<psi>s) (SOME i. i \<in> I \<and> \<not>(hml_conjunct_models q ((f \<circ> \<psi>s) i))))) Q"
   shows "p <> (hml.Conj Q (f \<circ> (\<lambda>q. \<psi>s (SOME i. i \<in> I \<and> \<not>(hml_conjunct_models q ((f \<circ> \<psi>s) i)))))) Q"
   using assms and comp_apply
   by (simp add: LTS_Tau.dist_def distFrom_def)
 
-lemma "distinguishes_from (ImmConj I \<psi>s) p Q
-     \<Longrightarrow> distinguishes_from (ImmConj Q (\<lambda>q. \<psi>s (SOME i. i \<in> I \<and> \<not>(hml_srbb_conjunct_models (\<psi>s i) q)))) p Q"
-  unfolding distinguishes_from_def and distinguishes_def and hml_srbb_models.simps and hml_srbb_to_hml.simps
+
+lemma dist_immconj_thinn:
+  defines 
+    "distinguishing_conjunct \<equiv> (\<lambda>I.\<lambda>\<psi>s.
+       \<lambda>q. \<psi>s (SOME i. i \<in> I \<and> \<not>(hml_srbb_conjunct_models (\<psi>s i) q)))"
+  assumes "distinguishes_from (ImmConj I \<psi>s) p Q"
+  shows "distinguishes_from (ImmConj Q (distinguishing_conjunct I \<psi>s)) p Q"
+  using assms
+  unfolding distinguishes_from_def
+        and distinguishes_def
+        and hml_srbb_models.simps
+        and hml_srbb_to_hml.simps
+        and distinguishing_conjunct_def
 proof -
   assume "\<forall>q\<in>Q. p \<Turnstile> hml.Conj I (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s) \<and>
            \<not> q \<Turnstile> hml.Conj I (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s)"
@@ -261,6 +289,46 @@ proof -
     by blast
 qed
 
+
+lemma dist_conj_thinn:
+  defines 
+    "distinguishing_conjunct \<equiv> (\<lambda>I.\<lambda>\<psi>s.
+       \<lambda>q. \<psi>s (SOME i. i \<in> I \<and> \<not>(hml_srbb_conjunct_models (\<psi>s i) q)))"
+  assumes "distinguishes_from_\<chi> (Conj I \<psi>s) p Q"
+  shows "distinguishes_from_\<chi> (Conj Q (distinguishing_conjunct I \<psi>s)) p Q"
+  using assms
+  unfolding distinguishes_from_\<chi>_def
+        and distinguishes_\<chi>_def
+        and hml_srbb_conjunction_models.simps
+        and hml_srbb_conjunction_to_hml.simps
+        and distinguishing_conjunct_def
+proof -
+  assume "\<forall>q\<in>Q. p \<Turnstile> hml.Conj I (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s) \<and>
+           \<not> q \<Turnstile> hml.Conj I (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s)"
+  hence "p <> (hml.Conj I (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s)) Q"
+    by (simp add: LTS_Tau.dist_def distFrom_def)
+
+  with dist_conj_thinning
+  have "p <> (hml.Conj Q (\<lambda>q. (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s) (SOME i. i \<in> I \<and> \<not>(hml_conjunct_models q ((hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s) i))))) Q"
+    by blast
+
+  with extract_converter
+  have "p <> (hml.Conj Q (hml_srbb_conjunct_to_hml_conjunct \<circ> (\<lambda>q. \<psi>s (SOME i. i \<in> I \<and> \<not>(hml_conjunct_models q ((hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s) i)))))) Q"
+    by auto
+
+  then have "p <> (hml.Conj Q (hml_srbb_conjunct_to_hml_conjunct \<circ> (\<lambda>q. \<psi>s (SOME i. i \<in> I \<and> \<not>(hml_conjunct_models q (hml_srbb_conjunct_to_hml_conjunct (\<psi>s i))))))) Q"
+    using comp_apply by auto
+
+  then have "p <> (hml.Conj Q (hml_srbb_conjunct_to_hml_conjunct \<circ> (\<lambda>q. \<psi>s (SOME i. i \<in> I \<and> \<not>(hml_srbb_conjunct_models (\<psi>s i) q))))) Q"
+    using hml_srbb_conjunct_models.simps by auto
+
+  then show "\<forall>q\<in>Q. p \<Turnstile> hml.Conj Q
+                (hml_srbb_conjunct_to_hml_conjunct \<circ> (\<lambda>q. \<psi>s (SOME i. i \<in> I \<and> \<not> hml_srbb_conjunct_models (\<psi>s i) q))) \<and>
+           \<not> q \<Turnstile> hml.Conj Q
+                   (hml_srbb_conjunct_to_hml_conjunct \<circ> (\<lambda>q. \<psi>s (SOME i. i \<in> I \<and> \<not> hml_srbb_conjunct_models (\<psi>s i) q)))"
+    unfolding distFrom_def and dist_def by auto
+qed
+  
 end (* Inhabited_Tau_LTS *)
 
 end
