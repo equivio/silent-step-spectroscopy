@@ -240,12 +240,12 @@ qed
 subsection \<open> Distinguishing Conjunction Thinning \<close>
 
 text \<open>
-The following four lemmata (dist_..._thinn) lift the result
+The following four lemmata (dist\_...\_thinn) lift the result
   [that a conjunction which distinguishes
    a process p from a set of processes Q may be reduced (thinned) to have at most one conjunct per
    element of Q while still being able to distinguish p from Q]
-  (dist_conj_thinning)
-from unrestricted hml to hml_srbb.
+  (dist\_conj\_thinning)
+from unrestricted hml to hml\_srbb.
 \<close>
 
 lemma extract_converter:
