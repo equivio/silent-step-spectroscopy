@@ -166,9 +166,6 @@ lemma srbb_impl_\<psi>_to_hml_impl:
   by (simp add: hml_conjunct_impl_def hml_srbb_impl_\<psi>_def)
 
 
-subsection \<open> Pre-Congruence \<close>
-
-
 subsection \<open> HML\_SRBB Equivalence \<close>
 
 definition hml_srbb_eq :: "('a, 's) hml_srbb \<Rightarrow> ('a, 's) hml_srbb \<Rightarrow> bool" (infix "\<Lleftarrow>srbb\<Rrightarrow>" 70) where
