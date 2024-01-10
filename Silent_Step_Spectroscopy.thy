@@ -42,7 +42,7 @@ next
 qed
 
 
-end \<comment> \<open>end of context full_spec_game\<close>
+end (* context full_spec_game *)
 
 
 end
