@@ -850,11 +850,21 @@ lemma models_full_models_dist_subset':
                 else \<psi>s (SOME i. i \<in> I))"
   assumes "p \<Turnstile> (Conj I \<psi>s)"
   shows "p \<Turnstile> (Conj Q (distinguishing_conjunct I \<psi>s))"
-  using assms
-    and T_is_\<epsilon>_empty_conj
-    and models_full_models_dist_subset
-    and hml_eq_equality
-  sorry
+  using assms(2)
+proof (cases "I = {}")
+  assume "I = {}"
+  then have "distinguishing_conjunct I \<psi>s = (\<lambda>q. Pos (Internal (Conj {} \<psi>s')))"
+    unfolding distinguishing_conjunct_def by simp
+  then show "p \<Turnstile> Conj Q (distinguishing_conjunct I \<psi>s)"
+    using silent_reachable.intros(1) by auto
+next
+  assume "p \<Turnstile> Conj I \<psi>s"
+      and "I \<noteq> {}"
+  then show "p \<Turnstile> Conj Q (distinguishing_conjunct I \<psi>s)"
+    using models_full_models_dist_subset
+      and distinguishing_conjunct_def
+    by (smt (verit, ccfv_threshold) hml_models.simps(5))
+qed
 
 
 lemma dist_conj_non_empty_conj:
