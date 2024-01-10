@@ -421,43 +421,19 @@ proof -
                      else (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s) (SOME i. i \<in> I)))" by simp
 
       then have "p \<Turnstile> hml.Conj Q
-           (\<lambda>q. if I = {} then hml_conjunct.Pos (hml.Internal (hml_srbb_conjunction_to_hml (hml_srbb_conjunction.Conj {} undefined)))
-                else (if \<exists>i\<in>I. \<not> hml_conjunct_models q ((hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s) i)
-                     then (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s) (SOME i. i \<in> I \<and> \<not> hml_conjunct_models q ((hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s) i))
-                     else (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s) (SOME i. i \<in> I)))"
-        unfolding hml_srbb_conjunction_to_hml.simps.
-
-      then have "p \<Turnstile> hml.Conj Q
-           (\<lambda>q. if I = {} then hml_srbb_conjunct_to_hml_conjunct (hml_srbb_conjunct.Pos (hml_srbb_conjunction.Conj {} undefined))
-                else (if \<exists>i\<in>I. \<not> hml_conjunct_models q ((hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s) i)
-                     then (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s) (SOME i. i \<in> I \<and> \<not> hml_conjunct_models q ((hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s) i))
-                     else (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s) (SOME i. i \<in> I)))"
-        unfolding hml_srbb_conjunct_to_hml_conjunct.simps.
-
-      then have "p \<Turnstile> hml.Conj Q
            (\<lambda>q. if I = {} then hml_srbb_conjunct_to_hml_conjunct (hml_srbb_conjunct.Pos (hml_srbb_conjunction.Conj {} undefined))
                 else (if \<exists>i\<in>I. \<not> hml_conjunct_models q (hml_srbb_conjunct_to_hml_conjunct (\<psi>s i))
                      then (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s) (SOME i. i \<in> I \<and> \<not> hml_conjunct_models q (hml_srbb_conjunct_to_hml_conjunct (\<psi>s i)))
                      else (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s) (SOME i. i \<in> I)))"
-        unfolding hml_models.simps(5) and comp_apply.
-
-      then have "p \<Turnstile> hml.Conj Q
-           (\<lambda>q. if I = {} then hml_srbb_conjunct_to_hml_conjunct (hml_srbb_conjunct.Pos (hml_srbb_conjunction.Conj {} undefined))
-                else hml_srbb_conjunct_to_hml_conjunct (if \<exists>i\<in>I. \<not> hml_conjunct_models q (hml_srbb_conjunct_to_hml_conjunct (\<psi>s i))
-                     then \<psi>s (SOME i. i \<in> I \<and> \<not> hml_conjunct_models q (hml_srbb_conjunct_to_hml_conjunct (\<psi>s i)))
-                     else \<psi>s (SOME i. i \<in> I)))" 
-        by (smt (verit) comp_apply hml_models.simps(5))
-
-      then have "p \<Turnstile> hml.Conj Q
-          (hml_srbb_conjunct_to_hml_conjunct \<circ>
-           (\<lambda>q. if I = {} then hml_srbb_conjunct.Pos (hml_srbb_conjunction.Conj {} undefined)
-                else if \<exists>i\<in>I. \<not> hml_conjunct_models q (hml_srbb_conjunct_to_hml_conjunct (\<psi>s i))
-                     then \<psi>s (SOME i. i \<in> I \<and> \<not> hml_conjunct_models q (hml_srbb_conjunct_to_hml_conjunct (\<psi>s i)))
-                     else \<psi>s (SOME i. i \<in> I)))" 
-        by (smt (verit, ccfv_threshold) LTS_Tau.hml_models.simps(5) comp_apply)
+        unfolding hml_models.simps(5)
+              and comp_apply
+              and hml_srbb_conjunct_to_hml_conjunct.simps
+              and hml_srbb_conjunction_to_hml.simps.
 
       then show "p \<Turnstile> hml.Conj Q (hml_srbb_conjunct_to_hml_conjunct \<circ> distinguishing_conjunct I \<psi>s)"
-        unfolding distinguishing_conjunct_def and hml_srbb_conjunct_models.simps.
+        unfolding distinguishing_conjunct_def
+              and hml_srbb_conjunct_models.simps
+        by (smt (verit, ccfv_threshold) LTS_Tau.hml_models.simps(5) comp_apply)
     qed
   next
     fix q
