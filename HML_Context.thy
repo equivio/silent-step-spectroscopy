@@ -24,6 +24,12 @@ primrec
 context LTS_Tau
 begin
 
+lemma pre_subst:
+  assumes "\<phi>l \<Rrightarrow> \<phi>r"
+      and "\<phi> \<Rrightarrow> fill_pre \<phi>l C" 
+  shows "\<phi> \<Rrightarrow> fill_pre \<phi>r C"
+    oops
+
 lemma pre_cong:
   assumes "\<phi>l \<Rrightarrow> \<phi>r"
   shows "fill_pre \<phi>l C \<Rrightarrow> fill_pre \<phi>r C"

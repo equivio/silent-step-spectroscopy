@@ -145,12 +145,6 @@ lemma pos_pre_subst:
   shows "\<psi> \<and>\<Rrightarrow> (Pos \<phi>r)" 
   using assms by (simp add: hml_conjunct_impl_def hml_impl_iffI)
 
-lemma pre_subst:
-  assumes "\<phi>l \<Rrightarrow> \<phi>r"
-      and "\<phi> \<Rrightarrow> fill_pre \<phi>l C" 
-  shows "\<phi> \<Rrightarrow> fill_pre \<phi>r C"
-    oops
-
 lemma neg_pre_subst: 
   assumes "\<phi>l \<Rrightarrow> \<phi>r"
       and "(Neg \<phi>l) \<and>\<Rrightarrow> \<psi>" 
