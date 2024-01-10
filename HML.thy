@@ -96,7 +96,8 @@ end (* context Inhabited_Tau_LTS *)
 context LTS_Tau
 begin
 
-\<comment> \<open> Pre-Order \<close>
+
+section \<open> Pre-Order \<close>
 
 definition hml_impl :: "('a, 's) hml \<Rightarrow> ('a, 's) hml \<Rightarrow> bool" (infix "\<Rrightarrow>" 60)  where
   "\<phi>l \<Rrightarrow> \<phi>r \<equiv> (\<forall>p. (p \<Turnstile> \<phi>l) \<longrightarrow> (p \<Turnstile> \<phi>r))"
@@ -113,7 +114,8 @@ definition hml_conjunct_impl :: "('a, 's) hml_conjunct \<Rightarrow> ('a, 's) hm
 lemma hml_conjunct_impl_preord: "reflp (\<and>\<Rrightarrow>) \<and> transp (\<and>\<Rrightarrow>)"
   by (metis hml_conjunct_impl_def reflpI transpI)
 
-\<comment> \<open> Pre-Substitution \<close>
+
+subsection \<open> Pre-Substitution \<close>
 
 lemma obs_pre_subst:
   assumes "\<phi>l \<Rrightarrow> \<phi>r"
@@ -151,7 +153,8 @@ lemma neg_pre_subst:
   shows "(Neg \<phi>r) \<and>\<Rrightarrow> \<psi>"
   using assms and hml_conjunct_impl_def hml_impl_iffI by auto
 
-\<comment> \<open> Pre-Congruence \<close>
+
+subsection \<open> Pre-Congruence \<close>
 
 lemma obs_pre_cong:
   assumes "\<phi>l \<Rrightarrow> \<phi>r"
@@ -193,7 +196,8 @@ lemma neg_pre_cong:
   shows "Neg \<phi>r \<and>\<Rrightarrow> Neg \<phi>l"
   using assms and hml_conjunct_impl_def hml_impl_def by auto
 
-\<comment> \<open> Know Pre-Order Elements\<close>
+
+subsection \<open> Know Pre-Order Elements\<close>
 
 lemma pre_\<epsilon>: "\<phi> \<Rrightarrow> (Internal \<phi>)"
   using silent_reachable.intros(1) hml_impl_def by fastforce
@@ -205,7 +209,7 @@ lemma \<epsilon>_eats_\<tau>: "(Internal (Obs \<tau> \<phi>)) \<Rrightarrow> (In
   using silent_reachable_append_\<tau> hml_impl_def by fastforce
 
 
-\<comment> \<open> Equivalence \<close>
+section \<open> Equivalence \<close>
 
 definition hml_eq :: "('a, 's) hml \<Rightarrow> ('a, 's) hml \<Rightarrow> bool" (infix "\<Lleftarrow>\<Rrightarrow>" 60)  where
   "\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r \<equiv> \<phi>l \<Rrightarrow> \<phi>r \<and> \<phi>r \<Rrightarrow> \<phi>l"
@@ -222,13 +226,8 @@ definition hml_conjunct_eq :: "('a, 's) hml_conjunct \<Rightarrow> ('a, 's) hml_
 lemma hml_conjunct_eq_equiv: "equivp (\<Lleftarrow>\<and>\<Rrightarrow>)"
   by (smt (verit, best) equivpI hml_conjunct_eq_def hml_conjunct_impl_def reflpI sympI transpI)
 
-end
 
-
-\<comment> \<open> Substitution \<close>
-
-context LTS_Tau
-begin
+subsection \<open> Substitution \<close>
 
 lemma obs_subst:
   assumes "\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r"
@@ -273,7 +272,7 @@ lemma neg_subst:
   by (meson LTS_Tau.neg_pre_subst hml_conjunct_eq_def hml_conjunct_impl_def hml_eq_def)
 
 
-\<comment> \<open> Congruence Properties\<close>
+subsection \<open> Congruence \<close>
 
 lemma obs_cong:
   assumes "\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r"
@@ -417,7 +416,7 @@ lemma neg_cong:
   by (meson hml_conjunct_eq_def hml_conjunct_impl_def hml_conjunct_models.simps(2) hml_eq_def hml_impl_def)
 
 
-\<comment> \<open> Know Equivalence Elements\<close>
+subsection \<open> Know Equivalence Elements\<close>
 
 lemma \<epsilon>\<tau>_is_\<tau>: "(Internal (Silent \<phi>)) \<Lleftarrow>\<Rrightarrow> (Internal \<phi>)"
   unfolding hml_eq_def
@@ -557,7 +556,7 @@ qed
 
 end (* Inhabited_Tau_LTS *)
 
-\<comment> \<open> Distinguishing Formulas \<close>
+section \<open> Distinguishing Formulas \<close>
 
 context LTS_Tau
 begin
@@ -568,6 +567,8 @@ definition dist :: "'s \<Rightarrow> ('a, 's) hml \<Rightarrow> 's \<Rightarrow>
 definition distFrom :: "'s \<Rightarrow> ('a, 's) hml \<Rightarrow> 's set \<Rightarrow> bool" ("_ <> _ _" [70, 70, 70] 80) where
   "(p <> \<phi> Q) \<equiv> (\<forall>q \<in> Q. p <> \<phi> q)"
 
+
+subsection \<open> Distinguishing Conjunction Thinning \<close>
 
 lemma
   fixes Q :: "'s set"
