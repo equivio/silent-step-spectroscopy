@@ -274,22 +274,36 @@ lemma neg_subst:
 
 subsection \<open> Congruence \<close>
 
+text \<open>
+The lemmata in this subsection all follow a similar form:
+  Given that two formulas (\<phi>l and \<phi>r) are equivalent,
+  then these two formulas wrapped in the same context are also equivalent.
+The lemmata differ in the choice of context.
+\<close>
+
+text \<open> Prepending an observation (\<langle>\<alpha>\<rangle>...) preserves equivalence. \<close>
 lemma obs_cong:
   assumes "\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r"
   shows "(Obs \<alpha> \<phi>l) \<Lleftarrow>\<Rrightarrow> (Obs \<alpha> \<phi>r)"
   using assms
   by (meson hml_eq_def hml_impl_def hml_models.simps(2))
 
+text \<open> Prepending an epsilon (\<langle>\<epsilon>\<rangle>...) preserves equivalence. \<close>
 lemma internal_cong:
   assumes "\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r"
   shows "(Internal \<phi>l) \<Lleftarrow>\<Rrightarrow> (Internal \<phi>r)"
   using assms and hml_eq_def and hml_impl_def by auto
 
+text \<open> Prepending a silent observation ((\<tau>)...) preserves equivalence. \<close>
 lemma silent_cong:
   assumes "\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r"
   shows "(Silent \<phi>l) \<Lleftarrow>\<Rrightarrow> (Silent \<phi>r)"
   using assms and hml_eq_def and hml_impl_def by auto
 
+text \<open>
+Wrapping two equivalent conjunction formulas in otherwise the same conjunction,
+will result in two equivalent conjunctions.
+\<close>
 lemma conj_cong:
   assumes "\<psi>sl ` I = \<psi>sr ` I"
       and "(\<psi>sl l) \<Lleftarrow>\<and>\<Rrightarrow> (\<psi>sr r)"
@@ -343,6 +357,11 @@ proof -
   qed
 qed
 
+text \<open>
+Wrapping two equivalent conjunction formulas in otherwise the same conjunction,
+will result in two equivalent conjunctions.
+This differs from conj\_cong in how the index set is extended.
+\<close>
 lemma conj_cong':
   assumes "s \<notin> I"
       and "\<psi>sl ` I = \<psi>sr ` I"
@@ -350,6 +369,10 @@ lemma conj_cong':
   shows "(Conj (I \<union> {s}) \<psi>sl) \<Lleftarrow>\<Rrightarrow> (Conj (I \<union> {s}) \<psi>sr)"
   using assms and conj_cong by presburger
 
+text \<open>
+Wrapping two sets of equivalent conjunction formulas in otherwise the same conjunction,
+will result in two equivalent conjunctions.
+\<close>
 lemma conj_congs:
   assumes "\<forall>i \<in> I. \<psi>sl i = \<psi>sr i"
       and "\<forall>i \<in> I'. (\<psi>sl i) \<Lleftarrow>\<and>\<Rrightarrow> (\<psi>sr i)"
@@ -396,6 +419,11 @@ proof -
   qed
 qed
 
+text \<open>
+Wrapping two sets of equivalent conjunction formulas in otherwise the same conjunction,
+will result in two equivalent conjunctions.
+This differs from conj\_congs in how the index set is extended.
+\<close>
 lemma conj_congs':
   assumes "I \<inter> I' = {}"
       and "\<forall>i \<in> I. \<psi>sl i = \<psi>sr i"
@@ -403,12 +431,14 @@ lemma conj_congs':
   shows "(Conj (I \<union> I') \<psi>sl) \<Lleftarrow>\<Rrightarrow> (Conj (I \<union> I') \<psi>sr)"
   using assms and conj_congs by presburger
 
+text \<open> Two equivalent formulas are also equivalent when used as conjuncts. \<close>
 lemma pos_cong:
   assumes "\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r"
   shows "(Pos \<phi>l) \<Lleftarrow>\<and>\<Rrightarrow> (Pos \<phi>r)"
   using assms
   by (simp add: hml_conjunct_eq_def hml_conjunct_impl_def hml_eq_def hml_impl_def)
 
+text \<open> Two equivalent formulas are also equivalent when negated. \<close>
 lemma neg_cong:
   assumes "\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r"
   shows "(Neg \<phi>l) \<Lleftarrow>\<and>\<Rrightarrow> (Neg \<phi>r)"
@@ -418,6 +448,7 @@ lemma neg_cong:
 
 subsection \<open> Know Equivalence Elements\<close>
 
+text \<open> \<langle>\<epsilon>\<rangle>(\<tau>)\<phi> is equivalent to \<langle>\<epsilon>\<rangle>\<phi> \<close>
 lemma \<epsilon>\<tau>_is_\<tau>: "(Internal (Silent \<phi>)) \<Lleftarrow>\<Rrightarrow> (Internal \<phi>)"
   unfolding hml_eq_def
 proof (rule conjI)
@@ -442,6 +473,7 @@ next
   qed
 qed
 
+text \<open> \<langle>\<epsilon>\<rangle>\<top> is equivalent to \<top> \<close>
 lemma \<epsilon>T_is_T: "(Internal TT) \<Lleftarrow>\<Rrightarrow> TT"
   by (simp add: LTS_Tau.pre_\<epsilon> hml_eq_def hml_impl_def)
 
@@ -449,6 +481,7 @@ fun n_\<epsilon>\<tau>s_then :: "nat \<Rightarrow> ('a, 's) hml \<Rightarrow> ('
   "n_\<epsilon>\<tau>s_then 0 cont = cont" |
   "n_\<epsilon>\<tau>s_then (Suc n) cont = (Internal (Silent (n_\<epsilon>\<tau>s_then n cont)))"
 
+text \<open> [\<langle>\<epsilon>\<rangle>(\<tau>)]^n \<langle>\<epsilon>\<rangle>\<phi> is equivalent to \<langle>\<epsilon>\<rangle>\<phi> \<close>
 lemma \<epsilon>\<tau>_stack_reduces: "n_\<epsilon>\<tau>s_then n (Internal \<phi>) \<Lleftarrow>\<Rrightarrow> (Internal \<phi>)"
   apply (induct n)
   apply (simp add: LTS_Tau.hml_impl_iffI hml_eq_def)
@@ -456,12 +489,14 @@ lemma \<epsilon>\<tau>_stack_reduces: "n_\<epsilon>\<tau>s_then n (Internal \<ph
   using \<epsilon>\<tau>_is_\<tau>
   by (smt (verit, del_insts) hml_eq_def hml_impl_iffI hml_models.simps(3) pre_\<epsilon> silent_reachable_trans)
 
+text \<open> wrapping two equivalent formulas into n \<langle>\<epsilon>\<rangle>(\<tau>) prefixes, yields two equivalent formulas. \<close>
 lemma n_\<epsilon>\<tau>s_then_cong:
   assumes "\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r"
   shows "n_\<epsilon>\<tau>s_then n \<phi>l \<Lleftarrow>\<Rrightarrow> n_\<epsilon>\<tau>s_then n \<phi>r"
   using assms
   by (induct n) (simp add: internal_cong silent_cong)+
 
+text \<open> [\<langle>\<epsilon>\<rangle>(\<tau>)]^n\<top> is equivalent to \<top> \<close>
 lemma "n_\<epsilon>\<tau>s_then n TT \<Lleftarrow>\<Rrightarrow> TT"
   using n_\<epsilon>\<tau>s_then_cong
     and \<epsilon>\<tau>_stack_reduces
@@ -470,11 +505,13 @@ lemma "n_\<epsilon>\<tau>s_then n TT \<Lleftarrow>\<Rrightarrow> TT"
     and hml_eq_equiv
   by metis
 
+text \<open> \<top> is equivalent to \<And>{} \<close>
 lemma T_is_empty_conj: "TT \<Lleftarrow>\<Rrightarrow> Conj {} \<psi>s"
   using tt_eq_empty_conj
     and hml_eq_equality
   by blast
 
+text \<open> \<top> is equivalent to \<langle>\<epsilon>\<rangle>\<And>{} \<close>
 lemma T_is_\<epsilon>_empty_conj: "TT \<Lleftarrow>\<Rrightarrow> Internal (Conj {} \<psi>s)"
   using \<epsilon>T_is_T
      and T_is_empty_conj
@@ -485,19 +522,24 @@ end
 context Inhabited_Tau_LTS
 begin
 
+text \<open> \<phi>l \<and> \<phi>r is equivalent to \<phi>r \<and> \<phi>l \<close>
 lemma hml_and_commutative: "(\<phi>l \<and>hml \<phi>r) \<Lleftarrow>\<Rrightarrow> (\<phi>r \<and>hml \<phi>l)"
   using Inhabited_LTS_axioms Inhabited_LTS_def hml_eq_equality by fastforce
 
+text \<open> \<top> \<and> \<phi> is equivalent to \<phi> \<close>
 lemma hml_and_left_tt: "(Pos TT \<and>hml Pos \<phi>) \<Lleftarrow>\<Rrightarrow> \<phi>"
   using Inhabited_LTS_axioms Inhabited_LTS_def hml_eq_equality by fastforce
 
+text \<open> \<phi> \<and> \<top> is equivalent to \<phi> \<close>
 lemma hml_and_right_tt: "(Pos \<phi> \<and>hml Pos TT) \<Lleftarrow>\<Rrightarrow> \<phi>"
   using hml_and_commutative and hml_and_left_tt
   by (simp add: hml_eq_equality)
 
+text \<open> \<phi> \<and> \<phi> is equivalent to \<phi> \<close>
 lemma hml_and_same_no_and: "(Pos \<phi> \<and>hml Pos \<phi>) \<Lleftarrow>\<Rrightarrow> \<phi>"
   by (simp add: hml_eq_equality)
 
+text \<open> \<And>({\<psi>} \<union> \<Psi>) is equivalent to \<psi> \<and> \<And>\<Psi> \<close>
 lemma conj_extract_conjunct:
   assumes "s \<notin> I"
   shows "Conj (I \<union> {s}) (\<lambda>i. if i = s then \<psi> else \<psi>s i) \<Lleftarrow>\<Rrightarrow> (\<psi> \<and>hml Pos (Conj I \<psi>s))"
@@ -541,6 +583,7 @@ proof -
   qed
 qed
 
+text \<open> \<And>({\<top>} \<union> \<Psi>) is equivalent to \<And>\<Psi> \<close>
 lemma
   assumes "s \<notin> I"
   shows "Conj (I \<union> {s}) (\<lambda>i. if i = s then Pos TT else \<psi>s i) \<Lleftarrow>\<Rrightarrow> Conj I \<psi>s"
