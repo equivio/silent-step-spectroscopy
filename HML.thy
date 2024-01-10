@@ -48,7 +48,7 @@ where
   "(hml_conjunct_models p (Neg \<phi>)) = (\<not>(p \<Turnstile> \<phi>))"
 
 
-lemma "(state \<Turnstile> TT) = (state \<Turnstile> Conj {} \<psi>)"
+lemma tt_eq_empty_conj: "(state \<Turnstile> TT) = (state \<Turnstile> Conj {} \<psi>)"
   by simp
 
 lemma opt_\<tau>_is_or: "(p \<Turnstile> (Silent \<phi>)) = ((p \<Turnstile> (Obs \<tau> \<phi>)) \<or> (p \<Turnstile> \<phi>))"
@@ -622,6 +622,16 @@ lemma "n_\<epsilon>\<tau>s_then n TT \<Lleftarrow>\<Rrightarrow> TT"
     and equivp_def
     and hml_eq_equiv
   by metis
+
+lemma T_is_empty_conj: "TT \<Lleftarrow>\<Rrightarrow> Conj {} \<psi>s"
+  using tt_eq_empty_conj
+    and hml_eq_equality
+  by blast
+
+lemma T_is_\<epsilon>_empty_conj: "TT \<Lleftarrow>\<Rrightarrow> Internal (Conj {} \<psi>s)"
+  using \<epsilon>T_is_T
+     and T_is_empty_conj
+  by (meson LTS_Tau.internal_subst equivp_symp hml_eq_equiv)
 
 end
 
