@@ -21,7 +21,7 @@ type_synonym 'gstate fplay = "'gstate list"
 
 text\<open>An energy games is played on a directed graph labeled by energy updates. We limit ourselves to 
 the case where only the attacker can run out of energy if the energy level reaches the 
-defender_win_level.\<close>
+\<open>defender_win_level\<close>.\<close>
 
 locale energy_game =
   fixes weight_opt :: "'gstate \<Rightarrow> 'gstate \<Rightarrow> 'energy update option" and
