@@ -345,77 +345,31 @@ qed
 lemma dist_stableconj_thinn:
   defines 
     "distinguishing_conjunct \<equiv> (\<lambda>I.\<lambda>\<psi>s.
-       \<lambda>q. if \<exists>i \<in> I. \<not>(hml_srbb_conjunct_models (\<psi>s i) q)
-           then \<psi>s (SOME i. i \<in> I \<and> \<not>(hml_srbb_conjunct_models (\<psi>s i) q))
-           else \<psi>s (SOME i. i \<in> I))" (* This if-then-else is necessary, as the distinction might come from the stability condition, thereby allowing q to satisfy all conjuncts. *)
+       \<lambda>q. if I = {}
+           then Pos (Conj {} undefined)
+           else if \<exists>i \<in> I. \<not>(hml_srbb_conjunct_models (\<psi>s i) q)
+                then \<psi>s (SOME i. i \<in> I \<and> \<not>(hml_srbb_conjunct_models (\<psi>s i) q))
+                else \<psi>s (SOME i. i \<in> I))"
+  (* These if-then-else's are necessary, as the distinction might come from the stability condition.
+     If that is the case then the stability condition could be the only distinction from some or even all elements of Q.
+     Due to the way that StableConj is translated (via two stacked conjunctions, c.f. the translate function),
+     this can lead to the situation where I might be empty (i.e. there are no conjuncts apart from the stability
+     condition) or there may be conjuncts via I, but some elements of Q model all of these (i.e. so they are
+     distinguished from p only via the stability condition).  Since we want to pick a conjunct for each element in Q,
+     we must describe what to do in these cases. *)
   assumes "distinguishes_from_\<chi> (StableConj I \<psi>s) p Q"
   shows "distinguishes_from_\<chi> (StableConj Q (distinguishing_conjunct I \<psi>s)) p Q"
-  using assms(2)
-  unfolding distinguishes_from_\<chi>_def
-        and distinguishes_\<chi>_def
-        and hml_srbb_conjunction_models.simps
-        and hml_srbb_conjunction_to_hml.simps
-proof -
-  assume "\<forall>q\<in>Q. p \<Turnstile> hml_conjunct.Neg
-              (hml.Obs \<tau> hml.TT) \<and>hml hml_conjunct.Pos (hml.Conj I (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s)) \<and>
-         \<not> q \<Turnstile> hml_conjunct.Neg
-                 (hml.Obs \<tau> hml.TT) \<and>hml hml_conjunct.Pos (hml.Conj I (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s))"
-  hence "\<forall>q\<in>Q. p <> (hml_conjunct.Neg (hml.Obs \<tau> hml.TT) 
-                     \<and>hml hml_conjunct.Pos (hml.Conj I (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s)))
-               q"
-    using dist_def by blast
-
-  with hml_and_dist_disj
-  have p_models_q_not_either:
-       "\<forall>q\<in>Q. p \<Turnstile> (hml_conjunct.Neg (hml.Obs \<tau> hml.TT)) 
-                    \<and>hml (hml_conjunct.Pos (hml.Conj I (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s)))
-            \<and> (\<not> hml_conjunct_models q (hml_conjunct.Neg (hml.Obs \<tau> hml.TT)) \<or> \<not> hml_conjunct_models q (hml_conjunct.Pos (hml.Conj I (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s))))"
-    by auto
-
-  show "\<forall>q\<in>Q. p \<Turnstile> hml_conjunct.Neg (hml.Obs \<tau> hml.TT)
-                  \<and>hml hml_conjunct.Pos (hml.Conj Q (hml_srbb_conjunct_to_hml_conjunct \<circ> distinguishing_conjunct I \<psi>s))
-            \<and> \<not> q \<Turnstile> hml_conjunct.Neg (hml.Obs \<tau> hml.TT)
-                  \<and>hml hml_conjunct.Pos (hml.Conj Q (hml_srbb_conjunct_to_hml_conjunct \<circ> distinguishing_conjunct I \<psi>s))"
-  proof (rule ballI, rule conjI)
-    fix q
-    assume "q \<in> Q"
-    with p_models_q_not_either
-    have "p \<Turnstile> (hml_conjunct.Neg (hml.Obs \<tau> hml.TT)) \<and>hml (hml_conjunct.Pos (hml.Conj I (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s)))"
-      by auto
-    with hml_and_and
-    have "hml_conjunct_models p (hml_conjunct.Neg (hml.Obs \<tau> hml.TT))
-        \<and> hml_conjunct_models p (hml_conjunct.Pos (hml.Conj I (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s)))"
-      by blast
-    hence "hml_conjunct_models p (hml_conjunct.Neg (hml.Obs \<tau> hml.TT))"
-      and "hml_conjunct_models p (hml_conjunct.Pos (hml.Conj I (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s)))"
-      by auto
-     
-    from \<open>hml_conjunct_models p (hml_conjunct.Pos (hml.Conj I (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s)))\<close>
-    have "hml_conjunct_models p (hml_conjunct.Pos (hml.Conj Q (hml_srbb_conjunct_to_hml_conjunct \<circ> distinguishing_conjunct I \<psi>s)))"
-      using distinguishing_conjunct_def and models_full_models_dist_subset and dist_conj_non_empty_conj
-      sorry
-
-    from \<open>hml_conjunct_models p (hml_conjunct.Neg (hml.Obs \<tau> hml.TT))\<close>
-      and \<open>hml_conjunct_models p (hml_conjunct.Pos (hml.Conj Q (hml_srbb_conjunct_to_hml_conjunct \<circ> distinguishing_conjunct I \<psi>s)))\<close>
-    show "p \<Turnstile> hml_conjunct.Neg (hml.Obs \<tau> hml.TT)
-             \<and>hml hml_conjunct.Pos (hml.Conj Q (hml_srbb_conjunct_to_hml_conjunct \<circ> distinguishing_conjunct I \<psi>s))"
-      using hml_and_and by auto
-  next
-    fix q
-    assume "q \<in> Q"
-    show "\<not> q \<Turnstile> hml_conjunct.Neg (hml.Obs \<tau> hml.TT)
-                \<and>hml hml_conjunct.Pos (hml.Conj Q (hml_srbb_conjunct_to_hml_conjunct \<circ> distinguishing_conjunct I \<psi>s))"
-      sorry
-  qed
-qed
+  oops
 
 
 lemma dist_branchconj_thinn:
   defines 
     "distinguishing_conjunct \<equiv> (\<lambda>I.\<lambda>\<psi>s.
-       \<lambda>q. if \<exists>i \<in> I. \<not>(hml_srbb_conjunct_models (\<psi>s i) q)
-           then \<psi>s (SOME i. i \<in> I \<and> \<not>(hml_srbb_conjunct_models (\<psi>s i) q))
-           else \<psi>s (SOME i. i \<in> I))" (* This if-then-else is necessary, as the distinction might come from the stability condition, thereby allowing q to satisfy all conjuncts. *)
+       \<lambda>q. if I = {}
+           then Pos (Conj {} undefined)
+           else if \<exists>i \<in> I. \<not>(hml_srbb_conjunct_models (\<psi>s i) q)
+                then \<psi>s (SOME i. i \<in> I \<and> \<not>(hml_srbb_conjunct_models (\<psi>s i) q))
+                else \<psi>s (SOME i. i \<in> I))" (* c.f. dist_stableconj_thinn for an explanation of this function. *)
   assumes "distinguishes_from_\<chi> (BranchConj \<alpha> \<phi> I \<psi>s) p Q"
   shows "distinguishes_from_\<chi> (BranchConj \<alpha> \<phi> Q (distinguishing_conjunct I \<psi>s)) p Q"
   oops
