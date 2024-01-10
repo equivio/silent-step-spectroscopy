@@ -472,26 +472,14 @@ proof -
         using someI_ex by (smt (verit))
 
       then have "\<not> hml_conjunct_models q (hml_srbb_conjunct_to_hml_conjunct
-                                          (\<psi>s (SOME i. i \<in> I \<and> \<not>(hml_srbb_conjunct_models (\<psi>s i) q))))"
-        unfolding hml_srbb_conjunct_models.simps by simp
-
-      then have "\<not> hml_conjunct_models q (hml_srbb_conjunct_to_hml_conjunct
                                           (if \<exists>i \<in> I. \<not>(hml_srbb_conjunct_models (\<psi>s i) q)
                                            then \<psi>s (SOME i. i \<in> I \<and> \<not>(hml_srbb_conjunct_models (\<psi>s i) q))
                                            else \<psi>s (SOME i. i \<in> I)))"
+        unfolding hml_srbb_conjunct_models.simps
         using \<open>\<exists>i\<in>I. \<not> hml_srbb_conjunct_models (\<psi>s i) q\<close> by simp
 
-      then have "\<not> hml_conjunct_models q (hml_srbb_conjunct_to_hml_conjunct (distinguishing_conjunct I \<psi>s q))"
-        using red_dist_conjunct by simp
-
-      then have "\<not> hml_conjunct_models q ((hml_srbb_conjunct_to_hml_conjunct \<circ> distinguishing_conjunct I \<psi>s) q)"
-        using comp_apply by simp
-
-      then have "\<exists>q' \<in> Q. \<not> hml_conjunct_models q ((hml_srbb_conjunct_to_hml_conjunct \<circ> distinguishing_conjunct I \<psi>s) q')"
-        using \<open>q \<in> Q\<close> by blast
-
       then show "\<not> (\<forall>q'\<in>Q. hml_conjunct_models q ((hml_srbb_conjunct_to_hml_conjunct \<circ> distinguishing_conjunct I \<psi>s) q'))"
-        by auto
+        using \<open>q \<in> Q\<close> and comp_apply and red_dist_conjunct by force
     qed
   qed
 qed
