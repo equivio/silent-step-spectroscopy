@@ -41,7 +41,7 @@ abbreviation weighted_move :: "'gstate \<Rightarrow> 'energy update \<Rightarrow
 abbreviation "weight g1 g2 \<equiv> the (weight_opt g1 g2)"
 
 text\<open>Starting with some energy at some state the resulting energy level after a valid play can be 
-calculated as follwos:\<close>
+calculated as follows:\<close>
 
 fun energy_level :: "'gstate \<Rightarrow> 'energy \<Rightarrow>'gstate fplay \<Rightarrow> 'energy" where
   "energy_level g0 e0 p = (
@@ -88,13 +88,13 @@ qed
 subsection \<open>Finite Plays\<close>
 
 text\<open>We already spoke of "valid games". By this we mean lists of states where an edge from one 
-state to the next in the list exists. In the finite case this is represented as finite_play.\<close>
+state to the next in the list exists. In the finite case this is represented as \<open>finite_play\<close>.\<close>
 
 inductive finite_play :: "'gstate \<Rightarrow> 'gstate fplay \<Rightarrow> bool" where
   "finite_play g0 [g0]" |
   "finite_play g0 (p @ [gn])" if "finite_play g0 p" and "last p \<Zinj> gn"
 
-text\<open>Some potentially helpful lemmata follow:\<close>
+text\<open>Some potentially helpful lemmas follow:\<close>
 
 lemma finite_play_prefix:
   assumes "finite_play g0 (a @ b)" "a \<noteq> []"
@@ -175,7 +175,7 @@ qed
 
 subsection \<open>Winning\<close>
 
-text\<open>Energy games can be won. An infinte game is won by the defender. A finite play is won if it's 
+text\<open>Energy games can be won. An infinite game is won by the defender. A finite play is won if it's 
 stuck (i.e. there are no more possible moves) and it is the other players turn. Since we for now
 only consider finite plays we will need to define stuckness.\<close>
 
@@ -251,8 +251,8 @@ lemma in_wina_Ga:
   using assms(1) assms(2) in_wina.simps by blast
 
 text\<open>The intuitively true statement "with more energy the attacker will win at least as much as 
-before" can be proven when given a partial order on energies such that the defender_win_level is the minimal energy,
-updates are monotonic and \<open>e \<ge> Upd(e)\<close> holds for all energies and updates:\<close>
+before" can be proven when given a partial order on energies such that the \<open>defender_win_leve\<close>l is 
+the minimal energy, updates are monotonic and \<open>e \<ge> Upd(e)\<close> holds for all energies and updates:\<close>
 
 lemma win_a_upwards_closure: 
   fixes ord::"'energy \<Rightarrow> 'energy \<Rightarrow> bool"
