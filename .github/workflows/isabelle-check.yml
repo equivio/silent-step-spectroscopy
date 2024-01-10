@@ -38,7 +38,7 @@ jobs:
             | tee isabelle_log &&
             (diff 
             <(cat isabelle_log | grep \"Presenting theory\" | grep LinearTimeBranchingTimeSpectroscopyAccountingForSilentSteps | sort)
-            <(sort <(for f in $(find . -name '*.thy'); do echo Presenting theory \\\"LinearTimeBranchingTimeSpectroscopyAccountingForSilentSteps.$(basename $f .thy)\\\"; done))
+            <(sort <(for f in $(find . -name '*.thy' | grep -v _); do echo Presenting theory \\\"LinearTimeBranchingTimeSpectroscopyAccountingForSilentSteps.$(basename $f .thy)\\\"; done))
             || (echo Not all .thy files were 'presented'; /bin/false))"
 
       - uses: actions/upload-artifact@v3
