@@ -26,10 +26,18 @@ jobs:
           path: ./out
           key: ${{ runner.os }}-out
 
-      - name: Isabelle-action
-        uses: TheHllm/isabelle-action@v1.10
+      - name: Isabelle
+        uses: 'docker://hllm/isabelle-docker'
         with:
-          session: LinearTimeBranchingTimeSpectroscopyAccountingForSilentSteps
+          entrypoint: /bin/bash
+          args: > 
+            -c "/home/isabelle/Isabelle/bin/isabelle build
+            -v
+            -o document=pdf
+            -o document_variants=document:outline=/proof,/ML
+            -P out
+            -d .
+            LinearTimeBranchingTimeSpectroscopyAccountingForSilentSteps"
       
       - name: Setup Pages
         uses: actions/configure-pages@v2

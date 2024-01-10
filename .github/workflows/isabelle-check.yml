@@ -23,11 +23,24 @@ jobs:
           path: ./out
           key: ${{ runner.os }}-out
 
-      - name: Isabelle-action
-        uses: TheHllm/isabelle-action@v1.10
+      - name: Isabelle
+        uses: 'docker://hllm/isabelle-docker'
         with:
-          session: LinearTimeBranchingTimeSpectroscopyAccountingForSilentSteps
-      
+          entrypoint: /bin/bash
+          args: > 
+            -c "/home/isabelle/Isabelle/bin/isabelle build
+            -v
+            -o document=pdf
+            -o document_variants=document:outline=/proof,/ML
+            -P out
+            -d .
+            LinearTimeBranchingTimeSpectroscopyAccountingForSilentSteps
+            | tee isabelle_log &&
+            (diff 
+            <(cat isabelle_log | grep \"Presenting theory\" | grep LinearTimeBranchingTimeSpectroscopyAccountingForSilentSteps | sort)
+            <(sort <(for f in $(find . -name '*.thy'); do echo Presenting theory \\\"LinearTimeBranchingTimeSpectroscopyAccountingForSilentSteps.$(basename $f .thy)\\\"; done))
+            || (echo Not all .thy files were 'presented'; /bin/false))"
+
       - uses: actions/upload-artifact@v3
         with:
           name: document
