@@ -56,9 +56,16 @@ fun hml_srbb_conjunction_models :: "('a, 's) hml_srbb_conjunction \<Rightarrow> 
 fun hml_srbb_conjunct_models :: "('a, 's) hml_srbb_conjunct \<Rightarrow> 's \<Rightarrow> bool" where
   "hml_srbb_conjunct_models \<psi> s = (hml_conjunct_models s (hml_srbb_conjunct_to_hml_conjunct \<psi>))"
 
+
 (*Some sanity checks*)
 
 lemma "(state \<Turnstile>SRBB TT) = (state \<Turnstile>SRBB ImmConj {} \<psi>s)"
+  by simp
+
+lemma "(state \<Turnstile>SRBB TT) = (hml_srbb_conjunction_models (Conj {} \<psi>s) state)"
+  by simp
+
+lemma "(state \<Turnstile>SRBB TT) = (hml_srbb_conjunction_models (Obs \<tau> TT) state)"
   by simp
 
 lemma "(state \<Turnstile>SRBB Internal \<chi>) = (state \<Turnstile>SRBB ImmConj {left} (\<lambda>i. if i = left then Pos \<chi> else undefined))"
@@ -236,6 +243,11 @@ proof -
     qed
   qed
 qed
+
+subsection \<open> Known Equivalence Elements \<close>
+
+lemma "Obs \<tau> TT \<Lleftarrow>\<chi>\<Rrightarrow> Conj {} \<psi>s"
+  by (simp add: hml_srbb_eq_\<chi>_def hml_srbb_impl_\<chi>_def)
 
 subsection \<open> Distinguishing Conjunction Thinning \<close>
 
