@@ -59,7 +59,7 @@ end (* context LTS_Tau *)
 context Inhabited_Tau_LTS
 begin
 
-lemma hml_and_and: "p \<Turnstile> (\<psi>l \<and>hml \<psi>r) = (hml_conjunct_models p \<psi>l \<and> hml_conjunct_models p \<psi>r)"
+lemma hml_and_and: "(p \<Turnstile> (\<psi>l \<and>hml \<psi>r)) = (hml_conjunct_models p \<psi>l \<and> hml_conjunct_models p \<psi>r)"
   unfolding hml_models.simps and hml_conjunct_models.simps
 proof (rule iffI)
   assume "\<forall>i\<in>{left, right}. hml_conjunct_models p (if i = left then \<psi>l else if i = right then \<psi>r else Pos TT)"
@@ -134,65 +134,94 @@ lemma hml_conjunct_impl_preord: "reflp (\<and>\<Rrightarrow>) \<and> transp (\<a
 
 \<comment> \<open> Pre-Substitution \<close>
 
-lemma obs_pre_subst: "\<phi>l \<Rrightarrow> \<phi>r \<Longrightarrow> \<phi> \<Rrightarrow> (Obs \<alpha> \<phi>l) \<Longrightarrow> \<phi> \<Rrightarrow> (Obs \<alpha> \<phi>r)"
-  using hml_impl_def by force
+lemma obs_pre_subst:
+  assumes "\<phi>l \<Rrightarrow> \<phi>r"
+      and "\<phi> \<Rrightarrow> (Obs \<alpha> \<phi>l)"
+  shows "\<phi> \<Rrightarrow> (Obs \<alpha> \<phi>r)"
+  using assms and hml_impl_def by force
 
-lemma internal_pre_subst: "\<phi>l \<Rrightarrow> \<phi>r \<Longrightarrow> \<phi> \<Rrightarrow> (Internal \<phi>l) \<Longrightarrow> \<phi> \<Rrightarrow> (Internal \<phi>r)"
-  using hml_impl_iffI by force
+lemma internal_pre_subst:
+  assumes "\<phi>l \<Rrightarrow> \<phi>r"
+      and "\<phi> \<Rrightarrow> (Internal \<phi>l)"
+  shows "\<phi> \<Rrightarrow> (Internal \<phi>r)"
+  using assms and hml_impl_iffI by force
 
-lemma silent_pre_subst: "\<phi>l \<Rrightarrow> \<phi>r \<Longrightarrow> \<phi> \<Rrightarrow> (Silent \<phi>l) \<Longrightarrow> \<phi> \<Rrightarrow> (Silent \<phi>r)"
-  using hml_impl_iffI by force
+lemma silent_pre_subst: 
+  assumes "\<phi>l \<Rrightarrow> \<phi>r"
+      and "\<phi> \<Rrightarrow> (Silent \<phi>l)"
+  shows "\<phi> \<Rrightarrow> (Silent \<phi>r)"
+  using assms and hml_impl_iffI by force
 
-lemma conj_pre_subst: "\<phi>l \<Rrightarrow> \<phi>r \<Longrightarrow> \<phi> \<Rrightarrow> (Conj (I \<union> {s}) (\<lambda>i. if i = s then Pos \<phi>l else \<psi>s i))
-                                \<Longrightarrow> \<phi> \<Rrightarrow> (Conj (I \<union> {s}) (\<lambda>i. if i = s then Pos \<phi>r else \<psi>s i))"
-  using hml_impl_iffI by fastforce
+lemma conj_pre_subst: 
+  assumes "\<phi>l \<Rrightarrow> \<phi>r"
+      and "\<phi> \<Rrightarrow> (Conj (I \<union> {s}) (\<lambda>i. if i = s then Pos \<phi>l else \<psi>s i))"
+  shows "\<phi> \<Rrightarrow> (Conj (I \<union> {s}) (\<lambda>i. if i = s then Pos \<phi>r else \<psi>s i))"
+  using assms and hml_impl_iffI by fastforce
 
-lemma pos_pre_subst: "\<phi>l \<Rrightarrow> \<phi>r \<Longrightarrow> \<psi> \<and>\<Rrightarrow> (Pos \<phi>l) \<Longrightarrow> \<psi> \<and>\<Rrightarrow> (Pos \<phi>r)" 
-  by (simp add: hml_conjunct_impl_def hml_impl_iffI)
+lemma pos_pre_subst:
+  assumes "\<phi>l \<Rrightarrow> \<phi>r"
+      and "\<psi> \<and>\<Rrightarrow> (Pos \<phi>l)" 
+  shows "\<psi> \<and>\<Rrightarrow> (Pos \<phi>r)" 
+  using assms by (simp add: hml_conjunct_impl_def hml_impl_iffI)
 
-lemma pre_subst: "\<phi>l \<Rrightarrow> \<phi>r \<Longrightarrow> \<phi> \<Rrightarrow> fill_pre \<phi>l C \<Longrightarrow> \<phi> \<Rrightarrow> fill_pre \<phi>r C"
-  apply (induct C arbitrary: \<phi>)
-  using hml_impl_iffI apply auto[1]
-  using hml_impl_iffI apply force
-  using hml_impl_preord internal_pre_subst reflpD apply fastforce
-  using hml_impl_preord reflpD silent_pre_subst apply fastforce
-proof -
-  fix I \<psi>s I' \<psi>s' \<phi> 
-  assume IH: "\<And>\<psi>' \<phi>. \<psi>' \<in> range \<psi>s' \<Longrightarrow> \<phi>l \<Rrightarrow> \<phi>r \<Longrightarrow> \<phi> \<Rrightarrow> fill_pre \<phi>l \<psi>' \<Longrightarrow> \<phi> \<Rrightarrow> fill_pre \<phi>r \<psi>'"
-         and "\<phi>l \<Rrightarrow> \<phi>r"
-         and "\<phi> \<Rrightarrow> fill_pre \<phi>l (ConjPC I \<psi>s I' \<psi>s')"
-  then show "\<phi> \<Rrightarrow> fill_pre \<phi>r (ConjPC I \<psi>s I' \<psi>s')"
-    unfolding fill_pre.simps
+lemma pre_subst:
+  assumes "\<phi>l \<Rrightarrow> \<phi>r"
+      and "\<phi> \<Rrightarrow> fill_pre \<phi>l C" 
+  shows "\<phi> \<Rrightarrow> fill_pre \<phi>r C"
     oops
 
-lemma neg_pre_subst: "\<phi>l \<Rrightarrow> \<phi>r \<Longrightarrow> (Neg \<phi>l) \<and>\<Rrightarrow> \<psi> \<Longrightarrow> (Neg \<phi>r) \<and>\<Rrightarrow> \<psi>"
-  using hml_conjunct_impl_def hml_impl_iffI by auto
+lemma neg_pre_subst: 
+  assumes "\<phi>l \<Rrightarrow> \<phi>r"
+      and "(Neg \<phi>l) \<and>\<Rrightarrow> \<psi>" 
+  shows "(Neg \<phi>r) \<and>\<Rrightarrow> \<psi>"
+  using assms and hml_conjunct_impl_def hml_impl_iffI by auto
 
 \<comment> \<open> Pre-Congruence \<close>
 
-lemma obs_pre_cong: "\<phi>l \<Rrightarrow> \<phi>r \<Longrightarrow> (Obs \<alpha> \<phi>l) \<Rrightarrow> (Obs \<alpha> \<phi>r)"
-  using hml_impl_iffI by auto
+lemma obs_pre_cong:
+  assumes "\<phi>l \<Rrightarrow> \<phi>r"
+  shows "(Obs \<alpha> \<phi>l) \<Rrightarrow> (Obs \<alpha> \<phi>r)"
+  using assms and hml_impl_iffI by auto
 
-lemma internal_pre_cong: "\<phi>l \<Rrightarrow> \<phi>r \<Longrightarrow> (Internal \<phi>l) \<Rrightarrow> (Internal \<phi>r)"
-  using hml_impl_iffI by auto
+lemma internal_pre_cong: 
+  assumes "\<phi>l \<Rrightarrow> \<phi>r"
+  shows "(Internal \<phi>l) \<Rrightarrow> (Internal \<phi>r)"
+  using assms and hml_impl_iffI by auto
 
-lemma silent_pre_cong: "\<phi>l \<Rrightarrow> \<phi>r \<Longrightarrow> (Silent \<phi>l) \<Rrightarrow> (Silent \<phi>r)"
-  using hml_impl_iffI by auto
+lemma silent_pre_cong: 
+  assumes "\<phi>l \<Rrightarrow> \<phi>r"
+  shows "(Silent \<phi>l) \<Rrightarrow> (Silent \<phi>r)"
+  using assms and hml_impl_iffI by auto
 
-lemma conj_pre_cong: "\<psi>sl ` I = \<psi>sr ` I \<Longrightarrow> \<psi>sl l \<and>\<Rrightarrow> \<psi>sr r \<Longrightarrow> (Conj (I \<union> {l}) \<psi>sl) \<Rrightarrow> (Conj (I \<union> {r}) \<psi>sr)"
+lemma conj_pre_cong: 
+  assumes "\<psi>sl ` I = \<psi>sr ` I"
+      and "\<psi>sl l \<and>\<Rrightarrow> \<psi>sr r" 
+  shows "(Conj (I \<union> {l}) \<psi>sl) \<Rrightarrow> (Conj (I \<union> {r}) \<psi>sr)"
+  using assms
   by (smt (verit) Un_insert_right hml_conjunct_impl_def hml_impl_def hml_models.simps(5) image_iff insert_iff sup_bot.right_neutral)
 
-lemma conj_pre_congs: "\<psi>sl ` I = \<psi>sr ` I \<Longrightarrow> \<forall>i \<in> I'. \<psi>sl i \<and>\<Rrightarrow> \<psi>sr i \<Longrightarrow> (Conj (I \<union> I') \<psi>sl) \<Rrightarrow> (Conj (I \<union> I') \<psi>sr)"
+lemma conj_pre_congs:
+  assumes "\<psi>sl ` I = \<psi>sr ` I"
+      and "\<forall>i \<in> I'. \<psi>sl i \<and>\<Rrightarrow> \<psi>sr i"
+  shows "(Conj (I \<union> I') \<psi>sl) \<Rrightarrow> (Conj (I \<union> I') \<psi>sr)"
+  using assms
   by (smt (verit, ccfv_threshold) LTS_Tau.hml_conjunct_impl_def UnE UnI1 hml_impl_iffI hml_models.simps(5) imageE imageI)
 
-lemma pos_pre_cong: "\<phi>l \<Rrightarrow> \<phi>r \<Longrightarrow> Pos \<phi>l \<and>\<Rrightarrow> Pos \<phi>r"
+lemma pos_pre_cong:
+  assumes "\<phi>l \<Rrightarrow> \<phi>r"
+  shows "Pos \<phi>l \<and>\<Rrightarrow> Pos \<phi>r"
+  using assms
   by (simp add: hml_conjunct_impl_def hml_impl_iffI)
 
-lemma neg_pre_cong: "\<phi>l \<Rrightarrow> \<phi>r \<Longrightarrow> Neg \<phi>r \<and>\<Rrightarrow> Neg \<phi>l"
-  using hml_conjunct_impl_def hml_impl_def by auto
+lemma neg_pre_cong:
+  assumes "\<phi>l \<Rrightarrow> \<phi>r"
+  shows "Neg \<phi>r \<and>\<Rrightarrow> Neg \<phi>l"
+  using assms and hml_conjunct_impl_def hml_impl_def by auto
 
-lemma pre_cong: "\<phi>l \<Rrightarrow> \<phi>r \<Longrightarrow> fill_pre \<phi>l C \<Rrightarrow> fill_pre \<phi>r C"
-  using hml_impl_def by (induct C) auto[5]
+lemma pre_cong:
+  assumes "\<phi>l \<Rrightarrow> \<phi>r"
+  shows "fill_pre \<phi>l C \<Rrightarrow> fill_pre \<phi>r C"
+  using assms and hml_impl_def by (induct C) auto[5]
 
 \<comment> \<open> Know Pre-Order Elements\<close>
 
@@ -204,6 +233,7 @@ lemma pre_\<tau>: "\<phi> \<Rrightarrow> (Silent \<phi>)"
 
 lemma \<epsilon>_eats_\<tau>: "(Internal (Obs \<tau> \<phi>)) \<Rrightarrow> (Internal \<phi>)"
   using silent_reachable_append_\<tau> hml_impl_def by fastforce
+
 
 \<comment> \<open> Equivalence \<close>
 
@@ -251,28 +281,52 @@ primrec
   "fill_conjunct \<phi> (PosC \<phi>') = (Pos (fill \<phi> \<phi>'))" |
   "fill_conjunct \<phi> (NegC \<phi>') = (Neg (fill \<phi> \<phi>'))"
 
-context LTS_Tau
-begin
 
 \<comment> \<open> Substitution \<close>
 
-lemma obs_subst: "\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r \<Longrightarrow> (Obs \<alpha> \<phi>l) \<Lleftarrow>\<Rrightarrow> \<phi> \<Longrightarrow> (Obs \<alpha> \<phi>r) \<Lleftarrow>\<Rrightarrow> \<phi>"
+context LTS_Tau
+begin
+
+lemma obs_subst:
+  assumes "\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r"
+      and "(Obs \<alpha> \<phi>l) \<Lleftarrow>\<Rrightarrow> \<phi>"
+  shows "(Obs \<alpha> \<phi>r) \<Lleftarrow>\<Rrightarrow> \<phi>"
+  using assms
   by (meson hml_eq_def hml_impl_iffI obs_pre_cong)
 
-lemma internal_subst: "\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r \<Longrightarrow> (Internal \<phi>l) \<Lleftarrow>\<Rrightarrow> \<phi> \<Longrightarrow> (Internal \<phi>r) \<Lleftarrow>\<Rrightarrow> \<phi>"
+lemma internal_subst:
+  assumes "\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r"
+      and "(Internal \<phi>l) \<Lleftarrow>\<Rrightarrow> \<phi>"
+  shows "(Internal \<phi>r) \<Lleftarrow>\<Rrightarrow> \<phi>"
+  using assms
   by (simp add: hml_eq_equality)
 
-lemma silent_subst: "\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r \<Longrightarrow> (Silent \<phi>l) \<Lleftarrow>\<Rrightarrow> \<phi> \<Longrightarrow> (Silent \<phi>r) \<Lleftarrow>\<Rrightarrow> \<phi>"
+lemma silent_subst:
+  assumes "\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r"
+      and "(Silent \<phi>l) \<Lleftarrow>\<Rrightarrow> \<phi>"
+  shows "(Silent \<phi>r) \<Lleftarrow>\<Rrightarrow> \<phi>"
+  using assms
   by (meson LTS_Tau.hml_impl_def LTS_Tau.silent_pre_cong hml_eq_def)
 
-lemma conj_subst: "\<psi>l \<Lleftarrow>\<and>\<Rrightarrow> \<psi>r \<Longrightarrow> (Conj (I \<union> {s}) (\<lambda>i. if i = s then \<psi>l else \<psi>s i)) \<Lleftarrow>\<Rrightarrow> \<phi>
-                              \<Longrightarrow> (Conj (I \<union> {s}) (\<lambda>i. if i = s then \<psi>r else \<psi>s i)) \<Lleftarrow>\<Rrightarrow> \<phi>"
+lemma conj_subst:
+  assumes "\<psi>l \<Lleftarrow>\<and>\<Rrightarrow> \<psi>r"
+      and "(Conj (I \<union> {s}) (\<lambda>i. if i = s then \<psi>l else \<psi>s i)) \<Lleftarrow>\<Rrightarrow> \<phi>"
+  shows "(Conj (I \<union> {s}) (\<lambda>i. if i = s then \<psi>r else \<psi>s i)) \<Lleftarrow>\<Rrightarrow> \<phi>"
+  using assms
   by (smt (verit) LTS_Tau.hml_impl_iffI hml_conjunct_eq_def hml_conjunct_impl_def hml_eq_def hml_models.simps(5))
 
-lemma pos_subst: "\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r \<Longrightarrow> (Pos \<phi>l) \<Lleftarrow>\<and>\<Rrightarrow> \<psi> \<Longrightarrow> (Pos \<phi>r) \<Lleftarrow>\<and>\<Rrightarrow> \<psi>"
+lemma pos_subst:
+  assumes "\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r"
+      and "(Pos \<phi>l) \<Lleftarrow>\<and>\<Rrightarrow> \<psi>"
+  shows "(Pos \<phi>r) \<Lleftarrow>\<and>\<Rrightarrow> \<psi>"
+  using assms
   by (meson LTS_Tau.hml_conjunct_eq_def LTS_Tau.hml_eq_def LTS_Tau.pos_pre_cong hml_conjunct_impl_preord transpE)
 
-lemma neg_subst: "\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r \<Longrightarrow> (Neg \<phi>l) \<Lleftarrow>\<and>\<Rrightarrow> \<psi> \<Longrightarrow> (Neg \<phi>r) \<Lleftarrow>\<and>\<Rrightarrow> \<psi>"
+lemma neg_subst:
+  assumes "\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r"
+      and "(Neg \<phi>l) \<Lleftarrow>\<and>\<Rrightarrow> \<psi>"
+  shows "(Neg \<phi>r) \<Lleftarrow>\<and>\<Rrightarrow> \<psi>"
+  using assms
   by (meson LTS_Tau.neg_pre_subst hml_conjunct_eq_def hml_conjunct_impl_def hml_eq_def)
 
 lemma hml_subst: "\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r \<Longrightarrow> (fill \<phi>l C) \<Lleftarrow>\<Rrightarrow> \<phi> \<Longrightarrow> (fill \<phi>r C) \<Lleftarrow>\<Rrightarrow> \<phi>"
@@ -369,16 +423,27 @@ qed
 
 \<comment> \<open> Congruence Properties\<close>
 
-lemma obs_cong: "\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r \<Longrightarrow> (Obs \<alpha> \<phi>l) \<Lleftarrow>\<Rrightarrow> (Obs \<alpha> \<phi>r)"
+lemma obs_cong:
+  assumes "\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r"
+  shows "(Obs \<alpha> \<phi>l) \<Lleftarrow>\<Rrightarrow> (Obs \<alpha> \<phi>r)"
+  using assms
   by (meson hml_eq_def hml_impl_def hml_models.simps(2))
 
-lemma internal_cong: "\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r \<Longrightarrow> (Internal \<phi>l) \<Lleftarrow>\<Rrightarrow> (Internal \<phi>r)"
-  using hml_eq_def hml_impl_def by auto
+lemma internal_cong:
+  assumes "\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r"
+  shows "(Internal \<phi>l) \<Lleftarrow>\<Rrightarrow> (Internal \<phi>r)"
+  using assms and hml_eq_def and hml_impl_def by auto
 
-lemma silent_cong: "\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r \<Longrightarrow> (Silent \<phi>l) \<Lleftarrow>\<Rrightarrow> (Silent \<phi>r)"
-  using hml_eq_def hml_impl_def by auto
+lemma silent_cong:
+  assumes "\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r"
+  shows "(Silent \<phi>l) \<Lleftarrow>\<Rrightarrow> (Silent \<phi>r)"
+  using assms and hml_eq_def and hml_impl_def by auto
 
-lemma conj_cong: "\<psi>sl ` I = \<psi>sr ` I \<Longrightarrow> (\<psi>sl l) \<Lleftarrow>\<and>\<Rrightarrow> (\<psi>sr r) \<Longrightarrow> (Conj (I \<union> {l}) \<psi>sl) \<Lleftarrow>\<Rrightarrow> (Conj (I \<union> {r}) \<psi>sr)"
+lemma conj_cong:
+  assumes "\<psi>sl ` I = \<psi>sr ` I"
+      and "(\<psi>sl l) \<Lleftarrow>\<and>\<Rrightarrow> (\<psi>sr r)"
+  shows "(Conj (I \<union> {l}) \<psi>sl) \<Lleftarrow>\<Rrightarrow> (Conj (I \<union> {r}) \<psi>sr)"
+  using assms
 proof -
   assume "\<psi>sl ` I = \<psi>sr ` I"
      and "(\<psi>sl l) \<Lleftarrow>\<and>\<Rrightarrow> (\<psi>sr r)"
@@ -427,10 +492,18 @@ proof -
   qed
 qed
 
-lemma conj_cong': "s \<notin> I \<Longrightarrow> \<psi>sl ` I = \<psi>sr ` I \<Longrightarrow> (\<psi>sl s) \<Lleftarrow>\<and>\<Rrightarrow> (\<psi>sr s) \<Longrightarrow> (Conj (I \<union> {s}) \<psi>sl) \<Lleftarrow>\<Rrightarrow> (Conj (I \<union> {s}) \<psi>sr)"
-  using local.conj_cong by presburger
+lemma conj_cong':
+  assumes "s \<notin> I"
+      and "\<psi>sl ` I = \<psi>sr ` I"
+      and "(\<psi>sl s) \<Lleftarrow>\<and>\<Rrightarrow> (\<psi>sr s)"
+  shows "(Conj (I \<union> {s}) \<psi>sl) \<Lleftarrow>\<Rrightarrow> (Conj (I \<union> {s}) \<psi>sr)"
+  using assms and conj_cong by presburger
 
-lemma conj_congs: "\<forall>i \<in> I. \<psi>sl i = \<psi>sr i \<Longrightarrow> \<forall>i \<in> I'. (\<psi>sl i) \<Lleftarrow>\<and>\<Rrightarrow> (\<psi>sr i) \<Longrightarrow> (Conj (I \<union> I') \<psi>sl) \<Lleftarrow>\<Rrightarrow> (Conj (I \<union> I') \<psi>sr)"
+lemma conj_congs:
+  assumes "\<forall>i \<in> I. \<psi>sl i = \<psi>sr i"
+      and "\<forall>i \<in> I'. (\<psi>sl i) \<Lleftarrow>\<and>\<Rrightarrow> (\<psi>sr i)"
+  shows "(Conj (I \<union> I') \<psi>sl) \<Lleftarrow>\<Rrightarrow> (Conj (I \<union> I') \<psi>sr)"
+  using assms
 proof -
   assume "\<forall>i \<in> I. \<psi>sl i = \<psi>sr i"
      and "\<forall>i \<in> I'. (\<psi>sl i) \<Lleftarrow>\<and>\<Rrightarrow> (\<psi>sr i)"
@@ -472,13 +545,23 @@ proof -
   qed
 qed
 
-lemma conj_congs': "I \<inter> I' = {} \<Longrightarrow> \<forall>i \<in> I. \<psi>sl i = \<psi>sr i \<Longrightarrow> \<forall>i \<in> I'. (\<psi>sl i) \<Lleftarrow>\<and>\<Rrightarrow> (\<psi>sr i) \<Longrightarrow> (Conj (I \<union> I') \<psi>sl) \<Lleftarrow>\<Rrightarrow> (Conj (I \<union> I') \<psi>sr)"
-  using conj_congs by presburger
+lemma conj_congs':
+  assumes "I \<inter> I' = {}"
+      and "\<forall>i \<in> I. \<psi>sl i = \<psi>sr i"
+      and "\<forall>i \<in> I'. (\<psi>sl i) \<Lleftarrow>\<and>\<Rrightarrow> (\<psi>sr i)"
+  shows "(Conj (I \<union> I') \<psi>sl) \<Lleftarrow>\<Rrightarrow> (Conj (I \<union> I') \<psi>sr)"
+  using assms and conj_congs by presburger
 
-lemma pos_cong: "\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r \<Longrightarrow> (Pos \<phi>l) \<Lleftarrow>\<and>\<Rrightarrow> (Pos \<phi>r)"
+lemma pos_cong:
+  assumes "\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r"
+  shows "(Pos \<phi>l) \<Lleftarrow>\<and>\<Rrightarrow> (Pos \<phi>r)"
+  using assms
   by (simp add: hml_conjunct_eq_def hml_conjunct_impl_def hml_eq_def hml_impl_def)
 
-lemma neg_cong: "\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r \<Longrightarrow> (Neg \<phi>l) \<Lleftarrow>\<and>\<Rrightarrow> (Neg \<phi>r)"
+lemma neg_cong:
+  assumes "\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r"
+  shows "(Neg \<phi>l) \<Lleftarrow>\<and>\<Rrightarrow> (Neg \<phi>r)"
+  using assms
   by (meson hml_conjunct_eq_def hml_conjunct_impl_def hml_conjunct_models.simps(2) hml_eq_def hml_impl_def)
 
 lemma hml_cong: "\<forall>\<phi>l \<phi>r. \<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r \<longrightarrow> fill \<phi>l C \<Lleftarrow>\<Rrightarrow> fill \<phi>r C"
@@ -612,7 +695,10 @@ lemma \<epsilon>\<tau>_stack_reduces: "n_\<epsilon>\<tau>s_then n (Internal \<ph
   using \<epsilon>\<tau>_is_\<tau>
   by (smt (verit, del_insts) hml_eq_def hml_impl_iffI hml_models.simps(3) pre_\<epsilon> silent_reachable_trans)
 
-lemma n_\<epsilon>\<tau>s_then_cong: "\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r \<Longrightarrow> n_\<epsilon>\<tau>s_then n \<phi>l \<Lleftarrow>\<Rrightarrow> n_\<epsilon>\<tau>s_then n \<phi>r"
+lemma n_\<epsilon>\<tau>s_then_cong:
+  assumes "\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r"
+  shows "n_\<epsilon>\<tau>s_then n \<phi>l \<Lleftarrow>\<Rrightarrow> n_\<epsilon>\<tau>s_then n \<phi>r"
+  using assms
   by (induct n) (simp add: internal_cong silent_cong)+
 
 lemma "n_\<epsilon>\<tau>s_then n TT \<Lleftarrow>\<Rrightarrow> TT"
@@ -651,7 +737,10 @@ lemma hml_and_right_tt: "(Pos \<phi> \<and>hml Pos TT) \<Lleftarrow>\<Rrightarro
 lemma hml_and_same_no_and: "(Pos \<phi> \<and>hml Pos \<phi>) \<Lleftarrow>\<Rrightarrow> \<phi>"
   by (simp add: hml_eq_equality)
 
-lemma conj_extract_conjunct: "s \<notin> I \<Longrightarrow> Conj (I \<union> {s}) (\<lambda>i. if i = s then \<psi> else \<psi>s i) \<Lleftarrow>\<Rrightarrow> (\<psi> \<and>hml Pos (Conj I \<psi>s))"
+lemma conj_extract_conjunct:
+  assumes "s \<notin> I"
+  shows "Conj (I \<union> {s}) (\<lambda>i. if i = s then \<psi> else \<psi>s i) \<Lleftarrow>\<Rrightarrow> (\<psi> \<and>hml Pos (Conj I \<psi>s))"
+  using assms
 proof -
   assume "s \<notin> I"
   show "Conj (I \<union> {s}) (\<lambda>i. if i = s then \<psi> else \<psi>s i) \<Lleftarrow>\<Rrightarrow> (\<psi> \<and>hml Pos (Conj I \<psi>s))"
@@ -691,7 +780,10 @@ proof -
   qed
 qed
 
-lemma "s \<notin> I \<Longrightarrow> Conj (I \<union> {s}) (\<lambda>i. if i = s then Pos TT else \<psi>s i) \<Lleftarrow>\<Rrightarrow> Conj I \<psi>s"
+lemma
+  assumes "s \<notin> I"
+  shows "Conj (I \<union> {s}) (\<lambda>i. if i = s then Pos TT else \<psi>s i) \<Lleftarrow>\<Rrightarrow> Conj I \<psi>s"
+  using assms
 proof -
   assume "s \<notin> I"
   then have "Conj (I \<union> {s}) (\<lambda>i. if i = s then Pos TT else \<psi>s i) \<Lleftarrow>\<Rrightarrow> (Pos TT \<and>hml Pos (Conj I \<psi>s))"
@@ -715,7 +807,11 @@ definition distFrom :: "'s \<Rightarrow> ('a, 's) hml \<Rightarrow> 's set \<Rig
   "(p <> \<phi> Q) \<equiv> (\<forall>q \<in> Q. p <> \<phi> q)"
 
 
-lemma "p <> (Conj I \<psi>s) Q \<Longrightarrow> \<exists>\<psi>s'. p <> (Conj Q \<psi>s') Q"
+lemma
+  fixes Q :: "'s set"
+  assumes "p <> (Conj I \<psi>s) Q"
+  shows "\<exists>\<psi>s'. p <> (Conj Q \<psi>s') Q"
+  using assms
   unfolding distFrom_def and dist_def
 proof -
   assume "\<forall>q\<in>Q. (p \<Turnstile> Conj I \<psi>s \<and> \<not> q \<Turnstile> Conj I \<psi>s)"
@@ -730,7 +826,11 @@ proof -
   then show "\<exists>\<psi>s'. \<forall>q\<in>Q. p \<Turnstile> Conj Q \<psi>s' \<and> \<not> q \<Turnstile> Conj Q \<psi>s'" by auto
 qed
 
-lemma dist_conj_thinning: "p <> (Conj I \<psi>s) Q \<Longrightarrow> p <> (Conj Q (\<lambda>q. \<psi>s (SOME i. i \<in> I \<and> \<not>(hml_conjunct_models q (\<psi>s i))))) Q"
+lemma dist_conj_thinning:
+  fixes Q :: "'s set"
+  assumes "p <> (Conj I \<psi>s) Q"
+  shows "p <> (Conj Q (\<lambda>q. \<psi>s (SOME i. i \<in> I \<and> \<not>(hml_conjunct_models q (\<psi>s i))))) Q"
+  using assms
 proof -
   assume "p <> Conj I \<psi>s Q"
   hence conj_dist_from_Q: "\<forall>q\<in>Q. p \<Turnstile> Conj I \<psi>s \<and> \<not> q \<Turnstile> Conj I \<psi>s"

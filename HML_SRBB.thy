@@ -119,7 +119,11 @@ next
     by (smt (verit, best) hml_preordered_def transpI)
 qed
 
-lemma "\<phi>s \<subseteq> \<phi>s' \<Longrightarrow> hml_equivalent \<phi>s' p q \<Longrightarrow> hml_equivalent \<phi>s p q"
+lemma
+  assumes "\<phi>s \<subseteq> \<phi>s'"
+      and "hml_equivalent \<phi>s' p q"
+  shows "hml_equivalent \<phi>s p q"
+  using assms
   by (meson hml_equivalent_def hml_preordered_def subsetD)
 
 lemma "hml_preordered \<phi>s p q = (\<forall>\<phi> \<in> \<phi>s. \<not>(distinguishes \<phi> p q))"
@@ -134,21 +138,31 @@ subsection \<open> HML\_SRBB Implication \<close>
 definition hml_srbb_impl :: "('a, 's) hml_srbb \<Rightarrow> ('a, 's) hml_srbb \<Rightarrow> bool" (infix "\<Rrightarrow>" 70) where
   "\<phi>l \<Rrightarrow> \<phi>r \<equiv> \<forall>p. p \<Turnstile>SRBB \<phi>l \<longrightarrow> p \<Turnstile>SRBB \<phi>r"
 
-lemma srbb_impl_to_hml_impl: "\<phi>l \<Rrightarrow> \<phi>r \<Longrightarrow> hml_srbb_to_hml \<phi>l \<Rrightarrow> hml_srbb_to_hml \<phi>r"
+lemma srbb_impl_to_hml_impl:
+  fixes \<phi>l and \<phi>r :: "('a, 's) hml_srbb"
+  assumes "\<phi>l \<Rrightarrow> \<phi>r"
+  shows "hml_srbb_to_hml \<phi>l \<Rrightarrow> hml_srbb_to_hml \<phi>r"
+  using assms
   by (simp add: LTS_Tau.hml_impl_iffI hml_srbb_impl_def)
 
 
 definition hml_srbb_impl_\<chi> :: "('a, 's) hml_srbb_conjunction \<Rightarrow> ('a, 's) hml_srbb_conjunction \<Rightarrow> bool" (infix "\<chi>\<Rrightarrow>" 70) where
   "\<chi>l \<chi>\<Rrightarrow> \<chi>r \<equiv> \<forall>p. hml_srbb_conjunction_models \<chi>l p \<longrightarrow> hml_srbb_conjunction_models \<chi>r p"
 
-lemma srbb_impl_\<chi>_to_hml_impl: "\<chi>l \<chi>\<Rrightarrow> \<chi>r \<Longrightarrow> hml_srbb_conjunction_to_hml \<chi>l \<Rrightarrow> hml_srbb_conjunction_to_hml \<chi>r"
+lemma srbb_impl_\<chi>_to_hml_impl:
+  assumes "\<chi>l \<chi>\<Rrightarrow> \<chi>r"
+  shows "hml_srbb_conjunction_to_hml \<chi>l \<Rrightarrow> hml_srbb_conjunction_to_hml \<chi>r"
+  using assms
   by (simp add: LTS_Tau.hml_impl_iffI hml_srbb_impl_\<chi>_def)
 
 
 definition hml_srbb_impl_\<psi> :: "('a, 's) hml_srbb_conjunct \<Rightarrow> ('a, 's) hml_srbb_conjunct \<Rightarrow> bool" (infix "\<psi>\<Rrightarrow>" 70) where
   "\<psi>l \<psi>\<Rrightarrow> \<psi>r \<equiv> \<forall>p. hml_srbb_conjunct_models \<psi>l p \<longrightarrow> hml_srbb_conjunct_models \<psi>r p"
 
-lemma srbb_impl_\<psi>_to_hml_impl: "\<psi>l \<psi>\<Rrightarrow> \<psi>r \<Longrightarrow> hml_srbb_conjunct_to_hml_conjunct \<psi>l \<and>\<Rrightarrow> hml_srbb_conjunct_to_hml_conjunct \<psi>r"
+lemma srbb_impl_\<psi>_to_hml_impl:
+  assumes "\<psi>l \<psi>\<Rrightarrow> \<psi>r"
+  shows "hml_srbb_conjunct_to_hml_conjunct \<psi>l \<and>\<Rrightarrow> hml_srbb_conjunct_to_hml_conjunct \<psi>r"
+  using assms
   by (simp add: hml_conjunct_impl_def hml_srbb_impl_\<psi>_def)
 
 
@@ -169,10 +183,17 @@ definition hml_srbb_eq_\<psi> :: "('a, 's) hml_srbb_conjunct \<Rightarrow> ('a, 
 
 subsection \<open> Congruence \<close>
 
-lemma internal_srbb_cong: "\<chi>l \<Lleftarrow>\<chi>\<Rrightarrow> \<chi>r \<Longrightarrow> (Internal \<chi>l) \<Lleftarrow>srbb\<Rrightarrow> (Internal \<chi>r)"
+lemma internal_srbb_cong:
+  assumes "\<chi>l \<Lleftarrow>\<chi>\<Rrightarrow> \<chi>r"
+  shows "(Internal \<chi>l) \<Lleftarrow>srbb\<Rrightarrow> (Internal \<chi>r)"
+  using assms
   by (smt (verit) hml_models.simps(3) hml_srbb_conjunction_models.elims(2) hml_srbb_conjunction_models.elims(3) hml_srbb_eq_\<chi>_def hml_srbb_eq_def hml_srbb_impl_\<chi>_def hml_srbb_impl_def hml_srbb_models.elims(2) hml_srbb_models.elims(3) hml_srbb_to_hml.simps(2))
 
-lemma immconj_cong: "\<psi>sl ` I = \<psi>sr ` I \<Longrightarrow> \<psi>sl s \<Lleftarrow>\<psi>\<Rrightarrow> \<psi>sr s \<Longrightarrow> ImmConj (I \<union> {s}) \<psi>sl \<Lleftarrow>srbb\<Rrightarrow> ImmConj (I \<union> {s}) \<psi>sr"
+lemma immconj_cong:
+  assumes "\<psi>sl ` I = \<psi>sr ` I"
+      and "\<psi>sl s \<Lleftarrow>\<psi>\<Rrightarrow> \<psi>sr s"
+  shows "ImmConj (I \<union> {s}) \<psi>sl \<Lleftarrow>srbb\<Rrightarrow> ImmConj (I \<union> {s}) \<psi>sr"
+  using assms
 proof -
   assume "\<psi>sl ` I = \<psi>sr ` I"
     and "\<psi>sl s \<Lleftarrow>\<psi>\<Rrightarrow> \<psi>sr s"
