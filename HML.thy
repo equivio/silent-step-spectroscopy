@@ -838,7 +838,24 @@ proof -
   show "\<forall>q\<in>Q. hml_conjunct_models p (distinguishing_conjunct I \<psi>s q)"
     using distinguishing_conjunct_def by fastforce
 qed
- 
+
+lemma models_full_models_dist_subset':
+  fixes \<psi>s'
+  defines 
+    "distinguishing_conjunct \<equiv> (\<lambda>I.\<lambda>\<psi>s.
+       \<lambda>q. if I = {}
+           then Pos (Internal (Conj {} \<psi>s'))
+           else if \<exists>i \<in> I. \<not>(hml_conjunct_models q (\<psi>s i))
+                then \<psi>s (SOME i. i \<in> I \<and> \<not>(hml_conjunct_models q (\<psi>s i)))
+                else \<psi>s (SOME i. i \<in> I))"
+  assumes "p \<Turnstile> (Conj I \<psi>s)"
+  shows "p \<Turnstile> (Conj Q (distinguishing_conjunct I \<psi>s))"
+  using assms
+    and T_is_\<epsilon>_empty_conj
+    and models_full_models_dist_subset
+    and hml_eq_equality
+  sorry
+
 
 lemma dist_conj_non_empty_conj:
   fixes p :: 's and q :: 's
