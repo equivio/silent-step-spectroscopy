@@ -2,6 +2,8 @@ theory HML_SRBB
   imports Main HML
 begin
 
+section \<open> Stability Respecting Branching Bisimilarity - Subset of HML \<close>
+
 datatype 
   ('act, 'i) hml_srbb =
     TT |
@@ -133,7 +135,7 @@ lemma "hml_equivalent \<phi>s p q = (\<forall>\<phi> \<in> \<phi>s. \<not>(disti
   using distinguishes_def hml_equivalent_def hml_preordered_def by auto
 
 
-subsection \<open> HML\_SRBB Implication \<close>
+subsection \<open> \<open>hml_srbb\<close> Implication \<close>
 
 definition hml_srbb_impl :: "('a, 's) hml_srbb \<Rightarrow> ('a, 's) hml_srbb \<Rightarrow> bool" (infix "\<Rrightarrow>" 70) where
   "\<phi>l \<Rrightarrow> \<phi>r \<equiv> \<forall>p. p \<Turnstile>SRBB \<phi>l \<longrightarrow> p \<Turnstile>SRBB \<phi>r"
@@ -166,7 +168,7 @@ lemma srbb_impl_\<psi>_to_hml_impl:
   by (simp add: hml_conjunct_impl_def hml_srbb_impl_\<psi>_def)
 
 
-subsection \<open> HML\_SRBB Equivalence \<close>
+subsection \<open> \<open>hml__srbb\<close> Equivalence \<close>
 
 definition hml_srbb_eq :: "('a, 's) hml_srbb \<Rightarrow> ('a, 's) hml_srbb \<Rightarrow> bool" (infix "\<Lleftarrow>srbb\<Rrightarrow>" 70) where
   "\<phi>l \<Lleftarrow>srbb\<Rrightarrow> \<phi>r \<equiv> \<phi>l \<Rrightarrow> \<phi>r \<and> \<phi>r \<Rrightarrow> \<phi>l"
