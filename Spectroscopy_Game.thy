@@ -8,7 +8,7 @@ definition 14, which extends definition 12, which is a energy game depending on 
 steps and give a definition directly.) 
 
 The full spectroscopy game is an energy game that can be constructed by adding stable and branching 
-conjunctions to a delay bisimulation game, which is  dependend on a LTS. In the following we 
+conjunctions to a delay bisimulation game, which is  depending on a LTS. In the following we 
 differentiate the positions accordingly:\<close>
 
 datatype ('s, 'a) spectroscopy_position = 
@@ -23,7 +23,7 @@ datatype ('s, 'a) spectroscopy_position =
 
 context Inhabited_Tau_LTS begin
 
-text \<open>Now we define the moves in a full spectroscopy game dependend on a LTS:\<close>
+text \<open>Now we define the moves in a full spectroscopy game depending on a LTS:\<close>
 fun spectroscopy_moves :: "('s, 'a) spectroscopy_position \<Rightarrow> ('s, 'a) spectroscopy_position \<Rightarrow> energy update option" where 
   delay: 
     "spectroscopy_moves (Attacker_Immediate p Q) (Attacker_Delayed p' Q') 
