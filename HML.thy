@@ -2,6 +2,8 @@ theory HML
   imports Main LTS
 begin
 
+section \<open> Hennesy-Milner-Logic (HML) \<close>
+
 datatype 
   ('act, 'i) hml =
     TT |
@@ -97,7 +99,10 @@ context LTS_Tau
 begin
 
 
-section \<open> Pre-Order \<close>
+subsection \<open> Pre-Order \<close>
+
+text \<open> An HML formula \<open>\<phi>l\<close> implies another (\<open>\<phi>r\<close>) if the fact that some process \<open>p\<close> satisfies \<open>\<phi>l\<close>
+implies that \<open>p\<close> must also satisfy \<open>\<phi>r\<close>, no matter the process \<open>p\<close>. \<close>
 
 definition hml_impl :: "('a, 's) hml \<Rightarrow> ('a, 's) hml \<Rightarrow> bool" (infix "\<Rrightarrow>" 60)  where
   "\<phi>l \<Rrightarrow> \<phi>r \<equiv> (\<forall>p. (p \<Turnstile> \<phi>l) \<longrightarrow> (p \<Turnstile> \<phi>r))"
@@ -105,8 +110,10 @@ definition hml_impl :: "('a, 's) hml \<Rightarrow> ('a, 's) hml \<Rightarrow> bo
 lemma hml_impl_iffI: "\<phi>l \<Rrightarrow> \<phi>r = (\<forall>p. (p \<Turnstile> \<phi>l) \<longrightarrow> (p \<Turnstile> \<phi>r))"
   using hml_impl_def by force
 
+text \<open> HML formula implication is a pre-order. \<close>
 lemma hml_impl_preord: "reflp (\<Rrightarrow>) \<and> transp (\<Rrightarrow>)"
   by (metis hml_impl_def reflpI transpI)
+
 
 definition hml_conjunct_impl :: "('a, 's) hml_conjunct \<Rightarrow> ('a, 's) hml_conjunct \<Rightarrow> bool" (infix "\<and>\<Rrightarrow>" 60)  where
   "\<psi>l \<and>\<Rrightarrow> \<psi>r \<equiv> (\<forall>p. (hml_conjunct_models p \<psi>l) \<longrightarrow> (hml_conjunct_models p \<psi>r))"
@@ -115,7 +122,17 @@ lemma hml_conjunct_impl_preord: "reflp (\<and>\<Rrightarrow>) \<and> transp (\<a
   by (metis hml_conjunct_impl_def reflpI transpI)
 
 
-subsection \<open> Pre-Substitution \<close>
+subsubsection \<open> Pre-Substitution \<close>
+
+text \<open>
+The following lemmata provide means to manipulate an HML implication
+by substituting other HML implications into it.
+
+This substitution may only occur on the right hand side of the implication.
+A notable exception is \<open>neg_pre_subst\<close>, so when substituting into a negation, where one may only
+substitute on the left hand side of the implication.
+The lemmata differ in the choice of context, i.e. what formula is substituted into.
+\<close>
 
 lemma obs_pre_subst:
   assumes "\<phi>l \<Rrightarrow> \<phi>r"
@@ -154,7 +171,14 @@ lemma neg_pre_subst:
   using assms and hml_conjunct_impl_def hml_impl_iffI by auto
 
 
-subsection \<open> Pre-Congruence \<close>
+subsubsection \<open> Pre-Congruence \<close>
+
+text \<open>
+The following lemmata provide means to manipulate an HML implication
+by wrapping both sides of the implication in the same HML formula context.
+
+The lemmata differ in the choice of context, i.e. how both sides are extended.
+\<close>
 
 lemma obs_pre_cong:
   assumes "\<phi>l \<Rrightarrow> \<phi>r"
@@ -191,13 +215,14 @@ lemma pos_pre_cong:
   using assms
   by (simp add: hml_conjunct_impl_def hml_impl_iffI)
 
+text \<open> Note: \<open>\<phi>l\<close> and \<open>\<phi>r\<close> switch sides in the conclusion! \<close>
 lemma neg_pre_cong:
   assumes "\<phi>l \<Rrightarrow> \<phi>r"
   shows "Neg \<phi>r \<and>\<Rrightarrow> Neg \<phi>l"
   using assms and hml_conjunct_impl_def hml_impl_def by auto
 
 
-subsection \<open> Know Pre-Order Elements\<close>
+subsubsection \<open> Know Pre-Order Elements\<close>
 
 lemma pre_\<epsilon>: "\<phi> \<Rrightarrow> (Internal \<phi>)"
   using silent_reachable.intros(1) hml_impl_def by fastforce
@@ -209,16 +234,29 @@ lemma \<epsilon>_eats_\<tau>: "(Internal (Obs \<tau> \<phi>)) \<Rrightarrow> (In
   using silent_reachable_append_\<tau> hml_impl_def by fastforce
 
 
-section \<open> Equivalence \<close>
+subsection \<open> Equivalence \<close>
+
+text \<open>
+A HML formula \<open>\<phi>l\<close> is said to be equivalent to some other HML formula \<open>\<phi>r\<close> (written \<open>\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r\<close>)
+iff process \<open>p\<close> satisfies \<open>\<phi>l\<close> iff it also satisfies \<open>\<phi>r\<close>, no matter the process \<open>p\<close>.
+
+We have chosen to define this equivalence by appealing to HML formula implication (c.f. pre-order).
+\<close>
 
 definition hml_eq :: "('a, 's) hml \<Rightarrow> ('a, 's) hml \<Rightarrow> bool" (infix "\<Lleftarrow>\<Rrightarrow>" 60)  where
   "\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r \<equiv> \<phi>l \<Rrightarrow> \<phi>r \<and> \<phi>r \<Rrightarrow> \<phi>l"
 
+text \<open> \<open>\<Lleftarrow>\<Rrightarrow>\<close> is truly an equivalence relation. \<close>
 lemma hml_eq_equiv: "equivp (\<Lleftarrow>\<Rrightarrow>)"
   by (smt (verit, del_insts) equivpI hml_eq_def hml_impl_def reflpI sympI transpI)
 
+text \<open>
+The definition given above is equivalent, i.e. formula equivalence is a biimplication on the
+models predicate.
+\<close>
 lemma hml_eq_equality: "(\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r) = (\<forall>p.( p \<Turnstile> \<phi>l) = (p \<Turnstile> \<phi>r))"
   using hml_eq_def hml_impl_iffI by blast
+
 
 definition hml_conjunct_eq :: "('a, 's) hml_conjunct \<Rightarrow> ('a, 's) hml_conjunct \<Rightarrow> bool" (infix "\<Lleftarrow>\<and>\<Rrightarrow>" 60)  where
   "\<psi>l \<Lleftarrow>\<and>\<Rrightarrow> \<psi>r \<equiv> \<psi>l \<and>\<Rrightarrow> \<psi>r \<and> \<psi>r \<and>\<Rrightarrow> \<psi>l"
@@ -227,7 +265,16 @@ lemma hml_conjunct_eq_equiv: "equivp (\<Lleftarrow>\<and>\<Rrightarrow>)"
   by (smt (verit, best) equivpI hml_conjunct_eq_def hml_conjunct_impl_def reflpI sympI transpI)
 
 
-subsection \<open> Substitution \<close>
+subsubsection \<open> Substitution \<close>
+
+text \<open>
+The following lemmata provide means to manipulate an HML equivalence
+by substituting other HML equivalence into it.
+
+While one may substitute on both sides of the equivalence, only substitutions on the left hand side
+are shown.  If one needs a substitution on the other side one may to use \<open>hml_eq_equiv\<close>.
+The lemmata differ in the choice of context, i.e. what formula is substituted into.
+\<close>
 
 lemma obs_subst:
   assumes "\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r"
@@ -272,7 +319,7 @@ lemma neg_subst:
   by (meson LTS_Tau.neg_pre_subst hml_conjunct_eq_def hml_conjunct_impl_def hml_eq_def)
 
 
-subsection \<open> Congruence \<close>
+subsubsection \<open> Congruence \<close>
 
 text \<open>
 The lemmata in this subsection all follow a similar form:
@@ -446,7 +493,7 @@ lemma neg_cong:
   by (meson hml_conjunct_eq_def hml_conjunct_impl_def hml_conjunct_models.simps(2) hml_eq_def hml_impl_def)
 
 
-subsection \<open> Know Equivalence Elements\<close>
+subsubsection \<open> Know Equivalence Elements\<close>
 
 text \<open> \<open>\<langle>\<epsilon>\<rangle>(\<tau>)\<phi>\<close> is equivalent to \<open>\<langle>\<epsilon>\<rangle>\<phi>\<close> \<close>
 lemma \<epsilon>\<tau>_is_\<tau>: "(Internal (Silent \<phi>)) \<Lleftarrow>\<Rrightarrow> (Internal \<phi>)"
@@ -599,7 +646,7 @@ qed
 
 end (* Inhabited_Tau_LTS *)
 
-section \<open> Distinguishing Formulas \<close>
+subsection \<open> Distinguishing Formulas \<close>
 
 context LTS_Tau
 begin
@@ -617,7 +664,7 @@ definition distFrom :: "'s \<Rightarrow> ('a, 's) hml \<Rightarrow> 's set \<Rig
   "(p <> \<phi> Q) \<equiv> (\<forall>q \<in> Q. p <> \<phi> q)"
 
 
-subsection \<open> Distinguishing Conjunction Thinning \<close>
+subsubsection \<open> Distinguishing Conjunction Thinning \<close>
 
 text \<open>
 This subsection provides proofs regarding conjunctions that distinguish a process \<open>p\<close> from a set of
