@@ -7,22 +7,22 @@ subsection \<open>Modal depth\<close>
 
 primrec
       modal_depth_srbb :: "('act, 'i) hml_srbb \<Rightarrow> enat"
-  and modal_depth_srbb_conjunction :: "('act, 'i) hml_srbb_conjunction \<Rightarrow> enat"
+  and modal_depth_srbb_inner :: "('act, 'i) hml_srbb_inner \<Rightarrow> enat"
   and modal_depth_srbb_conjunct :: "('act, 'i) hml_srbb_conjunct \<Rightarrow> enat" where
 "modal_depth_srbb TT = 0" |
- "modal_depth_srbb (Internal \<chi>) = modal_depth_srbb_conjunction \<chi>" |
+ "modal_depth_srbb (Internal \<chi>) = modal_depth_srbb_inner \<chi>" |
  "modal_depth_srbb (ImmConj I \<psi>s) = Sup ((modal_depth_srbb_conjunct \<circ> \<psi>s) ` I)" |
 
- "modal_depth_srbb_conjunction (Obs \<alpha> \<phi>) = 1 + modal_depth_srbb \<phi>" |
- "modal_depth_srbb_conjunction (Conj I \<psi>s) =
+ "modal_depth_srbb_inner (Obs \<alpha> \<phi>) = 1 + modal_depth_srbb \<phi>" |
+ "modal_depth_srbb_inner (Conj I \<psi>s) =
     Sup ((modal_depth_srbb_conjunct \<circ> \<psi>s) ` I)" |
- "modal_depth_srbb_conjunction (StableConj I \<psi>s) = 
+ "modal_depth_srbb_inner (StableConj I \<psi>s) = 
     Sup ((modal_depth_srbb_conjunct \<circ> \<psi>s) ` I)" |
- "modal_depth_srbb_conjunction (BranchConj a \<phi> I \<psi>s) =
+ "modal_depth_srbb_inner (BranchConj a \<phi> I \<psi>s) =
     Sup ({1 + modal_depth_srbb \<phi>} \<union> ((modal_depth_srbb_conjunct \<circ> \<psi>s) ` I))" |
 
- "modal_depth_srbb_conjunct (Pos \<chi>) = modal_depth_srbb_conjunction \<chi>" |
- "modal_depth_srbb_conjunct (Neg \<chi>) = modal_depth_srbb_conjunction \<chi>" 
+ "modal_depth_srbb_conjunct (Pos \<chi>) = modal_depth_srbb_inner \<chi>" |
+ "modal_depth_srbb_conjunct (Neg \<chi>) = modal_depth_srbb_inner \<chi>" 
 
 lemma "modal_depth_srbb TT = 0"
   using Sup_enat_def by simp
@@ -56,14 +56,14 @@ lemma "modal_depth_srbb (ImmConj \<nat> (\<lambda>n. Pos (Obs \<alpha> (observe_
   unfolding modal_depth_srbb.simps(3)
         and o_def
         and modal_depth_srbb_conjunct.simps(1)
-        and modal_depth_srbb_conjunction.simps(1)
+        and modal_depth_srbb_inner.simps(1)
         and obs_n_\<alpha>_depth_n
   by (rule sucs_of_nats_in_enats_sup_infinite)
 
 subsection \<open>Depth of branching conjunctions\<close>
 
 primrec branching_conjunction_depth :: "('a, 's) hml_srbb \<Rightarrow> enat"
-  and branch_conj_depth_\<chi> :: "('a, 's) hml_srbb_conjunction \<Rightarrow> enat"
+  and branch_conj_depth_\<chi> :: "('a, 's) hml_srbb_inner \<Rightarrow> enat"
   and branch_conj_depth_\<psi> :: "('a, 's) hml_srbb_conjunct \<Rightarrow> enat" where
   "branching_conjunction_depth TT = 0" |
   "branching_conjunction_depth (Internal \<chi>) = branch_conj_depth_\<chi> \<chi>" |
@@ -81,7 +81,7 @@ subsection \<open>Depth of instable conjunctions\<close>
 
 primrec
 instable_conjunction_depth :: "('a, 's) hml_srbb \<Rightarrow> enat"
-  and inst_conj_depth_\<chi> :: "('a, 's) hml_srbb_conjunction \<Rightarrow> enat"
+  and inst_conj_depth_\<chi> :: "('a, 's) hml_srbb_inner \<Rightarrow> enat"
   and inst_conj_depth_\<psi> :: "('a, 's) hml_srbb_conjunct \<Rightarrow> enat" where
   "instable_conjunction_depth TT = 0" |
   "instable_conjunction_depth (Internal \<chi>) = inst_conj_depth_\<chi> \<chi>" |
@@ -99,7 +99,7 @@ subsection \<open>Depth of stable conjunctions\<close>
 
 primrec
 stable_conjunction_depth :: "('a, 's) hml_srbb \<Rightarrow> enat"
-  and st_conj_depth_\<chi> :: "('a, 's) hml_srbb_conjunction \<Rightarrow> enat"
+  and st_conj_depth_\<chi> :: "('a, 's) hml_srbb_inner \<Rightarrow> enat"
   and st_conj_depth_\<psi> :: "('a, 's) hml_srbb_conjunct \<Rightarrow> enat" where
   "stable_conjunction_depth TT = 0" |
   "stable_conjunction_depth (Internal \<chi>) = st_conj_depth_\<chi> \<chi>" |
@@ -117,7 +117,7 @@ subsection \<open>Depth of immediate conjunctions\<close>
 
 primrec
       immediate_conjunction_depth :: "('a, 's) hml_srbb \<Rightarrow> enat"
-  and imm_conj_depth_\<chi> :: "('a, 's) hml_srbb_conjunction \<Rightarrow> enat"
+  and imm_conj_depth_\<chi> :: "('a, 's) hml_srbb_inner \<Rightarrow> enat"
   and imm_conj_depth_\<psi> :: "('a, 's) hml_srbb_conjunct \<Rightarrow> enat" where 
   "immediate_conjunction_depth TT = 0" |
   "immediate_conjunction_depth (Internal \<chi>) = imm_conj_depth_\<chi> \<chi>" |
@@ -135,7 +135,7 @@ section \<open>Maximal modal depth of positive clauses in conjunctions\<close>
 
 primrec
       max_positive_conjunct_depth :: "('a, 's) hml_srbb \<Rightarrow> enat"
-  and max_pos_conj_depth_\<chi> :: "('a, 's) hml_srbb_conjunction \<Rightarrow> enat"
+  and max_pos_conj_depth_\<chi> :: "('a, 's) hml_srbb_inner \<Rightarrow> enat"
   and max_pos_conj_depth_\<psi> :: "('a, 's) hml_srbb_conjunct \<Rightarrow> enat" where
   "max_positive_conjunct_depth TT = 0"|
   "max_positive_conjunct_depth (Internal \<chi>) = max_pos_conj_depth_\<chi> \<chi>" |
@@ -146,14 +146,14 @@ primrec
   "max_pos_conj_depth_\<chi> (StableConj I \<psi>s) = Sup ((max_pos_conj_depth_\<psi> \<circ> \<psi>s) ` I)" |
   "max_pos_conj_depth_\<chi> (BranchConj _ \<phi> I \<psi>s) = Sup ({max_positive_conjunct_depth \<phi>} \<union> ((max_pos_conj_depth_\<psi> \<circ> \<psi>s) ` I))" |
 
-  "max_pos_conj_depth_\<psi> (Pos \<chi>) = modal_depth_srbb_conjunction \<chi>" |
+  "max_pos_conj_depth_\<psi> (Pos \<chi>) = modal_depth_srbb_inner \<chi>" |
   "max_pos_conj_depth_\<psi> (Neg \<chi>) = max_pos_conj_depth_\<chi> \<chi>"
 
 subsection \<open>Maximal modal depth of negative clauses in conjunctions\<close>
 
 primrec
       max_negative_conjunct_depth :: "('a, 's) hml_srbb \<Rightarrow> enat"
-  and max_neg_conj_depth_\<chi> :: "('a, 's) hml_srbb_conjunction \<Rightarrow> enat"
+  and max_neg_conj_depth_\<chi> :: "('a, 's) hml_srbb_inner \<Rightarrow> enat"
   and max_neg_conj_depth_\<psi> :: "('a, 's) hml_srbb_conjunct \<Rightarrow> enat" where
   "max_negative_conjunct_depth TT = 0" |
   "max_negative_conjunct_depth (Internal \<chi>) = max_neg_conj_depth_\<chi> \<chi>" |
@@ -165,13 +165,13 @@ primrec
   "max_neg_conj_depth_\<chi> (BranchConj _ \<phi> I \<psi>s) = Sup ({max_negative_conjunct_depth \<phi>} \<union> ((max_neg_conj_depth_\<psi> \<circ> \<psi>s) ` I))" |
 
   "max_neg_conj_depth_\<psi> (Pos \<chi>) = max_neg_conj_depth_\<chi> \<chi>" |
-  "max_neg_conj_depth_\<psi> (Neg \<chi>) = modal_depth_srbb_conjunction \<chi>"
+  "max_neg_conj_depth_\<psi> (Neg \<chi>) = modal_depth_srbb_inner \<chi>"
 
 subsection \<open>Depth of negations\<close>
 
 primrec
       negation_depth :: "('a, 's) hml_srbb \<Rightarrow> enat"
-  and neg_depth_\<chi> :: "('a, 's) hml_srbb_conjunction \<Rightarrow> enat"
+  and neg_depth_\<chi> :: "('a, 's) hml_srbb_inner \<Rightarrow> enat"
   and neg_depth_\<psi> :: "('a, 's) hml_srbb_conjunct \<Rightarrow> enat" where
   "negation_depth TT = 0" |
   "negation_depth (Internal \<chi>) = neg_depth_\<chi> \<chi>" |
@@ -203,8 +203,8 @@ lemma srbb_price_never_neg : "expressiveness_price \<phi> \<noteq> eneg"
 definition \<O> :: "energy \<Rightarrow> (('a, 's) hml_srbb) set" where
   "\<O> energy \<equiv> {\<phi> . expressiveness_price \<phi> \<le> energy}"
 
-fun expr_pr_\<chi> :: "('a, 's) hml_srbb_conjunction \<Rightarrow> energy" where
-  "expr_pr_\<chi> \<chi> = E (modal_depth_srbb_conjunction \<chi>)
+fun expr_pr_\<chi> :: "('a, 's) hml_srbb_inner \<Rightarrow> energy" where
+  "expr_pr_\<chi> \<chi> = E (modal_depth_srbb_inner \<chi>)
                  (branch_conj_depth_\<chi> \<chi>)
                  (inst_conj_depth_\<chi> \<chi>)
                  (st_conj_depth_\<chi> \<chi>)
@@ -216,7 +216,7 @@ fun expr_pr_\<chi> :: "('a, 's) hml_srbb_conjunction \<Rightarrow> energy" where
 lemma \<chi>_price_never_neg: "expr_pr_\<chi> \<chi> \<noteq> eneg"
   by simp
 
-definition \<O>_\<chi> :: "energy \<Rightarrow> (('a, 's) hml_srbb_conjunction) set" where
+definition \<O>_\<chi> :: "energy \<Rightarrow> (('a, 's) hml_srbb_inner) set" where
   "\<O>_\<chi> energy \<equiv> {\<chi> . expr_pr_\<chi> \<chi> \<le> energy}"
 
 subsection \<open>characterizing equivalence by energy coordinates\<close>
