@@ -513,7 +513,128 @@ lemma dist_branchconj_thinn:
                 else \<psi>s (SOME i. i \<in> I))" (* c.f. dist_stableconj_thinn for an explanation of this function. *)
   assumes "distinguishes_from_\<chi> (BranchConj \<alpha> \<phi> I \<psi>s) p Q"
   shows "distinguishes_from_\<chi> (BranchConj \<alpha> \<phi> Q (distinguishing_conjunct I \<psi>s)) p Q"
-  oops
+  using assms(2)
+  unfolding distinguishes_from_\<chi>_def
+        and distinguishes_\<chi>_def
+        and hml_srbb_conjunction_models.simps
+        and hml_srbb_conjunction_to_hml.simps
+proof -
+  assume "\<forall>q\<in>Q. p \<Turnstile> hml_conjunct.Pos (HML_soft_poss \<alpha> (hml_srbb_to_hml \<phi>)) 
+                    \<and>hml hml_conjunct.Pos (hml.Conj I (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s))
+              \<and> \<not> q \<Turnstile> hml_conjunct.Pos (HML_soft_poss \<alpha> (hml_srbb_to_hml \<phi>))
+                      \<and>hml hml_conjunct.Pos (hml.Conj I (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s))"
+  hence "\<forall>q\<in>Q. p <> (hml_conjunct.Pos (HML_soft_poss \<alpha> (hml_srbb_to_hml \<phi>)) 
+                    \<and>hml hml_conjunct.Pos (hml.Conj I (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s)))
+               q" using dist_def by blast
+  with hml_and_dist_disj
+  have "\<forall>q\<in>Q. (p \<Turnstile> (hml_conjunct.Pos (HML_soft_poss \<alpha> (hml_srbb_to_hml \<phi>))) 
+                   \<and>hml (hml_conjunct.Pos (hml.Conj I (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s)))
+            \<and> (\<not> hml_conjunct_models q (hml_conjunct.Pos (HML_soft_poss \<alpha> (hml_srbb_to_hml \<phi>)))
+             \<or> \<not> hml_conjunct_models q (hml_conjunct.Pos (hml.Conj I (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s)))))"
+    by blast
+  then have p_models_branch_conj:
+    "\<forall>q\<in>Q. p \<Turnstile> (hml_conjunct.Pos (HML_soft_poss \<alpha> (hml_srbb_to_hml \<phi>))) 
+                 \<and>hml (hml_conjunct.Pos (hml.Conj I (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s)))"
+       and no_q_models_branch_conj:
+    "\<forall>q\<in>Q. (\<not> hml_conjunct_models q (hml_conjunct.Pos (HML_soft_poss \<alpha> (hml_srbb_to_hml \<phi>)))
+            \<or> \<not> hml_conjunct_models q (hml_conjunct.Pos (hml.Conj I (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s))))"
+    by auto
+
+  show "\<forall>q\<in>Q. p \<Turnstile> hml_conjunct.Pos (HML_soft_poss \<alpha> (hml_srbb_to_hml \<phi>))
+                  \<and>hml hml_conjunct.Pos (hml.Conj Q (hml_srbb_conjunct_to_hml_conjunct \<circ> distinguishing_conjunct I \<psi>s))
+          \<and> \<not> q \<Turnstile> hml_conjunct.Pos (HML_soft_poss \<alpha> (hml_srbb_to_hml \<phi>))
+                  \<and>hml hml_conjunct.Pos (hml.Conj Q (hml_srbb_conjunct_to_hml_conjunct \<circ> distinguishing_conjunct I \<psi>s))"
+  proof (rule ballI, rule conjI)
+    fix q
+    assume "q \<in> Q"
+    with p_models_branch_conj
+    have "p \<Turnstile> (hml_conjunct.Pos (HML_soft_poss \<alpha> (hml_srbb_to_hml \<phi>))) 
+                \<and>hml (hml_conjunct.Pos (hml.Conj I (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s)))"
+      by auto
+    then have "hml_conjunct_models p (hml_conjunct.Pos (HML_soft_poss \<alpha> (hml_srbb_to_hml \<phi>)))"
+          and "hml_conjunct_models p (hml_conjunct.Pos (hml.Conj I (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s)))"
+      unfolding hml_and_and by auto
+
+    from \<open>hml_conjunct_models p (hml_conjunct.Pos (HML_soft_poss \<alpha> (hml_srbb_to_hml \<phi>)))\<close>
+    show "p \<Turnstile> hml_conjunct.Pos (HML_soft_poss \<alpha> (hml_srbb_to_hml \<phi>))
+              \<and>hml hml_conjunct.Pos (hml.Conj Q (hml_srbb_conjunct_to_hml_conjunct \<circ> distinguishing_conjunct I \<psi>s))"
+      unfolding hml_and_and
+    proof (rule conjI)
+      from \<open>hml_conjunct_models p (hml_conjunct.Pos (hml.Conj I (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s)))\<close>
+       and models_full_models_dist_subset'
+      have "p \<Turnstile> hml.Conj Q
+           (\<lambda>q. if I = {}
+                then hml_srbb_conjunct_to_hml_conjunct (hml_srbb_conjunct.Pos (hml_srbb_conjunction.Conj {} undefined))
+                else (if \<exists>i\<in>I. \<not> hml_srbb_conjunct_models (\<psi>s i) q
+                     then (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s) (SOME i. i \<in> I \<and> \<not> hml_srbb_conjunct_models (\<psi>s i) q)
+                     else (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s) (SOME i. i \<in> I)))"
+        unfolding hml_srbb_conjunct_to_hml_conjunct.simps
+              and hml_srbb_conjunction_to_hml.simps
+              and hml_srbb_conjunct_models.simps
+              and comp_apply and hml_conjunct_models.simps by blast
+
+      then have "p \<Turnstile> hml.Conj Q
+          (hml_srbb_conjunct_to_hml_conjunct \<circ>
+           (\<lambda>q. if I = {} then hml_srbb_conjunct.Pos (hml_srbb_conjunction.Conj {} undefined)
+                else if \<exists>i\<in>I. \<not> hml_srbb_conjunct_models (\<psi>s i) q
+                     then \<psi>s (SOME i. i \<in> I \<and> \<not> hml_srbb_conjunct_models (\<psi>s i) q) else \<psi>s (SOME i. i \<in> I)))"
+        using comp_apply and o_def by (smt (verit) hml_models.simps(5))
+
+      then show "hml_conjunct_models p (hml_conjunct.Pos (hml.Conj Q (hml_srbb_conjunct_to_hml_conjunct \<circ> distinguishing_conjunct I \<psi>s)))"
+        unfolding hml_conjunct_models.simps
+              and distinguishing_conjunct_def.
+    qed
+  next
+    fix q
+    assume "q \<in> Q"
+    with no_q_models_branch_conj
+    have "\<not> hml_conjunct_models q (hml_conjunct.Pos (HML_soft_poss \<alpha> (hml_srbb_to_hml \<phi>)))
+            \<or> \<not> hml_conjunct_models q (hml_conjunct.Pos (hml.Conj I (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s)))"
+      by auto
+    then show "\<not> q \<Turnstile> hml_conjunct.Pos (HML_soft_poss \<alpha> (hml_srbb_to_hml \<phi>))
+                     \<and>hml hml_conjunct.Pos (hml.Conj Q (hml_srbb_conjunct_to_hml_conjunct \<circ> distinguishing_conjunct I \<psi>s))"
+      unfolding hml_and_and and de_Morgan_conj
+    proof (rule disjE)
+      assume "\<not> hml_conjunct_models q (hml_conjunct.Pos (HML_soft_poss \<alpha> (hml_srbb_to_hml \<phi>)))"
+      then show "\<not> hml_conjunct_models q (hml_conjunct.Pos (HML_soft_poss \<alpha> (hml_srbb_to_hml \<phi>)))
+               \<or> \<not> hml_conjunct_models q (hml_conjunct.Pos (hml.Conj Q (hml_srbb_conjunct_to_hml_conjunct \<circ> distinguishing_conjunct I \<psi>s)))"
+        by (rule disjI1)
+    next
+      assume "\<not> hml_conjunct_models q (hml_conjunct.Pos (hml.Conj I (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s)))"
+      hence "\<exists>i\<in>I. \<not> hml_conjunct_models q ((hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s) i)"
+        unfolding hml_conjunct_models.simps and hml_models.simps by auto
+      then have "I \<noteq> {}" by auto
+
+      then have "distinguishing_conjunct I \<psi>s =
+        (\<lambda>q. if \<exists>i \<in> I. \<not>(hml_srbb_conjunct_models (\<psi>s i) q)
+             then \<psi>s (SOME i. i \<in> I \<and> \<not>(hml_srbb_conjunct_models (\<psi>s i) q))
+             else \<psi>s (SOME i. i \<in> I))"
+        using distinguishing_conjunct_def by auto
+
+      with \<open>\<exists>i\<in>I. \<not> hml_conjunct_models q ((hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s) i)\<close>
+
+      have "distinguishing_conjunct I \<psi>s q = \<psi>s (SOME i. i \<in> I \<and> \<not>(hml_srbb_conjunct_models (\<psi>s i) q))"
+        unfolding hml_srbb_conjunct_models.simps by auto
+
+      show "\<not> hml_conjunct_models q (hml_conjunct.Pos (HML_soft_poss \<alpha> (hml_srbb_to_hml \<phi>)))
+         \<or> \<not> hml_conjunct_models q (hml_conjunct.Pos (hml.Conj Q (hml_srbb_conjunct_to_hml_conjunct \<circ> distinguishing_conjunct I \<psi>s)))"
+        unfolding hml_conjunct_models.simps and hml_models.simps
+      proof (rule disjI2)
+        from \<open>\<exists>i\<in>I. \<not> hml_conjunct_models q ((hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s) i)\<close>
+        have "\<not>hml_conjunct_models q (hml_srbb_conjunct_to_hml_conjunct (\<psi>s (SOME i. i \<in> I \<and> \<not>(hml_srbb_conjunct_models (\<psi>s i) q))))"
+          using someI_ex by (metis (mono_tags, lifting) Inhabited_Tau_LTS.hml_srbb_conjunct_models.elims(1) Inhabited_Tau_LTS_axioms comp_eq_dest_lhs)
+        then have "\<not>hml_conjunct_models q (hml_srbb_conjunct_to_hml_conjunct (distinguishing_conjunct I \<psi>s q))"
+          using \<open>distinguishing_conjunct I \<psi>s q = \<psi>s (SOME i. i \<in> I \<and> \<not>(hml_srbb_conjunct_models (\<psi>s i) q))\<close> by simp
+        then have "\<exists>q'\<in>Q. \<not>hml_conjunct_models q (hml_srbb_conjunct_to_hml_conjunct (distinguishing_conjunct I \<psi>s q'))" 
+          using \<open>q \<in> Q\<close> by auto
+        then have "\<exists>q'\<in>Q. \<not>hml_conjunct_models q ((hml_srbb_conjunct_to_hml_conjunct \<circ> distinguishing_conjunct I \<psi>s) q')"
+          unfolding comp_apply.
+        then show "\<not> (\<forall>i\<in>Q. hml_conjunct_models q ((hml_srbb_conjunct_to_hml_conjunct \<circ> distinguishing_conjunct I \<psi>s) i))"
+          by auto
+      qed
+    qed
+  qed
+qed
 
 end (* Inhabited_Tau_LTS *)
 
