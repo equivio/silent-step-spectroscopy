@@ -172,31 +172,32 @@ where
       = (Some id) \<and> in_wina e (Defender_Stable_Conj p Q) 
         \<and> strategy_formula (Defender_Stable_Conj p Q) e \<chi>"|
 
-stable_conj:
-  "strategy_formula_conjunction (Defender_Stable_Conj p Q) e (StableConj Q \<Phi>)"
-    if "\<forall>q \<in> Q. spectroscopy_moves (Defender_Stable_Conj p Q) (Attacker_Clause p q) 
-      = (subtract 0 0 0 1 0 0 0 0) \<and> in_wina (e - (E 0 0 0 1 0 0 0 0)) (Attacker_Clause p q)
-        \<and> strategy_formula_conjunct (Attacker_Clause p q) (e - (E 0 0 0 1 0 0 0 0)) (\<Phi> q)"|
+  stable_conj:
+    "strategy_formula_conjunction (Defender_Stable_Conj p Q) e (StableConj Q \<Phi>)"
+      if "\<forall>q \<in> Q. spectroscopy_moves (Defender_Stable_Conj p Q) (Attacker_Clause p q) 
+        = (subtract 0 0 0 1 0 0 0 0) \<and> in_wina (e - (E 0 0 0 1 0 0 0 0)) (Attacker_Clause p q)
+          \<and> strategy_formula_conjunct (Attacker_Clause p q) (e - (E 0 0 0 1 0 0 0 0)) (\<Phi> q)"|
   
   branch:
   "strategy_formula (Attacker_Delayed p Q) e \<chi>" 
     if "\<exists>p' Q' \<alpha> Q\<alpha>. spectroscopy_moves (Attacker_Delayed p Q) (Defender_Branch p' \<alpha> p'' Q' Q\<alpha>) 
       = (Some id) \<and> in_wina e (Defender_Branch p' \<alpha> p'' Q' Q\<alpha>) 
         \<and> strategy_formula (Defender_Branch p' \<alpha> p'' Q' Q\<alpha>) e \<chi>"|
-  
-  "strategy_formula_conjunction (Defender_Branch p \<alpha> p' Q Qa) e (BranchConj \<alpha> \<psi> Q \<Phi>)"
-if "\<exists>Q'. spectroscopy_moves (Defender_Branch p \<alpha> p' Q Q\<alpha>) (Attacker_Branch p' Q') 
-      = Some (min1_6 \<circ> (\<lambda>x. x- E 0 1 1 0 0 0 0 0)) 
-        \<and> spectroscopy_moves (Attacker_Branch p' Q') (Attacker_Immediate p' Q')
-        = subtract 1 0 0 0 0 0 0 0 
-        \<and> (in_wina ((min1_6 (e - E 0 1 1 0 0 0 0 0)) - (E 1 0 0 0 0 0 0 0)) 
-              (Attacker_Immediate p' Q'))
 
-        \<and> strategy_formula (Attacker_Immediate p' Q') e' \<psi>"
-    "\<forall>q \<in> Q. spectroscopy_moves (Defender_Branch p \<alpha> p' Q Q\<alpha>) (Attacker_Clause p q) 
-      = (subtract 0 1 1 0 0 0 0 0)
-      \<and> in_wina (e - (E 0 1 1 0 0 0 0 0)) (Attacker_Clause p q)
-      \<and> strategy_formula_conjunct (Attacker_Clause p q) (e - (E 0 1 1 0 0 0 0 0)) (\<Phi> q)"
+  branch_conj:
+  "strategy_formula_conjunction (Defender_Branch p \<alpha> p' Q Qa) e (BranchConj \<alpha> \<psi> Q \<Phi>)"
+    if "\<exists>Q'. spectroscopy_moves (Defender_Branch p \<alpha> p' Q Q\<alpha>) (Attacker_Branch p' Q') 
+          = Some (min1_6 \<circ> (\<lambda>x. x- E 0 1 1 0 0 0 0 0)) 
+            \<and> spectroscopy_moves (Attacker_Branch p' Q') (Attacker_Immediate p' Q')
+            = subtract 1 0 0 0 0 0 0 0 
+            \<and> (in_wina ((min1_6 (e - E 0 1 1 0 0 0 0 0)) - (E 1 0 0 0 0 0 0 0)) 
+                  (Attacker_Immediate p' Q'))
+            \<and> strategy_formula (Attacker_Immediate p' Q') e' \<psi>"
+        
+        "\<forall>q \<in> Q. spectroscopy_moves (Defender_Branch p \<alpha> p' Q Q\<alpha>) (Attacker_Clause p q) 
+          = (subtract 0 1 1 0 0 0 0 0)
+          \<and> in_wina (e - (E 0 1 1 0 0 0 0 0)) (Attacker_Clause p q)
+          \<and> strategy_formula_conjunct (Attacker_Clause p q) (e - (E 0 1 1 0 0 0 0 0)) (\<Phi> q)"
 
 end
 
