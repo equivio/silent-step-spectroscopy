@@ -1,5 +1,5 @@
 theory Spectroscopy_Game
-  imports Energy_Games Energy LTS HML_SRBB
+  imports Energy_Games Energy LTS HML_SRBB Expressiveness_Price
 begin
 
 text \<open>In this theory the full spectroscopy game is defined (as a locale). 
@@ -211,6 +211,31 @@ where
           \<and> in_wina (e - (E 0 1 1 0 0 0 0 0)) (Attacker_Clause p q)
           \<and> strategy_formula_conjunct (Attacker_Clause p q) (e - (E 0 1 1 0 0 0 0 0)) (\<Phi> q)"
 
-end
+lemma one_empty_Q:
+  assumes "distinguishes_from \<phi> p {}"
+  shows "in_wina (expressiveness_price \<phi>) (Attacker_Immediate p {})"
+proof-
+  have not_neg: "expressiveness_price \<phi> \<noteq> eneg" by auto
+  moreover have is_last_move: "spectroscopy_moves (Defender_Conj p {}) p' = None" for p' 
+    by(rule spectroscopy_moves.elims, auto)
+  moreover have "spectroscopy_defender (Defender_Conj p {})" by simp
+  ultimately have conj_win: "in_wina (expressiveness_price \<phi>) (Defender_Conj p {})" 
+    by (simp add: in_wina.intros(1))
+
+  from finishing_or_early_conj[of p "{}" p "{}"] have next_move: 
+    "spectroscopy_moves (Attacker_Immediate p {}) (Defender_Conj p {}) = Some id" 
+    by force
+
+  moreover have "attacker (Attacker_Immediate p {})" by simp
+  ultimately show ?thesis using in_wina.intros(2)[of "Attacker_Immediate p {}" "expressiveness_price \<phi>"]
+    by (metis conj_win id_apply not_neg option.distinct(1) option.sel)
+qed
+
+lemma one:
+  assumes "distinguishes_from \<phi> p Q"
+  shows "in_wina (expressiveness_price \<phi>) (Attacker_Immediate p Q)"
+  sorry
+
+end (* context full_spec_game *)
 
 end
