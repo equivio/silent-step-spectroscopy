@@ -85,20 +85,6 @@ fun spectroscopy_defender where
   "spectroscopy_defender (Defender_Conj _ _) = True" |
   "spectroscopy_defender (Defender_Stable_Conj _ _) = True"
 
-  
-interpretation Game: energy_game "spectroscopy_moves" "spectroscopy_defender" "eneg" .
-
-end
-
-locale full_spec_game =
-  Inhabited_Tau_LTS step left right \<tau>
-  + energy_game "spectroscopy_moves" "spectroscopy_defender" "eneg"
-  for step :: \<open>'s \<Rightarrow> 'a \<Rightarrow> 's \<Rightarrow> bool\<close> (\<open>_ \<mapsto>_ _\<close> [70, 70, 70] 80) and
-      left :: 's and
-      right :: 's and
-      \<tau> :: 'a
-begin
-
 
 text \<open>
   Next we show that the lemma \<open>win_a_upwards_closure\<close> (which shows that "with more energy the 
@@ -107,6 +93,7 @@ text \<open>
   - all updates are monotonic w.r.t. \<open>\<le>\<close> 
   - and  \<open>e \<le> Upd(e)\<close> holds for all energies and updates. 
 \<close> 
+
 
 lemma update_monotonicity: 
   fixes g g' e e'
@@ -291,11 +278,29 @@ next
   then show ?thesis using gets_smaller by auto
 qed
 
-lemma win_a_upwards_closure_spec:          
-  assumes "in_wina e g"
-  shows "(\<forall>e'.((e \<le> e')\<longrightarrow> (in_wina e' g)))"
-  using win_a_upwards_closure update_monotonicity update_gets_smaller
-  by (smt (verit) antisym assms eneg_leq order_refl order_trans)
+interpretation Game: energy_game "spectroscopy_moves" "spectroscopy_defender" "eneg" "less_eq" 
+proof 
+  fix e e' e''::energy
+  show "e \<le> e' \<Longrightarrow> e' \<le> e'' \<Longrightarrow> e \<le> e''" unfolding less_eq_energy_def by (smt (z3) energy.case_eq_if order_trans)
+  show "e \<le> e" unfolding less_eq_energy_def by (simp add: energy.case_eq_if)
+  show "e \<le> e' \<Longrightarrow> e' \<le> e \<Longrightarrow> e = e'" unfolding less_eq_energy_def
+    by (smt (z3) energy.case_eq_if energy.expand nle_le)
+  show "eneg \<le> e" using eneg_leq .
+  show "\<And>g g' e e'. spectroscopy_moves g g' \<noteq> None \<Longrightarrow> e \<le> e' \<Longrightarrow> the (spectroscopy_moves g g') e \<le> the (spectroscopy_moves g g') e'" using update_monotonicity by simp
+  show "\<And>g g' e. spectroscopy_moves g g' \<noteq> None \<Longrightarrow> the (spectroscopy_moves g g') e \<le> e" using update_gets_smaller by simp
+qed
+
+
+end
+
+locale full_spec_game =
+  Inhabited_Tau_LTS step left right \<tau>
+  + energy_game "spectroscopy_moves" "spectroscopy_defender" "eneg" "less_eq"
+  for step :: \<open>'s \<Rightarrow> 'a \<Rightarrow> 's \<Rightarrow> bool\<close> (\<open>_ \<mapsto>_ _\<close> [70, 70, 70] 80) and
+      left :: 's and
+      right :: 's and
+      \<tau> :: 'a
+begin
 
 end
 
