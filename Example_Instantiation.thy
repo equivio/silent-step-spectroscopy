@@ -46,7 +46,7 @@ fun defender :: "state \<Rightarrow> bool" where
   "defender e = True" |
   "defender _ = False"
 
-interpretation Game: energy_game "weight_opt" "defender" "eneg" .
+interpretation Game: energy_game "weight_opt" "defender" "eneg" "somewhere_smaller" sorry
 
 notation Game.moves (infix "\<Zinj>" 70)
 abbreviation "finite_play \<equiv> Game.finite_play"
