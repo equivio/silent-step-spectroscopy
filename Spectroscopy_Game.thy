@@ -234,7 +234,15 @@ qed
 lemma one:
   assumes "distinguishes_from \<phi> p Q"
   shows "in_wina (expressiveness_price \<phi>) (Attacker_Immediate p Q)"
-  sorry
+proof-
+  have "\<lbrakk>Q \<noteq> {}; distinguishes_from \<phi> p Q\<rbrakk> \<Longrightarrow> in_wina (expressiveness_price \<phi>) (Attacker_Immediate p Q)" and
+        "\<lbrakk>Q \<noteq> {}; distinguishes_inner \<chi> p q;  Q \<Zsurj>S Q\<rbrakk> \<Longrightarrow> in_wina (expr_pr_inner \<chi>) (Attacker_Delayed p Q)" and
+        "\<lbrakk>Q \<noteq> {}; distinguishes_conjunct \<psi> p q\<rbrakk> \<Longrightarrow> in_wina (expr_pr_conjunct \<psi>) (Attacker_Clause p q)" and
+        "\<lbrakk>Q \<noteq> {}; distinguishes_from_inner (Conj \<Psi>_I \<Psi>) p Q\<rbrakk> \<Longrightarrow> in_wina (expr_pr_inner (Conj \<Psi>_I \<Psi>)) (Defender_Conj p Q)" and
+        
+        for \<phi> p Q \<chi> q \<psi> \<Psi>_I \<Psi>
+    sorry
+qed
 
 end (* context full_spec_game *)
 

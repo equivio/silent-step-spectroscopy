@@ -219,6 +219,19 @@ lemma \<chi>_price_never_neg: "expr_pr_inner \<chi> \<noteq> eneg"
 definition \<O>_inner :: "energy \<Rightarrow> (('a, 's) hml_srbb_inner) set" where
   "\<O>_inner energy \<equiv> {\<chi> . expr_pr_inner \<chi> \<le> energy}"
 
+fun expr_pr_conjunct :: "('a, 's) hml_srbb_conjunct \<Rightarrow> energy" where
+  "expr_pr_conjunct \<psi> = E (modal_depth_srbb_conjunct \<psi>)
+                 (branch_conj_depth_conjunct \<psi>)
+                 (inst_conj_depth_conjunct \<psi>)
+                 (st_conj_depth_conjunct \<psi>)
+                 (imm_conj_depth_conjunct \<psi>)
+                 (max_pos_conj_depth_conjunct \<psi>)
+                 (max_neg_conj_depth_conjunct \<psi>)
+                 (neg_depth_conjunct \<psi>)"
+
+definition \<O>_conjunct :: "energy \<Rightarrow> (('a, 's) hml_srbb_conjunct) set" where
+  "\<O>_conjunct energy \<equiv> {\<chi> . expr_pr_conjunct \<chi> \<le> energy}"
+
 subsection \<open>characterizing equivalence by energy coordinates\<close>
 
 context Inhabited_Tau_LTS
