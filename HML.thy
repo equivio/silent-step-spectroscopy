@@ -604,6 +604,12 @@ section \<open> Distinguishing Formulas \<close>
 context LTS_Tau
 begin
 
+text \<open> A formula is said to distinguishe to processes iff one process satisfies the formula,
+while the other does not. 
+One may lift this to sets of processes, i.e. that a formula distinguishes a singular processes
+from a whole set of processes iff this formula distinguishes the processes from each processes
+in the set. \<close>
+
 definition dist :: "'s \<Rightarrow> ('a, 's) hml \<Rightarrow> 's \<Rightarrow> bool" ("_ <> _ _" [70, 70, 70] 80) where
   "(p <> \<phi> q) \<equiv> (p \<Turnstile> \<phi>) \<and> \<not>(q \<Turnstile> \<phi>)"
 
@@ -613,6 +619,32 @@ definition distFrom :: "'s \<Rightarrow> ('a, 's) hml \<Rightarrow> 's set \<Rig
 
 subsection \<open> Distinguishing Conjunction Thinning \<close>
 
+text \<open>
+This subsection provides proofs regarding conjunctions that distinguish a process \<open>p\<close> from a set of
+processes \<open>Q\<close>.
+In particular the property of distinguishing conjunction thinning is proven.
+
+This property states that if a conjunction distinguishes \<open>p\<close> from \<open>Q\<close> with some arbitrary index set
+\<open>I\<close>, then one can construct another conjunction with the index set \<open>Q\<close> (i.e. with one conjunct per
+process to be distinguished from) that also distinguished \<open>p\<close> from \<open>Q\<close>.
+
+Intuitively, this proposition should hold, since for the conjunction to distinguish from \<open>Q\<close> it must
+contain at least one conjunct for each element \<open>q\<close> of \<open>Q\<close> that is not satisfied by \<open>q\<close>.
+One may now constructed the 'thinned' conjunction with index set \<open>Q\<close> by picking for each \<open>q\<close> in \<open>Q\<close>
+a conjunct that \<open>q\<close> does not satisfy, thereby guaranteeing that all elements of \<open>Q\<close> can not satisfy
+this new conjunction.
+The process \<open>p\<close> must still satisfy this new conjunction since all conjuncts originate from the old
+conjunction which \<open>p\<close> satisfies and thereby all conjuncts hold for \<open>p\<close>. Said in another way: since
+no new conjuncts are constructed there is no opportunity for p to not satisfy the new conjunction.
+\<close>
+
+text \<open>The following proof is a prove of a underspecified variant of the distinguishing conjunction thinning.
+It is underspecified in the sense that we do not know anything about the new set of conjuncts.
+For purposes of the silent step spectroscopy, this is problematic, since we might want relate the
+expressiveness price of the new distinguishing conjunction to the old distinguishing conjunction.
+The proof diverges from the proof sketch given above in that the new conjunction simply copies the
+old conjunction in each new conjunct.
+\<close>
 lemma
   fixes Q :: "'s set"
   assumes "p <> (Conj I \<psi>s) Q"
@@ -632,6 +664,7 @@ proof -
   then show "\<exists>\<psi>s'. \<forall>q\<in>Q. p \<Turnstile> Conj Q \<psi>s' \<and> \<not> q \<Turnstile> Conj Q \<psi>s'" by auto
 qed
 
+text \<open> This is the main proof and implements the proof sketch given above. \<close>
 lemma dist_conj_thinning:
   fixes Q :: "'s set"
   assumes "p <> (Conj I \<psi>s) Q"
@@ -691,6 +724,23 @@ proof -
   qed
 qed
 
+
+text \<open> The following three lemmata prove that the first condition of a distinguishing conjunction
+(i.e. that the distinguished process \<open>p\<close> satisfies the conjunction)
+for a somewhat more complex strategy of picking conjuncts. 
+These become necessary when one wants to lift the distinguishing conjunction thinning lemma to \<open>hml_srbb\<close>.
+Confer to the file of \<open>hml_srbb\<close> for more insight into the background.
+
+The strategy for picking the conjuncts -- defined as \<open>distinguishing_conjunct\<close> in each lemma head --
+is robust against original conjunctions with empty index sets or that do not contain distinguishing
+conjuncts for some elements of \<open>Q\<close>. While these cases are impossible for normal distinguishing 
+conjunctions in hml (how can an empty conjunction distinguish anything; a distinguishing conjunction
+must have a subformula that actually distinguishes), in our formalisation of \<open>hml_srbb\<close> these cases
+are relevant and in particular it is important that well defined conjuncts be present in such cases.
+So the strategy works as follows: if I is empty, just pick \<open>\<top>\<close> (encoded in different ways);
+if there is no distinguishing conjunct just pick any conjunct for the original conjunction;
+otherwise pick a distinguishing conjunct.
+\<close>
 
 lemma dist_conjunct_image_subset_all_conjuncts:
   defines 
