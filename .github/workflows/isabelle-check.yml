@@ -1,11 +1,10 @@
-name: Check Isabelle for PRs
+name: Build isabelle session
 
 on:
   pull_request:
     branches: [ main ]
   workflow_dispatch:
 
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
   contents: read
 
@@ -16,33 +15,8 @@ jobs:
     steps:
       - uses: actions/checkout@v3.4.0
 
-      - name: chache output
-        id: cache-output
-        uses: actions/cache@v3
-        with:
-          path: ./out
-          key: ${{ runner.os }}-out
-
       - name: Isabelle
         uses: 'docker://hllm/isabelle-docker'
         with:
           entrypoint: /bin/bash
-          args: > 
-            -c "/home/isabelle/Isabelle/bin/isabelle build
-            -v
-            -o document=pdf
-            -o document_variants=document:outline=/proof,/ML
-            -P out
-            -d .
-            LinearTimeBranchingTimeSpectroscopyAccountingForSilentSteps
-            | tee isabelle_log &&
-            (diff 
-            <(cat isabelle_log | grep \"Presenting theory\" | grep LinearTimeBranchingTimeSpectroscopyAccountingForSilentSteps | sort)
-            <(sort <(for f in $(find . -name '*.thy' | grep -v _); do echo Presenting theory \\\"LinearTimeBranchingTimeSpectroscopyAccountingForSilentSteps.$(basename $f .thy)\\\"; done))
-            || (echo Not all .thy files were 'presented'; /bin/false))"
-
-      - uses: actions/upload-artifact@v3
-        with:
-          name: document
-          path: ./out/AFP/LinearTimeBranchingTimeSpectroscopyAccountingForSilentSteps/document.pdf
-          retention-days: 7
+          args: build.sh
