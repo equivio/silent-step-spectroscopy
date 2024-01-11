@@ -4,10 +4,24 @@ theory Energy_Games
   imports Main Misc
 begin
 
+text \<open>In this theory energy games are introduced and basic definitions such as (winning) plays are 
+given. This creates the foundation for the later introduced full spectroscopy game, which is an 
+energy game itself, characterizing equivalence problems.\<close>
+
 section \<open>Energy Games\<close>
 
+text\<open>Later on we will consider 8-dimensional energy games. For now energies will not be typed.\<close>
+
 type_synonym 'energy update = "'energy \<Rightarrow> 'energy"
+
+text\<open>When only finite plays are considered these can be represented as a list of states. To stay 
+aware of this limitation to finite cases a corresponding type synonym is introduced.\<close>
+
 type_synonym 'gstate fplay = "'gstate list"
+
+text\<open>An energy games is played on a directed graph labeled by energy updates. We limit ourselves to 
+the case where only the attacker can run out of energy if the energy level reaches the 
+\<open>defender_win_level\<close>.\<close>
 
 locale energy_game =
   fixes weight_opt :: "'gstate \<Rightarrow> 'gstate \<Rightarrow> 'energy update option" and
@@ -22,6 +36,8 @@ locale energy_game =
           update_gets_smaller: "\<And>g g' e. ((weight_opt g g') \<noteq> None) \<Longrightarrow> (ord (the (weight_opt g g')e) e)"
 begin
 
+text\<open>Some natural abbreviations follow:\<close>
+
 abbreviation attacker :: "'gstate \<Rightarrow> bool" ("Ga") where "Ga p \<equiv> \<not> Gd p" 
 
 abbreviation moves :: "'gstate \<Rightarrow> 'gstate \<Rightarrow> bool" (infix "\<Zinj>" 70) where "g1 \<Zinj> g2 \<equiv> weight_opt g1 g2 \<noteq> None"
@@ -31,6 +47,9 @@ abbreviation weighted_move :: "'gstate \<Rightarrow> 'energy update \<Rightarrow
 
 abbreviation "weight g1 g2 \<equiv> the (weight_opt g1 g2)"
 
+text\<open>Starting with some energy at some state the resulting energy level after a valid play can be 
+calculated as follows:\<close>
+
 fun energy_level :: "'gstate \<Rightarrow> 'energy \<Rightarrow>'gstate fplay \<Rightarrow> 'energy" where
   "energy_level g0 e0 p = (
     if p = [g0] then 
@@ -38,8 +57,6 @@ fun energy_level :: "'gstate \<Rightarrow> 'energy \<Rightarrow>'gstate fplay \<
     else ( if (length p \<ge> 2) then ( if ((weight_opt (last (butlast p))(last p)) \<noteq> None) then ((weight (last (butlast p)) (last p)) (energy_level g0 e0 (butlast p)))
                                     else undefined)
           else undefined))"
-
-
 
 lemma %invisible energy_level_def1:
   shows "energy_level g0 e0 [g0] = e0"
@@ -76,9 +93,15 @@ next
 qed
 
 subsection \<open>Finite Plays\<close>
+
+text\<open>We already spoke of "valid games". By this we mean lists of states where an edge from one 
+state to the next in the list exists. In the finite case this is represented as \<open>finite_play\<close>.\<close>
+
 inductive finite_play :: "'gstate \<Rightarrow> 'gstate fplay \<Rightarrow> bool" where
   "finite_play g0 [g0]" |
   "finite_play g0 (p @ [gn])" if "finite_play g0 p" and "last p \<Zinj> gn"
+
+text\<open>Some potentially helpful lemmas follow:\<close>
 
 lemma finite_play_prefix:
   assumes "finite_play g0 (a @ b)" "a \<noteq> []"
@@ -139,8 +162,6 @@ lemma finite_play_is_path:
   shows "((p = ((a @ [g]) @ b)) \<and> a \<noteq>[]) \<longrightarrow> ((last a) \<Zinj> g)"
   by (metis assms butlast.simps(2) finite_play.simps finite_play_prefix snoc_eq_iff_butlast)
 
-thm finite_play.induct
-
 lemma energy_level_fold_eq:
   assumes "finite_play g0 p"
   shows "energy_level g0 e0 p = fold (\<lambda>(g1, g2) e. (weight g1 g2) e) (pairs p) e0"
@@ -160,6 +181,11 @@ next
 qed
 
 subsection \<open>Winning\<close>
+
+text\<open>Energy games can be won. An infinite game is won by the defender. A finite play is won if it's 
+stuck (i.e. there are no more possible moves) and it is the other players turn. Since we for now
+only consider finite plays we will need to define stuckness.\<close>
+
 abbreviation "play_stuck g0 p \<equiv> (finite_play g0 p) \<and> (\<nexists>gn. finite_play g0 (p @ [gn]))"
 
 lemma play_stuck_def:
@@ -182,6 +208,11 @@ qed
 abbreviation "is_defender_turn p \<equiv> Gd (last p)"
 abbreviation "is_attacker_turn p \<equiv> Ga (last p)"
 
+text\<open>Now the winning conditions for finite plays can be formalized and we can show that each finite 
+play is either won by the defender, won by the attacker or not yet stuck. We need to consider the 
+energy levels of plays. The attacker should be understood as truly not stuck only if the energy 
+level does not equal the defender win level - otherwise the defender wins.\<close>
+
 definition won_by_defender:: "'gstate \<Rightarrow> 'energy \<Rightarrow> 'gstate fplay \<Rightarrow> bool" where
   "won_by_defender g0 e0 p \<equiv> (play_stuck g0 p \<and> is_attacker_turn p) \<or> (energy_level g0 e0 p = defender_win_level)"
 
@@ -201,15 +232,23 @@ lemma play_won_unique:
   and  "no_winner g0 e0 p  \<longleftrightarrow>  \<not> (won_by_defender g0 e0 p \<or> won_by_attacker g0 e0 p)"
   using  won_by_attacker_def won_by_defender_def by blast+
 
-subsection \<open>Winning Budgets\<close>
+subsubsection \<open>Winning Budgets\<close>
+
+text\<open>The attacker wins a game from some starting position if they can force the defender to get 
+stuck before running out of energy themselves. How much energy is needed can be characterized by 
+winning budgets: \<close>
 
 inductive in_wina:: "'energy \<Rightarrow> 'gstate \<Rightarrow> bool " where
  "in_wina e g" if "(Gd g) \<and> (\<forall>g'. \<not>(g \<Zinj> g')) \<and> (e \<noteq> defender_win_level)" |
  "in_wina e g" if "(Ga g) \<and> (\<exists>g'. ((g \<Zinj> g') \<and> (in_wina ((weight g g') e) g')))\<and> (e \<noteq> defender_win_level)" |
- "in_wina e g" if "(Gd g) \<and> (\<forall>g'. ((g \<Zinj> g') \<longrightarrow> (in_wina ((weight g g') e) g'))) \<and> (e \<noteq> defender_win_level)" 
+ "in_wina e g" if "(Gd g) \<and> (\<forall>g'. ((g \<Zinj> g') \<longrightarrow> (in_wina ((weight g g') e) g'))) \<and> (e \<noteq> defender_win_level)"
+
+definition wina_set
+  where
+"wina_set g = {e. in_wina e g}"
 
 lemma defender_win_level_not_in_wina:
-  shows "\<forall>g. \<not>in_wina defender_win_level g"
+  shows "\<forall>g. \<not>in_wina defender_win_level g" 
   by (metis in_wina.cases)
 
 lemma attacker_wins_last_wina_notempty:
@@ -221,6 +260,10 @@ lemma in_wina_Ga:
   assumes "in_wina e g" and "Ga g" 
   shows "\<exists>g'. ((g \<Zinj> g') \<and> (in_wina ((weight g g') e) g'))"
   using assms(1) assms(2) in_wina.simps by blast
+
+text\<open>The intuitively true statement "with more energy the attacker will win at least as much as 
+before" can be proven when given a partial order on energies such that the \<open>defender_win_leve\<close>l is 
+the minimal energy, updates are monotonic and \<open>e \<ge> Upd(e)\<close> holds for all energies and updates:\<close>
 
 lemma win_a_upwards_closure: 
   assumes "in_wina e g"
