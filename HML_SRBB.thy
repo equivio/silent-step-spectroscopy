@@ -77,14 +77,14 @@ lemma "(state \<Turnstile>SRBB Internal \<chi>) = (state \<Turnstile>SRBB ImmCon
 definition distinguishes :: "('a, 's) hml_srbb \<Rightarrow> 's \<Rightarrow> 's \<Rightarrow> bool" where
   "distinguishes \<phi> p q \<equiv> p \<Turnstile>SRBB \<phi> \<and> \<not>(q \<Turnstile>SRBB \<phi>)"
 
-definition distinguishes_\<chi> :: "('a, 's) hml_srbb_inner \<Rightarrow> 's \<Rightarrow> 's \<Rightarrow> bool" where
-  "distinguishes_\<chi> \<chi> p q \<equiv> hml_srbb_inner_models \<chi> p \<and> \<not>(hml_srbb_inner_models \<chi> q)"
+definition distinguishes_inner :: "('a, 's) hml_srbb_inner \<Rightarrow> 's \<Rightarrow> 's \<Rightarrow> bool" where
+  "distinguishes_inner \<chi> p q \<equiv> hml_srbb_inner_models \<chi> p \<and> \<not>(hml_srbb_inner_models \<chi> q)"
 
 definition distinguishes_from :: "('a, 's) hml_srbb \<Rightarrow> 's \<Rightarrow> 's set \<Rightarrow> bool" where
   "distinguishes_from \<phi> p Q \<equiv> \<forall>q \<in> Q. distinguishes \<phi> p q"
 
-definition distinguishes_from_\<chi> :: "('a, 's) hml_srbb_inner \<Rightarrow> 's \<Rightarrow> 's set \<Rightarrow> bool" where
-  "distinguishes_from_\<chi> \<chi> p Q \<equiv> \<forall>q \<in> Q. distinguishes_\<chi> \<chi> p q"
+definition distinguishes_from_inner :: "('a, 's) hml_srbb_inner \<Rightarrow> 's \<Rightarrow> 's set \<Rightarrow> bool" where
+  "distinguishes_from_inner \<chi> p Q \<equiv> \<forall>q \<in> Q. distinguishes_inner \<chi> p q"
 
 
 definition hml_preordered :: "(('a, 's) hml_srbb) set \<Rightarrow> 's \<Rightarrow> 's \<Rightarrow> bool" where
@@ -148,24 +148,24 @@ lemma srbb_impl_to_hml_impl:
   by (simp add: LTS_Tau.hml_impl_iffI hml_srbb_impl_def)
 
 
-definition hml_srbb_impl_\<chi> :: "('a, 's) hml_srbb_inner \<Rightarrow> ('a, 's) hml_srbb_inner \<Rightarrow> bool" (infix "\<chi>\<Rrightarrow>" 70) where
+definition hml_srbb_impl_inner :: "('a, 's) hml_srbb_inner \<Rightarrow> ('a, 's) hml_srbb_inner \<Rightarrow> bool" (infix "\<chi>\<Rrightarrow>" 70) where
   "\<chi>l \<chi>\<Rrightarrow> \<chi>r \<equiv> \<forall>p. hml_srbb_inner_models \<chi>l p \<longrightarrow> hml_srbb_inner_models \<chi>r p"
 
-lemma srbb_impl_\<chi>_to_hml_impl:
+lemma srbb_impl_inner_to_hml_impl:
   assumes "\<chi>l \<chi>\<Rrightarrow> \<chi>r"
   shows "hml_srbb_inner_to_hml \<chi>l \<Rrightarrow> hml_srbb_inner_to_hml \<chi>r"
   using assms
-  by (simp add: LTS_Tau.hml_impl_iffI hml_srbb_impl_\<chi>_def)
+  by (simp add: LTS_Tau.hml_impl_iffI hml_srbb_impl_inner_def)
 
 
-definition hml_srbb_impl_\<psi> :: "('a, 's) hml_srbb_conjunct \<Rightarrow> ('a, 's) hml_srbb_conjunct \<Rightarrow> bool" (infix "\<psi>\<Rrightarrow>" 70) where
+definition hml_srbb_impl_conjunct :: "('a, 's) hml_srbb_conjunct \<Rightarrow> ('a, 's) hml_srbb_conjunct \<Rightarrow> bool" (infix "\<psi>\<Rrightarrow>" 70) where
   "\<psi>l \<psi>\<Rrightarrow> \<psi>r \<equiv> \<forall>p. hml_srbb_conjunct_models \<psi>l p \<longrightarrow> hml_srbb_conjunct_models \<psi>r p"
 
-lemma srbb_impl_\<psi>_to_hml_impl:
+lemma srbb_impl_conjunct_to_hml_impl:
   assumes "\<psi>l \<psi>\<Rrightarrow> \<psi>r"
   shows "hml_srbb_conjunct_to_hml_conjunct \<psi>l \<and>\<Rrightarrow> hml_srbb_conjunct_to_hml_conjunct \<psi>r"
   using assms
-  by (simp add: hml_conjunct_impl_def hml_srbb_impl_\<psi>_def)
+  by (simp add: hml_conjunct_impl_def hml_srbb_impl_conjunct_def)
 
 
 subsection \<open> \<open>hml__srbb\<close> Equivalence \<close>
@@ -173,10 +173,10 @@ subsection \<open> \<open>hml__srbb\<close> Equivalence \<close>
 definition hml_srbb_eq :: "('a, 's) hml_srbb \<Rightarrow> ('a, 's) hml_srbb \<Rightarrow> bool" (infix "\<Lleftarrow>srbb\<Rrightarrow>" 70) where
   "\<phi>l \<Lleftarrow>srbb\<Rrightarrow> \<phi>r \<equiv> \<phi>l \<Rrightarrow> \<phi>r \<and> \<phi>r \<Rrightarrow> \<phi>l"
 
-definition hml_srbb_eq_\<chi> :: "('a, 's) hml_srbb_inner \<Rightarrow> ('a, 's) hml_srbb_inner \<Rightarrow> bool" (infix "\<Lleftarrow>\<chi>\<Rrightarrow>" 70) where
+definition hml_srbb_eq_inner :: "('a, 's) hml_srbb_inner \<Rightarrow> ('a, 's) hml_srbb_inner \<Rightarrow> bool" (infix "\<Lleftarrow>\<chi>\<Rrightarrow>" 70) where
   "\<chi>l \<Lleftarrow>\<chi>\<Rrightarrow> \<chi>r \<equiv> \<chi>l \<chi>\<Rrightarrow> \<chi>r \<and> \<chi>r \<chi>\<Rrightarrow> \<chi>l"
 
-definition hml_srbb_eq_\<psi> :: "('a, 's) hml_srbb_conjunct \<Rightarrow> ('a, 's) hml_srbb_conjunct \<Rightarrow> bool" (infix "\<Lleftarrow>\<psi>\<Rrightarrow>" 70) where
+definition hml_srbb_eq_conjunct :: "('a, 's) hml_srbb_conjunct \<Rightarrow> ('a, 's) hml_srbb_conjunct \<Rightarrow> bool" (infix "\<Lleftarrow>\<psi>\<Rrightarrow>" 70) where
   "\<psi>l \<Lleftarrow>\<psi>\<Rrightarrow> \<psi>r \<equiv> \<psi>l \<psi>\<Rrightarrow> \<psi>r \<and> \<psi>r \<psi>\<Rrightarrow> \<psi>l"
 
 
@@ -186,7 +186,7 @@ lemma internal_srbb_cong:
   assumes "\<chi>l \<Lleftarrow>\<chi>\<Rrightarrow> \<chi>r"
   shows "(Internal \<chi>l) \<Lleftarrow>srbb\<Rrightarrow> (Internal \<chi>r)"
   using assms
-  by (smt (verit) hml_models.simps(3) hml_srbb_inner_models.elims(2) hml_srbb_inner_models.elims(3) hml_srbb_eq_\<chi>_def hml_srbb_eq_def hml_srbb_impl_\<chi>_def hml_srbb_impl_def hml_srbb_models.elims(2) hml_srbb_models.elims(3) hml_srbb_to_hml.simps(2))
+  by (smt (verit) hml_models.simps(3) hml_srbb_inner_models.elims(2) hml_srbb_inner_models.elims(3) hml_srbb_eq_inner_def hml_srbb_eq_def hml_srbb_impl_inner_def hml_srbb_impl_def hml_srbb_models.elims(2) hml_srbb_models.elims(3) hml_srbb_to_hml.simps(2))
 
 lemma immconj_cong:
   assumes "\<psi>sl ` I = \<psi>sr ` I"
@@ -198,7 +198,7 @@ proof -
     and "\<psi>sl s \<Lleftarrow>\<psi>\<Rrightarrow> \<psi>sr s"
   then have "(\<forall>p. hml_srbb_conjunct_models (\<psi>sl s) p \<longrightarrow> hml_srbb_conjunct_models (\<psi>sr s) p) \<and>
              (\<forall>p. hml_srbb_conjunct_models (\<psi>sr s) p \<longrightarrow> hml_srbb_conjunct_models (\<psi>sl s) p)"
-    unfolding hml_srbb_eq_\<psi>_def and hml_srbb_impl_\<psi>_def by auto
+    unfolding hml_srbb_eq_conjunct_def and hml_srbb_impl_conjunct_def by auto
   then have "\<forall>p. hml_srbb_conjunct_models (\<psi>sl s) p \<longrightarrow> hml_srbb_conjunct_models (\<psi>sr s) p"
         and "\<forall>p. hml_srbb_conjunct_models (\<psi>sr s) p \<longrightarrow> hml_srbb_conjunct_models (\<psi>sl s) p" by auto
 
@@ -267,7 +267,7 @@ qed
 subsection \<open> Known Equivalence Elements \<close>
 
 lemma "Obs \<tau> TT \<Lleftarrow>\<chi>\<Rrightarrow> Conj {} \<psi>s"
-  by (simp add: hml_srbb_eq_\<chi>_def hml_srbb_impl_\<chi>_def)
+  by (simp add: hml_srbb_eq_inner_def hml_srbb_impl_inner_def)
 
 subsection \<open> Distinguishing Conjunction Thinning \<close>
 
@@ -326,11 +326,11 @@ lemma dist_conj_thinn:
   defines 
     "distinguishing_conjunct \<equiv> (\<lambda>I.\<lambda>\<psi>s.
        \<lambda>q. \<psi>s (SOME i. i \<in> I \<and> \<not>(hml_srbb_conjunct_models (\<psi>s i) q)))"
-  assumes "distinguishes_from_\<chi> (Conj I \<psi>s) p Q"
-  shows "distinguishes_from_\<chi> (Conj Q (distinguishing_conjunct I \<psi>s)) p Q"
+  assumes "distinguishes_from_inner (Conj I \<psi>s) p Q"
+  shows "distinguishes_from_inner (Conj Q (distinguishing_conjunct I \<psi>s)) p Q"
   using assms
-  unfolding distinguishes_from_\<chi>_def
-        and distinguishes_\<chi>_def
+  unfolding distinguishes_from_inner_def
+        and distinguishes_inner_def
         and hml_srbb_inner_models.simps
         and hml_srbb_inner_to_hml.simps
         and distinguishing_conjunct_def
@@ -377,11 +377,11 @@ lemma dist_stableconj_thinn:
      condition) or there may be conjuncts via I, but some elements of Q model all of these (i.e. so they are
      distinguished from p only via the stability condition).  Since we want to pick a conjunct for each element in Q,
      we must describe what to do in these cases. *)
-  assumes "distinguishes_from_\<chi> (StableConj I \<psi>s) p Q"
-  shows "distinguishes_from_\<chi> (StableConj Q (distinguishing_conjunct I \<psi>s)) p Q"
+  assumes "distinguishes_from_inner (StableConj I \<psi>s) p Q"
+  shows "distinguishes_from_inner (StableConj Q (distinguishing_conjunct I \<psi>s)) p Q"
   using assms
-  unfolding distinguishes_from_\<chi>_def
-        and distinguishes_\<chi>_def
+  unfolding distinguishes_from_inner_def
+        and distinguishes_inner_def
         and hml_srbb_inner_models.simps
         and hml_srbb_inner_to_hml.simps
 proof -
@@ -511,11 +511,11 @@ lemma dist_branchconj_thinn:
            else if \<exists>i \<in> I. \<not>(hml_srbb_conjunct_models (\<psi>s i) q)
                 then \<psi>s (SOME i. i \<in> I \<and> \<not>(hml_srbb_conjunct_models (\<psi>s i) q))
                 else \<psi>s (SOME i. i \<in> I))" (* c.f. dist_stableconj_thinn for an explanation of this function. *)
-  assumes "distinguishes_from_\<chi> (BranchConj \<alpha> \<phi> I \<psi>s) p Q"
-  shows "distinguishes_from_\<chi> (BranchConj \<alpha> \<phi> Q (distinguishing_conjunct I \<psi>s)) p Q"
+  assumes "distinguishes_from_inner (BranchConj \<alpha> \<phi> I \<psi>s) p Q"
+  shows "distinguishes_from_inner (BranchConj \<alpha> \<phi> Q (distinguishing_conjunct I \<psi>s)) p Q"
   using assms(2)
-  unfolding distinguishes_from_\<chi>_def
-        and distinguishes_\<chi>_def
+  unfolding distinguishes_from_inner_def
+        and distinguishes_inner_def
         and hml_srbb_inner_models.simps
         and hml_srbb_inner_to_hml.simps
 proof -
