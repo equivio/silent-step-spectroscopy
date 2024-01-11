@@ -113,7 +113,7 @@ end (* Inhabited_Tau_LTS *)
 context Inhabited_Tau_LTS
 begin
 
-text \<open> (HML_not \<phi>) represents \<open>\<not>\<phi>\<close> and is realized via a one element conjunction. \<close>
+text \<open> \<open>(HML_not \<phi>)\<close> represents \<open>\<not>\<phi>\<close> and is realized via a one element conjunction. \<close>
 
 abbreviation HML_not :: "('a, 's) hml \<Rightarrow> ('a, 's) hml" where
   "HML_not \<phi> \<equiv> Conj {left} (\<lambda>i. if i = left then (Neg \<phi>) else (Pos TT))"
