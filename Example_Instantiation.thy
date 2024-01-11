@@ -167,8 +167,9 @@ using assms proof -
   hence "(\<exists>gn. finite_play a (p @ [gn]))" using assms(1) Game.finite_play.intros(2) by blast 
   thus "\<not>Game.play_stuck a p" by simp
 qed
+text \<open>Finally, we verify our definition of win_a using scenarios where we expect the attacker to have a winning strategy (or not).\<close>
 
-lemma attackers_winas_defender_stuck: 
+lemma attackers_winas_defender_stuck:
   shows "Game.in_wina (E 9 8) e"
   by (simp add: energy_game.in_wina.intros(1))
 
