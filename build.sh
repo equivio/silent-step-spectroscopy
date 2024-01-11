@@ -19,7 +19,7 @@ RED='\033[;31m'
 GREEN='\033[0;32m'
 NOCOLOR='\033[0m'
 
-# Check that all .thy files not starting with an "_" were presented
+# Check that all .thy files not ending with an "_" were presented
 (diff \
     <( \
         cat isabelle_log | \
@@ -28,7 +28,7 @@ NOCOLOR='\033[0m'
         sort\
     ) \
     <( \
-        find . -name "*.thy" -not -name "_*" -exec basename {} .thy ';' | \
+        find . -name "*.thy" -not -name "*_.thy" -exec basename {} .thy ';' | \
         sort | \
         awk -v SN=$SESSION_NAME '{print "Presenting theory \"" SN "." $0 "\""}' \
     ) \
