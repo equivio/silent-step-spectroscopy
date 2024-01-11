@@ -644,6 +644,196 @@ proof -
     by (meson equivp_transp hml_eq_equiv)
 qed
 
+
+subsection \<open> HML Equivalence X HML Pre-Order \<close>
+
+text \<open>
+These lemmata provide means to substitute HML equivalences and implications into each other,
+thereby providing further support for equational reasoning on HML formulas.
+Of note is the fact that this always yields an HML implication.
+\<close>
+
+subsubsection \<open> Observations \<open>\<langle>\<alpha>\<rangle>...\<close> \<close>
+
+lemma obs_left_impl_subst_equal:
+  assumes "\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r"
+      and "(Obs \<alpha> \<phi>l) \<Rrightarrow> \<phi>"
+    shows "(Obs \<alpha> \<phi>r) \<Rrightarrow> \<phi>"
+  using assms by (meson hml_impl_iffI hml_eq_def obs_pre_cong)
+
+lemma obs_right_impl_subst_equal:
+  assumes "\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r"
+      and "\<phi> \<Rrightarrow> (Obs \<alpha> \<phi>l)"
+    shows "\<phi> \<Rrightarrow> (Obs \<alpha> \<phi>r)" 
+  using assms and hml_eq_def and obs_pre_subst by blast
+
+lemma obs_equal_subst_impl:
+  assumes "\<phi>l \<Rrightarrow> \<phi>r"
+      and "\<phi> \<Lleftarrow>\<Rrightarrow> (Obs \<alpha> \<phi>l)"
+    shows "\<phi> \<Rrightarrow> (Obs \<alpha> \<phi>r)"
+  using assms by (simp add: hml_eq_def obs_pre_subst)
+
+subsubsection \<open> Internal Behavior \<open>\<langle>\<epsilon>\<rangle>...\<close> \<close>
+
+lemma internal_left_impl_subst_equal:
+  assumes "\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r"
+      and "(Internal \<phi>l) \<Rrightarrow> \<phi>"
+    shows "(Internal \<phi>r) \<Rrightarrow> \<phi>"
+  using assms by (meson hml_impl_iffI hml_eq_def internal_pre_cong)
+
+lemma internal_right_impl_subst_equal:
+  assumes "\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r"
+      and "\<phi> \<Rrightarrow> (Internal \<phi>l)"
+    shows "\<phi> \<Rrightarrow> (Internal \<phi>r)"
+  using assms using hml_eq_def internal_pre_subst by blast
+
+lemma internal_equal_subst_impl:
+  assumes "\<phi>l \<Rrightarrow> \<phi>r"
+      and "\<phi> \<Lleftarrow>\<Rrightarrow> (Internal \<phi>l)"
+    shows "\<phi> \<Rrightarrow> (Internal \<phi>r)"
+  using assms and hml_eq_def and internal_pre_subst by blast
+
+subsubsection \<open> Silent Step \<open>(\<tau>)...\<close> \<close>
+
+lemma silent_left_impl_subst_equal:
+  assumes "\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r"
+      and "(Silent \<phi>l) \<Rrightarrow> \<phi>"
+    shows "(Silent \<phi>r) \<Rrightarrow> \<phi>"
+  using assms by (simp add: hml_eq_equality hml_impl_iffI)
+
+lemma silent_right_impl_subst_equal:
+  assumes "\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r"
+      and "\<phi> \<Rrightarrow> (Silent \<phi>l)"
+    shows "\<phi> \<Rrightarrow> (Silent \<phi>r)"
+  using assms and hml_eq_def and silent_pre_subst by blast
+
+lemma silent_equal_subst_impl:
+  assumes "\<phi>l \<Rrightarrow> \<phi>r"
+      and "\<phi> \<Lleftarrow>\<Rrightarrow> (Silent \<phi>l)"
+    shows "\<phi> \<Rrightarrow> (Silent \<phi>r)"
+  using assms and hml_eq_def and silent_pre_subst by blast
+
+subsubsection \<open> Conjunctions \<open>\<And>\<Psi>\<close> \<close>
+
+lemma conjunction_left_impl_subst_equal:
+  assumes "\<psi>sl ` I = \<psi>sr ` I"
+      and "\<forall>i\<in>I'. \<psi>sl i \<Lleftarrow>\<and>\<Rrightarrow> \<psi>sr i"
+      and "(Conj (I \<union> I') \<psi>sl) \<Rrightarrow> \<phi>"
+    shows "(Conj (I \<union> I') \<psi>sr) \<Rrightarrow> \<phi>"
+  using assms by (smt (verit, del_insts) hml_conjunct_eq_def conj_pre_congs hml_impl_preord transp_def)
+
+lemma conjunction_right_impl_subst_equal:
+  assumes "\<psi>sl ` I = \<psi>sr ` I"
+      and "\<forall>i\<in>I'. \<psi>sl i \<Lleftarrow>\<and>\<Rrightarrow> \<psi>sr i"
+      and "\<phi> \<Rrightarrow> (Conj (I \<union> I') \<psi>sl)"
+    shows "\<phi> \<Rrightarrow> (Conj (I \<union> I') \<psi>sr)"
+  using assms by (meson hml_conjunct_eq_def conj_pre_congs hml_impl_iffI)
+
+lemma conjunction_equal_subst_impl:
+  assumes "\<psi>sl ` I = \<psi>sr ` I"
+      and "\<forall>i\<in>I'. \<psi>sl i \<and>\<Rrightarrow> \<psi>sr i"
+      and "\<phi> \<Lleftarrow>\<Rrightarrow> (Conj (I \<union> I') \<psi>sl)"
+    shows "\<phi> \<Rrightarrow> (Conj (I \<union> I') \<psi>sr)"
+  using assms by (meson conj_pre_congs hml_eq_def hml_impl_iffI)
+
+subsubsection \<open> Positive Conjunct \<close>
+
+lemma conjunct_left_impl_subst_equal:
+  assumes "\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r"
+      and "(Pos \<phi>l) \<and>\<Rrightarrow> \<psi>"
+    shows "(Pos \<phi>r) \<and>\<Rrightarrow> \<psi>"
+  using assms hml_conjunct_impl_def hml_eq_def pos_pre_cong by auto
+
+lemma conjunct_right_impl_subst_equal:
+  assumes "\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r"
+      and "\<psi> \<and>\<Rrightarrow> (Pos \<phi>l)"
+    shows "\<psi> \<and>\<Rrightarrow> (Pos \<phi>r)" 
+  using assms and hml_eq_def and pos_pre_subst by blast
+
+lemma conjunct_equal_subst_impl:
+  assumes "\<phi>l \<Rrightarrow> \<phi>r"
+      and "\<psi> \<Lleftarrow>\<and>\<Rrightarrow> (Pos \<phi>l)"
+    shows "\<psi> \<and>\<Rrightarrow> (Pos \<phi>r)"
+  using assms by (simp add: hml_conjunct_eq_def pos_pre_subst)
+
+subsubsection \<open> Negative Conjunct \<close>
+
+lemma neg_left_impl_subst_equal:
+  assumes "\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r"
+      and "(Neg \<phi>l) \<and>\<Rrightarrow> \<psi>"
+    shows "(Neg \<phi>r) \<and>\<Rrightarrow> \<psi>"
+  using assms and hml_eq_def and neg_pre_subst by blast
+
+lemma neg_right_impl_subst_equal:
+  assumes "\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r"
+      and "\<psi> \<and>\<Rrightarrow> (Neg \<phi>l)"
+    shows "\<psi> \<and>\<Rrightarrow> (Neg \<phi>r)" 
+  using assms by (meson hml_impl_iffI hml_conjunct_impl_def hml_conjunct_models.simps(2) hml_eq_def)
+
+lemma neg_equal_subst_impl:
+  assumes "\<phi>l \<Rrightarrow> \<phi>r"
+      and "\<psi> \<Lleftarrow>\<and>\<Rrightarrow> (Neg \<phi>r)"
+    shows "\<psi> \<and>\<Rrightarrow> (Neg \<phi>l)"
+  using assms by (meson hml_conjunct_impl_def hml_conjunct_eq_def neg_pre_cong)
+
+subsubsection \<open> Negation \<close>
+
+lemma not_left_impl_subst_equal:
+  assumes "\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r"
+      and "HML_not \<phi>l \<Rrightarrow> \<phi>"
+    shows "HML_not \<phi>r \<Rrightarrow> \<phi>"
+  using assms by (smt (verit) hml_conjunct_impl_def hml_eq_def hml_impl_iffI hml_models.simps(5) neg_pre_cong)
+
+lemma not_right_impl_subst_equal:
+  assumes "\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r"
+      and "\<phi> \<Rrightarrow> HML_not \<phi>l"
+    shows "\<phi> \<Rrightarrow> HML_not \<phi>r"
+  using assms by (smt (verit) hml_conjunct_impl_def hml_eq_def hml_impl_iffI hml_models.simps(5) neg_pre_cong)
+
+lemma not_equal_subst_impl:
+  assumes "\<phi>l \<Rrightarrow> \<phi>r"
+      and "\<phi> \<Lleftarrow>\<Rrightarrow> HML_not \<phi>r"
+    shows "\<phi> \<Rrightarrow> HML_not \<phi>l"
+  using assms by (smt (verit) hml_conjunct_impl_def hml_eq_def hml_impl_iffI hml_models.simps(5) neg_pre_cong)
+
+subsubsection \<open> And, i.e. Binary Conjunction \<close>
+
+lemma and_lr_impl_subst_equal:
+  assumes "\<phi>l \<Lleftarrow>\<and>\<Rrightarrow> \<phi>r"
+      and "\<phi> \<and>hml \<phi>l \<Rrightarrow> \<phi>'"
+    shows "\<phi> \<and>hml \<phi>r \<Rrightarrow> \<phi>'"
+  using assms by (simp add: LTS_Tau.hml_impl_iffI hml_conjunct_eq_def hml_conjunct_impl_def)
+
+lemma and_ll_impl_subst_equal:
+  assumes "\<phi>l \<Lleftarrow>\<and>\<Rrightarrow> \<phi>r"
+      and "\<phi>l \<and>hml \<phi> \<Rrightarrow> \<phi>'"
+    shows "\<phi>r \<and>hml \<phi> \<Rrightarrow> \<phi>'"
+  using assms by (simp add: LTS_Tau.hml_impl_iffI hml_conjunct_eq_def hml_conjunct_impl_def)
+
+lemma and_rr_impl_subst_equal:
+  assumes "\<phi>l \<Lleftarrow>\<and>\<Rrightarrow> \<phi>r"
+      and "\<phi>' \<Rrightarrow> \<phi> \<and>hml \<phi>l"
+    shows "\<phi>' \<Rrightarrow> \<phi> \<and>hml \<phi>r"
+  using assms hml_conjunct_eq_def hml_conjunct_impl_def hml_impl_iffI hml_models.simps(5) by auto
+
+lemma and_rl_impl_subst_equal:
+  assumes "\<phi>l \<Lleftarrow>\<and>\<Rrightarrow> \<phi>r"
+      and "\<phi>' \<Rrightarrow> \<phi>l \<and>hml \<phi>"
+    shows "\<phi>' \<Rrightarrow> \<phi>r \<and>hml \<phi>"
+  using assms hml_conjunct_eq_def hml_conjunct_impl_def hml_impl_iffI hml_models.simps(5) by auto
+
+lemma and_left_equal_subst_impl:
+  assumes "\<phi>l \<and>\<Rrightarrow> \<phi>r"
+      and "\<phi>' \<Lleftarrow>\<Rrightarrow> \<phi>l \<and>hml \<phi>"
+    shows "\<phi>' \<Rrightarrow> \<phi>r \<and>hml \<phi>"
+  using assms by (simp add: LTS_Tau.hml_conjunct_impl_def hml_eq_equality hml_impl_def)
+
+lemma and_right_equal_subst_impl:
+  assumes "\<phi>l \<and>\<Rrightarrow> \<phi>r"
+      and "\<phi>' \<Lleftarrow>\<Rrightarrow> \<phi> \<and>hml \<phi>l"
+    shows "\<phi>' \<Rrightarrow> \<phi> \<and>hml \<phi>r"
+  using assms by (simp add: hml_conjunct_impl_def hml_eq_equality hml_impl_def)
+
 end (* Inhabited_Tau_LTS *)
 
 subsection \<open> Distinguishing Formulas \<close>
