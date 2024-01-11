@@ -1,9 +1,12 @@
 theory Example_Instantiation      
   imports Energy_Games "HOL-Library.Extended_Nat"
 begin
-
+text \<open>In this theory we create an instantiation of energy game to test our definitions.\<close>
+text \<open>Based on our definition of energy  with eight dimensions, we first define energy..\<close>
 datatype energy = E (one: "enat") (two: "enat") | eneg
 
+text \<open>We define the following definitions and abbreviations to update our energy levels.
+Note that we always use "eneg" when the energy level is equal to or lower than the "defender win level".\<close>
 instantiation energy :: minus
 begin
 abbreviation "somewhere_smaller e1 e2 \<equiv> ((one e1)<(one e2)) \<or> ((two e1) < (two e2))"
@@ -22,6 +25,7 @@ definition "min_update e1 \<equiv> E (min (one e1) (two e1)) (two e1)"
 lemma min_update[simp]:
   shows "min_update (E a b) = E (min a b) b" unfolding min_update_def using energy.sel by fastforce
 
+text \<open>In preparation for our instantiation we define our states, the updates for our energy levels and which states are defender positions.\<close>
 datatype state = a | b1 | b2 | c | d1 | d2 | e
 
 fun weight_opt :: "state \<Rightarrow> state \<Rightarrow> energy update option" where
@@ -55,6 +59,8 @@ lemma moves:
        "\<not>(c \<Zinj> e)" "\<not>(e \<Zinj> d1)"
   by simp+
 
+text\<open>In the following we check our definition of finite play with two examples: one that is a finite play and one that is not.
+We also look at the "behavior" of our finite game definition if we change the starting position.\<close>
 lemma Game_finite_play_example:
   shows "finite_play a [a, b2, c, d1, e]"
 proof-
@@ -87,7 +93,7 @@ proof (rule notI)
 qed
 
 abbreviation "energy_level \<equiv> Game.energy_level"
-
+text \<open>To check our calculation of energy levels, we look at different games and their energy levels using the following lemmas.\<close>
 lemma energy_level_example:
   shows "energy_level a (E 10 10) [a, b2, c, d1, e] = E 9 8"
 proof-
@@ -119,6 +125,8 @@ lemma energy_level_example_4:
   shows "energy_level a (E 10 10) [c] = undefined"
   using Game.energy_level.elims Game.energy_level.pelims by simp
 
+text \<open>We also take a look at our definition of play stuck using different examples of plays.
+In particular we check our definition regarding invalid games.\<close>
 lemma play_stuck_example:
   shows "Game.play_stuck a [a, b2, c, d1, e]"
   by (metis (mono_tags, opaque_lifting) Game_finite_play_example append.assoc append_Cons energy_game.finite_play_is_path last_ConsR list.distinct(1) self_append_conv2 snoc_eq_iff_butlast weight_opt.simps(38))
@@ -130,7 +138,7 @@ proof (-)
     by (metis Game.finite_play_suffix Game_finite_play_example append_Cons append_Nil list.distinct(1))
   thus "\<not>(Game.play_stuck a [a, b2, c])" by auto
 qed
-
+text \<open>\<close>
 lemma play_stuck_invalid_game: 
   shows "\<not>(Game.play_stuck a [a, b2, d1])"
   by (smt (verit, best) Game.finite_play.simps butlast.simps(2) butlast_snoc distinct_adj_Cons distinct_adj_Cons_Cons last.simps last_snoc weight_opt.simps(18))
@@ -139,6 +147,7 @@ lemma play_stuck_invalid_game_1:
   shows "\<not>Game.play_stuck a [a, b2, b1]"
   by (metis Game.finite_play.cases butlast.simps(2) butlast_snoc last.simps last_snoc list.discI weight_opt.simps(16))
 
+text \<open>In the following we look at play examples and check who wins the corresponding game.\<close>
 lemma attacker_wins_example:
   shows "Game.won_by_attacker a (E 10 10) [a, b2, c, d1, e]"
   using play_stuck_example energy_level_example
@@ -158,8 +167,9 @@ using assms proof -
   hence "(\<exists>gn. finite_play a (p @ [gn]))" using assms(1) Game.finite_play.intros(2) by blast 
   thus "\<not>Game.play_stuck a p" by simp
 qed
+text \<open>Finally, we verify our definition of win_a using scenarios where we expect the attacker to have a winning strategy (or not).\<close>
 
-lemma attackers_winas_defender_stuck: 
+lemma attackers_winas_defender_stuck:
   shows "Game.in_wina (E 9 8) e"
   by (simp add: energy_game.in_wina.intros(1))
 
