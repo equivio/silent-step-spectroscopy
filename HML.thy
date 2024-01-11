@@ -4,6 +4,24 @@ begin
 
 section \<open> Hennesy-Milner-Logic (HML) \<close>
 
+text \<open>
+The mutually recursive data types \<open>hml\<close> and \<open>hml_conjunct\<close> represent arbitrary HML formulas.
+
+In particular:
+  - in \<open>hml\<close>
+    - \<open>TT\<close> encodes \<open>\<top>\<close>
+    - \<open>Obs \<alpha> \<phi>\<close> encodes \<open>\<langle>\<alpha>\<rangle>\<phi>\<close>
+    - \<open>Internal \<phi>\<close> encodes \<open>\<langle>\<epsilon>\<rangle>\<phi>\<close>
+    - \<open>Silent \<phi>\<close> encodes \<open>(\<tau>)\<phi>\<close>
+    - \<open>Conj I \<psi>s\<close> encodes \<open>\<And>\<Psi>\<close> where \<open>\<Psi> \<equiv> \<psi>s ` I\<close>
+  - in \<open>hml_conjunct\<close>
+    - \<open>Pos \<phi>\<close> encodes \<open>\<phi>\<close> when used as a conjunct
+    - \<open>Neg \<phi>\<close> encodes \<open>\<not>\<phi>\<close> in position of a conjunct
+
+When a variable is of type \<open>hml\<close> then \<open>\<phi>\<close> is used in most cases.
+In case a variable is of type \<open>hml_conjunct\<close> then \<open>\<psi>\<close> is used.
+\<close>
+
 datatype 
   ('act, 'i) hml =
     TT |
@@ -17,24 +35,15 @@ and
     Neg "('act, 'i) hml"
 
 
-context Inhabited_LTS
-begin
-
-abbreviation HML_and :: "('a, 's) hml_conjunct \<Rightarrow> ('a, 's) hml_conjunct \<Rightarrow> ('a, 's) hml" ("_ \<and>hml _" 70) where
-  "HML_and left_conjunct right_conjunct \<equiv> Conj {left, right} (\<lambda>i. if i = left
-                                          then left_conjunct
-                                          else if i = right
-                                               then right_conjunct
-                                               else Pos TT)"
-
-end (* context Inhabited_LTS *)
-
-
 context LTS_Tau
 begin
 
-abbreviation HML_soft_poss :: "'a \<Rightarrow> ('a, 'i) hml \<Rightarrow> ('a, 'i) hml" where
-  "HML_soft_poss \<alpha> \<phi> \<equiv> if \<alpha> = \<tau> then Silent \<phi> else Obs \<alpha> \<phi>"
+text \<open>
+Definition of the meaning of an HML formula in the context of an LTS.
+
+Note that this formalization and semantic allows for conjunctions of arbitrary width,
+even of infinite width.
+\<close>
 
 primrec
       hml_models          :: "'s \<Rightarrow> ('a, 's) hml          \<Rightarrow> bool" ("_ \<Turnstile> _" 60) 
@@ -56,7 +65,30 @@ lemma tt_eq_empty_conj: "(state \<Turnstile> TT) = (state \<Turnstile> Conj {} \
 lemma opt_\<tau>_is_or: "(p \<Turnstile> (Silent \<phi>)) = ((p \<Turnstile> (Obs \<tau> \<phi>)) \<or> (p \<Turnstile> \<phi>))"
   by simp
 
+
+text \<open> \<open>HML_soft_poss \<alpha> \<phi>\<close> represents \<open>(\<alpha>)\<phi>\<close> \<close>
+
+abbreviation HML_soft_poss :: "'a \<Rightarrow> ('a, 'i) hml \<Rightarrow> ('a, 'i) hml" where
+  "HML_soft_poss \<alpha> \<phi> \<equiv> if \<alpha> = \<tau> then Silent \<phi> else Obs \<alpha> \<phi>"
+
 end (* context LTS_Tau *)
+
+context Inhabited_LTS
+begin
+
+text \<open>
+Binary conjunction (\<open>\<and>\<close>) is reduced to a conjunction over sets,
+whereby the LTS needs to be inhabited so that at least two indices are available.
+\<close>
+
+abbreviation HML_and :: "('a, 's) hml_conjunct \<Rightarrow> ('a, 's) hml_conjunct \<Rightarrow> ('a, 's) hml" ("_ \<and>hml _" 70) where
+  "HML_and left_conjunct right_conjunct \<equiv> Conj {left, right} (\<lambda>i. if i = left
+                                          then left_conjunct
+                                          else if i = right
+                                               then right_conjunct
+                                               else Pos TT)"
+
+end (* context Inhabited_LTS *)
 
 context Inhabited_Tau_LTS
 begin
@@ -81,6 +113,8 @@ end (* Inhabited_Tau_LTS *)
 context Inhabited_Tau_LTS
 begin
 
+text \<open> (HML_not \<phi>) represents \<open>\<not>\<phi>\<close> and is realized via a one element conjunction. \<close>
+
 abbreviation HML_not :: "('a, 's) hml \<Rightarrow> ('a, 's) hml" where
   "HML_not \<phi> \<equiv> Conj {left} (\<lambda>i. if i = left then (Neg \<phi>) else (Pos TT))"
 
@@ -95,9 +129,9 @@ lemma "(state \<Turnstile> \<phi>) = (state \<Turnstile> HML_not (HML_not \<phi>
 
 end (* context Inhabited_Tau_LTS *)
 
+
 context LTS_Tau
 begin
-
 
 subsection \<open> Pre-Order \<close>
 
