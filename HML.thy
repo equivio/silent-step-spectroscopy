@@ -847,10 +847,10 @@ One may lift this to sets of processes, i.e. that a formula distinguishes a sing
 from a whole set of processes iff this formula distinguishes the processes from each processes
 in the set. \<close>
 
-definition dist :: "'s \<Rightarrow> ('a, 's) hml \<Rightarrow> 's \<Rightarrow> bool" ("_ <> _ _" [70, 70, 70] 80) where
+definition distinguishes_hml :: "'s \<Rightarrow> ('a, 's) hml \<Rightarrow> 's \<Rightarrow> bool" ("_ <> _ _" [70, 70, 70] 80) where
   "(p <> \<phi> q) \<equiv> (p \<Turnstile> \<phi>) \<and> \<not>(q \<Turnstile> \<phi>)"
 
-definition distFrom :: "'s \<Rightarrow> ('a, 's) hml \<Rightarrow> 's set \<Rightarrow> bool" ("_ <> _ _" [70, 70, 70] 80) where
+definition distinguishes_from_hml :: "'s \<Rightarrow> ('a, 's) hml \<Rightarrow> 's set \<Rightarrow> bool" ("_ <> _ _" [70, 70, 70] 80) where
   "(p <> \<phi> Q) \<equiv> (\<forall>q \<in> Q. p <> \<phi> q)"
 
 
@@ -887,7 +887,7 @@ lemma
   assumes "p <> (Conj I \<psi>s) Q"
   shows "\<exists>\<psi>s'. p <> (Conj Q \<psi>s') Q"
   using assms
-  unfolding distFrom_def and dist_def
+  unfolding distinguishes_from_hml_def and distinguishes_hml_def
 proof -
   assume "\<forall>q\<in>Q. (p \<Turnstile> Conj I \<psi>s \<and> \<not> q \<Turnstile> Conj I \<psi>s)"
 
@@ -910,10 +910,10 @@ lemma dist_conj_thinning:
 proof -
   assume "p <> Conj I \<psi>s Q"
   hence conj_dist_from_Q: "\<forall>q\<in>Q. p \<Turnstile> Conj I \<psi>s \<and> \<not> q \<Turnstile> Conj I \<psi>s"
-    unfolding distFrom_def and dist_def.
+    unfolding distinguishes_from_hml_def and distinguishes_hml_def.
 
   show "p <> (Conj Q (\<lambda>q. \<psi>s (SOME i. i \<in> I \<and> \<not>(hml_conjunct_models q (\<psi>s i))))) Q"
-    unfolding distFrom_def and dist_def
+    unfolding distinguishes_from_hml_def and distinguishes_hml_def
   proof (rule ballI, rule conjI)
     fix q
     assume "q \<in> Q"
@@ -1064,7 +1064,7 @@ lemma dist_conj_non_empty_conj:
   fixes p :: 's and q :: 's
   assumes "p <> (Conj I \<psi>s) q"
   shows "I \<noteq> {}"
-  by (metis dist_def assms empty_iff hml_models.simps(5))
+  by (metis distinguishes_hml_def assms empty_iff hml_models.simps(5))
 
 end (* LTS_Tau *)
 
@@ -1072,7 +1072,7 @@ context Inhabited_Tau_LTS
 begin
 
 lemma hml_and_dist_disj: "p <> (\<psi>l \<and>hml \<psi>r) q = (p \<Turnstile> (\<psi>l \<and>hml \<psi>r) \<and> (\<not>hml_conjunct_models q \<psi>l \<or> \<not>hml_conjunct_models q \<psi>r))"
-  using Inhabited_Tau_LTS.hml_and_and Inhabited_Tau_LTS_axioms LTS_Tau.dist_def by fastforce
+  using Inhabited_Tau_LTS.hml_and_and Inhabited_Tau_LTS_axioms distinguishes_hml_def by fastforce
 
 end
 

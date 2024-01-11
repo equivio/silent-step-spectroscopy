@@ -284,7 +284,7 @@ lemma extract_converter:
   assumes "p <> (hml.Conj Q (\<lambda>q. (f \<circ> \<psi>s) (SOME i. i \<in> I \<and> \<not>(hml_conjunct_models q ((f \<circ> \<psi>s) i))))) Q"
   shows "p <> (hml.Conj Q (f \<circ> (\<lambda>q. \<psi>s (SOME i. i \<in> I \<and> \<not>(hml_conjunct_models q ((f \<circ> \<psi>s) i)))))) Q"
   using assms and comp_apply
-  by (simp add: LTS_Tau.dist_def distFrom_def)
+  by (simp add: LTS_Tau.distinguishes_hml_def distinguishes_from_hml_def)
 
 
 lemma dist_immconj_thinn:
@@ -303,7 +303,7 @@ proof -
   assume "\<forall>q\<in>Q. p \<Turnstile> hml.Conj I (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s) \<and>
            \<not> q \<Turnstile> hml.Conj I (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s)"
   hence "p <> (hml.Conj I (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s)) Q"
-    by (simp add: LTS_Tau.dist_def distFrom_def)
+    by (simp add: LTS_Tau.distinguishes_hml_def distinguishes_from_hml_def)
 
   with dist_conj_thinning
   have "p <> (hml.Conj Q (\<lambda>q. (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s) (SOME i. i \<in> I \<and> \<not>(hml_conjunct_models q ((hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s) i))))) Q"
@@ -317,7 +317,7 @@ proof -
                 (hml_srbb_conjunct_to_hml_conjunct \<circ> (\<lambda>q. \<psi>s (SOME i. i \<in> I \<and> \<not> hml_srbb_conjunct_models (\<psi>s i) q))) \<and>
            \<not> q \<Turnstile> hml.Conj Q
                    (hml_srbb_conjunct_to_hml_conjunct \<circ> (\<lambda>q. \<psi>s (SOME i. i \<in> I \<and> \<not> hml_srbb_conjunct_models (\<psi>s i) q)))"
-    unfolding distFrom_def and dist_def and hml_srbb_conjunct_models.simps and comp_apply
+    unfolding distinguishes_from_hml_def and distinguishes_hml_def and hml_srbb_conjunct_models.simps and comp_apply
     by blast
 qed
 
@@ -338,7 +338,7 @@ proof -
   assume "\<forall>q\<in>Q. p \<Turnstile> hml.Conj I (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s) \<and>
            \<not> q \<Turnstile> hml.Conj I (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s)"
   hence "p <> (hml.Conj I (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s)) Q"
-    by (simp add: LTS_Tau.dist_def distFrom_def)
+    by (simp add: LTS_Tau.distinguishes_hml_def distinguishes_from_hml_def)
 
   with dist_conj_thinning
   have "p <> (hml.Conj Q (\<lambda>q. (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s) (SOME i. i \<in> I \<and> \<not>(hml_conjunct_models q ((hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s) i))))) Q"
@@ -358,7 +358,7 @@ proof -
                 (hml_srbb_conjunct_to_hml_conjunct \<circ> (\<lambda>q. \<psi>s (SOME i. i \<in> I \<and> \<not> hml_srbb_conjunct_models (\<psi>s i) q))) \<and>
            \<not> q \<Turnstile> hml.Conj Q
                    (hml_srbb_conjunct_to_hml_conjunct \<circ> (\<lambda>q. \<psi>s (SOME i. i \<in> I \<and> \<not> hml_srbb_conjunct_models (\<psi>s i) q)))"
-    unfolding distFrom_def and dist_def by auto
+    unfolding distinguishes_from_hml_def and distinguishes_hml_def by auto
 qed
 
 
@@ -393,7 +393,7 @@ proof -
   then have "\<forall>q\<in>Q. p <> (hml_conjunct.Neg (hml.Obs \<tau> hml.TT)
                          \<and>hml hml_conjunct.Pos (hml.Conj I (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s)))
                    q"
-    unfolding dist_def.
+    unfolding distinguishes_hml_def.
 
   then have "\<forall>q\<in>Q. p \<Turnstile> hml_conjunct.Neg (hml.Obs \<tau> hml.TT)
                         \<and>hml hml_conjunct.Pos (hml.Conj I (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s))
@@ -525,7 +525,7 @@ proof -
                       \<and>hml hml_conjunct.Pos (hml.Conj I (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s))"
   hence "\<forall>q\<in>Q. p <> (hml_conjunct.Pos (HML_soft_poss \<alpha> (hml_srbb_to_hml \<phi>)) 
                     \<and>hml hml_conjunct.Pos (hml.Conj I (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s)))
-               q" using dist_def by blast
+               q" using distinguishes_hml_def by blast
   with hml_and_dist_disj
   have "\<forall>q\<in>Q. (p \<Turnstile> (hml_conjunct.Pos (HML_soft_poss \<alpha> (hml_srbb_to_hml \<phi>))) 
                    \<and>hml (hml_conjunct.Pos (hml.Conj I (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s)))
