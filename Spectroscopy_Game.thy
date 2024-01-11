@@ -95,15 +95,9 @@ fun spectroscopy_defender where
   "spectroscopy_defender (Defender_Conj _ _) = True" |
   "spectroscopy_defender (Defender_Stable_Conj _ _) = True"
 
-
-text \<open>
-  Next we show that the lemma \<open>win_a_upwards_closure\<close> (which shows that "with more energy the 
-  attacker will win at least as much as before") applies to spectroscopy games. To apply the lemma 
-  we first show that  the given order \<open>\<le>\<close> on energies fullfills the following properties:  
-  - all updates are monotonic w.r.t. \<open>\<le>\<close> 
-  - and  \<open>e \<le> Upd(e)\<close> holds for all energies and updates. 
-\<close> 
-
+text \<open>To check whether these definitions are compatible with our definition of energy games we proof 
+an interpretation. To do so we first provide lemmas showing monotonicity of updates and that updates 
+only decline.\<close>
 
 lemma update_monotonicity: 
   fixes g g' e e'
@@ -299,10 +293,6 @@ proof
   show "\<And>g g' e e'. spectroscopy_moves g g' \<noteq> None \<Longrightarrow> e \<le> e' \<Longrightarrow> the (spectroscopy_moves g g') e \<le> the (spectroscopy_moves g g') e'" using update_monotonicity by simp
   show "\<And>g g' e. spectroscopy_moves g g' \<noteq> None \<Longrightarrow> the (spectroscopy_moves g g') e \<le> e" using update_gets_smaller by simp
 qed
-
-text \<open>To check whether these definitions are compatible with our definition of energy games we proof 
-an interpretation:\<close>
-interpretation Game: energy_game "spectroscopy_moves" "spectroscopy_defender" "eneg" .
 
 end
 
