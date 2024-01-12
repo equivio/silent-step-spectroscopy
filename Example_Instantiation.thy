@@ -9,12 +9,12 @@ text \<open>We define the following definitions and abbreviations to update our 
 Note that we always use "eneg" when the energy level is equal to or lower than the "defender win level".\<close>
 instantiation energy :: minus
 begin
+abbreviation "direct_minus e1 e2 \<equiv> E ((one e1) - (one e2)) ((two e1) - (two e2))"
+
 fun order:: "energy \<Rightarrow> energy \<Rightarrow> bool" where 
   "order eneg _ = True" |
   "order (E e1 e2) (E e1' e2') = (e1 \<le> e1' \<and> e2 \<le> e2')" |
   "order _ _ = False"
-
-abbreviation "direct_minus e1 e2 \<equiv> E ((one e1) - (one e2)) ((two e1) - (two e2))"
 
 definition minus_energy_def: "e1 - e2 \<equiv> if (\<not> order e2 e1) then eneg
                                              else direct_minus e1 e2"
@@ -131,7 +131,7 @@ proof
       from True 10 have E': "the (weight_opt g g') e' = E ((one e') - 1) ((two e') - 0)" using \<open>order e e'\<close>
         by (smt (verit) energy.sel(1) energy.sel(2) minus_energy_def option.sel order.elims(2) order.simps(2) order.simps(3) order.trans) 
       have "order  (E ((one e) - 1) ((two e) - 0)) (E ((one e') - 1) ((two e') - 0))" using True \<open>order e e'\<close>
-        by (metis \<open>order e e\<close>  add.commute add_diff_assoc_enat eSuc_ile_mono eSuc_minus_1 eSuc_plus_1 energy.distinct(1) energy.exhaust energy.inject energy.sel(1) energy.sel(2) group_cancel.add2 idiff_0_right le_iff_add order.elims(2) order.simps(2))
+        by (metis add.commute add_diff_assoc_enat energy.distinct(1) energy.exhaust energy.sel(1) energy.sel(2) idiff_0_right le_iff_add order.elims(2) order.simps(2))
       thus ?thesis using E E' by simp
     next
       case False
@@ -147,7 +147,7 @@ proof
       from True 01 have E': "the (weight_opt g g') e' = E ((one e') - 0) ((two e') - 1)" using \<open>order e e'\<close>
         by (smt (verit) energy.sel(1) energy.sel(2) minus_energy_def option.sel order.elims(2) order.simps(2) order.simps(3) order.trans) 
       have "order  (E ((one e) - 0) ((two e) - 1)) (E ((one e') - 0) ((two e') - 1))" using True \<open>order e e'\<close>
-        by (metis \<open>order e e\<close>  add.commute add_diff_assoc_enat eSuc_ile_mono eSuc_minus_1 eSuc_plus_1 energy.distinct(1) energy.exhaust energy.inject energy.sel(1) energy.sel(2) group_cancel.add2 idiff_0_right le_iff_add order.elims(2) order.simps(2))
+        by (metis add.commute add_diff_assoc_enat energy.distinct(1) energy.exhaust energy.sel(1) energy.sel(2) idiff_0_right le_iff_add order.elims(2) order.simps(2))
       thus ?thesis using E E' by simp
     next
       case False
