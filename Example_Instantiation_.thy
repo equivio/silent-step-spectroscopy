@@ -1,4 +1,4 @@
-theory Example_Instantiation      
+theory Example_Instantiation_
   imports Energy_Games "HOL-Library.Extended_Nat"
 begin
 text \<open>In this theory we create an instantiation of energy game to test our definitions.\<close>
