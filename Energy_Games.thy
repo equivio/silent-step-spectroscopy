@@ -19,7 +19,7 @@ aware of this limitation to finite cases a corresponding type synonym is introdu
 
 type_synonym 'gstate fplay = "'gstate list"
 
-text\<open>An energy games is played on a directed graph labeled by energy updates. We limit ourselves to 
+text\<open>An energy game is played on a directed graph labeled by energy updates. We limit ourselves to 
 the case where only the attacker can run out of energy if the energy level reaches the 
 \<open>defender_win_level\<close>.\<close>
 
