@@ -58,7 +58,6 @@ fun hml_srbb_inner_models :: "('a, 's) hml_srbb_inner \<Rightarrow> 's \<Rightar
 fun hml_srbb_conjunct_models :: "('a, 's) hml_srbb_conjunct \<Rightarrow> 's \<Rightarrow> bool" where
   "hml_srbb_conjunct_models \<psi> s = (hml_conjunct_models s (hml_srbb_conjunct_to_hml_conjunct \<psi>))"
 
-
 (*Some sanity checks*)
 
 lemma "(state \<Turnstile>SRBB TT) = (state \<Turnstile>SRBB ImmConj {} \<psi>s)"
@@ -73,6 +72,9 @@ lemma "(state \<Turnstile>SRBB TT) = (hml_srbb_inner_models (Obs \<tau> TT) stat
 lemma "(state \<Turnstile>SRBB Internal \<chi>) = (state \<Turnstile>SRBB ImmConj {left} (\<lambda>i. if i = left then Pos \<chi> else undefined))"
   by simp
 
+abbreviation model_set :: "('a, 's) hml_srbb \<Rightarrow> 's set"  where "model_set \<phi> \<equiv> {p. p \<Turnstile>SRBB \<phi>}"
+abbreviation model_set_inner :: "('a, 's) hml_srbb_inner \<Rightarrow> 's set"  where "model_set_inner \<chi> \<equiv> {p. hml_srbb_inner_models \<chi> p}"
+abbreviation model_set_conjunct :: "('a, 's) hml_srbb_conjunct \<Rightarrow> 's set"  where "model_set_conjunct \<psi> \<equiv> {p. hml_srbb_conjunct_models \<psi> p}"
 
 definition distinguishes :: "('a, 's) hml_srbb \<Rightarrow> 's \<Rightarrow> 's \<Rightarrow> bool" where
   "distinguishes \<phi> p q \<equiv> p \<Turnstile>SRBB \<phi> \<and> \<not>(q \<Turnstile>SRBB \<phi>)"

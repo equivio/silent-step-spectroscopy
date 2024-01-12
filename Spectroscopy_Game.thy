@@ -238,10 +238,17 @@ proof-
   have "\<lbrakk>Q \<noteq> {}; distinguishes_from \<phi> p Q\<rbrakk> \<Longrightarrow> in_wina (expressiveness_price \<phi>) (Attacker_Immediate p Q)" and
         "\<lbrakk>Q \<noteq> {}; distinguishes_inner \<chi> p q;  Q \<Zsurj>S Q\<rbrakk> \<Longrightarrow> in_wina (expr_pr_inner \<chi>) (Attacker_Delayed p Q)" and
         "\<lbrakk>Q \<noteq> {}; distinguishes_conjunct \<psi> p q\<rbrakk> \<Longrightarrow> in_wina (expr_pr_conjunct \<psi>) (Attacker_Clause p q)" and
-        "\<lbrakk>Q \<noteq> {}; distinguishes_from_inner (Conj \<Psi>_I \<Psi>) p Q\<rbrakk> \<Longrightarrow> in_wina (expr_pr_inner (Conj \<Psi>_I \<Psi>)) (Defender_Conj p Q)" and
-        
-        for \<phi> p Q \<chi> q \<psi> \<Psi>_I \<Psi>
+        "\<lbrakk>Q \<noteq> {}; distinguishes_from_inner (Conj \<Psi>_I \<Psi>) p Q\<rbrakk> \<Longrightarrow> 
+          in_wina (expr_pr_inner (Conj \<Psi>_I \<Psi>)) (Defender_Conj p Q)" and
+        "\<lbrakk>Q \<noteq> {}; distinguishes_from_inner (StableConj \<Psi>_I \<Psi>) p Q\<rbrakk> \<Longrightarrow> 
+          in_wina (expr_pr_inner (StableConj \<Psi>_I \<Psi>)) (Defender_Stable_Conj p Q)" and
+        "\<lbrakk>Q \<noteq> {}; distinguishes_from_inner (BranchConj \<alpha> \<phi> \<Psi>_I \<Psi>) p Q\<rbrakk> \<Longrightarrow> 
+          \<lbrakk>p \<mapsto>\<alpha> p'; p' \<Turnstile>SRBB \<phi>; Q \<inter> (model_set_inner (Conj \<Psi>_I \<Psi>)) \<subseteq> Q_\<alpha>; 
+           Q_\<alpha> \<subseteq> model_set_inner (BranchConj \<alpha> \<phi> \<Psi>_I \<Psi>)\<rbrakk> \<Longrightarrow>
+          in_wina (expr_pr_inner (BranchConj \<alpha> \<phi> \<Psi>_I \<Psi>)) (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>)"
+        for \<phi> p Q \<chi> q \<psi> \<Psi>_I \<Psi> \<alpha> p' Q_\<alpha>
     sorry
+  thus ?thesis using one_empty_Q assms by metis
 qed
 
 end (* context full_spec_game *)
