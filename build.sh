@@ -34,4 +34,4 @@ NOCOLOR='\033[0m'
     ) \
 ) || (echo -e "${RED}Not all .thy files were 'presented'.${NOCOLOR}"; /bin/false)
 
-echo -e "\n${GREEN}Build sucseeded, all theorys were presented.${NOCOLOR}"
+echo -e "\n${GREEN}Build succeeded, all theories were presented.${NOCOLOR}"
