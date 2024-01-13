@@ -266,9 +266,12 @@ before" can be proven when given a partial order on energies such that the \<ope
 the minimal energy, updates are monotonic and \<open>e \<ge> Upd(e)\<close> holds for all energies and updates:\<close>
 
 lemma win_a_upwards_closure: 
-  assumes "in_wina e g"
-        shows "(\<forall>e'.((ord e e')\<longrightarrow> (in_wina e' g)))"
-using assms proof (induct rule: in_wina.induct)
+  assumes
+    "in_wina e g"
+    "ord e e'"
+  shows
+    "in_wina e' g"
+using assms proof (induct arbitrary: e' rule: in_wina.induct)
   case (1 g e)
   then show ?case using antysim dwl_min local.reflexivity local.transitivity update_gets_smaller
     by (metis in_wina.intros(1))
