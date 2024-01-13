@@ -273,4 +273,10 @@ qed
 
 abbreviation "subtract a b c d e f g h \<equiv> Some (\<lambda>x. x - (E a b c d e f g h))"
 
+lemma mono_subtract: 
+  assumes "x \<le> x'"
+  shows "(\<lambda>x. x - (E a b c d e f g h)) x \<le> (\<lambda>x. x - (E a b c d e f g h)) x'"
+  by (smt (verit) antisym assms dual_order.trans eneg_leq energy.distinct(1) leq_not_eneg minus_component_leq(1) minus_component_leq(2) minus_component_leq(3) minus_component_leq(4) minus_component_leq(5) minus_component_leq(6) minus_component_leq(7) minus_component_leq(8) minus_energy_def)
+
+
 end
