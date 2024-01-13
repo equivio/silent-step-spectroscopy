@@ -19,14 +19,21 @@ aware of this limitation to finite cases a corresponding type synonym is introdu
 
 type_synonym 'gstate fplay = "'gstate list"
 
-text\<open>An energy games is played on a directed graph labeled by energy updates. We limit ourselves to 
+text\<open>An energy game is played on a directed graph labeled by energy updates. We limit ourselves to 
 the case where only the attacker can run out of energy if the energy level reaches the 
 \<open>defender_win_level\<close>.\<close>
 
 locale energy_game =
   fixes weight_opt :: "'gstate \<Rightarrow> 'gstate \<Rightarrow> 'energy update option" and
         defender :: "'gstate \<Rightarrow> bool" ("Gd") and 
-        defender_win_level :: "'energy"
+        defender_win_level :: "'energy" and
+        ord::"'energy \<Rightarrow> 'energy \<Rightarrow> bool"
+  assumes transitivity: "\<And>e e' e''. (ord e e') \<Longrightarrow> (ord e' e'') \<Longrightarrow> (ord e e'')" and
+          reflexivity: "\<And>e. (ord e e)" and
+          antysim: "\<And>e e'. (ord e e') \<Longrightarrow> (ord e' e) \<Longrightarrow> e=e'" and
+          dwl_min: "\<And>e. ord defender_win_level e" and 
+          monotonicity:"\<And>g g' e e'. (weight_opt g g') \<noteq> None \<Longrightarrow> (ord e e')  \<Longrightarrow> (ord (the (weight_opt g g')e) (the (weight_opt g g')e'))" and
+          update_gets_smaller: "\<And>g g' e. ((weight_opt g g') \<noteq> None) \<Longrightarrow> (ord (the (weight_opt g g')e) e)"
 begin
 
 text\<open>Some natural abbreviations follow:\<close>
@@ -147,7 +154,7 @@ proof (rule notI)
 qed
 
 lemma finite_play_min_len: "finite_play g0 p \<Longrightarrow> length p \<ge> 1"
-  by (metis One_nat_def Suc_le_eq energy_game.finite_play.simps length_greater_0_conv not_Cons_self snoc_eq_iff_butlast)
+  using add_leE finite_play.cases not_Cons_self2 not_less_eq_eq by fastforce
 
 lemma finite_play_is_path:
   fixes p
@@ -259,20 +266,15 @@ before" can be proven when given a partial order on energies such that the \<ope
 the minimal energy, updates are monotonic and \<open>e \<ge> Upd(e)\<close> holds for all energies and updates:\<close>
 
 lemma win_a_upwards_closure: 
-  fixes ord::"'energy \<Rightarrow> 'energy \<Rightarrow> bool"
-  assumes transitive: "\<forall>e e' e''. (((ord e e') \<and> (ord e' e'')) \<longrightarrow> (ord e e''))" and
-          reflexive: "\<forall>e. (ord e e)" and
-          antysim: "\<forall>e e'. (((ord e e') \<and> (ord e' e)) \<longrightarrow> e=e')" and
-          dwl_min: "\<forall>e. (ord defender_win_level e)" and 
-          monotonicity:"\<forall>g g' e e'. (((weight_opt g g') \<noteq> None \<and> (ord e e'))  \<longrightarrow> (ord (the (weight_opt g g')e) (the (weight_opt g g')e')))" and
-          update_gets_smaller: "\<forall>g g' e. (((weight_opt g g') \<noteq> None) \<longrightarrow> (ord (the (weight_opt g g')e) e))" and
-          
-          "in_wina e g"
-        shows "(\<forall>e'.((ord e e')\<longrightarrow> (in_wina e' g)))"
-using assms(7) proof (induct rule: in_wina.induct)
+  assumes
+    "in_wina e g"
+    "ord e e'"
+  shows
+    "in_wina e' g"
+using assms proof (induct arbitrary: e' rule: in_wina.induct)
   case (1 g e)
-  then show ?case using antysim dwl_min local.reflexive local.transitive update_gets_smaller
-    by (metis in_wina.intros(1)) 
+  then show ?case using antysim dwl_min local.reflexivity local.transitivity update_gets_smaller
+    by (metis in_wina.intros(1))
 next
   case (2 g e)
   then show ?case
