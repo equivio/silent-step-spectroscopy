@@ -6,22 +6,17 @@ context full_spec_game begin
 
 inductive Strat :: "('s, 'a) spectroscopy_position \<Rightarrow> ('a, 's) hml_srbb \<Rightarrow> bool"  
 
-lemma upwards_closure:
-  assumes "in_wina e p" "e \<le> e'"
-  shows "in_wina e' p"
-  sorry
-
-lemma one:
+lemma distinction_implies_winning_budgets:
   assumes "distinguishes_from \<phi> p Q"
   shows "in_wina (expressiveness_price \<phi>) (Attacker_Immediate p Q)"
   sorry
 
-lemma two:
+lemma winning_budget_implies_strategy_formula:
   assumes "in_wina e (Attacker_Immediate p Q)"
   shows "\<exists>\<phi>. Strat (Attacker_Immediate p Q) \<phi> \<and> expressiveness_price \<phi> \<le> e"
   sorry
 
-lemma three:
+lemma strategy_formulas_distinguish:
   assumes "Strat (Attacker_Immediate p Q) \<phi>"
   shows "distinguishes_from \<phi> p Q"
   sorry
@@ -31,14 +26,19 @@ theorem spectroscopy_game_correctness:
        = (in_wina e (Attacker_Immediate p Q))"
 proof
   assume "\<exists>\<phi>\<in>\<O> e. distinguishes_from \<phi> p Q"
-  then obtain \<phi> where "distinguishes_from \<phi> p Q" and le: "expressiveness_price \<phi> \<le> e" unfolding \<O>_def by blast 
-  from this(1) have budget: "in_wina (expressiveness_price \<phi>) (Attacker_Immediate p Q)" by (rule one)
-  thus "in_wina e (Attacker_Immediate p Q)" using upwards_closure le by simp
+  then obtain \<phi> where
+    "distinguishes_from \<phi> p Q" and le: "expressiveness_price \<phi> \<le> e"
+    unfolding \<O>_def by blast 
+  from distinction_implies_winning_budgets this(1)
+    have budget: "in_wina (expressiveness_price \<phi>) (Attacker_Immediate p Q)" .
+  thus "in_wina e (Attacker_Immediate p Q)" using win_a_upwards_closure le by simp
 next
   assume "in_wina e (Attacker_Immediate p Q)"
-  hence "\<exists>\<phi>. Strat (Attacker_Immediate p Q) \<phi> \<and> expressiveness_price \<phi> \<le> e" by (rule two)
+  with winning_budget_implies_strategy_formula
+    have "\<exists>\<phi>. Strat (Attacker_Immediate p Q) \<phi> \<and> expressiveness_price \<phi> \<le> e" .
   hence "\<exists>\<phi>\<in>\<O> e. Strat (Attacker_Immediate p Q) \<phi>" unfolding \<O>_def by blast
-  thus "\<exists>\<phi>\<in>\<O> e. distinguishes_from \<phi> p Q" using three by blast
+  thus "\<exists>\<phi>\<in>\<O> e. distinguishes_from \<phi> p Q"
+    using strategy_formulas_distinguish by blast
 qed
 
 
