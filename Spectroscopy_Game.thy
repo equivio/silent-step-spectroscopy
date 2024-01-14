@@ -374,10 +374,10 @@ where
         \<and> strategy_formula_inner (Attacker_Delayed q P') ((min1_7 (e - (E 0 0 0 0 0 0 0 1)))) \<chi>" |
   
   stable:
-  "strategy_formula (Attacker_Delayed p Q) e \<chi>" 
+  "strategy_formula_inner (Attacker_Delayed p Q) e \<chi>" 
     if "spectroscopy_moves (Attacker_Delayed p Q) (Defender_Stable_Conj p Q) 
       = (Some id) \<and> in_wina e (Defender_Stable_Conj p Q) 
-        \<and> strategy_formula (Defender_Stable_Conj p Q) e \<chi>"|
+        \<and> strategy_formula_inner (Defender_Stable_Conj p Q) e \<chi>"|
 
   stable_conj:
     "strategy_formula_inner (Defender_Stable_Conj p Q) e (StableConj Q \<Phi>)"

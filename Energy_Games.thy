@@ -285,5 +285,17 @@ next
     using antysim dwl_min in_wina.intros(3) monotonicity by blast 
 qed
 
+inductive_set pos_order :: "('gstate \<times> 'energy) rel" 
+  where 
+"((g', e'), (g, e)) \<in> pos_order" 
+if "((Ga g) \<and> (g \<Zinj> g') \<and> (in_wina ((weight g g') e) g') \<and> (e' = ((weight g g') e)))" |
+"((g', e'), (g, e)) \<in> pos_order"
+if "(Gd g) \<and> ((g \<Zinj> g') \<and> (e' = ((weight g g') e)))"
+
+lemma pos_order_is_wf:
+  shows "wf pos_order"
+  sorry
+
+
 end (*End of context energy_game*)
 end

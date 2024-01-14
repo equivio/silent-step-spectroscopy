@@ -197,6 +197,26 @@ fun expressiveness_price :: "('a, 's) hml_srbb \<Rightarrow> energy" where
                               (max_negative_conjunct_depth \<phi>)
                               (negation_depth              \<phi>)"
 
+fun expressiveness_price_inner :: "('a, 's) hml_srbb_inner \<Rightarrow> energy" where
+  "expressiveness_price_inner \<phi> = E (modal_depth_srbb_inner \<phi>)
+                              (branch_conj_depth_inner      \<phi>)
+                              (inst_conj_depth_inner        \<phi>)
+                              (st_conj_depth_inner          \<phi>)
+                              (imm_conj_depth_inner         \<phi>)
+                              (max_pos_conj_depth_inner     \<phi>)
+                              (max_neg_conj_depth_inner     \<phi>)
+                              (neg_depth_inner              \<phi>)"
+
+fun expressiveness_price_conjunct :: "('a, 's) hml_srbb_conjunct \<Rightarrow> energy" where
+  "expressiveness_price_conjunct \<phi> = E (modal_depth_srbb_conjunct \<phi>)
+                              (branch_conj_depth_conjunct         \<phi>)
+                              (inst_conj_depth_conjunct           \<phi>)
+                              (st_conj_depth_conjunct             \<phi>)
+                              (imm_conj_depth_conjunct            \<phi>)
+                              (max_pos_conj_depth_conjunct        \<phi>)
+                              (max_neg_conj_depth_conjunct        \<phi>)
+                              (neg_depth_conjunct                 \<phi>)"
+
 lemma srbb_price_never_neg : "expressiveness_price \<phi> \<noteq> eneg"
   by simp
 
