@@ -285,5 +285,137 @@ next
     using antysim dwl_min in_wina.intros(3) monotonicity by blast 
 qed
 
+subsubsection \<open>Order on Game Positions\<close>
+
+fun pos_order:: "'gstate \<times> 'energy \<Rightarrow> 'gstate \<times> 'energy \<Rightarrow> bool" where
+  "pos_order (g', e') (g, e) = (if (Ga g) then ((in_wina e g) \<and> (weight_opt g g' \<noteq> None) \<and> (e'= (weight g g') e) \<and> (in_wina e' g')) 
+                                else ((in_wina e g) \<and> (weight_opt g g' \<noteq> None) \<and> ( e'= (weight g g') e)))" 
+
+lemma leaf_is_min:
+  assumes "(\<forall>g''. \<not>(g \<Zinj> g''))"
+  shows "\<forall> g' e'. \<not> (pos_order (g', e') (g, e))"
+  using assms by auto
+
+lemma pos_order_in_wina:
+  assumes "pos_order (g', e') (g, e)"
+  shows "in_wina e' g'"
+  by (metis assms in_wina.cases pos_order.simps)
+
+text\<open>Define the transitive closure of \<open>pos_order\<close>.\<close>
+
+inductive pos_order_t_c :: "'gstate \<times> 'energy \<Rightarrow> 'gstate \<times> 'energy \<Rightarrow> bool" where
+    "pos_order_t_c (g', e') (g, e)" if "pos_order (g', e') (g, e)" |
+    "pos_order_t_c (g'', e'') (g, e)" if "\<exists>g' e'. ((pos_order_t_c (g'', e'') (g', e')) \<and> (pos_order_t_c (g', e') (g, e)))"
+
+(*
+lemma t_c_imp_direct_r:
+  fixes g g' e e'
+  assumes "pos_order_t_c (g', e') (g, e)"
+  shows "\<exists>g'' e''. pos_order (g'', e'') (g, e)"
+  using assms proof (rule pos_order_t_c.induct)
+  fix g g' e e'
+  assume "pos_order (g', e') (g, e)"
+  thus "\<exists>g'' e''. pos_order (g'', e'') (g, e)" by blast
+next
+  fix g'' e'' g e
+  assume "\<exists>g' e'.
+          (pos_order_t_c (g'', e'') (g', e') \<and> (\<exists>g'' e''. pos_order (g'', e'') (g', e'))) \<and>
+          pos_order_t_c (g', e') (g, e) \<and> (\<exists>g'' e''. pos_order (g'', e'') (g, e))"
+  thus "\<exists>g'' e''. pos_order (g'', e'') (g, e)" by blast
+qed
+
+lemma t_c_imp_direct_l:
+  fixes g g' e e'
+  assumes "pos_order_t_c (g', e') (g, e)"
+  shows "\<exists>g'' e''. pos_order (g', e') (g'', e'')"
+  using assms proof (rule pos_order_t_c.induct)
+  fix g g' e e'
+  assume "pos_order (g', e') (g, e)"
+  thus "\<exists>g'' e''. pos_order (g', e') (g'', e'')" by blast
+next
+  fix g'' e'' g e
+  assume "\<exists>g' e'.
+          (pos_order_t_c (g'', e'') (g', e') \<and> (\<exists>g''a e''a. pos_order (g'', e'') (g''a, e''a))) \<and>
+          pos_order_t_c (g', e') (g, e) \<and> (\<exists>g'' e''. pos_order (g', e') (g'', e''))"
+  thus "\<exists>g''a e''a. pos_order (g'', e'') (g''a, e''a)" by blast
+qed
+*)
+
+lemma t_c_imp_direct:
+  fixes g g' e e'
+  assumes "pos_order_t_c (g', e') (g, e)"
+  shows "\<exists>g'' e''. pos_order (g', e') (g'', e'')" and "\<exists>g'' e''. pos_order (g'', e'') (g, e)"
+proof - 
+  show "\<exists>g'' e''. pos_order (g', e') (g'', e'')" using assms proof (rule pos_order_t_c.induct)
+    fix g g' e e'
+    assume "pos_order (g', e') (g, e)"
+    thus "\<exists>g'' e''. pos_order (g', e') (g'', e'')" by blast
+  next
+    fix g'' e'' g e
+    assume "\<exists>g' e'.
+          (pos_order_t_c (g'', e'') (g', e') \<and> (\<exists>g''a e''a. pos_order (g'', e'') (g''a, e''a))) \<and>
+          pos_order_t_c (g', e') (g, e) \<and> (\<exists>g'' e''. pos_order (g', e') (g'', e''))"
+    thus "\<exists>g''a e''a. pos_order (g'', e'') (g''a, e''a)" by blast
+  qed
+next 
+  show "\<exists>g'' e''. pos_order (g'', e'') (g, e)" using assms proof (rule pos_order_t_c.induct)
+    fix g g' e e'
+    assume "pos_order (g', e') (g, e)"
+    thus "\<exists>g'' e''. pos_order (g'', e'') (g, e)" by blast
+  next
+    fix g'' e'' g e
+    assume "\<exists>g' e'.
+          (pos_order_t_c (g'', e'') (g', e') \<and> (\<exists>g'' e''. pos_order (g'', e'') (g', e'))) \<and>
+          pos_order_t_c (g', e') (g, e) \<and> (\<exists>g'' e''. pos_order (g'', e'') (g, e))"
+    thus "\<exists>g'' e''. pos_order (g'', e'') (g, e)" by blast
+  qed
+qed
+
+lemma leaf_is_min_t_c:
+  assumes "(\<forall>g''. \<not>(g \<Zinj> g''))"
+  shows "\<forall> g' e'. \<not> (pos_order_t_c (g', e') (g, e))"
+  using assms t_c_imp_direct leaf_is_min
+  by meson
+
+lemma pos_order_in_wina_t_c:
+  assumes "pos_order_t_c (g', e') (g, e)"
+  shows "in_wina e' g'"
+  using assms t_c_imp_direct pos_order_in_wina by meson 
+
+
+lemma wf_pos_order_t_c:
+  fixes S::"('gstate \<times> 'energy) set"
+  assumes "S \<noteq> {}" (*"\<exists>x. x \<in> S"*)
+  shows "\<exists>m\<in>S.\<forall>s\<in>S. \<not> (pos_order_t_c s m)"
+proof - 
+  from assms obtain g e where "(g,e) \<in> S" by auto
+  show "\<exists>m\<in>S.\<forall>s\<in>S. \<not> (pos_order_t_c s m)" proof (cases "in_wina e g")
+    case True
+    then show ?thesis proof (cases "\<exists>s\<in>S. (pos_order_t_c s (g,e))")
+      case True
+      then obtain g' e' where "pos_order_t_c (g', e') (g,e)" and X:"(g', e') \<in> S" by auto
+      from this(1) show ?thesis sorry (* proof(rule pos_order_t_c.induct) *)
+    next
+      case False
+      then show ?thesis using \<open>(g, e) \<in> S\<close> by auto 
+    qed
+  next
+    case False
+    then show ?thesis
+      by (smt (verit) \<open>(g, e) \<in> S\<close> pos_order.simps pos_order_t_c.cases t_c_imp_direct) 
+  qed
+qed
+
+lemma direct_imp_t_c:
+  assumes "pos_order x y"
+  shows "pos_order_t_c x y"
+  by (metis assms old.prod.exhaust pos_order_t_c.intros(1))
+
+lemma wf_pos_order:
+  fixes S::"('gstate \<times> 'energy) set"
+  assumes "S \<noteq> {}" (*"\<exists>x. x \<in> S"*)
+  shows "\<exists>m\<in>S.\<forall>s\<in>S. \<not> (pos_order s m)"
+  using assms wf_pos_order_t_c direct_imp_t_c by meson
+
 end (*End of context energy_game*)
 end
