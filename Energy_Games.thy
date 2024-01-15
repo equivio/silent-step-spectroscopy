@@ -238,6 +238,7 @@ text\<open>The attacker wins a game from some starting position if they can forc
 stuck before running out of energy themselves. How much energy is needed can be characterized by 
 winning budgets: \<close>
 
+
 inductive in_wina:: "'energy \<Rightarrow> 'gstate \<Rightarrow> bool " where
  "in_wina e g" if "(Gd g) \<and> (\<forall>g'. \<not>(g \<Zinj> g')) \<and> (e \<noteq> defender_win_level)" |
  "in_wina e g" if "(Ga g) \<and> (\<exists>g'. ((g \<Zinj> g') \<and> (in_wina ((weight g g') e) g')))\<and> (e \<noteq> defender_win_level)" |
@@ -375,6 +376,7 @@ next
     thus "\<exists>g'' e''. pos_order (g'', e'') (g, e)" by blast
   qed
 qed
+
 
 lemma leaf_is_min_t_c:
   assumes "(\<forall>g''. \<not>(g \<Zinj> g''))"
