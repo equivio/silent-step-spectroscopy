@@ -244,6 +244,14 @@ inductive in_wina:: "'energy \<Rightarrow> 'gstate \<Rightarrow> bool " where
  "in_wina e g" if "(Ga g) \<and> (\<exists>g'. ((g \<Zinj> g') \<and> (in_wina ((weight g g') e) g')))\<and> (e \<noteq> defender_win_level)" |
  "in_wina e g" if "(Gd g) \<and> (\<forall>g'. ((g \<Zinj> g') \<longrightarrow> (in_wina ((weight g g') e) g'))) \<and> (e \<noteq> defender_win_level)"
 
+(*
+inductive in_wina:: "'energy \<Rightarrow> 'gstate \<Rightarrow> bool " where
+ "in_wina e g" if "(Gd g) \<and> (\<forall>g'. \<not>(g \<Zinj> g')) \<and> (e \<noteq> defender_win_level)" |
+ "in_wina e g" if "(Ga g)\<and> (e \<noteq> defender_win_level) \<and> (\<exists>S::'gstate set. (\<forall>g'\<in> S. ((g \<Zinj> g') \<and> (in_wina ((weight g g') e) g')) \<and> ((\<exists>p. p\<in> S)\<and> (\<forall>S'. ((\<exists>g. ((g\<in>S \<and> g\<notin>S') \<or>(g\<in>S' \<and> g\<notin>S))) \<and> (\<forall>g'\<in> S. ((g \<Zinj> g') \<and> (in_wina ((weight g g') e) g')) ) \<longrightarrow> S'\<subseteq>S)))   ))"  |
+ "in_wina e g" if "(Gd g) \<and> (\<forall>g'. ((g \<Zinj> g') \<longrightarrow> (in_wina ((weight g g') e) g'))) \<and> (e \<noteq> defender_win_level)"
+*)                                                                                                                                         
+                                                                                                                                              
+
 definition wina_set
   where
 "wina_set g = {e. in_wina e g}"
@@ -339,6 +347,56 @@ lemma wf_pos_order1:
   assumes "S \<noteq> {}" (*"\<exists>x. x \<in> S"*)
   shows "\<exists>m\<in>S.\<forall>s\<in>S. (s,m) \<notin>pos_order_set"
   sorry
+
+lemma hilfslemma:
+  assumes A: "\<forall>x. (\<forall>y. (y, x) \<in> pos_order_set \<longrightarrow> P y) \<longrightarrow> P x" and "in_wina e g"
+  shows "P (g,e)"
+  using assms(2) proof (induct rule: in_wina.induct)
+          case (1 g e)
+          then have IWA: "in_wina e g" using in_wina.simps by meson 
+          from 1 have "(\<forall>g'. \<not> g \<Zinj> g')" by simp
+          thus "P (g,e)" using A leaf_is_min1 IWA
+            using surj_pair by fastforce 
+        next
+          case (2 g e)
+          assume "Ga g \<and>
+           (\<exists>g'. g \<Zinj> g' \<and> in_wina (weight g g' e) g' \<and> P (g', weight g g' e)) \<and>
+           e \<noteq> defender_win_level"
+          then show ?case oops
+        next
+          case (3 g e)
+          then show ?case using A 3
+            by (metis old.prod.exhaust pos_order_set.simps)
+        qed
+
+lemma pos_order_is_wf:
+  shows "wf pos_order_set"
+  unfolding wf_def 
+proof 
+  fix P 
+  show "(\<forall>x. (\<forall>y. (y, x) \<in> pos_order_set \<longrightarrow> P y) \<longrightarrow> P x) \<longrightarrow> All P" 
+  proof 
+    assume A: "\<forall>x. (\<forall>y. (y, x) \<in> pos_order_set \<longrightarrow> P y) \<longrightarrow> P x"
+    show "All P"
+    proof
+      fix s 
+      have "\<exists>g::'gstate. \<exists> e::'energy. s=(g,e)" by simp
+      then obtain g e where "s=(g,e)" by blast
+      show "P s"
+      proof (cases "in_wina e g")
+        case True
+        hence "P (g,e)" using hilfslemma A by blast 
+        then show ?thesis by (simp add: \<open>s = (g, e)\<close>) 
+      next
+        case False
+        hence "P (g,e)" using A
+          by (smt (verit, ccfv_threshold) pos_order.elims(2) pos_order.elims(3) pos_order_set.simps)
+        then show ?thesis by (simp add: \<open>s = (g, e)\<close>) 
+      qed 
+    qed
+  qed
+qed
+
 text\<open>Define the transitive closure of \<open>pos_order\<close>.\<close>
 
 inductive pos_order_t_c :: "'gstate \<times> 'energy \<Rightarrow> 'gstate \<times> 'energy \<Rightarrow> bool" where
