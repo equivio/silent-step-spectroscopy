@@ -406,7 +406,7 @@ where
           \<and> in_wina (e - (E 0 1 1 0 0 0 0 0)) (Attacker_Clause p q)
           \<and> strategy_formula_conjunct (Attacker_Clause p q) (e - (E 0 1 1 0 0 0 0 0)) (\<Phi> q)"
 
-lemma one_empty_Q:
+lemma distinction_implies_winning_budgets_empty_Q:
   assumes "distinguishes_from \<phi> p {}"
   shows "in_wina (expressiveness_price \<phi>) (Attacker_Immediate p {})"
 proof-
@@ -426,24 +426,71 @@ proof-
     by (metis conj_win id_apply not_neg option.distinct(1) option.sel)
 qed
 
-lemma one:
+(*corollary one_inner_empty_Q:
+  assumes "distinguishes_from_inner \<chi> p {}"
+  shows "in_wina (expr_pr_inner \<chi>) (Attacker_Immediate p {})"
+proof-
+  define phi where "phi \<equiv> Internal \<chi>"
+  have price_eq: "expr_pr_inner \<chi> = expressiveness_price phi" unfolding phi_def by force
+  from assms have "distinguishes_from phi p {}" unfolding distinguishes_from_def by fast
+  hence "in_wina (expressiveness_price phi) (Attacker_Immediate p {})" by (rule one_empty_Q)
+  thus ?thesis unfolding price_eq .
+qed
+
+corollary one_conjunct_empty_Q:
+  assumes "\<exists>i \<in> I.  distinguishes_from_conjunct (\<Psi> i)  p {}"
+  shows "in_wina (expr_pr_conjunct ljhjsdfhb) (Attacker_Immediate p {})"
+using assms proof(cases "\<psi>")
+  case (Pos "\<chi>")
+  then show ?thesis using one_empty_Q 
+next
+  case (Neg "\<phi>")
+  then show ?thesis sorry
+qed
+
+   unfolding phi_def by force
+  from assms have "distinguishes_from phi p {}" unfolding distinguishes_from_def by fast
+  hence "in_wina (expressiveness_price phi) (Attacker_Immediate p {})" by (rule one_empty_Q)
+  thus ?thesis unfolding price_eq .
+qed*)
+
+thm hml_srbb.case
+thm hml_srbb.distinct
+thm hml_srbb.exhaust
+thm hml_srbb_hml_srbb_inner_hml_srbb_conjunct.induct
+
+lemma distinction_implies_winning_budgets':
   assumes "distinguishes_from \<phi> p Q"
   shows "in_wina (expressiveness_price \<phi>) (Attacker_Immediate p Q)"
 proof-
-  have "\<lbrakk>Q \<noteq> {}; distinguishes_from \<phi> p Q\<rbrakk> \<Longrightarrow> in_wina (expressiveness_price \<phi>) (Attacker_Immediate p Q)" and
-        "\<lbrakk>Q \<noteq> {}; distinguishes_inner \<chi> p q;  Q \<Zsurj>S Q\<rbrakk> \<Longrightarrow> in_wina (expr_pr_inner \<chi>) (Attacker_Delayed p Q)" and
-        "\<lbrakk>Q \<noteq> {}; distinguishes_conjunct \<psi> p q\<rbrakk> \<Longrightarrow> in_wina (expr_pr_conjunct \<psi>) (Attacker_Clause p q)" and
-        "\<lbrakk>Q \<noteq> {}; distinguishes_from_inner (Conj \<Psi>_I \<Psi>) p Q\<rbrakk> \<Longrightarrow> 
-          in_wina (expr_pr_inner (Conj \<Psi>_I \<Psi>)) (Defender_Conj p Q)" and
-        "\<lbrakk>Q \<noteq> {}; distinguishes_from_inner (StableConj \<Psi>_I \<Psi>) p Q\<rbrakk> \<Longrightarrow> 
-          in_wina (expr_pr_inner (StableConj \<Psi>_I \<Psi>)) (Defender_Stable_Conj p Q)" and
-        "\<lbrakk>Q \<noteq> {}; distinguishes_from_inner (BranchConj \<alpha> \<phi> \<Psi>_I \<Psi>) p Q\<rbrakk> \<Longrightarrow> 
-          \<lbrakk>p \<mapsto>\<alpha> p'; p' \<Turnstile>SRBB \<phi>; Q \<inter> (model_set_inner (Conj \<Psi>_I \<Psi>)) \<subseteq> Q_\<alpha>; 
-           Q_\<alpha> \<subseteq> model_set_inner (BranchConj \<alpha> \<phi> \<Psi>_I \<Psi>)\<rbrakk> \<Longrightarrow>
-          in_wina (expr_pr_inner (BranchConj \<alpha> \<phi> \<Psi>_I \<Psi>)) (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>)"
-        for \<phi> p Q \<chi> q \<psi> \<Psi>_I \<Psi> \<alpha> p' Q_\<alpha>
-    sorry
-  thus ?thesis using one_empty_Q assms by metis
+  have "\<And>\<phi> \<chi> \<psi>. (\<forall>Q p. Q \<noteq> {} \<longrightarrow>
+       distinguishes_from \<phi> p Q \<longrightarrow>
+       in_wina (expressiveness_price \<phi>) (Attacker_Immediate p Q)) \<and>
+((\<forall>p Q. distinguishes_from_inner \<chi> p Q \<longrightarrow>
+        Q \<Zsurj>S Q \<longrightarrow> in_wina (expr_pr_inner \<chi>) (Attacker_Delayed p Q)) \<and>
+ (\<forall>\<Psi>_I \<Psi> p Q.
+     \<chi> = hml_srbb_inner.Conj \<Psi>_I \<Psi> \<longrightarrow>
+     Q \<noteq> {} \<longrightarrow>
+     distinguishes_from_inner \<chi> p Q \<longrightarrow>
+     in_wina (expr_pr_inner \<chi>) (Defender_Conj p Q)) \<and>
+ (\<forall>\<Psi>_I \<Psi> p Q.
+     \<chi> = StableConj \<Psi>_I \<Psi> \<longrightarrow>
+     Q \<noteq> {} \<longrightarrow>
+     distinguishes_from_inner \<chi> p Q \<longrightarrow>
+     in_wina (expr_pr_inner \<chi>) (Defender_Stable_Conj p Q)) \<and>
+ (\<forall>\<Psi>_I \<Psi> \<alpha> \<phi> p Q p' Q_\<alpha>.
+     \<chi> = BranchConj \<alpha> \<phi> \<Psi>_I \<Psi> \<longrightarrow>
+     distinguishes_from_inner \<chi> p Q \<longrightarrow>
+     p \<mapsto>\<alpha> p' \<longrightarrow>
+     p' \<Turnstile>SRBB \<phi> \<longrightarrow>
+     Q \<inter> model_set_inner \<chi> \<subseteq> Q_\<alpha> \<longrightarrow>
+     Q_\<alpha> \<subseteq> Q - model_set_inner (hml_srbb_inner.Obs \<alpha> \<phi>) \<longrightarrow>
+     in_wina (expr_pr_inner \<chi>) (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>))) \<and>
+(\<forall>p q. distinguishes_conjunct \<psi> p q \<longrightarrow>
+       in_wina (expr_pr_conjunct \<psi>) (Attacker_Clause p q))"
+    apply(rule hml_srbb_hml_srbb_inner_hml_srbb_conjunct.induct) sorry
+  thus ?thesis
+    by (metis assms distinction_implies_winning_budgets_empty_Q)
 qed
 
 end (* context full_spec_game *)

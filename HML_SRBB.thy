@@ -21,7 +21,6 @@ and
     Pos "('act, 'i) hml_srbb_inner" |
     Neg "('act, 'i) hml_srbb_inner"
 
-
 context Inhabited_Tau_LTS
 begin
 
