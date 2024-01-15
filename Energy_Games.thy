@@ -285,18 +285,6 @@ next
     using antysim dwl_min in_wina.intros(3) monotonicity by blast 
 qed
 
-text \<open>alternative order on game positions\<close>
-inductive_set pos_order_alt :: "('gstate \<times> 'energy) rel" 
-  where 
-"((g', e'), (g, e)) \<in> pos_order_alt" 
-if "((Ga g) \<and> (g \<Zinj> g') \<and> (in_wina ((weight g g') e) g') \<and> (e' = ((weight g g') e)))" |
-"((g', e'), (g, e)) \<in> pos_order_alt"
-if "(Gd g) \<and> ((g \<Zinj> g') \<and> (e' = ((weight g g') e)))"
-
-lemma pos_order_is_wf:
-  shows "wf pos_order_alt"
-  sorry
-
 subsubsection \<open>Order on Game Positions\<close>
 
 fun pos_order:: "'gstate \<times> 'energy \<Rightarrow> 'gstate \<times> 'energy \<Rightarrow> bool" where
@@ -313,11 +301,50 @@ lemma pos_order_in_wina:
   shows "in_wina e' g'"
   by (metis assms in_wina.cases pos_order.simps)
 
+lemma min_in_win_is_leaf:
+  assumes "\<forall> g' e'. \<not> (pos_order (g', e') (g, e))" and "in_wina e g"
+  shows  "(\<forall>g''. \<not>(g \<Zinj> g''))"
+  by (meson assms(1) assms(2) in_wina_Ga pos_order.simps)
+
+
+inductive_set pos_order_set::"('gstate \<times> 'energy) rel" where 
+  "((g', e'),(g, e)) \<in> pos_order_set" 
+    if "(Ga g) \<and> (in_wina e g) \<and> (weight_opt g g' \<noteq> None) \<and> (e'= (weight g g') e) \<and> (in_wina e' g')" |
+  "((g', e'),(g, e)) \<in> pos_order_set" 
+    if "(Gd g) \<and> (in_wina e g) \<and> (weight_opt g g' \<noteq> None) \<and> ( e'= (weight g g') e)"
+
+lemma leaf_is_min1:
+  assumes "(\<forall>g''. \<not>(g \<Zinj> g''))"
+  shows "\<forall> g' e'. ((g', e'),(g, e))\<notin>pos_order_set"
+  using assms by (simp add: pos_order_set.simps) 
+
+lemma pos_order_in_wina1:
+  assumes "((g', e'),(g, e))\<in>pos_order_set"
+  shows "in_wina e' g'"
+  using assms in_wina.cases pos_order_set.simps by auto
+  
+lemma min_in_win_is_leaf1:
+  assumes "\<forall> g' e'. ((g', e'),(g, e))\<notin>pos_order_set" and "in_wina e g"
+  shows  "(\<forall>g''. \<not>(g \<Zinj> g''))"
+  using assms by (meson in_wina_Ga pos_order_set.intros(1) pos_order_set.intros(2)) 
+
+lemma in_wina_is_ordered1:
+  assumes "in_wina e g"
+  shows "(\<forall>g''. \<not>(g \<Zinj> g'')) \<or> (\<exists>g' e'. ((g', e'),(g, e))\<in>pos_order_set)"
+  using assms using min_in_win_is_leaf1 by auto
+
+lemma wf_pos_order1:
+  fixes S::"('gstate \<times> 'energy) set"
+  assumes "S \<noteq> {}" (*"\<exists>x. x \<in> S"*)
+  shows "\<exists>m\<in>S.\<forall>s\<in>S. (s,m) \<notin>pos_order_set"
+  sorry
 text\<open>Define the transitive closure of \<open>pos_order\<close>.\<close>
 
 inductive pos_order_t_c :: "'gstate \<times> 'energy \<Rightarrow> 'gstate \<times> 'energy \<Rightarrow> bool" where
     "pos_order_t_c (g', e') (g, e)" if "pos_order (g', e') (g, e)" |
     "pos_order_t_c (g'', e'') (g, e)" if "\<exists>g' e'. ((pos_order_t_c (g'', e'') (g', e')) \<and> (pos_order_t_c (g', e') (g, e)))"
+
+definition "pos_order_t_c_set = {((g', e'), (g, e)). pos_order_t_c (g', e') (g, e)}"
 
 lemma t_c_imp_direct:
   fixes g g' e e'
@@ -395,5 +422,9 @@ lemma wf_pos_order:
   shows "\<exists>m\<in>S.\<forall>s\<in>S. \<not> (pos_order s m)"
   using assms wf_pos_order_t_c direct_imp_t_c by meson
 
+lemma wfP_pos_order:
+  shows "wfP pos_order"
+  using wf_pos_order sorry
+    
 end (*End of context energy_game*)
 end
