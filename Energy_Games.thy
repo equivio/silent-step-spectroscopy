@@ -319,40 +319,6 @@ inductive pos_order_t_c :: "'gstate \<times> 'energy \<Rightarrow> 'gstate \<tim
     "pos_order_t_c (g', e') (g, e)" if "pos_order (g', e') (g, e)" |
     "pos_order_t_c (g'', e'') (g, e)" if "\<exists>g' e'. ((pos_order_t_c (g'', e'') (g', e')) \<and> (pos_order_t_c (g', e') (g, e)))"
 
-(*
-lemma t_c_imp_direct_r:
-  fixes g g' e e'
-  assumes "pos_order_t_c (g', e') (g, e)"
-  shows "\<exists>g'' e''. pos_order (g'', e'') (g, e)"
-  using assms proof (rule pos_order_t_c.induct)
-  fix g g' e e'
-  assume "pos_order (g', e') (g, e)"
-  thus "\<exists>g'' e''. pos_order (g'', e'') (g, e)" by blast
-next
-  fix g'' e'' g e
-  assume "\<exists>g' e'.
-          (pos_order_t_c (g'', e'') (g', e') \<and> (\<exists>g'' e''. pos_order (g'', e'') (g', e'))) \<and>
-          pos_order_t_c (g', e') (g, e) \<and> (\<exists>g'' e''. pos_order (g'', e'') (g, e))"
-  thus "\<exists>g'' e''. pos_order (g'', e'') (g, e)" by blast
-qed
-
-lemma t_c_imp_direct_l:
-  fixes g g' e e'
-  assumes "pos_order_t_c (g', e') (g, e)"
-  shows "\<exists>g'' e''. pos_order (g', e') (g'', e'')"
-  using assms proof (rule pos_order_t_c.induct)
-  fix g g' e e'
-  assume "pos_order (g', e') (g, e)"
-  thus "\<exists>g'' e''. pos_order (g', e') (g'', e'')" by blast
-next
-  fix g'' e'' g e
-  assume "\<exists>g' e'.
-          (pos_order_t_c (g'', e'') (g', e') \<and> (\<exists>g''a e''a. pos_order (g'', e'') (g''a, e''a))) \<and>
-          pos_order_t_c (g', e') (g, e) \<and> (\<exists>g'' e''. pos_order (g', e') (g'', e''))"
-  thus "\<exists>g''a e''a. pos_order (g'', e'') (g''a, e''a)" by blast
-qed
-*)
-
 lemma t_c_imp_direct:
   fixes g g' e e'
   assumes "pos_order_t_c (g', e') (g, e)"
