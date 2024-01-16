@@ -61,6 +61,10 @@ definition weakly_trace_equivalent (infix "\<simeq>WT" 60) where
 "p \<simeq>WT q \<equiv> p \<lesssim>WT q \<and> q \<lesssim>WT p"
 
 abbreviation silent_reachable_set (infix "\<Zsurj>S" 80) where "P \<Zsurj>S Q \<equiv> \<forall>p \<in> P. \<forall>q \<in> Q. p \<Zsurj> q"
+
+lemma "Q \<Zsurj>S {}"
+  by blast
+
 abbreviation non_tau_step_set ("_ \<mapsto>aS _ _" [70,70,70] 80) where "P \<mapsto>aS \<alpha> Q \<equiv> \<forall>p \<in> P. \<forall>q \<in> Q. p \<mapsto>a \<alpha> q"
 
 end (* locale LTS_Tau *)
