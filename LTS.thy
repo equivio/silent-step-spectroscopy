@@ -33,8 +33,7 @@ lemma silent_reachable_trans:
   shows
     \<open>p \<Zsurj> p''\<close>
 using assms silent_reachable.intros(2)
-by (induct, blast+)
-
+  by (induct, blast+)
 
 definition weak_step ("_ \<Zsurj>\<mapsto>\<Zsurj> _ _" [70, 70, 70] 80) where
   "p  \<Zsurj>\<mapsto>\<Zsurj> \<alpha> p' \<equiv> if \<alpha> = \<tau> 
@@ -60,10 +59,25 @@ definition weakly_trace_preordered (infix "\<lesssim>WT" 60) where
 definition weakly_trace_equivalent (infix "\<simeq>WT" 60) where
 "p \<simeq>WT q \<equiv> p \<lesssim>WT q \<and> q \<lesssim>WT p"
 
+
 abbreviation silent_reachable_set (infix "\<Zsurj>S" 80) where "P \<Zsurj>S Q \<equiv> \<forall>p \<in> P. \<forall>q \<in> Q. p \<Zsurj> q"
 
 lemma "Q \<Zsurj>S {}"
   by blast
+
+definition silent_reachable_destinations :: "'s \<Rightarrow> 's set \<Rightarrow> bool"  where
+  "silent_reachable_destinations p Q \<equiv> \<forall>q. p \<Zsurj> q \<longleftrightarrow> q \<in> Q"
+
+fun silent_reachable_closure :: "'s set \<Rightarrow> 's set" where
+  "silent_reachable_closure P = \<Union>{Q . \<exists>p \<in> P. silent_reachable_destinations p Q}"
+
+lemma "silent_reachable_closure {} = {}"
+  unfolding silent_reachable_closure.simps
+  by fastforce
+
+lemma "P \<Zsurj>S (silent_reachable_closure P)"
+  unfolding silent_reachable_closure.simps
+  oops
 
 abbreviation non_tau_step_set ("_ \<mapsto>aS _ _" [70,70,70] 80) where "P \<mapsto>aS \<alpha> Q \<equiv> \<forall>p \<in> P. \<forall>q \<in> Q. p \<mapsto>a \<alpha> q"
 
