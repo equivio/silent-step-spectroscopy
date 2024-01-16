@@ -40,7 +40,7 @@ proof safe
       proof(cases)
         case 1
         then have "(attacker (Attacker_Immediate x1 x2) \<and> spectroscopy_moves (Attacker_Immediate x1 x2) g' \<noteq> None) \<and>
-  in_wina e (Attacker_Immediate x1 x2) \<and> in_wina e' g' \<and> e' = weight (Attacker_Immediate x1 x2) g' e"
+        in_wina e (Attacker_Immediate x1 x2) \<and> in_wina e' g' \<and> e' = weight (Attacker_Immediate x1 x2) g' e"
           by blast
         then show ?thesis using Attacker_Immediate sorry
       next
@@ -69,7 +69,7 @@ proof safe
     case (Defender_Stable_Conj x1 x2)
     then show ?case sorry
   qed
-
+qed
 (*
 lemma pos_order_min_is_leaf:
   assumes "\<forall> g' e'. ((g', e'), (g, e))\<notin> spectroscopy_pos_order" and "in_wina e g"
@@ -125,23 +125,46 @@ proof-
       case (Defender_Conj p Q)
         from assms have A: "in_wina e (Defender_Conj p Q)"
           by (simp add: Defender_Conj)
-        consider (m0) "in_wina e (Defender_Conj p Q) = (spectroscopy_defender g) \<and> (\<forall>g'. spectroscopy_moves g g' = None)" | 
-        (m1) "in_wina e (Defender_Conj p Q) = (\<not>spectroscopy_defender g) \<and> (\<exists>g'. spectroscopy_moves g g' \<noteq>  None \<and> (in_wina (the (spectroscopy_moves g g') e) g'))" |
-        (m2) "in_wina e (Defender_Conj p Q) = (spectroscopy_defender g) \<and> (\<forall>g'. spectroscopy_moves g g' \<noteq>  None \<longrightarrow>  (in_wina (the (spectroscopy_moves g g') e) g'))"
-          by (metis A Defender_Conj in_wina.cases)
+        consider "in_wina e (Defender_Conj p Q) = (spectroscopy_defender g) \<and> (\<forall>g'. \<not>spectroscopy_moves g g' \<noteq> None)" | 
+                 "in_wina e (Defender_Conj p Q) = (\<not>spectroscopy_defender g) \<and> (\<exists>g'. spectroscopy_moves g g' \<noteq>  None \<and> (in_wina (the (spectroscopy_moves g g') e) g'))" |
+                 "in_wina e (Defender_Conj p Q) = (spectroscopy_defender g) \<and> (\<forall>g'. spectroscopy_moves g g' \<noteq>  None \<longrightarrow>  (in_wina (the (spectroscopy_moves g g') e) g'))"
+                  by (metis A Defender_Conj in_wina.cases)
         from A show ?thesis
         proof(cases)
           case 1
-          then show ?thesis sorry
+          from 1 have A: "\<forall>g'. \<not>spectroscopy_moves g g' \<noteq>  None" using Defender_Conj by blast
+          hence "\<forall>y'. (y',(g,e)) \<notin> spectroscopy_pos_order" by (metis spectroscopy_pos_order.cases surj_pair)
+          hence "False" using 1 sorry
+          then show ?thesis by blast 
         next
           case 2
           then show ?thesis by simp 
         next
           case 3
-          then show ?thesis sorry
+          show ?thesis
+          proof (cases "(spectroscopy_defender g) \<and> (\<forall>g'. spectroscopy_moves g g' \<noteq>  None)")
+            case True
+             hence "\<forall>y'. (y',(g,e)) \<in> spectroscopy_pos_order " using Defender_Conj spectroscopy_moves.simps(35) by blast 
+             then show ?thesis using Defender_Conj True spectroscopy_moves.simps(69) by blast
+          next
+            case False
+            from False have "\<not>spectroscopy_defender g \<or> (\<exists>g'. spectroscopy_moves g g' = None)" using Defender_Conj by simp
+            (*hence "\<forall>y'. (y',(g,e)) \<notin> spectroscopy_pos_order" by (metis spectroscopy_pos_order.cases surj_pair)
+            hence "False" using 1 sorry*)
+            from this show ?thesis
+            proof (rule disjE)
+              assume "\<not>spectroscopy_defender g"
+              then show ?thesis by (simp add: Defender_Conj)
+            next
+              assume "\<exists>g'. spectroscopy_moves g g' = None"
+              hence "\<exists>y'. (y',(g,e)) \<notin> spectroscopy_pos_order"
+                by (meson spectroscopy_pos_order.cases)
+              hence "False" sorry
+              then show ?thesis
+                by auto 
+            qed
+          qed
         qed
-      
-
         (*proof(cases "in_wina e (Defender_Conj p Q) = (spectroscopy_defender g) \<and> (\<forall>g'. spectroscopy_moves g g' = None)|
               in_wina e (Defender_Conj p Q) = (\<not>spectroscopy_defender g) \<and> (\<exists>g'. spectroscopy_moves g g' \<noteq>  None \<and> (in_wina (the (spectroscopy_moves g g') e) g')) |
               in_wina e (Defender_Conj p Q) = (spectroscopy_defender g) \<and> (\<forall>g'. spectroscopy_moves g g' \<noteq>  None \<longrightarrow>  (in_wina (the (spectroscopy_moves g g') e) g'))")
@@ -162,7 +185,6 @@ proof-
     qed 
   qed
 qed
-
 (*
 "(in_wina e (Attacker_Immediate p Q)) \<longrightarrow> 
     (\<exists>\<phi>. strategy_formula (Attacker_Immediate p Q) e \<phi> \<and> expressiveness_price \<phi> \<le> e)"
