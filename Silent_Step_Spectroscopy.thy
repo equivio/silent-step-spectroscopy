@@ -1,5 +1,5 @@
 theory Silent_Step_Spectroscopy
-  imports Spectroscopy_Game Expressiveness_Price HML_SRBB Weak_Traces
+  imports Spectroscopy_Game Expressiveness_Price HML_SRBB Weak_Traces 
 begin
 
 context full_spec_game begin
@@ -45,10 +45,10 @@ lemma winning_budget_implies_strategy_formula:
         (\<exists>\<phi>. strategy_formula_conjunct g e \<phi> \<and> expressiveness_price_conjunct \<phi> \<le> e)"
 
 proof- 
-  define x where X: "x\<equiv>(g,e)"
+  define x where X: "x=(g,e)"
   show ?thesis
     using assms proof (induction x rule: wf_induct[OF spectroscopy_pos_order_is_wf])
-    case (1 x)
+    case (1 z)
     then show ?case proof (cases g)
       case (Attacker_Immediate p Q)
       from assms have "in_wina e (Attacker_Immediate p Q)"
@@ -60,8 +60,11 @@ proof-
         by (simp add: \<open>in_wina e (Attacker_Immediate p Q)\<close>)
       hence "\<exists>y. (y,((Attacker_Immediate p Q),e)) \<in> spectroscopy_pos_order" by auto
       hence "\<exists>y. (y,(g,e)) \<in> spectroscopy_pos_order" using Attacker_Immediate by simp
-      hence "\<exists>y.  (y, x) \<in> spectroscopy_pos_order" using X sorry
-      then show ?thesis using 1 by simp
+      from this obtain y where "(y,(g,e)) \<in> spectroscopy_pos_order" by (rule exE)
+      from this have "\<exists>z. (y, z) \<in> spectroscopy_pos_order" by auto
+      from this obtain z where "(y, z) \<in> spectroscopy_pos_order" by auto
+      hence "\<exists>y. (y, z) \<in> spectroscopy_pos_order" by blast
+      then show ?thesis using 1 sorry
     next
       case (Attacker_Branch x21 x22)
       then show ?thesis sorry
@@ -75,8 +78,40 @@ proof-
       case (Defender_Branch x51 x52 x53 x54 x55)
       then show ?thesis sorry
     next
-      case (Defender_Conj x61 x62)
-      then show ?thesis sorry
+      case (Defender_Conj p Q)
+        from assms have A: "in_wina e (Defender_Conj p Q)"
+          by (simp add: Defender_Conj)
+        consider (m0) "in_wina e (Defender_Conj p Q) = (spectroscopy_defender g) \<and> (\<forall>g'. spectroscopy_moves g g' = None)" | 
+        (m1) "in_wina e (Defender_Conj p Q) = (\<not>spectroscopy_defender g) \<and> (\<exists>g'. spectroscopy_moves g g' \<noteq>  None \<and> (in_wina (the (spectroscopy_moves g g') e) g'))" |
+        (m2) "in_wina e (Defender_Conj p Q) = (spectroscopy_defender g) \<and> (\<forall>g'. spectroscopy_moves g g' \<noteq>  None \<longrightarrow>  (in_wina (the (spectroscopy_moves g g') e) g'))"
+          by (metis A Defender_Conj in_wina.cases)
+        from A show ?thesis
+        proof(cases)
+          case 1
+          then show ?thesis sorry
+        next
+          case 2
+          then show ?thesis by simp 
+        next
+          case 3
+          then show ?thesis sorry
+        qed
+      
+
+        (*proof(cases "in_wina e (Defender_Conj p Q) = (spectroscopy_defender g) \<and> (\<forall>g'. spectroscopy_moves g g' = None)|
+              in_wina e (Defender_Conj p Q) = (\<not>spectroscopy_defender g) \<and> (\<exists>g'. spectroscopy_moves g g' \<noteq>  None \<and> (in_wina (the (spectroscopy_moves g g') e) g')) |
+              in_wina e (Defender_Conj p Q) = (spectroscopy_defender g) \<and> (\<forall>g'. spectroscopy_moves g g' \<noteq>  None \<longrightarrow>  (in_wina (the (spectroscopy_moves g g') e) g'))")
+          case*)
+          
+          (*case True
+            from A True have "\<forall>g'. (spectroscopy_moves (Defender_Conj p Q) g')\<noteq>None \<longrightarrow> (in_wina (the (spectroscopy_moves (Defender_Conj p Q) g') e) g')"
+              using Defender_Conj spectroscopy_moves.simps(69) by blast
+            then show ?thesis by (meson True spectroscopy_moves.simps(38))
+          next
+            case False
+            from False have "\<exists>g'. (spectroscopy_moves (Defender_Conj p Q) g') = None" by simp
+            from A False have "\<forall>g'. (spectroscopy_moves (Defender_Conj p Q) g') = None"
+           then show ?thesis by*)
     next
       case (Defender_Stable_Conj x71 x72)
       then show ?thesis sorry
