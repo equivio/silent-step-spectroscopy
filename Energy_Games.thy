@@ -342,6 +342,7 @@ lemma in_wina_is_ordered1:
   shows "(\<forall>g''. \<not>(g \<Zinj> g'')) \<or> (\<exists>g' e'. ((g', e'),(g, e))\<in>pos_order_set)"
   using assms using min_in_win_is_leaf1 by auto
 
+
 lemma wf_pos_order1:
   fixes S::"('gstate \<times> 'energy) set"
   assumes "S \<noteq> {}" (*"\<exists>x. x \<in> S"*)
@@ -368,6 +369,15 @@ lemma hilfslemma:
           then show ?case using A 3
             by (metis old.prod.exhaust pos_order_set.simps)
         qed
+
+lemma pos_order_is_wf2:
+  shows "wf pos_order_set"
+  unfolding wf_def
+proof safe
+  fix P g e
+  assume "\<forall>x. (\<forall>y. (y, x) \<in> pos_order_set \<longrightarrow> P y) \<longrightarrow> P x"
+  show "P (g, e)"
+  proof(induction rule: in_wina.induct)
 
 lemma pos_order_is_wf:
   shows "wf pos_order_set"
