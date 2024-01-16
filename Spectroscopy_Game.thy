@@ -480,7 +480,7 @@ The inductive property of lemma 1 is formalized as follows: \\
 5. At defender positions, if \<open>\<And>({\<not>\<langle>\<tau>\<rangle>\<top>} \<union> \<Psi>)\<close> distinguishes \<open>p\<close> from \<open>Q \<noteq> {}\<close> and the processes in \<open>Q\<close> are stable,
    then \<open>expr^\<epsilon>(\<And>({\<not>\<langle>\<tau>\<rangle>\<top>} \<union> \<Psi>)) \<in> Win_a((p,Q)^s_d)\<close>.\\
 \<open>\<forall>\<Psi>_I \<Psi> p Q. \<chi> = StableConj \<Psi>_I \<Psi> \<longrightarrow>
-       Q \<noteq> {} \<longrightarrow> distinguishes_from_inner \<chi> p Q
+       Q \<noteq> {} \<longrightarrow> distinguishes_from_inner \<chi> p Q \<longrightarrow> (\<forall>q \<in> Q. \<nexists>q'. q \<mapsto> \<tau> q')
        \<longrightarrow> in_wina (expr_pr_inner \<chi>) (Defender_Stable_Conj p Q)\<close>\\
 
 6. At defender positions, if \<open>\<And>({(\<alpha>)\<phi>} \<union> \<Psi>)\<close> distinguishes \<open>p\<close> from \<open>Q\<close>,
@@ -506,7 +506,7 @@ The inductive property of lemma 1 is formalized as follows: \\
             Q \<noteq> {} \<longrightarrow> distinguishes_from_inner \<chi> p Q
             \<longrightarrow> in_wina (expr_pr_inner \<chi>) (Defender_Conj p Q))
         \<and> (\<forall>\<Psi>_I \<Psi> p Q. \<chi> = StableConj \<Psi>_I \<Psi> \<longrightarrow>
-            Q \<noteq> {} \<longrightarrow> distinguishes_from_inner \<chi> p Q \<longrightarrow> (\<forall>q \<in> Q. \<nexists>q'. q \<mapsto> \<tau> q') 
+            Q \<noteq> {} \<longrightarrow> distinguishes_from_inner \<chi> p Q \<longrightarrow> (\<forall>q \<in> Q. \<nexists>q'. q \<mapsto> \<tau> q')
             \<longrightarrow> in_wina (expr_pr_inner \<chi>) (Defender_Stable_Conj p Q))
         \<and> (\<forall>\<Psi>_I \<Psi> \<alpha> \<phi> p Q p' Q_\<alpha>. \<chi> = BranchConj \<alpha> \<phi> \<Psi>_I \<Psi> \<longrightarrow>
             distinguishes_from_inner \<chi> p Q \<longrightarrow> p \<mapsto>\<alpha> p' \<longrightarrow> p' \<Turnstile>SRBB \<phi> \<longrightarrow>
