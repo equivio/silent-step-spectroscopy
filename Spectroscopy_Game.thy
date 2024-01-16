@@ -488,7 +488,7 @@ The inductive property of lemma 1 is formalized as follows: \\
    then \<open>expr^\<epsilon>(\<And>({(\<alpha>)\<phi>} \<union> \<Psi>)) \<in> Win_a((p,\<alpha>,p',Q - Q_\<alpha>, Q_\<alpha>)^\<eta>_d)\<close>.\\
 \<open>\<forall>\<Psi>_I \<Psi> \<alpha> \<phi> p Q p' Q_\<alpha>. \<chi> = BranchConj \<alpha> \<phi> \<Psi>_I \<Psi> \<longrightarrow>
        distinguishes_from_inner \<chi> p Q \<longrightarrow> p \<mapsto>\<alpha> p' \<longrightarrow> p' \<Turnstile>SRBB \<phi> \<longrightarrow>
-       Q \<inter> model_set_inner \<chi> \<subseteq> Q_\<alpha> \<longrightarrow> Q_\<alpha> \<subseteq> Q - model_set_inner (hml_srbb_inner.Obs \<alpha> \<phi>)
+       Q \<inter> model_set_inner (Conj \<Psi>_I \<Psi>) \<subseteq> Q_\<alpha> \<longrightarrow> Q_\<alpha> \<subseteq> Q - model_set_inner (Obs \<alpha> \<phi>)
        \<longrightarrow> in_wina (expr_pr_inner \<chi>) (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>))\<close>\\
 
 3. At attacker positions, if \<open>\<psi>\<close> distinguishes \<open>p\<close> from \<open>q\<close>,
@@ -510,7 +510,7 @@ The inductive property of lemma 1 is formalized as follows: \\
             \<longrightarrow> in_wina (expr_pr_inner \<chi>) (Defender_Stable_Conj p Q))
         \<and> (\<forall>\<Psi>_I \<Psi> \<alpha> \<phi> p Q p' Q_\<alpha>. \<chi> = BranchConj \<alpha> \<phi> \<Psi>_I \<Psi> \<longrightarrow>
             distinguishes_from_inner \<chi> p Q \<longrightarrow> p \<mapsto>\<alpha> p' \<longrightarrow> p' \<Turnstile>SRBB \<phi> \<longrightarrow>
-            Q \<inter> model_set_inner \<chi> \<subseteq> Q_\<alpha> \<longrightarrow> Q_\<alpha> \<subseteq> Q - model_set_inner (hml_srbb_inner.Obs \<alpha> \<phi>)
+            Q \<inter> model_set_inner (Conj \<Psi>_I \<Psi>) \<subseteq> Q_\<alpha> \<longrightarrow> Q_\<alpha> \<subseteq> Q - model_set_inner (Obs \<alpha> \<phi>)
             \<longrightarrow> in_wina (expr_pr_inner \<chi>) (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>)))
       \<and>
         (\<forall>p q. distinguishes_conjunct \<psi> p q
