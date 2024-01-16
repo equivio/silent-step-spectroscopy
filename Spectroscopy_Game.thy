@@ -515,10 +515,30 @@ The inductive property of lemma 1 is formalized as follows: \\
       \<and>
         (\<forall>p q. distinguishes_conjunct \<psi> p q
                \<longrightarrow> in_wina (expr_pr_conjunct \<psi>) (Attacker_Clause p q))"
+
   proof (rule hml_srbb_hml_srbb_inner_hml_srbb_conjunct.induct)
-    show "\<forall>Q p. Q \<noteq> {} \<longrightarrow> distinguishes_from hml_srbb.TT p Q
-                \<longrightarrow> in_wina (expressiveness_price hml_srbb.TT) (Attacker_Immediate p Q)" sorry
+    show "\<forall>Q p. Q \<noteq> {} \<longrightarrow> distinguishes_from TT p Q
+                \<longrightarrow> in_wina (expressiveness_price TT) (Attacker_Immediate p Q)"
+    proof (rule allI, rule allI, rule impI, rule impI)
+      fix Q p
+      assume "Q \<noteq> {}"
+        and "distinguishes_from TT p Q"
+      hence "\<exists>q. q \<in> Q" 
+        by blast
+      then obtain q where "q \<in> Q" by auto
+
+      from \<open>distinguishes_from TT p Q\<close>
+       and \<open>q \<in> Q\<close>
+      have "distinguishes TT p q" 
+        using distinguishes_from_def by blast
+
+      with verum_never_distinguishes
+      show "in_wina (expressiveness_price TT) (Attacker_Immediate p Q)" 
+        by blast
+    qed
+
   next
+
     fix \<chi>
     assume IH:
       "(\<forall>p Q. distinguishes_from_inner \<chi> p Q \<longrightarrow> Q \<Zsurj>S Q \<longrightarrow> in_wina (expr_pr_inner \<chi>) (Attacker_Delayed p Q))
@@ -535,14 +555,18 @@ The inductive property of lemma 1 is formalized as follows: \\
            \<longrightarrow> in_wina (expr_pr_inner \<chi>) (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>))"
     show "\<forall>Q p. Q \<noteq> {} \<longrightarrow> distinguishes_from (hml_srbb.Internal \<chi>) p Q
                 \<longrightarrow> in_wina (expressiveness_price (hml_srbb.Internal \<chi>)) (Attacker_Immediate p Q)" sorry
+
   next
+
     fix I :: "'s set"
     and \<psi>s :: "'s \<Rightarrow> ('a, 's) hml_srbb_conjunct"
     assume IH: "\<And>\<psi>. \<psi> \<in> range \<psi>s \<Longrightarrow> \<forall>p q. distinguishes_conjunct \<psi> p q
                   \<longrightarrow> in_wina (expr_pr_conjunct \<psi>) (Attacker_Clause p q)"
     show "\<forall>Q p. Q \<noteq> {} \<longrightarrow> distinguishes_from (ImmConj I \<psi>s) p Q
                 \<longrightarrow> in_wina (expressiveness_price (ImmConj I \<psi>s)) (Attacker_Immediate p Q)" sorry
+
   next
+
     fix \<alpha> \<phi>
     assume IH: "\<forall>Q p. Q \<noteq> {} \<longrightarrow> distinguishes_from \<phi> p Q
                   \<longrightarrow> in_wina (expressiveness_price \<phi>) (Attacker_Immediate p Q)"
@@ -563,7 +587,9 @@ The inductive property of lemma 1 is formalized as follows: \\
            Q_\<alpha> \<subseteq> Q - model_set_inner (hml_srbb_inner.Obs \<alpha>' \<phi>')
            \<longrightarrow> in_wina (expr_pr_inner (hml_srbb_inner.Obs \<alpha> \<phi>)) (Defender_Branch p \<alpha>' p' (Q - Q_\<alpha>) Q_\<alpha>))" 
       by fastforce
+
   next
+
     fix I :: "'s set"
     and \<psi>s :: "'s \<Rightarrow> ('a, 's) hml_srbb_conjunct"
     assume IH: "\<And>\<psi>. \<psi> \<in> range \<psi>s \<Longrightarrow> \<forall>p q. distinguishes_conjunct \<psi> p q
@@ -589,7 +615,9 @@ The inductive property of lemma 1 is formalized as follows: \\
            Q_\<alpha> \<subseteq> Q - model_set_inner (hml_srbb_inner.Obs \<alpha> \<phi>)
            \<longrightarrow> in_wina (expr_pr_inner (hml_srbb_inner.Conj I \<psi>s)) (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>))"
       by fastforce
+
   next
+
     fix I :: "'s set"
     and \<psi>s :: "'s \<Rightarrow> ('a, 's) hml_srbb_conjunct"
     assume IH: "\<And>\<psi>. \<psi> \<in> range \<psi>s \<Longrightarrow> \<forall>p q. distinguishes_conjunct \<psi> p q
@@ -615,7 +643,9 @@ The inductive property of lemma 1 is formalized as follows: \\
            Q_\<alpha> \<subseteq> Q - model_set_inner (hml_srbb_inner.Obs \<alpha> \<phi>)
            \<longrightarrow> in_wina (expr_pr_inner (StableConj I \<psi>s)) (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>))"
       by fastforce
+
   next
+
     fix \<alpha> :: 'a
     and \<phi> :: "('a, 's) hml_srbb"
     and I :: "'s set"
@@ -649,7 +679,9 @@ The inductive property of lemma 1 is formalized as follows: \\
            Q_\<alpha> \<subseteq> Q - model_set_inner (hml_srbb_inner.Obs \<alpha>' \<phi>')
            \<longrightarrow> in_wina (expr_pr_inner (BranchConj \<alpha> \<phi> I \<psi>s)) (Defender_Branch p \<alpha>' p' (Q - Q_\<alpha>) Q_\<alpha>))"
       by fastforce
+
   next
+
     fix \<chi>
     assume IH:
       "(\<forall>p Q. distinguishes_from_inner \<chi> p Q \<longrightarrow> Q \<Zsurj>S Q
@@ -667,7 +699,9 @@ The inductive property of lemma 1 is formalized as follows: \\
            \<longrightarrow> in_wina (expr_pr_inner \<chi>) (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>))"
     show "\<forall>p q. distinguishes_conjunct (hml_srbb_conjunct.Pos \<chi>) p q \<longrightarrow>
              in_wina (expr_pr_conjunct (hml_srbb_conjunct.Pos \<chi>)) (Attacker_Clause p q)" sorry
+
   next
+
     fix \<chi>
     assume IH: 
       "(\<forall>p Q. distinguishes_from_inner \<chi> p Q \<longrightarrow> Q \<Zsurj>S Q
