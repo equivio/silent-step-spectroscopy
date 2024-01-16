@@ -515,7 +515,178 @@ The inductive property of lemma 1 is formalized as follows: \\
       \<and>
         (\<forall>p q. distinguishes_conjunct \<psi> p q
                \<longrightarrow> in_wina (expr_pr_conjunct \<psi>) (Attacker_Clause p q))"
-    apply(rule hml_srbb_hml_srbb_inner_hml_srbb_conjunct.induct) sorry
+  proof (rule hml_srbb_hml_srbb_inner_hml_srbb_conjunct.induct)
+    show "\<forall>Q p. Q \<noteq> {} \<longrightarrow> distinguishes_from hml_srbb.TT p Q
+                \<longrightarrow> in_wina (expressiveness_price hml_srbb.TT) (Attacker_Immediate p Q)" sorry
+  next
+    fix \<chi>
+    assume IH:
+      "(\<forall>p Q. distinguishes_from_inner \<chi> p Q \<longrightarrow> Q \<Zsurj>S Q \<longrightarrow> in_wina (expr_pr_inner \<chi>) (Attacker_Delayed p Q))
+     \<and> (\<forall>\<Psi>_I \<Psi> p Q. \<chi> = hml_srbb_inner.Conj \<Psi>_I \<Psi> \<longrightarrow>
+           Q \<noteq> {} \<longrightarrow> distinguishes_from_inner \<chi> p Q
+           \<longrightarrow> in_wina (expr_pr_inner \<chi>) (Defender_Conj p Q))
+     \<and> (\<forall>\<Psi>_I \<Psi> p Q. \<chi> = StableConj \<Psi>_I \<Psi> \<longrightarrow>
+           Q \<noteq> {} \<longrightarrow> distinguishes_from_inner \<chi> p Q \<longrightarrow> (\<forall>q\<in>Q. \<nexists>q'. q \<mapsto>\<tau> q')
+           \<longrightarrow> in_wina (expr_pr_inner \<chi>) (Defender_Stable_Conj p Q))
+     \<and> (\<forall>\<Psi>_I \<Psi> \<alpha> \<phi> p Q p' Q_\<alpha>. \<chi> = BranchConj \<alpha> \<phi> \<Psi>_I \<Psi> \<longrightarrow>
+           distinguishes_from_inner \<chi> p Q \<longrightarrow> p \<mapsto>\<alpha> p' \<longrightarrow> p' \<Turnstile>SRBB \<phi> \<longrightarrow>
+           Q \<inter> model_set_inner (hml_srbb_inner.Conj \<Psi>_I \<Psi>) \<subseteq> Q_\<alpha> \<longrightarrow>
+           Q_\<alpha> \<subseteq> Q - model_set_inner (hml_srbb_inner.Obs \<alpha> \<phi>)
+           \<longrightarrow> in_wina (expr_pr_inner \<chi>) (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>))"
+    show "\<forall>Q p. Q \<noteq> {} \<longrightarrow> distinguishes_from (hml_srbb.Internal \<chi>) p Q
+                \<longrightarrow> in_wina (expressiveness_price (hml_srbb.Internal \<chi>)) (Attacker_Immediate p Q)" sorry
+  next
+    fix I :: "'s set"
+    and \<psi>s :: "'s \<Rightarrow> ('a, 's) hml_srbb_conjunct"
+    assume IH: "\<And>\<psi>. \<psi> \<in> range \<psi>s \<Longrightarrow> \<forall>p q. distinguishes_conjunct \<psi> p q
+                  \<longrightarrow> in_wina (expr_pr_conjunct \<psi>) (Attacker_Clause p q)"
+    show "\<forall>Q p. Q \<noteq> {} \<longrightarrow> distinguishes_from (ImmConj I \<psi>s) p Q
+                \<longrightarrow> in_wina (expressiveness_price (ImmConj I \<psi>s)) (Attacker_Immediate p Q)" sorry
+  next
+    fix \<alpha> \<phi>
+    assume IH: "\<forall>Q p. Q \<noteq> {} \<longrightarrow> distinguishes_from \<phi> p Q
+                  \<longrightarrow> in_wina (expressiveness_price \<phi>) (Attacker_Immediate p Q)"
+    have "\<forall>p Q. distinguishes_from_inner (hml_srbb_inner.Obs \<alpha> \<phi>) p Q \<longrightarrow> Q \<Zsurj>S Q
+                \<longrightarrow> in_wina (expr_pr_inner (hml_srbb_inner.Obs \<alpha> \<phi>)) (Attacker_Delayed p Q)" sorry
+    then show
+      "(\<forall>p Q. distinguishes_from_inner (hml_srbb_inner.Obs \<alpha> \<phi>) p Q \<longrightarrow> Q \<Zsurj>S Q
+           \<longrightarrow> in_wina (expr_pr_inner (hml_srbb_inner.Obs \<alpha> \<phi>)) (Attacker_Delayed p Q))
+     \<and> (\<forall>\<Psi>_I \<Psi> p Q. hml_srbb_inner.Obs \<alpha> \<phi> = hml_srbb_inner.Conj \<Psi>_I \<Psi> \<longrightarrow>
+           Q \<noteq> {} \<longrightarrow> distinguishes_from_inner (hml_srbb_inner.Obs \<alpha> \<phi>) p Q
+           \<longrightarrow> in_wina (expr_pr_inner (hml_srbb_inner.Obs \<alpha> \<phi>)) (Defender_Conj p Q))
+     \<and> (\<forall>\<Psi>_I \<Psi> p Q. hml_srbb_inner.Obs \<alpha> \<phi> = StableConj \<Psi>_I \<Psi> \<longrightarrow>
+           Q \<noteq> {} \<longrightarrow> distinguishes_from_inner (hml_srbb_inner.Obs \<alpha> \<phi>) p Q \<longrightarrow> (\<forall>q\<in>Q. \<nexists>q'. q \<mapsto>\<tau> q')
+           \<longrightarrow> in_wina (expr_pr_inner (hml_srbb_inner.Obs \<alpha> \<phi>)) (Defender_Stable_Conj p Q))
+     \<and> (\<forall>\<Psi>_I \<Psi> \<alpha>' \<phi>' p Q p' Q_\<alpha>. hml_srbb_inner.Obs \<alpha> \<phi> = BranchConj \<alpha>' \<phi>' \<Psi>_I \<Psi> \<longrightarrow>
+           distinguishes_from_inner (hml_srbb_inner.Obs \<alpha> \<phi>) p Q \<longrightarrow> p \<mapsto>\<alpha>' p' \<longrightarrow> p' \<Turnstile>SRBB \<phi>' \<longrightarrow>
+           Q \<inter> model_set_inner (hml_srbb_inner.Conj \<Psi>_I \<Psi>) \<subseteq> Q_\<alpha> \<longrightarrow>
+           Q_\<alpha> \<subseteq> Q - model_set_inner (hml_srbb_inner.Obs \<alpha>' \<phi>')
+           \<longrightarrow> in_wina (expr_pr_inner (hml_srbb_inner.Obs \<alpha> \<phi>)) (Defender_Branch p \<alpha>' p' (Q - Q_\<alpha>) Q_\<alpha>))" 
+      by fastforce
+  next
+    fix I :: "'s set"
+    and \<psi>s :: "'s \<Rightarrow> ('a, 's) hml_srbb_conjunct"
+    assume IH: "\<And>\<psi>. \<psi> \<in> range \<psi>s \<Longrightarrow> \<forall>p q. distinguishes_conjunct \<psi> p q
+                  \<longrightarrow> in_wina (expr_pr_conjunct \<psi>) (Attacker_Clause p q)"
+    have
+      "(\<forall>p Q. distinguishes_from_inner (hml_srbb_inner.Conj I \<psi>s) p Q \<longrightarrow> Q \<Zsurj>S Q
+           \<longrightarrow> in_wina (expr_pr_inner (hml_srbb_inner.Conj I \<psi>s)) (Attacker_Delayed p Q))
+     \<and> (\<forall>\<Psi>_I \<Psi> p Q. hml_srbb_inner.Conj I \<psi>s = hml_srbb_inner.Conj \<Psi>_I \<Psi> \<longrightarrow>
+           Q \<noteq> {} \<longrightarrow> distinguishes_from_inner (hml_srbb_inner.Conj I \<psi>s) p Q
+           \<longrightarrow> in_wina (expr_pr_inner (hml_srbb_inner.Conj I \<psi>s)) (Defender_Conj p Q))" sorry
+    then show
+      "(\<forall>p Q. distinguishes_from_inner (hml_srbb_inner.Conj I \<psi>s) p Q \<longrightarrow> Q \<Zsurj>S Q
+           \<longrightarrow> in_wina (expr_pr_inner (hml_srbb_inner.Conj I \<psi>s)) (Attacker_Delayed p Q))
+     \<and> (\<forall>\<Psi>_I \<Psi> p Q. hml_srbb_inner.Conj I \<psi>s = hml_srbb_inner.Conj \<Psi>_I \<Psi> \<longrightarrow>
+           Q \<noteq> {} \<longrightarrow> distinguishes_from_inner (hml_srbb_inner.Conj I \<psi>s) p Q
+           \<longrightarrow> in_wina (expr_pr_inner (hml_srbb_inner.Conj I \<psi>s)) (Defender_Conj p Q))
+     \<and> (\<forall>\<Psi>_I \<Psi> p Q. hml_srbb_inner.Conj I \<psi>s = StableConj \<Psi>_I \<Psi> \<longrightarrow>
+           Q \<noteq> {} \<longrightarrow> distinguishes_from_inner (hml_srbb_inner.Conj I \<psi>s) p Q \<longrightarrow> (\<forall>q\<in>Q. \<nexists>q'. q \<mapsto>\<tau> q')
+           \<longrightarrow> in_wina (expr_pr_inner (hml_srbb_inner.Conj I \<psi>s)) (Defender_Stable_Conj p Q))
+     \<and> (\<forall>\<Psi>_I \<Psi> \<alpha> \<phi> p Q p' Q_\<alpha>. hml_srbb_inner.Conj I \<psi>s = BranchConj \<alpha> \<phi> \<Psi>_I \<Psi> \<longrightarrow>
+           distinguishes_from_inner (hml_srbb_inner.Conj I \<psi>s) p Q \<longrightarrow> p \<mapsto>\<alpha> p' \<longrightarrow> p' \<Turnstile>SRBB \<phi> \<longrightarrow>
+           Q \<inter> model_set_inner (hml_srbb_inner.Conj \<Psi>_I \<Psi>) \<subseteq> Q_\<alpha> \<longrightarrow>
+           Q_\<alpha> \<subseteq> Q - model_set_inner (hml_srbb_inner.Obs \<alpha> \<phi>)
+           \<longrightarrow> in_wina (expr_pr_inner (hml_srbb_inner.Conj I \<psi>s)) (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>))"
+      by fastforce
+  next
+    fix I :: "'s set"
+    and \<psi>s :: "'s \<Rightarrow> ('a, 's) hml_srbb_conjunct"
+    assume IH: "\<And>\<psi>. \<psi> \<in> range \<psi>s \<Longrightarrow> \<forall>p q. distinguishes_conjunct \<psi> p q
+                  \<longrightarrow> in_wina (expr_pr_conjunct \<psi>) (Attacker_Clause p q)"
+    have
+      "(\<forall>p Q. distinguishes_from_inner (StableConj I \<psi>s) p Q \<longrightarrow> Q \<Zsurj>S Q
+           \<longrightarrow> in_wina (expr_pr_inner (StableConj I \<psi>s)) (Attacker_Delayed p Q))
+     \<and> (\<forall>\<Psi>_I \<Psi> p Q. StableConj I \<psi>s = StableConj \<Psi>_I \<Psi> \<longrightarrow>
+           Q \<noteq> {} \<longrightarrow> distinguishes_from_inner (StableConj I \<psi>s) p Q \<longrightarrow> (\<forall>q\<in>Q. \<nexists>q'. q \<mapsto>\<tau> q')
+           \<longrightarrow> in_wina (expr_pr_inner (StableConj I \<psi>s)) (Defender_Stable_Conj p Q))" sorry
+    then show
+      "(\<forall>p Q. distinguishes_from_inner (StableConj I \<psi>s) p Q \<longrightarrow> Q \<Zsurj>S Q
+           \<longrightarrow> in_wina (expr_pr_inner (StableConj I \<psi>s)) (Attacker_Delayed p Q))
+     \<and> (\<forall>\<Psi>_I \<Psi> p Q. StableConj I \<psi>s = hml_srbb_inner.Conj \<Psi>_I \<Psi> \<longrightarrow>
+           Q \<noteq> {} \<longrightarrow> distinguishes_from_inner (StableConj I \<psi>s) p Q
+           \<longrightarrow> in_wina (expr_pr_inner (StableConj I \<psi>s)) (Defender_Conj p Q))
+     \<and> (\<forall>\<Psi>_I \<Psi> p Q. StableConj I \<psi>s = StableConj \<Psi>_I \<Psi> \<longrightarrow>
+           Q \<noteq> {} \<longrightarrow> distinguishes_from_inner (StableConj I \<psi>s) p Q \<longrightarrow> (\<forall>q\<in>Q. \<nexists>q'. q \<mapsto>\<tau> q')
+           \<longrightarrow> in_wina (expr_pr_inner (StableConj I \<psi>s)) (Defender_Stable_Conj p Q))
+     \<and> (\<forall>\<Psi>_I \<Psi> \<alpha> \<phi> p Q p' Q_\<alpha>. StableConj I \<psi>s = BranchConj \<alpha> \<phi> \<Psi>_I \<Psi> \<longrightarrow>
+           distinguishes_from_inner (StableConj I \<psi>s) p Q \<longrightarrow> p \<mapsto>\<alpha> p' \<longrightarrow> p' \<Turnstile>SRBB \<phi> \<longrightarrow>
+           Q \<inter> model_set_inner (hml_srbb_inner.Conj \<Psi>_I \<Psi>) \<subseteq> Q_\<alpha> \<longrightarrow>
+           Q_\<alpha> \<subseteq> Q - model_set_inner (hml_srbb_inner.Obs \<alpha> \<phi>)
+           \<longrightarrow> in_wina (expr_pr_inner (StableConj I \<psi>s)) (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>))"
+      by fastforce
+  next
+    fix \<alpha> :: 'a
+    and \<phi> :: "('a, 's) hml_srbb"
+    and I :: "'s set"
+    and \<psi>s :: "'s \<Rightarrow> ('a,'s) hml_srbb_conjunct"
+    assume IH1:
+          "\<forall>Q p. Q \<noteq> {} \<longrightarrow> distinguishes_from \<phi> p Q
+            \<longrightarrow> in_wina (expressiveness_price \<phi>) (Attacker_Immediate p Q)"
+       and IH2:
+          "\<And>\<psi>. \<psi> \<in> range \<psi>s \<Longrightarrow> \<forall>p q. distinguishes_conjunct \<psi> p q
+            \<longrightarrow> in_wina (expr_pr_conjunct \<psi>) (Attacker_Clause p q)"
+    have
+      "(\<forall>p Q. distinguishes_from_inner (BranchConj \<alpha> \<phi> I \<psi>s) p Q \<longrightarrow> Q \<Zsurj>S Q
+           \<longrightarrow> in_wina (expr_pr_inner (BranchConj \<alpha> \<phi> I \<psi>s)) (Attacker_Delayed p Q))
+     \<and> (\<forall>\<Psi>_I \<Psi> \<alpha>' \<phi>' p Q p' Q_\<alpha>. BranchConj \<alpha> \<phi> I \<psi>s = BranchConj \<alpha>' \<phi>' \<Psi>_I \<Psi> \<longrightarrow>
+           distinguishes_from_inner (BranchConj \<alpha> \<phi> I \<psi>s) p Q \<longrightarrow> p \<mapsto>\<alpha>' p' \<longrightarrow> p' \<Turnstile>SRBB \<phi>' \<longrightarrow>
+           Q \<inter> model_set_inner (hml_srbb_inner.Conj \<Psi>_I \<Psi>) \<subseteq> Q_\<alpha> \<longrightarrow>
+           Q_\<alpha> \<subseteq> Q - model_set_inner (hml_srbb_inner.Obs \<alpha>' \<phi>')
+           \<longrightarrow> in_wina (expr_pr_inner (BranchConj \<alpha> \<phi> I \<psi>s)) (Defender_Branch p \<alpha>' p' (Q - Q_\<alpha>) Q_\<alpha>))" sorry
+    then show
+      "(\<forall>p Q. distinguishes_from_inner (BranchConj \<alpha> \<phi> I \<psi>s) p Q \<longrightarrow> Q \<Zsurj>S Q
+           \<longrightarrow> in_wina (expr_pr_inner (BranchConj \<alpha> \<phi> I \<psi>s)) (Attacker_Delayed p Q))
+     \<and> (\<forall>\<Psi>_I \<Psi> p Q. BranchConj \<alpha> \<phi> I \<psi>s = hml_srbb_inner.Conj \<Psi>_I \<Psi> \<longrightarrow>
+           Q \<noteq> {} \<longrightarrow> distinguishes_from_inner (BranchConj \<alpha> \<phi> I \<psi>s) p Q
+           \<longrightarrow> in_wina (expr_pr_inner (BranchConj \<alpha> \<phi> I \<psi>s)) (Defender_Conj p Q))
+     \<and> (\<forall>\<Psi>_I \<Psi> p Q. BranchConj \<alpha> \<phi> I \<psi>s = StableConj \<Psi>_I \<Psi> \<longrightarrow>
+           Q \<noteq> {} \<longrightarrow> distinguishes_from_inner (BranchConj \<alpha> \<phi> I \<psi>s) p Q \<longrightarrow> (\<forall>q\<in>Q. \<nexists>q'. q \<mapsto>\<tau> q')
+           \<longrightarrow> in_wina (expr_pr_inner (BranchConj \<alpha> \<phi> I \<psi>s)) (Defender_Stable_Conj p Q))
+     \<and> (\<forall>\<Psi>_I \<Psi> \<alpha>' \<phi>' p Q p' Q_\<alpha>. BranchConj \<alpha> \<phi> I \<psi>s = BranchConj \<alpha>' \<phi>' \<Psi>_I \<Psi> \<longrightarrow>
+           distinguishes_from_inner (BranchConj \<alpha> \<phi> I \<psi>s) p Q \<longrightarrow> p \<mapsto>\<alpha>' p' \<longrightarrow> p' \<Turnstile>SRBB \<phi>' \<longrightarrow>
+           Q \<inter> model_set_inner (hml_srbb_inner.Conj \<Psi>_I \<Psi>) \<subseteq> Q_\<alpha> \<longrightarrow>
+           Q_\<alpha> \<subseteq> Q - model_set_inner (hml_srbb_inner.Obs \<alpha>' \<phi>')
+           \<longrightarrow> in_wina (expr_pr_inner (BranchConj \<alpha> \<phi> I \<psi>s)) (Defender_Branch p \<alpha>' p' (Q - Q_\<alpha>) Q_\<alpha>))"
+      by fastforce
+  next
+    fix \<chi>
+    assume IH:
+      "(\<forall>p Q. distinguishes_from_inner \<chi> p Q \<longrightarrow> Q \<Zsurj>S Q
+           \<longrightarrow> in_wina (expr_pr_inner \<chi>) (Attacker_Delayed p Q))
+     \<and> (\<forall>\<Psi>_I \<Psi> p Q. \<chi> = hml_srbb_inner.Conj \<Psi>_I \<Psi> \<longrightarrow>
+           Q \<noteq> {} \<longrightarrow> distinguishes_from_inner \<chi> p Q
+           \<longrightarrow> in_wina (expr_pr_inner \<chi>) (Defender_Conj p Q))
+     \<and> (\<forall>\<Psi>_I \<Psi> p Q. \<chi> = StableConj \<Psi>_I \<Psi> \<longrightarrow>
+           Q \<noteq> {} \<longrightarrow> distinguishes_from_inner \<chi> p Q \<longrightarrow> (\<forall>q\<in>Q. \<nexists>q'. q \<mapsto>\<tau> q')
+           \<longrightarrow> in_wina (expr_pr_inner \<chi>) (Defender_Stable_Conj p Q))
+     \<and> (\<forall>\<Psi>_I \<Psi> \<alpha> \<phi> p Q p' Q_\<alpha>. \<chi> = BranchConj \<alpha> \<phi> \<Psi>_I \<Psi> \<longrightarrow>
+           distinguishes_from_inner \<chi> p Q \<longrightarrow> p \<mapsto>\<alpha> p' \<longrightarrow> p' \<Turnstile>SRBB \<phi> \<longrightarrow>
+           Q \<inter> model_set_inner (hml_srbb_inner.Conj \<Psi>_I \<Psi>) \<subseteq> Q_\<alpha> \<longrightarrow>
+           Q_\<alpha> \<subseteq> Q - model_set_inner (hml_srbb_inner.Obs \<alpha> \<phi>)
+           \<longrightarrow> in_wina (expr_pr_inner \<chi>) (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>))"
+    show "\<forall>p q. distinguishes_conjunct (hml_srbb_conjunct.Pos \<chi>) p q \<longrightarrow>
+             in_wina (expr_pr_conjunct (hml_srbb_conjunct.Pos \<chi>)) (Attacker_Clause p q)" sorry
+  next
+    fix \<chi>
+    assume IH: 
+      "(\<forall>p Q. distinguishes_from_inner \<chi> p Q \<longrightarrow> Q \<Zsurj>S Q
+           \<longrightarrow> in_wina (expr_pr_inner \<chi>) (Attacker_Delayed p Q))
+     \<and> (\<forall>\<Psi>_I \<Psi> p Q. \<chi> = hml_srbb_inner.Conj \<Psi>_I \<Psi> \<longrightarrow>
+           Q \<noteq> {} \<longrightarrow> distinguishes_from_inner \<chi> p Q
+           \<longrightarrow> in_wina (expr_pr_inner \<chi>) (Defender_Conj p Q))
+     \<and> (\<forall>\<Psi>_I \<Psi> p Q. \<chi> = StableConj \<Psi>_I \<Psi> \<longrightarrow>
+           Q \<noteq> {} \<longrightarrow> distinguishes_from_inner \<chi> p Q \<longrightarrow> (\<forall>q\<in>Q. \<nexists>q'. q \<mapsto>\<tau> q')
+           \<longrightarrow> in_wina (expr_pr_inner \<chi>) (Defender_Stable_Conj p Q))
+     \<and> (\<forall>\<Psi>_I \<Psi> \<alpha> \<phi> p Q p' Q_\<alpha>. \<chi> = BranchConj \<alpha> \<phi> \<Psi>_I \<Psi> \<longrightarrow>
+           distinguishes_from_inner \<chi> p Q \<longrightarrow> p \<mapsto>\<alpha> p' \<longrightarrow> p' \<Turnstile>SRBB \<phi> \<longrightarrow>
+           Q \<inter> model_set_inner (hml_srbb_inner.Conj \<Psi>_I \<Psi>) \<subseteq> Q_\<alpha> \<longrightarrow>
+           Q_\<alpha> \<subseteq> Q - model_set_inner (hml_srbb_inner.Obs \<alpha> \<phi>)
+           \<longrightarrow> in_wina (expr_pr_inner \<chi>) (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>))"
+    show "\<forall>p q. distinguishes_conjunct (hml_srbb_conjunct.Neg \<chi>) p q
+           \<longrightarrow> in_wina (expr_pr_conjunct (hml_srbb_conjunct.Neg \<chi>)) (Attacker_Clause p q)" sorry
+  qed
+  
   thus ?thesis
     by (metis assms distinction_implies_winning_budgets_empty_Q)
 qed
