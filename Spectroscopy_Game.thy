@@ -454,6 +454,9 @@ qed
   thus ?thesis unfolding price_eq .
 qed*)
 
+lemma silent_closure: "Q \<noteq> {} \<Longrightarrow> \<exists>Q\<tau>. Q \<Zsurj>S Q\<tau> \<and> Q\<tau> \<Zsurj>S Q\<tau>"
+  by blast
+
 lemma distinction_implies_winning_budgets':
   assumes "distinguishes_from \<phi> p Q"
   shows "in_wina (expressiveness_price \<phi>) (Attacker_Immediate p Q)"
@@ -540,7 +543,7 @@ The inductive property of lemma 1 is formalized as follows: \\
   next
 
     fix \<chi>
-    assume IH:
+    assume
       "(\<forall>p Q. distinguishes_from_inner \<chi> p Q \<longrightarrow> Q \<Zsurj>S Q \<longrightarrow> in_wina (expr_pr_inner \<chi>) (Attacker_Delayed p Q))
      \<and> (\<forall>\<Psi>_I \<Psi> p Q. \<chi> = hml_srbb_inner.Conj \<Psi>_I \<Psi> \<longrightarrow>
            Q \<noteq> {} \<longrightarrow> distinguishes_from_inner \<chi> p Q
@@ -553,8 +556,70 @@ The inductive property of lemma 1 is formalized as follows: \\
            Q \<inter> model_set_inner (hml_srbb_inner.Conj \<Psi>_I \<Psi>) \<subseteq> Q_\<alpha> \<longrightarrow>
            Q_\<alpha> \<subseteq> Q - model_set_inner (hml_srbb_inner.Obs \<alpha> \<phi>)
            \<longrightarrow> in_wina (expr_pr_inner \<chi>) (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>))"
-    show "\<forall>Q p. Q \<noteq> {} \<longrightarrow> distinguishes_from (hml_srbb.Internal \<chi>) p Q
-                \<longrightarrow> in_wina (expressiveness_price (hml_srbb.Internal \<chi>)) (Attacker_Immediate p Q)" sorry
+    hence IH1:
+      "\<forall>p Q. distinguishes_from_inner \<chi> p Q \<longrightarrow> Q \<Zsurj>S Q \<longrightarrow> in_wina (expr_pr_inner \<chi>) (Attacker_Delayed p Q)"
+      and IH2:
+      "(\<forall>\<Psi>_I \<Psi> p Q. \<chi> = hml_srbb_inner.Conj \<Psi>_I \<Psi> \<longrightarrow>
+           Q \<noteq> {} \<longrightarrow> distinguishes_from_inner \<chi> p Q
+           \<longrightarrow> in_wina (expr_pr_inner \<chi>) (Defender_Conj p Q))"
+      and IH3:
+      "(\<forall>\<Psi>_I \<Psi> p Q. \<chi> = StableConj \<Psi>_I \<Psi> \<longrightarrow>
+           Q \<noteq> {} \<longrightarrow> distinguishes_from_inner \<chi> p Q \<longrightarrow> (\<forall>q\<in>Q. \<nexists>q'. q \<mapsto>\<tau> q')
+           \<longrightarrow> in_wina (expr_pr_inner \<chi>) (Defender_Stable_Conj p Q))"
+      and IH4:
+      "(\<forall>\<Psi>_I \<Psi> \<alpha> \<phi> p Q p' Q_\<alpha>. \<chi> = BranchConj \<alpha> \<phi> \<Psi>_I \<Psi> \<longrightarrow>
+           distinguishes_from_inner \<chi> p Q \<longrightarrow> p \<mapsto>\<alpha> p' \<longrightarrow> p' \<Turnstile>SRBB \<phi> \<longrightarrow>
+           Q \<inter> model_set_inner (hml_srbb_inner.Conj \<Psi>_I \<Psi>) \<subseteq> Q_\<alpha> \<longrightarrow>
+           Q_\<alpha> \<subseteq> Q - model_set_inner (hml_srbb_inner.Obs \<alpha> \<phi>)
+           \<longrightarrow> in_wina (expr_pr_inner \<chi>) (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>))"
+      by auto
+
+    show "\<forall>Q p. Q \<noteq> {} \<longrightarrow> distinguishes_from (Internal \<chi>) p Q
+                \<longrightarrow> in_wina (expressiveness_price (Internal \<chi>)) (Attacker_Immediate p Q)"
+    proof (rule allI, rule allI, rule impI, rule impI)
+      fix Q p
+      assume "Q \<noteq> {}"
+         and "distinguishes_from (Internal \<chi>) p Q"
+      hence "(\<exists>p'. p \<Zsurj> p' \<and> p' \<Turnstile> hml_srbb_inner_to_hml \<chi>)
+           \<and> (\<forall>q \<in> Q. (\<nexists>q'. q \<Zsurj> q' \<and> q' \<Turnstile> hml_srbb_inner_to_hml \<chi>))"
+        unfolding distinguishes_from_def
+              and distinguishes_def
+              and hml_srbb_models.simps
+              and hml_srbb_to_hml.simps
+              and hml_models.simps
+        by blast
+      then have "\<exists>p'. p \<Zsurj> p' \<and> p' \<Turnstile> hml_srbb_inner_to_hml \<chi>"
+            and "\<forall>q \<in> Q. (\<nexists>q'. q \<Zsurj> q' \<and> q' \<Turnstile> hml_srbb_inner_to_hml \<chi>)"
+        by auto
+      hence "\<forall>q \<in> Q. (\<forall>q'. q \<Zsurj> q' \<longrightarrow> \<not>(q' \<Turnstile> hml_srbb_inner_to_hml \<chi>))" by auto
+      then have "\<forall>Q'. \<forall>q \<in> Q. (\<forall>q'\<in>Q'. q \<Zsurj> q' \<longrightarrow> \<not>(q' \<Turnstile> hml_srbb_inner_to_hml \<chi>))" 
+        by blast
+      then have "\<forall>Q'. Q \<Zsurj>S Q' \<longrightarrow> (\<forall>q' \<in> Q'. \<not>(q' \<Turnstile> hml_srbb_inner_to_hml \<chi>))"
+        using \<open>Q \<noteq> {}\<close> by blast
+
+      define Q\<tau> where "Q\<tau> \<equiv> (SOME Q'. Q \<Zsurj>S Q' \<and> Q' \<Zsurj>S Q')"
+      have "Q \<Zsurj>S Q\<tau> \<and> Q\<tau> \<Zsurj>S Q\<tau>" using Q\<tau>_def
+        by (smt (verit) empty_iff tfl_some)
+      hence "Q \<Zsurj>S Q\<tau>" and "Q\<tau> \<Zsurj>S Q\<tau>" by auto
+      with \<open>\<forall>Q'. Q \<Zsurj>S Q' \<longrightarrow> (\<forall>q' \<in> Q'. \<not>(q' \<Turnstile> hml_srbb_inner_to_hml \<chi>))\<close>
+      have "\<forall>q' \<in> Q\<tau>. \<not>(q' \<Turnstile> hml_srbb_inner_to_hml \<chi>)" by auto
+
+      from \<open>\<exists>p'. p \<Zsurj> p' \<and> p' \<Turnstile> hml_srbb_inner_to_hml \<chi>\<close>
+      obtain p' where "p \<Zsurj> p'" and "p' \<Turnstile> hml_srbb_inner_to_hml \<chi>" by auto
+
+      from \<open>p' \<Turnstile> hml_srbb_inner_to_hml \<chi>\<close>
+       and \<open>\<forall>q' \<in> Q\<tau>. \<not>(q' \<Turnstile> hml_srbb_inner_to_hml \<chi>)\<close>
+      have "distinguishes_from_inner \<chi> p' Q\<tau>" 
+        by (simp add: distinguishes_from_inner_def distinguishes_inner_def)
+
+      with \<open>Q\<tau> \<Zsurj>S Q\<tau>\<close>
+       and IH1
+      have "in_wina (expr_pr_inner \<chi>) (Attacker_Delayed p' Q\<tau>)" 
+        by blast
+        
+      then show "in_wina (expressiveness_price (Internal \<chi>)) (Attacker_Immediate p Q)"
+         sorry
+    qed
 
   next
 
