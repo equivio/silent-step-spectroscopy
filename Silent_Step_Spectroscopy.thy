@@ -20,11 +20,55 @@ inductive_set spectroscopy_pos_order :: "(('s, 'a) spectroscopy_position \<times
       if "(spectroscopy_defender g) \<and> ((spectroscopy_moves g g' \<noteq> None)) \<and> 
           (in_wina e g) \<and>(e' = the (spectroscopy_moves g g') e)" 
 
-thm spectroscopy_pos_order.induct
-
 lemma spectroscopy_pos_order_is_wf:
   shows "wf spectroscopy_pos_order"
-  sorry
+  unfolding wf_def
+proof safe
+  fix P g e
+  assume ih: "\<forall>x. (\<forall>y. (y, x) \<in> spectroscopy_pos_order \<longrightarrow> P y) \<longrightarrow> P x"
+  then show "P(g, e)"
+  proof(induction g arbitrary: e)
+    case (Attacker_Immediate x1 x2)
+    hence ih: "(\<forall>y. (y, ((Attacker_Immediate x1 x2), e)) \<in> spectroscopy_pos_order \<longrightarrow> P y) \<Longrightarrow> 
+            P ((Attacker_Immediate x1 x2), e)"
+      by blast
+    show ?case
+    proof(rule ih, safe)
+      fix g' e'
+      assume "((g', e'), Attacker_Immediate x1 x2, e) \<in> spectroscopy_pos_order"
+      then show "P (g', e')"
+      proof(cases)
+        case 1
+        then have "(attacker (Attacker_Immediate x1 x2) \<and> spectroscopy_moves (Attacker_Immediate x1 x2) g' \<noteq> None) \<and>
+  in_wina e (Attacker_Immediate x1 x2) \<and> in_wina e' g' \<and> e' = weight (Attacker_Immediate x1 x2) g' e"
+          by blast
+        then show ?thesis using Attacker_Immediate sorry
+      next
+        case 2
+        then have False 
+          by simp
+        then show ?thesis by simp
+      qed
+    qed
+  next
+    case (Attacker_Branch x1 x2)
+    then show ?case sorry
+  next
+    case (Attacker_Clause x1 x2)
+    then show ?case sorry
+  next
+    case (Attacker_Delayed x1 x2)
+    then show ?case sorry
+  next
+    case (Defender_Branch x1 x2 x3 x4 x5)
+    then show ?case sorry
+  next
+    case (Defender_Conj x1 x2)
+    then show ?case sorry
+  next
+    case (Defender_Stable_Conj x1 x2)
+    then show ?case sorry
+  qed
 
 (*
 lemma pos_order_min_is_leaf:
