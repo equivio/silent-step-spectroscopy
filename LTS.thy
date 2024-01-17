@@ -70,6 +70,34 @@ definition silent_reachable_set :: "'s set \<Rightarrow> 's set" where
 lemma sreachable_set_is_sreachable: "P \<Zsurj>S (silent_reachable_set P)"
   using silent_reachable_set_def by auto
 
+lemma exactly_one_sreachable_set: "\<exists>!Q. P \<Zsurj>S Q"
+proof -
+  from sreachable_set_is_sreachable
+  have "P \<Zsurj>S (silent_reachable_set P)".
+
+  have "\<And>Q. P \<Zsurj>S Q \<Longrightarrow> Q = (silent_reachable_set P)"
+  proof -
+    fix Q
+    assume "P \<Zsurj>S Q"
+
+    with sreachable_set_is_sreachable
+    have "\<forall>q \<in> Q. q \<in> (silent_reachable_set P)" 
+      by meson
+
+    from \<open>P \<Zsurj>S Q\<close>
+     and sreachable_set_is_sreachable
+    have "\<forall>q \<in> (silent_reachable_set P). q \<in> Q"
+      by meson
+
+    from \<open>\<forall>q \<in> Q. q \<in> (silent_reachable_set P)\<close>
+     and \<open>\<forall>q \<in> (silent_reachable_set P). q \<in> Q\<close>
+    show "Q = (silent_reachable_set P)" by auto
+  qed
+
+  with \<open>P \<Zsurj>S (silent_reachable_set P)\<close> 
+  show "\<exists>!Q. P \<Zsurj>S Q" 
+    by blast
+qed
 
 abbreviation non_tau_step_set ("_ \<mapsto>aS _ _" [70,70,70] 80) where "P \<mapsto>aS \<alpha> Q \<equiv> \<forall>p \<in> P. \<forall>q \<in> Q. p \<mapsto>a \<alpha> q"
 
