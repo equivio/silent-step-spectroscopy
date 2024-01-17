@@ -336,7 +336,7 @@ where
     "strategy_formula (Attacker_Immediate p Q) e \<phi>" 
       if "(if Q = {} then (\<exists>p'. spectroscopy_moves (Attacker_Immediate p Q) (Defender_Conj p' Q') 
                           = (Some id) \<and> in_wina e (Defender_Conj p' Q') 
-                            \<and> strategy_formula (Defender_Conj p' Q') e \<phi>)
+                            \<and> (strategy_formula (Defender_Conj p' Q') e \<phi>))
 
            else \<exists>p'. spectroscopy_moves (Attacker_Immediate p Q) (Defender_Conj p' Q') 
                 = (subtract 0 0 0 0 1 0 0 0) \<and> in_wina (e - (E 0 0 0 0 1 0 0 0)) (Defender_Conj p' Q')
