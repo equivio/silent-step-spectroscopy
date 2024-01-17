@@ -25,6 +25,11 @@ proof -
     by blast
 qed
 
+lemma step_set_eq:
+  assumes "P \<mapsto>S \<alpha> Q"
+  shows "Q = step_set P \<alpha>"
+  using assms step_set_is_step_set exactly_one_step_set by fastforce
+
 end (* locale LTS *)
 
 
@@ -120,6 +125,11 @@ proof -
 qed
 
 
+lemma sreachable_set_eq:
+  assumes "P \<Zsurj>S Q"
+  shows "Q = silent_reachable_set P"
+  using exactly_one_sreachable_set sreachable_set_is_sreachable assms by fastforce
+
 abbreviation non_tau_step_setp ("_ \<mapsto>aS _ _" [70,70,70] 80) where
   "P \<mapsto>aS \<alpha> Q \<equiv> (\<forall>q \<in> Q. \<exists>p \<in> P. p \<mapsto>a \<alpha> q) \<and> (\<forall>p \<in> P. \<forall>q. p \<mapsto>a \<alpha> q \<longrightarrow> q \<in> Q)"
 
@@ -140,6 +150,12 @@ proof -
   then show "\<exists>!Q. P \<mapsto>aS \<alpha> Q"
     by blast
 qed  
+
+lemma non_tau_step_set_eq:
+  assumes "P \<mapsto>aS \<alpha> Q"
+  shows "Q = non_tau_step_set P \<alpha>"
+  using exactly_one_non_tau_step_set non_tau_step_set_is_non_tau_step_set assms 
+    by fastforce
 
 end (* locale LTS_Tau *)
 
