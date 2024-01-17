@@ -119,7 +119,27 @@ proof -
     by blast
 qed
 
-abbreviation non_tau_step_set ("_ \<mapsto>aS _ _" [70,70,70] 80) where "P \<mapsto>aS \<alpha> Q \<equiv> \<forall>p \<in> P. \<forall>q \<in> Q. p \<mapsto>a \<alpha> q"
+
+abbreviation non_tau_step_setp ("_ \<mapsto>aS _ _" [70,70,70] 80) where
+  "P \<mapsto>aS \<alpha> Q \<equiv> (\<forall>q \<in> Q. \<exists>p \<in> P. p \<mapsto>a \<alpha> q) \<and> (\<forall>p \<in> P. \<forall>q. p \<mapsto>a \<alpha> q \<longrightarrow> q \<in> Q)"
+
+definition non_tau_step_set :: "'s set \<Rightarrow> 'a \<Rightarrow> 's set" where
+  "non_tau_step_set P \<alpha> \<equiv> { q . \<exists>p \<in> P. p \<mapsto>a \<alpha> q }"
+
+lemma non_tau_step_set_is_non_tau_step_set:
+  "P \<mapsto>aS \<alpha> (non_tau_step_set P \<alpha>)"
+  using non_tau_step_set_def by auto
+
+lemma exactly_one_non_tau_step_set:
+  "\<exists>!Q. P \<mapsto>aS \<alpha> Q"
+proof -
+  from non_tau_step_set_is_non_tau_step_set
+  have "P \<mapsto>aS \<alpha> (non_tau_step_set P \<alpha>)"
+    and "\<And>Q. P \<mapsto>aS \<alpha> Q \<Longrightarrow> Q = (non_tau_step_set P \<alpha>)"
+    by fastforce+
+  then show "\<exists>!Q. P \<mapsto>aS \<alpha> Q"
+    by blast
+qed  
 
 end (* locale LTS_Tau *)
 
