@@ -151,7 +151,7 @@ next
   next
     case A_Immediate (* observation *)
     then have "spectroscopy_moves g g' = (subtract 1 0 0 0 0 0 0 0)"
-      by (metis (no_types, lifting) Attacker_Delayed assms(1) local.observation) 
+      by (smt (verit) Attacker_Delayed assms(1) local.observation)
     then show ?thesis using assms(2) mono_subtract
       by simp
   next
@@ -243,7 +243,7 @@ next
   next
     case A_Immediate (* observation *)
     then have "spectroscopy_moves g g' = (subtract 1 0 0 0 0 0 0 0)"
-      by (metis (no_types, lifting) Attacker_Delayed assms(1) local.observation) 
+      by (smt (verit) Attacker_Delayed assms local.observation) 
     then show ?thesis using gets_smaller by simp
   next
     case D_Conj (* late_inst_conj *)
