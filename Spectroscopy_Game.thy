@@ -133,7 +133,7 @@ next
   then have "\<exists>p' Q'. g'= (Attacker_Delayed p' Q')" using assms(1) spectroscopy_moves.simps
     by (metis (no_types, lifting) spectroscopy_defender.elims(2) spectroscopy_defender.elims(3))
   then have "spectroscopy_moves g g' = Some min1_6 \<or> spectroscopy_moves g g' = Some (min1_7 \<circ> (\<lambda>x. x- E 0 0 0 0 0 0 0 1))" using assms(1)
-    by (metis Attacker_Clause local.pos_neg_clause)
+    by (smt (verit) Attacker_Clause local.pos_neg_clause)
   then show ?thesis using assms(2) mono_min_1_6 mono_min_1_7 mono_subtract
     by (metis (no_types, lifting) comp_apply monoE option.sel) 
 next
@@ -225,7 +225,7 @@ next
   then have "\<exists>p' Q'. g'= (Attacker_Delayed p' Q')" using assms(1) spectroscopy_moves.simps
     by (metis (no_types, lifting) spectroscopy_defender.elims(2) spectroscopy_defender.elims(3))
   then have "spectroscopy_moves g g' = Some min1_6 \<or> spectroscopy_moves g g' = Some (min1_7 \<circ> (\<lambda>x. x- E 0 0 0 0 0 0 0 1))" using assms(1)
-    by (metis Attacker_Clause local.pos_neg_clause)
+    by (smt (verit) Attacker_Clause local.pos_neg_clause) 
   then show ?thesis using gets_smaller
     using dual_order.trans gets_smaller_min_1_6 gets_smaller_min_1_7 option.sel by fastforce 
 next
