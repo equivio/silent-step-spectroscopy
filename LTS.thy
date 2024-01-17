@@ -5,8 +5,28 @@ begin
 locale LTS =
   fixes step :: "'s \<Rightarrow> 'a \<Rightarrow> 's \<Rightarrow> bool" ("_ \<mapsto> _ _" [70,70,70] 80)
 begin
-abbreviation step_set ("_ \<mapsto>S _ _" [70,70,70] 80) where "P \<mapsto>S \<alpha> Q \<equiv> \<forall>p \<in> P. \<forall>q \<in> Q. p \<mapsto> \<alpha> q"
-end
+
+abbreviation step_setp ("_ \<mapsto>S _ _" [70,70,70] 80) where
+  "P \<mapsto>S \<alpha> Q \<equiv> (\<forall>q \<in> Q. \<exists>p \<in> P. p \<mapsto> \<alpha> q) \<and> (\<forall>p \<in> P. \<forall>q. p \<mapsto> \<alpha> q \<longrightarrow> q \<in> Q)"
+
+definition step_set :: "'s set \<Rightarrow> 'a \<Rightarrow> 's set" where
+  "step_set P \<alpha> \<equiv> { q . \<exists>p \<in> P. p \<mapsto> \<alpha> q }"
+
+lemma step_set_is_step_set: "P \<mapsto>S \<alpha> (step_set P \<alpha>)"
+  using step_set_def by force
+
+lemma exactly_one_step_set: "\<exists>!Q. P \<mapsto>S \<alpha> Q"
+proof -
+  from step_set_is_step_set
+  have "P \<mapsto>S \<alpha> (step_set P \<alpha>)"
+    and "\<And>Q. P \<mapsto>S \<alpha> Q \<Longrightarrow> Q = (step_set P \<alpha>)"
+    by fastforce+
+  then show "\<exists>!Q. P \<mapsto>S \<alpha> Q"
+    by blast
+qed
+
+end (* locale LTS *)
+
 
 locale LTS_Tau =
   LTS step
