@@ -40,7 +40,7 @@ proof safe
       proof(cases)
         case 1
         then have "(attacker (Attacker_Immediate x1 x2) \<and> spectroscopy_moves (Attacker_Immediate x1 x2) g' \<noteq> None) \<and>
-  in_wina e (Attacker_Immediate x1 x2) \<and> in_wina e' g' \<and> e' = weight (Attacker_Immediate x1 x2) g' e"
+        in_wina e (Attacker_Immediate x1 x2) \<and> in_wina e' g' \<and> e' = weight (Attacker_Immediate x1 x2) g' e"
           by blast
         then show ?thesis using Attacker_Immediate sorry
       next
@@ -73,7 +73,6 @@ proof safe
     then show ?case sorry
   qed
 qed
-
 (*
 lemma pos_order_min_is_leaf:
   assumes "\<forall> g' e'. ((g', e'), (g, e))\<notin> spectroscopy_pos_order" and "in_wina e g"
@@ -369,8 +368,7 @@ lemma winning_budget_implies_strategy_formula:
         = (Some (min1_6))) \<and> (in_wina (min1_6 e) (Attacker_Delayed p Q')) 
           \<and> strategy_formula_inner (Attacker_Delayed p Q') (min1_6 e) \<chi>))"
           by (meson \<open>in_wina (min1_6 e) (Attacker_Delayed p Q')\<close> \<open>{q} \<Zsurj>S Q'\<close> local.pos_neg_clause)
-
-        hence "strategy_formula_conjunct (Attacker_Clause p q) e (Pos \<chi>)"
+hence "strategy_formula_conjunct (Attacker_Clause p q) e (Pos \<chi>)"
           using strategy_formula_strategy_formula_inner_strategy_formula_conjunct.delay
           using pos by blast
 
@@ -534,8 +532,51 @@ E (modal_depth_srbb_conjunct (Neg \<chi>))
       case (Defender_Branch x51 x52 x53 x54 x55)
       then show ?case sorry
     next
-      case (Defender_Conj x61 x62)
-      then show ?case sorry
+      case (Defender_Conj p Q)
+        from assms have A: "in_wina e (Defender_Conj p Q)"
+          by (simp add: Defender_Conj)
+        consider "in_wina e (Defender_Conj p Q) = (spectroscopy_defender g) \<and> (\<forall>g'. \<not>spectroscopy_moves g g' \<noteq> None)" | 
+                 "in_wina e (Defender_Conj p Q) = (\<not>spectroscopy_defender g) \<and> (\<exists>g'. spectroscopy_moves g g' \<noteq>  None \<and> (in_wina (the (spectroscopy_moves g g') e) g'))" |
+                 "in_wina e (Defender_Conj p Q) = (spectroscopy_defender g) \<and> (\<forall>g'. spectroscopy_moves g g' \<noteq>  None \<longrightarrow>  (in_wina (the (spectroscopy_moves g g') e) g'))"
+          by (metis "1.prems" Defender_Conj.prems(2) in_wina.cases)        
+          
+        from A show ?case
+        proof(cases)
+          case 1
+          from 1 have A: "\<forall>g'. \<not>spectroscopy_moves (Defender_Conj p Q) g' \<noteq>  None" using Defender_Conj by blast
+          hence "\<forall>y'. (y',((Defender_Conj p Q),e)) \<notin> spectroscopy_pos_order" by (metis spectroscopy_pos_order.cases surj_pair)
+          hence "False" using 1 sorry
+          then show ?thesis by blast 
+        next
+          case 2
+          then show ?thesis by simp 
+        next
+          case 3
+          show ?thesis
+          proof (cases "(spectroscopy_defender (Defender_Conj p Q)) \<and> (\<forall>g'. spectroscopy_moves (Defender_Conj p Q) g' \<noteq>  None)")
+            case True
+             hence "\<forall>y'. (y',((Defender_Conj p Q),e)) \<in> spectroscopy_pos_order " using Defender_Conj
+               by (meson spectroscopy_moves.simps(95)) 
+             then show ?thesis using Defender_Conj True spectroscopy_moves.simps(69) by blast
+          next
+            case False
+            from False have "\<not>spectroscopy_defender (Defender_Conj p Q) \<or> (\<exists>g'. spectroscopy_moves (Defender_Conj p Q) g' = None)" using Defender_Conj by simp
+            (*hence "\<forall>y'. (y',(g,e)) \<notin> spectroscopy_pos_order" by (metis spectroscopy_pos_order.cases surj_pair)
+            hence "False" using 1 sorry*)
+            from this show ?thesis
+            proof (rule disjE)
+              assume "\<not>spectroscopy_defender (Defender_Conj p Q)"
+              then show ?thesis by (simp add: Defender_Conj)
+            next
+              assume "\<exists>g'. spectroscopy_moves (Defender_Conj p Q) g' = None"
+              hence "\<exists>y'. (y',((Defender_Conj p Q),e)) \<notin> spectroscopy_pos_order"
+                by (meson spectroscopy_pos_order.cases)
+              hence "False" sorry
+              then show ?thesis
+                by auto 
+            qed
+          qed
+        qed
     next
       case (Defender_Stable_Conj x71 x72)
       then show ?case sorry
