@@ -5,8 +5,33 @@ begin
 locale LTS =
   fixes step :: "'s \<Rightarrow> 'a \<Rightarrow> 's \<Rightarrow> bool" ("_ \<mapsto> _ _" [70,70,70] 80)
 begin
-abbreviation step_set ("_ \<mapsto>S _ _" [70,70,70] 80) where "P \<mapsto>S \<alpha> Q \<equiv> \<forall>p \<in> P. \<forall>q \<in> Q. p \<mapsto> \<alpha> q"
-end
+
+abbreviation step_setp ("_ \<mapsto>S _ _" [70,70,70] 80) where
+  "P \<mapsto>S \<alpha> Q \<equiv> (\<forall>q \<in> Q. \<exists>p \<in> P. p \<mapsto> \<alpha> q) \<and> (\<forall>p \<in> P. \<forall>q. p \<mapsto> \<alpha> q \<longrightarrow> q \<in> Q)"
+
+definition step_set :: "'s set \<Rightarrow> 'a \<Rightarrow> 's set" where
+  "step_set P \<alpha> \<equiv> { q . \<exists>p \<in> P. p \<mapsto> \<alpha> q }"
+
+lemma step_set_is_step_set: "P \<mapsto>S \<alpha> (step_set P \<alpha>)"
+  using step_set_def by force
+
+lemma exactly_one_step_set: "\<exists>!Q. P \<mapsto>S \<alpha> Q"
+proof -
+  from step_set_is_step_set
+  have "P \<mapsto>S \<alpha> (step_set P \<alpha>)"
+    and "\<And>Q. P \<mapsto>S \<alpha> Q \<Longrightarrow> Q = (step_set P \<alpha>)"
+    by fastforce+
+  then show "\<exists>!Q. P \<mapsto>S \<alpha> Q"
+    by blast
+qed
+
+lemma step_set_eq:
+  assumes "P \<mapsto>S \<alpha> Q"
+  shows "Q = step_set P \<alpha>"
+  using assms step_set_is_step_set exactly_one_step_set by fastforce
+
+end (* locale LTS *)
+
 
 locale LTS_Tau =
   LTS step
@@ -60,26 +85,76 @@ definition weakly_trace_equivalent (infix "\<simeq>WT" 60) where
 "p \<simeq>WT q \<equiv> p \<lesssim>WT q \<and> q \<lesssim>WT p"
 
 
-abbreviation silent_reachable_set (infix "\<Zsurj>S" 80) where "P \<Zsurj>S Q \<equiv> \<forall>p \<in> P. \<forall>q \<in> Q. p \<Zsurj> q"
+abbreviation silent_reachable_setp (infix "\<Zsurj>S" 80) where
+  "P \<Zsurj>S Q \<equiv> ((\<forall>q \<in> Q. \<exists>p \<in> P. p \<Zsurj> q) \<and> (\<forall>p \<in> P. \<forall>q. p \<Zsurj> q \<longrightarrow> q \<in> Q))"
 
-lemma "Q \<Zsurj>S {}"
-  by blast
+definition silent_reachable_set :: "'s set \<Rightarrow> 's set" where
+  "silent_reachable_set P \<equiv> { q . \<exists>p \<in> P. p \<Zsurj> q }"
 
-definition silent_reachable_destinations :: "'s \<Rightarrow> 's set \<Rightarrow> bool"  where
-  "silent_reachable_destinations p Q \<equiv> \<forall>q. p \<Zsurj> q \<longleftrightarrow> q \<in> Q"
+lemma sreachable_set_is_sreachable: "P \<Zsurj>S (silent_reachable_set P)"
+  using silent_reachable_set_def by auto
 
-fun silent_reachable_closure :: "'s set \<Rightarrow> 's set" where
-  "silent_reachable_closure P = \<Union>{Q . \<exists>p \<in> P. silent_reachable_destinations p Q}"
+lemma exactly_one_sreachable_set: "\<exists>!Q. P \<Zsurj>S Q"
+proof -
+  from sreachable_set_is_sreachable
+  have "P \<Zsurj>S (silent_reachable_set P)".
 
-lemma "silent_reachable_closure {} = {}"
-  unfolding silent_reachable_closure.simps
-  by fastforce
+  have "\<And>Q. P \<Zsurj>S Q \<Longrightarrow> Q = (silent_reachable_set P)"
+  proof -
+    fix Q
+    assume "P \<Zsurj>S Q"
 
-lemma "P \<Zsurj>S (silent_reachable_closure P)"
-  unfolding silent_reachable_closure.simps
-  oops
+    with sreachable_set_is_sreachable
+    have "\<forall>q \<in> Q. q \<in> (silent_reachable_set P)" 
+      by meson
 
-abbreviation non_tau_step_set ("_ \<mapsto>aS _ _" [70,70,70] 80) where "P \<mapsto>aS \<alpha> Q \<equiv> \<forall>p \<in> P. \<forall>q \<in> Q. p \<mapsto>a \<alpha> q"
+    from \<open>P \<Zsurj>S Q\<close>
+     and sreachable_set_is_sreachable
+    have "\<forall>q \<in> (silent_reachable_set P). q \<in> Q"
+      by meson
+
+    from \<open>\<forall>q \<in> Q. q \<in> (silent_reachable_set P)\<close>
+     and \<open>\<forall>q \<in> (silent_reachable_set P). q \<in> Q\<close>
+    show "Q = (silent_reachable_set P)" by auto
+  qed
+
+  with \<open>P \<Zsurj>S (silent_reachable_set P)\<close> 
+  show "\<exists>!Q. P \<Zsurj>S Q" 
+    by blast
+qed
+
+
+lemma sreachable_set_eq:
+  assumes "P \<Zsurj>S Q"
+  shows "Q = silent_reachable_set P"
+  using exactly_one_sreachable_set sreachable_set_is_sreachable assms by fastforce
+
+abbreviation non_tau_step_setp ("_ \<mapsto>aS _ _" [70,70,70] 80) where
+  "P \<mapsto>aS \<alpha> Q \<equiv> (\<forall>q \<in> Q. \<exists>p \<in> P. p \<mapsto>a \<alpha> q) \<and> (\<forall>p \<in> P. \<forall>q. p \<mapsto>a \<alpha> q \<longrightarrow> q \<in> Q)"
+
+definition non_tau_step_set :: "'s set \<Rightarrow> 'a \<Rightarrow> 's set" where
+  "non_tau_step_set P \<alpha> \<equiv> { q . \<exists>p \<in> P. p \<mapsto>a \<alpha> q }"
+
+lemma non_tau_step_set_is_non_tau_step_set:
+  "P \<mapsto>aS \<alpha> (non_tau_step_set P \<alpha>)"
+  using non_tau_step_set_def by auto
+
+lemma exactly_one_non_tau_step_set:
+  "\<exists>!Q. P \<mapsto>aS \<alpha> Q"
+proof -
+  from non_tau_step_set_is_non_tau_step_set
+  have "P \<mapsto>aS \<alpha> (non_tau_step_set P \<alpha>)"
+    and "\<And>Q. P \<mapsto>aS \<alpha> Q \<Longrightarrow> Q = (non_tau_step_set P \<alpha>)"
+    by fastforce+
+  then show "\<exists>!Q. P \<mapsto>aS \<alpha> Q"
+    by blast
+qed  
+
+lemma non_tau_step_set_eq:
+  assumes "P \<mapsto>aS \<alpha> Q"
+  shows "Q = non_tau_step_set P \<alpha>"
+  using exactly_one_non_tau_step_set non_tau_step_set_is_non_tau_step_set assms 
+    by fastforce
 
 end (* locale LTS_Tau *)
 
