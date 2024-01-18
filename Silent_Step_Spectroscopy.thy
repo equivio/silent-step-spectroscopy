@@ -217,7 +217,7 @@ lemma winning_budget_implies_strategy_formula:
   fixes g e
   defines "x \<equiv> (g, e)"
   assumes "in_wina e g"
-  shows (* "\<exists>\<phi>. Strat (Attacker_Immediate p Q) \<phi> \<and> expressiveness_price \<phi> \<le> e"*)
+  shows
   "case g of
     Attacker_Immediate p Q \<Rightarrow> (\<exists>\<phi>. strategy_formula g e \<phi> \<and> expressiveness_price \<phi> \<le> e)
   | Attacker_Delayed p Q => (\<exists>\<phi>. strategy_formula_inner g e \<phi> \<and> expressiveness_price_inner \<phi> \<le> e)
