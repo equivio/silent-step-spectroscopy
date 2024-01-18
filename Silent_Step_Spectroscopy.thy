@@ -46,8 +46,8 @@ lemma winning_budget_implies_strategy_formula:
   next
     case (Defender_Stable_Conj x1 x2)
     then show ?case proof
-      have Strat: "strategy_formula_inner (Defender_Stable_Conj x1 x2) e (StableConj {} TT)" sorry
-      have " expr_pr_inner (StableConj {} TT) \<le> e" sorry
+      have Strat: "strategy_formula_inner (Defender_Stable_Conj x1 x2) e (StableConj {} \<phi>)" sorry
+      have " expr_pr_inner (StableConj {} \<phi>) \<le> e" sorry
       from Strat this show ?thesis by auto
     qed
   qed
