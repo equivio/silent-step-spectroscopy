@@ -85,6 +85,70 @@ corollary pos_order_min_is_leaf_is_d:
   using pos_order_min_is_leaf in_wina.simps assms by meson
 *)
 
+lemma expr_internal_eq:
+  shows "expressiveness_price (Internal \<chi>) = expressiveness_price_inner \<chi>"
+proof-
+  have expr_internal: "expressiveness_price (Internal \<chi>) = E (modal_depth_srbb (Internal \<chi>))
+                              (branching_conjunction_depth (Internal \<chi>))
+                              (instable_conjunction_depth  (Internal \<chi>))
+                              (stable_conjunction_depth    (Internal \<chi>))
+                              (immediate_conjunction_depth (Internal \<chi>))
+                              (max_positive_conjunct_depth (Internal \<chi>))
+                              (max_negative_conjunct_depth (Internal \<chi>))
+                              (negation_depth              (Internal \<chi>))"
+            using expressiveness_price.simps by blast
+          have "modal_depth_srbb (Internal \<chi>) = modal_depth_srbb_inner \<chi>"
+            "(branching_conjunction_depth (Internal \<chi>)) = branch_conj_depth_inner \<chi>"
+"(instable_conjunction_depth  (Internal \<chi>)) = inst_conj_depth_inner \<chi>"
+"(stable_conjunction_depth    (Internal \<chi>)) = st_conj_depth_inner \<chi>"
+"(immediate_conjunction_depth (Internal \<chi>)) = imm_conj_depth_inner \<chi>"
+"max_positive_conjunct_depth (Internal \<chi>) = max_pos_conj_depth_inner \<chi>"
+"max_negative_conjunct_depth (Internal \<chi>) = max_neg_conj_depth_inner \<chi>"
+"negation_depth (Internal \<chi>) = neg_depth_inner \<chi>"
+            by simp+
+          with expr_internal show ?thesis
+            by auto
+        qed
+
+lemma expr_pos:
+  assumes "expressiveness_price_inner \<chi> \<le> (min1_6 e)"
+  shows "expressiveness_price_conjunct (Pos \<chi>) \<le> e"
+proof-
+  have expr_internal: "expressiveness_price_conjunct (Pos \<chi>) = E (modal_depth_srbb_conjunct (Pos \<chi>))
+                              (branch_conj_depth_conjunct (Pos \<chi>))
+                              (inst_conj_depth_conjunct  (Pos \<chi>))
+                              (st_conj_depth_conjunct    (Pos \<chi>))
+                              (imm_conj_depth_conjunct (Pos \<chi>))
+                              (max_pos_conj_depth_conjunct (Pos \<chi>))
+                              (max_neg_conj_depth_conjunct (Pos \<chi>))
+                              (neg_depth_conjunct            (Pos \<chi>))"
+            using expressiveness_price_conjunct.simps by blast
+          have pos_upd: "(modal_depth_srbb_conjunct (Pos \<chi>)) = modal_depth_srbb_inner \<chi>"
+            "(branch_conj_depth_conjunct (Pos \<chi>)) = branch_conj_depth_inner \<chi>"
+  "(inst_conj_depth_conjunct  (Pos \<chi>)) = inst_conj_depth_inner \<chi>"
+  "(st_conj_depth_conjunct    (Pos \<chi>)) = st_conj_depth_inner \<chi>"
+  "(imm_conj_depth_conjunct (Pos \<chi>)) = imm_conj_depth_inner \<chi>"
+  "(max_pos_conj_depth_conjunct (Pos \<chi>)) = modal_depth_srbb_inner \<chi>"
+  "(max_neg_conj_depth_conjunct (Pos \<chi>)) = max_neg_conj_depth_inner \<chi>"
+  "(neg_depth_conjunct            (Pos \<chi>)) = neg_depth_inner \<chi>"
+            by simp+
+          have "expressiveness_price_inner \<chi> \<le> (min1_6 e)"
+            using assms 
+            by blast
+          obtain e1 e2 e3 e4 e5 e6 e7 e8 where "e = E e1 e2 e3 e4 e5 e6 e7 e8"
+            by (metis antysim assms eneg_leq energy.exhaust_sel expressiveness_price_inner.simps min_eneg(1))
+          hence "min1_6 e = (E (min e1 e6) e2 e3 e4 e5 e6 e7 e8)"  
+            by (simp add: min1_6_def)
+          hence "modal_depth_srbb_inner \<chi> \<le> (min e1 e6)"
+            using \<open>expressiveness_price_inner \<chi> \<le> (min1_6 e)\<close> expressiveness_price_inner.simps 
+            by (simp add: leq_not_eneg)
+          hence "modal_depth_srbb_inner \<chi> \<le> e6"
+            using min.boundedE by blast
+          thus "expressiveness_price_conjunct (Pos \<chi>) \<le> e"
+            using expr_internal pos_upd \<open>e = E e1 e2 e3 e4 e5 e6 e7 e8\<close>
+            using \<open>expressiveness_price_inner \<chi> \<le> min1_6 e\<close> \<open>min1_6 e = E (min e1 e6) e2 e3 e4 e5 e6 e7 e8\<close> leq_not_eneg by force
+        qed
+
 lemma winning_budget_implies_strategy_formula:
   fixes g e
   defines "x \<equiv> (g, e)"
@@ -165,32 +229,8 @@ lemma winning_budget_implies_strategy_formula:
           using strategy_formula_strategy_formula_inner_strategy_formula_conjunct.delay by blast
         have "expressiveness_price (Internal \<chi>) \<le> e"
           using \<open>(strategy_formula_inner (Attacker_Delayed p Q') e \<chi> \<and> expressiveness_price_inner \<chi> \<le> e)\<close>
-        proof
-          have expr_internal: "expressiveness_price (Internal \<chi>) = E (modal_depth_srbb (Internal \<chi>))
-                              (branching_conjunction_depth (Internal \<chi>))
-                              (instable_conjunction_depth  (Internal \<chi>))
-                              (stable_conjunction_depth    (Internal \<chi>))
-                              (immediate_conjunction_depth (Internal \<chi>))
-                              (max_positive_conjunct_depth (Internal \<chi>))
-                              (max_negative_conjunct_depth (Internal \<chi>))
-                              (negation_depth              (Internal \<chi>))"
-            using expressiveness_price.simps by blast
-          have "modal_depth_srbb (Internal \<chi>) = modal_depth_srbb_inner \<chi>"
-            "(branching_conjunction_depth (Internal \<chi>)) = branch_conj_depth_inner \<chi>"
-"(instable_conjunction_depth  (Internal \<chi>)) = inst_conj_depth_inner \<chi>"
-"(stable_conjunction_depth    (Internal \<chi>)) = st_conj_depth_inner \<chi>"
-"(immediate_conjunction_depth (Internal \<chi>)) = imm_conj_depth_inner \<chi>"
-"max_positive_conjunct_depth (Internal \<chi>) = max_pos_conj_depth_inner \<chi>"
-"max_negative_conjunct_depth (Internal \<chi>) = max_neg_conj_depth_inner \<chi>"
-"negation_depth (Internal \<chi>) = neg_depth_inner \<chi>"
-            by simp+
-          with expr_internal have "expressiveness_price (Internal \<chi>) = expressiveness_price_inner \<chi>"
-            using expressiveness_price_inner.simps
-            by force
-          then show ?thesis
-            using \<open>strategy_formula_inner (Attacker_Delayed p Q') e \<chi> \<and> expressiveness_price_inner \<chi> \<le> e\<close> 
-            by presburger
-        qed
+            expr_internal_eq
+          by force
         then show ?case 
           using \<open>strategy_formula (Attacker_Immediate p Q) e (Internal \<chi>)\<close>
           by force
@@ -373,42 +413,8 @@ hence "strategy_formula_conjunct (Attacker_Clause p q) e (Pos \<chi>)"
           using pos by blast
 
         have "expressiveness_price_conjunct (Pos \<chi>) \<le> e"
-          using \<open>(strategy_formula_inner (Attacker_Delayed p Q') (min1_6 e) \<chi> \<and> expressiveness_price_inner \<chi> \<le> (min1_6 e))\<close>
-        proof
-          have expr_internal: "expressiveness_price_conjunct (Pos \<chi>) = E (modal_depth_srbb_conjunct (Pos \<chi>))
-                              (branch_conj_depth_conjunct (Pos \<chi>))
-                              (inst_conj_depth_conjunct  (Pos \<chi>))
-                              (st_conj_depth_conjunct    (Pos \<chi>))
-                              (imm_conj_depth_conjunct (Pos \<chi>))
-                              (max_pos_conj_depth_conjunct (Pos \<chi>))
-                              (max_neg_conj_depth_conjunct (Pos \<chi>))
-                              (neg_depth_conjunct            (Pos \<chi>))"
-            using expressiveness_price_conjunct.simps by blast
-          have pos_upd: "(modal_depth_srbb_conjunct (Pos \<chi>)) = modal_depth_srbb_inner \<chi>"
-            "(branch_conj_depth_conjunct (Pos \<chi>)) = branch_conj_depth_inner \<chi>"
-"(inst_conj_depth_conjunct  (Pos \<chi>)) = inst_conj_depth_inner \<chi>"
-"(st_conj_depth_conjunct    (Pos \<chi>)) = st_conj_depth_inner \<chi>"
-"(imm_conj_depth_conjunct (Pos \<chi>)) = imm_conj_depth_inner \<chi>"
-"(max_pos_conj_depth_conjunct (Pos \<chi>)) = modal_depth_srbb_inner \<chi>"
-"(max_neg_conj_depth_conjunct (Pos \<chi>)) = max_neg_conj_depth_inner \<chi>"
-"(neg_depth_conjunct            (Pos \<chi>)) = neg_depth_inner \<chi>"
-            by simp+
-          have "expressiveness_price_inner \<chi> \<le> (min1_6 e)"
-            using \<open>strategy_formula_inner (Attacker_Delayed p Q') (min1_6 e) \<chi> \<and> expressiveness_price_inner \<chi> \<le> min1_6 e\<close> 
-            by blast
-          obtain e1 e2 e3 e4 e5 e6 e7 e8 where "e = E e1 e2 e3 e4 e5 e6 e7 e8"
-            by (metis "1"(2) energy.exhaust_sel in_wina.cases)
-          hence "min1_6 e = (E (min e1 e6) e2 e3 e4 e5 e6 e7 e8)"  
-            by (simp add: min1_6_def)
-          hence "modal_depth_srbb_inner \<chi> \<le> (min e1 e6)"
-            using \<open>expressiveness_price_inner \<chi> \<le> (min1_6 e)\<close> expressiveness_price_inner.simps 
-            by (simp add: leq_not_eneg)
-          hence "modal_depth_srbb_inner \<chi> \<le> e6"
-            using min.boundedE by blast
-          thus "expressiveness_price_conjunct (Pos \<chi>) \<le> e"
-            using expr_internal pos_upd \<open>e = E e1 e2 e3 e4 e5 e6 e7 e8\<close>
-            using \<open>expressiveness_price_inner \<chi> \<le> min1_6 e\<close> \<open>min1_6 e = E (min e1 e6) e2 e3 e4 e5 e6 e7 e8\<close> leq_not_eneg by force
-        qed
+          using \<open>(strategy_formula_inner (Attacker_Delayed p Q') (min1_6 e) \<chi> \<and> expressiveness_price_inner \<chi> \<le> (min1_6 e))\<close> expr_pos 
+          by blast 
         then show ?thesis 
           using \<open>strategy_formula_conjunct (Attacker_Clause p q) e (Pos \<chi>)\<close>
           by force
@@ -587,7 +593,7 @@ E (modal_depth_srbb_conjunct (Neg \<chi>))
   qed
 
 lemma strategy_formulas_distinguish:
-  assumes "Strat (Attacker_Immediate p Q) \<phi>"
+  assumes "strategy_formula (Attacker_Immediate p Q) e \<phi>"
   shows "distinguishes_from \<phi> p Q"
   sorry
 
@@ -605,8 +611,9 @@ proof
 next
   assume "in_wina e (Attacker_Immediate p Q)"
   with winning_budget_implies_strategy_formula
-    have "\<exists>\<phi>. Strat (Attacker_Immediate p Q) \<phi> \<and> expressiveness_price \<phi> \<le> e" .
-  hence "\<exists>\<phi>\<in>\<O> e. Strat (Attacker_Immediate p Q) \<phi>" unfolding \<O>_def by blast
+    have "\<exists>\<phi>. strategy_formula (Attacker_Immediate p Q) e \<phi> \<and> expressiveness_price \<phi> \<le> e" 
+      by force
+  hence "\<exists>\<phi>\<in>\<O> e. strategy_formula (Attacker_Immediate p Q) e \<phi>" unfolding \<O>_def by blast
   thus "\<exists>\<phi>\<in>\<O> e. distinguishes_from \<phi> p Q"
     using strategy_formulas_distinguish by blast
 qed
