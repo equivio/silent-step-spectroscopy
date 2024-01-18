@@ -24,7 +24,33 @@ lemma winning_budget_implies_strategy_formula:
   | Attacker_Branch p Q \<Rightarrow> True"
   using assms proof(induction rule: in_wina.induct)
   case (1 g e)
-  then show ?case sorry
+  then show ?case proof(induction g)
+    case (Attacker_Immediate x1 x2)
+    then show ?case
+      by simp 
+  next
+    case (Attacker_Branch x1 x2)
+    then show ?case by simp
+  next
+    case (Attacker_Clause x1 x2)
+    then show ?case by simp
+  next
+    case (Attacker_Delayed x1 x2)
+    then show ?case by simp
+  next
+    case (Defender_Branch x1 x2 x3 x4 x5)
+    then show ?case sorry
+  next
+    case (Defender_Conj x1 x2)
+    then show ?case sorry
+  next
+    case (Defender_Stable_Conj x1 x2)
+    then show ?case proof
+      have Strat: "strategy_formula_inner (Defender_Stable_Conj x1 x2) e (StableConj {} TT)" sorry
+      have " expr_pr_inner (StableConj {} TT) \<le> e" sorry
+      from Strat this show ?thesis by auto
+    qed
+  qed
 next
   case (2 g e)
   then show ?case sorry
