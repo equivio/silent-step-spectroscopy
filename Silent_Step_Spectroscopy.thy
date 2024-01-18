@@ -4,9 +4,7 @@ begin
 
 context full_spec_game begin
 
-inductive Strat :: "('s, 'a) spectroscopy_position \<Rightarrow> ('a, 's) hml_srbb \<Rightarrow> bool"  
-
-lemma distinction_implies_winning_budgets:
+ lemma distinction_implies_winning_budgets:
   assumes "distinguishes_from \<phi> p Q"
   shows "in_wina (expressiveness_price \<phi>) (Attacker_Immediate p Q)"
   sorry
@@ -149,11 +147,77 @@ proof-
             using \<open>expressiveness_price_inner \<chi> \<le> min1_6 e\<close> \<open>min1_6 e = E (min e1 e6) e2 e3 e4 e5 e6 e7 e8\<close> leq_not_eneg by force
         qed
 
+lemma expr_neg:
+  assumes "expressiveness_price_inner \<chi> \<le> (min1_7 (e - E 0 0 0 0 0 0 0 1))"
+  shows "expressiveness_price_conjunct (Neg \<chi>) \<le> e"
+proof-
+  have expr_neg: "expressiveness_price_conjunct (Neg \<chi>) =
+  E (modal_depth_srbb_conjunct (Neg \<chi>))
+                                (branch_conj_depth_conjunct (Neg \<chi>))
+                                (inst_conj_depth_conjunct (Neg \<chi>))
+                                (st_conj_depth_conjunct (Neg \<chi>))
+                                (imm_conj_depth_conjunct (Neg \<chi>))
+                                (max_pos_conj_depth_conjunct (Neg \<chi>))
+                                (max_neg_conj_depth_conjunct (Neg \<chi>))
+                                (neg_depth_conjunct (Neg \<chi>))"
+              using expressiveness_price_conjunct.simps by blast
+  
+            have neg_ups: "modal_depth_srbb_conjunct (Neg \<chi>) = modal_depth_srbb_inner \<chi>" 
+  "(branch_conj_depth_conjunct (Neg \<chi>)) = branch_conj_depth_inner \<chi>"
+  "inst_conj_depth_conjunct (Neg \<chi>) = inst_conj_depth_inner \<chi>" 
+  "st_conj_depth_conjunct (Neg \<chi>) = st_conj_depth_inner \<chi>"
+  "imm_conj_depth_conjunct (Neg \<chi>) = imm_conj_depth_inner \<chi>"
+  "max_pos_conj_depth_conjunct (Neg \<chi>) = max_pos_conj_depth_inner \<chi>"
+  "max_neg_conj_depth_conjunct (Neg \<chi>) = modal_depth_srbb_inner \<chi>"
+  "neg_depth_conjunct (Neg \<chi>) = 1 + neg_depth_inner \<chi>" 
+              by simp+
+
+          have "expressiveness_price_inner \<chi> \<le> (min1_7 (e - E 0 0 0 0 0 0 0 1))"
+            using assms
+            by blast
+          obtain e1 e2 e3 e4 e5 e6 e7 e8 where "e = E e1 e2 e3 e4 e5 e6 e7 e8"
+            by (metis antysim assms eneg_leq energy.exhaust_sel expressiveness_price_inner.simps min_eneg(2) minus_energy_def)
+          hence "(e - (E 0 0 0 0 0 0 0 1)) = (E e1 e2 e3 e4 e5 e6 e7 (e8-1)) \<or> 
+                  ((e - (E 0 0 0 0 0 0 0 1)) = eneg)"
+            using minus_energy_def
+            by simp
+          then show ?thesis
+          proof(rule disjE)
+            assume "e - E 0 0 0 0 0 0 0 1 = eneg"
+            hence "e = (E 0 0 0 0 0 0 0 0)"
+              using assms
+              using antysim eneg_leq min_eneg(2) by fastforce
+            then show ?thesis 
+              using \<open>e - E 0 0 0 0 0 0 0 1 = eneg\<close> assms 
+              by (metis antysim eneg_leq energy.distinct(1) expressiveness_price_inner.simps min_eneg(2))
+          next
+            assume "e - E 0 0 0 0 0 0 0 1 = E e1 e2 e3 e4 e5 e6 e7 (e8 - 1)"
+            hence "(min1_7 (e - E 0 0 0 0 0 0 0 1)) = (E (min e1 e7) e2 e3 e4 e5 e6 e7 (e8-1))"
+            using min1_7_def
+            by simp
+            hence "modal_depth_srbb_inner \<chi> \<le> (min e1 e7)"
+              using expressiveness_price_inner.simps
+              using \<open>expressiveness_price_inner \<chi> \<le> min1_7 (e - E 0 0 0 0 0 0 0 1)\<close> leq_not_eneg by auto
+            
+            have "neg_depth_inner \<chi> \<le> (e8-1)"
+              using \<open>(min1_7 (e - E 0 0 0 0 0 0 0 1)) = (E (min e1 e7) e2 e3 e4 e5 e6 e7 (e8-1))\<close>
+\<open>e = E e1 e2 e3 e4 e5 e6 e7 e8\<close> \<open>expressiveness_price_inner \<chi> \<le> (min1_7 (e - E 0 0 0 0 0 0 0 1))\<close>
+              using leq_not_eneg by force
+            hence "neg_depth_conjunct (Neg \<chi>) \<le> e8"
+              using \<open>neg_depth_conjunct (Neg \<chi>) = 1 + neg_depth_inner \<chi>\<close>
+              by (metis \<open>e - E 0 0 0 0 0 0 0 1 = E e1 e2 e3 e4 e5 e6 e7 (e8 - 1)\<close> \<open>e = E e1 e2 e3 e4 e5 e6 e7 e8\<close> add_diff_cancel_enat enat_add_left_cancel_le energy.sel(8) energy.simps(3) le_iff_add leq_not_eneg minus_energy_def)
+          thus "expressiveness_price_conjunct (Neg \<chi>) \<le> e"
+            using expr_neg \<open>e = E e1 e2 e3 e4 e5 e6 e7 e8\<close> \<open>modal_depth_srbb_inner \<chi> \<le> (min e1 e7)\<close>
+            using \<open>expressiveness_price_inner \<chi> \<le> min1_7 (e - E 0 0 0 0 0 0 0 1)\<close> \<open>(min1_7 (e - E 0 0 0 0 0 0 0 1)) = (E (min e1 e7) e2 e3 e4 e5 e6 e7 (e8-1))\<close> leq_not_eneg 
+            by (simp add: \<open>e = E e1 e2 e3 e4 e5 e6 e7 e8\<close> neg_ups(7))
+        qed
+      qed
+
 lemma winning_budget_implies_strategy_formula:
   fixes g e
   defines "x \<equiv> (g, e)"
   assumes "in_wina e g"
-  shows
+  shows (* "\<exists>\<phi>. Strat (Attacker_Immediate p Q) \<phi> \<and> expressiveness_price \<phi> \<le> e"*)
   "case g of
     Attacker_Immediate p Q \<Rightarrow> (\<exists>\<phi>. strategy_formula g e \<phi> \<and> expressiveness_price \<phi> \<le> e)
   | Attacker_Delayed p Q => (\<exists>\<phi>. strategy_formula_inner g e \<phi> \<and> expressiveness_price_inner \<phi> \<le> e)
@@ -467,67 +531,9 @@ hence "strategy_formula_conjunct (Attacker_Clause p q) e (Pos \<chi>)"
 
         have "expressiveness_price_conjunct (Neg \<chi>) \<le> e"
           using \<open>(strategy_formula_inner (Attacker_Delayed p' Q') (min1_7 (e - E 0 0 0 0 0 0 0 1)) \<chi> \<and> expressiveness_price_inner \<chi> \<le> (min1_7 (e - E 0 0 0 0 0 0 0 1)))\<close>
-        proof
-          have expr_neg: "expressiveness_price_conjunct (Neg \<chi>) =
-E (modal_depth_srbb_conjunct (Neg \<chi>))
-                              (branch_conj_depth_conjunct (Neg \<chi>))
-                              (inst_conj_depth_conjunct (Neg \<chi>))
-                              (st_conj_depth_conjunct (Neg \<chi>))
-                              (imm_conj_depth_conjunct (Neg \<chi>))
-                              (max_pos_conj_depth_conjunct (Neg \<chi>))
-                              (max_neg_conj_depth_conjunct (Neg \<chi>))
-                              (neg_depth_conjunct (Neg \<chi>))"
-            using expressiveness_price_conjunct.simps by blast
-
-          have neg_ups: "modal_depth_srbb_conjunct (Neg \<chi>) = modal_depth_srbb_inner \<chi>" 
-"(branch_conj_depth_conjunct (Neg \<chi>)) = branch_conj_depth_inner \<chi>"
-"inst_conj_depth_conjunct (Neg \<chi>) = inst_conj_depth_inner \<chi>" 
-"st_conj_depth_conjunct (Neg \<chi>) = st_conj_depth_inner \<chi>"
-"imm_conj_depth_conjunct (Neg \<chi>) = imm_conj_depth_inner \<chi>"
-"max_pos_conj_depth_conjunct (Neg \<chi>) = max_pos_conj_depth_inner \<chi>"
-"max_neg_conj_depth_conjunct (Neg \<chi>) = modal_depth_srbb_inner \<chi>"
-"neg_depth_conjunct (Neg \<chi>) = 1 + neg_depth_inner \<chi>" 
-            by simp+
-
-          have "expressiveness_price_inner \<chi> \<le> (min1_7 (e - E 0 0 0 0 0 0 0 1))"
-            using \<open>strategy_formula_inner (Attacker_Delayed p' Q') (min1_7 (e - E 0 0 0 0 0 0 0 1)) \<chi> \<and> expressiveness_price_inner \<chi> \<le> min1_7 (e - E 0 0 0 0 0 0 0 1)\<close>
-            by blast
-          obtain e1 e2 e3 e4 e5 e6 e7 e8 where "e = E e1 e2 e3 e4 e5 e6 e7 e8"
-            by (metis "1"(2) energy.exhaust_sel in_wina.cases)
-          hence "(e - (E 0 0 0 0 0 0 0 1)) = (E e1 e2 e3 e4 e5 e6 e7 (e8-1)) \<or> 
-                  ((e - (E 0 0 0 0 0 0 0 1)) = eneg)"
-            using minus_energy_def
-            by simp
-          then show ?thesis
-          proof(rule disjE)
-            assume "e - E 0 0 0 0 0 0 0 1 = eneg"
-            hence "e = (E 0 0 0 0 0 0 0 0)"
-              by (metis \<open>\<exists>Q'. spectroscopy_moves (Attacker_Clause p q) (Attacker_Delayed p' Q') = Some (min1_7 \<circ> (\<lambda>x. x - E 0 0 0 0 0 0 0 1)) \<and> in_wina (min1_7 (e - E 0 0 0 0 0 0 0 1)) (Attacker_Delayed p' Q') \<and> strategy_formula_inner (Attacker_Delayed p' Q') (min1_7 (e - E 0 0 0 0 0 0 0 1)) \<chi>\<close> eneg_leq gets_smaller_min_1_7 in_wina.cases order_class.order_eq_iff)
-            then show ?thesis 
-              using \<open>e - E 0 0 0 0 0 0 0 1 = eneg\<close> \<open>weight (Attacker_Clause p q) g' e = min1_7 (e - E 0 0 0 0 0 0 0 1)\<close> energy_game.in_wina.cases energy_game_axioms min_eneg(2) move 
-              by fastforce
-          next
-            assume "e - E 0 0 0 0 0 0 0 1 = E e1 e2 e3 e4 e5 e6 e7 (e8 - 1)"
-            hence "(min1_7 (e - E 0 0 0 0 0 0 0 1)) = (E (min e1 e7) e2 e3 e4 e5 e6 e7 (e8-1))"
-            using min1_7_def
-            by simp
-            hence "modal_depth_srbb_inner \<chi> \<le> (min e1 e7)"
-              using expressiveness_price_inner.simps
-              using \<open>expressiveness_price_inner \<chi> \<le> min1_7 (e - E 0 0 0 0 0 0 0 1)\<close> leq_not_eneg by auto
-            
-            have "neg_depth_inner \<chi> \<le> (e8-1)"
-              using \<open>(min1_7 (e - E 0 0 0 0 0 0 0 1)) = (E (min e1 e7) e2 e3 e4 e5 e6 e7 (e8-1))\<close>
-\<open>e = E e1 e2 e3 e4 e5 e6 e7 e8\<close> \<open>expressiveness_price_inner \<chi> \<le> (min1_7 (e - E 0 0 0 0 0 0 0 1))\<close>
-              using leq_not_eneg by force
-            hence "neg_depth_conjunct (Neg \<chi>) \<le> e8"
-              using \<open>neg_depth_conjunct (Neg \<chi>) = 1 + neg_depth_inner \<chi>\<close>
-              by (metis \<open>e - E 0 0 0 0 0 0 0 1 = E e1 e2 e3 e4 e5 e6 e7 (e8 - 1)\<close> \<open>e = E e1 e2 e3 e4 e5 e6 e7 e8\<close> add_diff_cancel_enat enat_add_left_cancel_le energy.sel(8) energy.simps(3) le_iff_add leq_not_eneg minus_energy_def)
-          thus "expressiveness_price_conjunct (Neg \<chi>) \<le> e"
-            using expr_neg \<open>e = E e1 e2 e3 e4 e5 e6 e7 e8\<close> \<open>modal_depth_srbb_inner \<chi> \<le> (min e1 e7)\<close>
-            using \<open>expressiveness_price_inner \<chi> \<le> min1_7 (e - E 0 0 0 0 0 0 0 1)\<close> \<open>(min1_7 (e - E 0 0 0 0 0 0 0 1)) = (E (min e1 e7) e2 e3 e4 e5 e6 e7 (e8-1))\<close> leq_not_eneg 
-            by (simp add: \<open>e = E e1 e2 e3 e4 e5 e6 e7 e8\<close> neg_ups(7))
-        qed
-      qed
+        expr_neg
+          by blast
+        
         then show ?thesis 
           using \<open>strategy_formula_conjunct (Attacker_Clause p q) e (hml_srbb_conjunct.Neg \<chi>)\<close> by force
       qed
@@ -611,8 +617,8 @@ proof
 next
   assume "in_wina e (Attacker_Immediate p Q)"
   with winning_budget_implies_strategy_formula
-    have "\<exists>\<phi>. strategy_formula (Attacker_Immediate p Q) e \<phi> \<and> expressiveness_price \<phi> \<le> e" 
-      by force
+    have "\<exists>\<phi>. strategy_formula (Attacker_Immediate p Q) e \<phi> \<and> expressiveness_price \<phi> \<le> e"
+      by force 
   hence "\<exists>\<phi>\<in>\<O> e. strategy_formula (Attacker_Immediate p Q) e \<phi>" unfolding \<O>_def by blast
   thus "\<exists>\<phi>\<in>\<O> e. distinguishes_from \<phi> p Q"
     using strategy_formulas_distinguish by blast
