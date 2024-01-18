@@ -4,9 +4,7 @@ begin
 
 context full_spec_game begin
 
-inductive Strat :: "('s, 'a) spectroscopy_position \<Rightarrow> ('a, 's) hml_srbb \<Rightarrow> bool"  
-
-lemma distinction_implies_winning_budgets:
+ lemma distinction_implies_winning_budgets:
   assumes "distinguishes_from \<phi> p Q"
   shows "in_wina (expressiveness_price \<phi>) (Attacker_Immediate p Q)"
   sorry
@@ -89,7 +87,7 @@ lemma winning_budget_implies_strategy_formula:
   fixes g e
   defines "x \<equiv> (g, e)"
   assumes "in_wina e g"
-  shows
+  shows (* "\<exists>\<phi>. Strat (Attacker_Immediate p Q) \<phi> \<and> expressiveness_price \<phi> \<le> e"*)
   "case g of
     Attacker_Immediate p Q \<Rightarrow> (\<exists>\<phi>. strategy_formula g e \<phi> \<and> expressiveness_price \<phi> \<le> e)
   | Attacker_Delayed p Q => (\<exists>\<phi>. strategy_formula_inner g e \<phi> \<and> expressiveness_price_inner \<phi> \<le> e)
@@ -587,7 +585,7 @@ E (modal_depth_srbb_conjunct (Neg \<chi>))
   qed
 
 lemma strategy_formulas_distinguish:
-  assumes "Strat (Attacker_Immediate p Q) \<phi>"
+  assumes "strategy_formula (Attacker_Immediate p Q) e \<phi>"
   shows "distinguishes_from \<phi> p Q"
   sorry
 
@@ -605,8 +603,9 @@ proof
 next
   assume "in_wina e (Attacker_Immediate p Q)"
   with winning_budget_implies_strategy_formula
-    have "\<exists>\<phi>. Strat (Attacker_Immediate p Q) \<phi> \<and> expressiveness_price \<phi> \<le> e" .
-  hence "\<exists>\<phi>\<in>\<O> e. Strat (Attacker_Immediate p Q) \<phi>" unfolding \<O>_def by blast
+    have "\<exists>\<phi>. strategy_formula (Attacker_Immediate p Q) e \<phi> \<and> expressiveness_price \<phi> \<le> e"
+      by force 
+  hence "\<exists>\<phi>\<in>\<O> e. strategy_formula (Attacker_Immediate p Q) e \<phi>" unfolding \<O>_def by blast
   thus "\<exists>\<phi>\<in>\<O> e. distinguishes_from \<phi> p Q"
     using strategy_formulas_distinguish by blast
 qed
