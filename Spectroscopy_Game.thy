@@ -56,7 +56,7 @@ fun spectroscopy_moves :: "('s, 'a) spectroscopy_position \<Rightarrow> ('s, 'a)
     "spectroscopy_moves (Attacker_Clause p q) (Attacker_Delayed p' Q') 
       = (if (p = p') then 
           (if {q} \<Zsurj>S Q' then Some min1_6 else None) 
-         else (if ({p} \<Zsurj>S Q'\<and> p'\<noteq>q \<and> q=p')then Some (min1_7 \<circ> (\<lambda>x. x- E 0 0 0 0 0 0 0 1)) else None))" |
+         else (if ({p} \<Zsurj>S Q'\<and> q=p')then Some (min1_7 \<circ> (\<lambda>x. x- E 0 0 0 0 0 0 0 1)) else None))" |
 
   late_stbl_conj: 
     "spectroscopy_moves (Attacker_Delayed p Q) (Defender_Stable_Conj p' Q') 
