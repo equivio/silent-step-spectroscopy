@@ -60,6 +60,28 @@ lemma silent_reachable_trans:
 using assms silent_reachable.intros(2)
   by (induct, blast+)
 
+inductive silent_reachable_loopless :: "'s \<Rightarrow> 's \<Rightarrow> bool"  (infix "\<Zsurj>L" 80)
+  where
+    "p \<Zsurj>L p" |
+    "p \<Zsurj>L p''" if "p \<mapsto> \<tau> p'" and "p' \<Zsurj>L p''" and "p \<noteq> p'"
+
+lemma silent_reachable_impl_loopless:
+  assumes "p \<Zsurj> p'"
+  shows "p \<Zsurj>L p'"
+  using assms proof(induct rule: silent_reachable.induct)
+  case (1 p)
+  thus ?case by (rule silent_reachable_loopless.intros(1))
+next
+  case (2 p p' p'')
+  thus ?case proof(cases "p = p'")
+    case True
+    thus ?thesis using "2.hyps"(3) by auto
+  next
+    case False
+    thus ?thesis using "2.hyps" silent_reachable_loopless.intros(2) by blast
+  qed
+qed
+
 definition weak_step ("_ \<Zsurj>\<mapsto>\<Zsurj> _ _" [70, 70, 70] 80) where
   "p  \<Zsurj>\<mapsto>\<Zsurj> \<alpha> p' \<equiv> if \<alpha> = \<tau> 
                     then p \<Zsurj> p'

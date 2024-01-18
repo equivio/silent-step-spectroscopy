@@ -426,37 +426,6 @@ proof-
     by (metis conj_win id_apply not_neg option.distinct(1) option.sel)
 qed
 
-(*corollary one_inner_empty_Q:
-  assumes "distinguishes_from_inner \<chi> p {}"
-  shows "in_wina (expr_pr_inner \<chi>) (Attacker_Immediate p {})"
-proof-
-  define phi where "phi \<equiv> Internal \<chi>"
-  have price_eq: "expr_pr_inner \<chi> = expressiveness_price phi" unfolding phi_def by force
-  from assms have "distinguishes_from phi p {}" unfolding distinguishes_from_def by fast
-  hence "in_wina (expressiveness_price phi) (Attacker_Immediate p {})" by (rule one_empty_Q)
-  thus ?thesis unfolding price_eq .
-qed
-
-corollary one_conjunct_empty_Q:
-  assumes "\<exists>i \<in> I.  distinguishes_from_conjunct (\<Psi> i)  p {}"
-  shows "in_wina (expr_pr_conjunct ljhjsdfhb) (Attacker_Immediate p {})"
-using assms proof(cases "\<psi>")
-  case (Pos "\<chi>")
-  then show ?thesis using one_empty_Q 
-next
-  case (Neg "\<phi>")
-  then show ?thesis sorry
-qed
-
-   unfolding phi_def by force
-  from assms have "distinguishes_from phi p {}" unfolding distinguishes_from_def by fast
-  hence "in_wina (expressiveness_price phi) (Attacker_Immediate p {})" by (rule one_empty_Q)
-  thus ?thesis unfolding price_eq .
-qed*)
-
-lemma silent_closure: "Q \<noteq> {} \<Longrightarrow> \<exists>Q\<tau>. Q \<Zsurj>S Q\<tau> \<and> Q\<tau> \<Zsurj>S Q\<tau>"
-  by blast
-
 lemma distinction_implies_winning_budgets':
   assumes "distinguishes_from \<phi> p Q"
   shows "in_wina (expressiveness_price \<phi>) (Attacker_Immediate p Q)"
@@ -592,20 +561,22 @@ The inductive property of lemma 1 is formalized as follows: \\
             and "\<forall>q \<in> Q. (\<nexists>q'. q \<Zsurj> q' \<and> q' \<Turnstile> hml_srbb_inner_to_hml \<chi>)"
         by auto
       hence "\<forall>q \<in> Q. (\<forall>q'. q \<Zsurj> q' \<longrightarrow> \<not>(q' \<Turnstile> hml_srbb_inner_to_hml \<chi>))" by auto
-      then have "\<forall>Q'. \<forall>q \<in> Q. (\<forall>q'\<in>Q'. q \<Zsurj> q' \<longrightarrow> \<not>(q' \<Turnstile> hml_srbb_inner_to_hml \<chi>))" 
-        by blast
-      then have "\<forall>Q'. Q \<Zsurj>S Q' \<longrightarrow> (\<forall>q' \<in> Q'. \<not>(q' \<Turnstile> hml_srbb_inner_to_hml \<chi>))"
-        using \<open>Q \<noteq> {}\<close> by blast
+      then have "\<forall>q \<in> Q. (\<forall>q'\<in>Q'. q \<Zsurj> q' \<longrightarrow> \<not>(q' \<Turnstile> hml_srbb_inner_to_hml \<chi>))" 
+        for Q' by blast
+      then have "Q \<Zsurj>S Q' \<longrightarrow> (\<forall>q' \<in> Q'. \<not>(q' \<Turnstile> hml_srbb_inner_to_hml \<chi>))"
+        for Q' using \<open>Q \<noteq> {}\<close> by blast
 
-      define Q\<tau> where "Q\<tau> \<equiv> (SOME Q'. Q \<Zsurj>S Q' \<and> Q' \<Zsurj>S Q')"
-      have "Q \<Zsurj>S Q\<tau> \<and> Q\<tau> \<Zsurj>S Q\<tau>" using Q\<tau>_def
-        by (smt (verit) empty_iff tfl_some)
-      hence "Q \<Zsurj>S Q\<tau>" and "Q\<tau> \<Zsurj>S Q\<tau>" by auto
-      with \<open>\<forall>Q'. Q \<Zsurj>S Q' \<longrightarrow> (\<forall>q' \<in> Q'. \<not>(q' \<Turnstile> hml_srbb_inner_to_hml \<chi>))\<close>
-      have "\<forall>q' \<in> Q\<tau>. \<not>(q' \<Turnstile> hml_srbb_inner_to_hml \<chi>)" by auto
+      define Q\<tau> where "Q\<tau> \<equiv> silent_reachable_set Q"
+      with \<open>\<And>Q'. Q \<Zsurj>S Q' \<longrightarrow> (\<forall>q' \<in> Q'. \<not>(q' \<Turnstile> hml_srbb_inner_to_hml \<chi>))\<close>
+      have "\<forall>q' \<in> Q\<tau>. \<not>(q' \<Turnstile> hml_srbb_inner_to_hml \<chi>)" 
+        using sreachable_set_is_sreachable by presburger
+      have "Q\<tau> \<Zsurj>S Q\<tau>" unfolding Q\<tau>_def 
+        by (metis silent_reachable_trans sreachable_set_is_sreachable 
+            silent_reachable.intros(1))
 
       from \<open>\<exists>p'. p \<Zsurj> p' \<and> p' \<Turnstile> hml_srbb_inner_to_hml \<chi>\<close>
       obtain p' where "p \<Zsurj> p'" and "p' \<Turnstile> hml_srbb_inner_to_hml \<chi>" by auto
+      from this(1) have "p \<Zsurj>L p'" by(rule silent_reachable_impl_loopless)
 
       from \<open>p' \<Turnstile> hml_srbb_inner_to_hml \<chi>\<close>
        and \<open>\<forall>q' \<in> Q\<tau>. \<not>(q' \<Turnstile> hml_srbb_inner_to_hml \<chi>)\<close>
@@ -616,10 +587,34 @@ The inductive property of lemma 1 is formalized as follows: \\
        and IH1
       have "in_wina (expr_pr_inner \<chi>) (Attacker_Delayed p' Q\<tau>)" 
         by blast
-        
-      then show "in_wina (expressiveness_price (Internal \<chi>)) (Attacker_Immediate p Q)"
-         sorry
-    qed
+
+      moreover have "expr_pr_inner \<chi> = expressiveness_price (Internal \<chi>)" by simp
+      ultimately have "in_wina (expressiveness_price (Internal \<chi>)) 
+          (Attacker_Delayed p' Q\<tau>)" by simp
+
+      hence "in_wina (expressiveness_price (Internal \<chi>)) (Attacker_Delayed p Q\<tau>)"
+      proof(induct rule: silent_reachable_loopless.induct[of "p" "p'", OF \<open>p \<Zsurj>L p'\<close>])
+        case (1 p)                    
+        thus ?case by simp
+      next
+        case (2 p p' p'')
+        hence "in_wina (expressiveness_price (Internal \<chi>)) (Attacker_Delayed p' Q\<tau>)"
+          by simp
+        moreover have "spectroscopy_moves (Attacker_Delayed p Q\<tau>) (Attacker_Delayed p' Q\<tau>) 
+          = Some id" using spectroscopy_moves.simps(2) \<open>p \<noteq> p'\<close> \<open>p \<mapsto>\<tau> p'\<close> by auto
+        moreover have "attacker (Attacker_Delayed p Q\<tau>)" by simp
+        ultimately show ?case using in_wina_with_id_step by auto
+      qed
+
+      have  "Q \<Zsurj>S Q\<tau>" 
+        using Q\<tau>_def sreachable_set_is_sreachable by simp
+      hence "spectroscopy_moves (Attacker_Immediate p Q) (Attacker_Delayed p Q\<tau>) = Some id"
+        using spectroscopy_moves.simps(1) by simp
+      with \<open>in_wina (expressiveness_price (Internal \<chi>)) (Attacker_Delayed p Q\<tau>)\<close>
+      show "in_wina (expressiveness_price (Internal \<chi>)) (Attacker_Immediate p Q)" 
+        using in_wina_with_id_step
+        by (metis option.discI option.sel spectroscopy_defender.simps(1))
+      qed
 
   next
 

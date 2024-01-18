@@ -285,5 +285,10 @@ next
     using antysim dwl_min in_wina.intros(3) monotonicity by blast 
 qed
 
+lemma in_wina_with_id_step:
+  assumes "in_wina e p'" "p \<Zinj>wgt id p'" "Ga p"
+  shows "in_wina e p"
+  using assms  by (metis id_apply in_wina.simps)
+
 end (*End of context energy_game*)
 end
