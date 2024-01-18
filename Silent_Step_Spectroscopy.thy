@@ -47,7 +47,11 @@ lemma winning_budget_implies_strategy_formula:
     case (Defender_Stable_Conj x1 x2)
     then show ?case proof
       have Strat: "strategy_formula_inner (Defender_Stable_Conj x1 x2) e (StableConj {} \<phi>)" sorry
-      have " expr_pr_inner (StableConj {} \<phi>) \<le> e" sorry
+
+      have " expr_pr_inner (StableConj {} \<phi>) = E 0 0 0 0 0 0 0 0" sorry (* Soweit ich Sup auf enats verstanden habe, sollte hier das Supremum einer leeren Menge 0 sein.*)
+      hence " expr_pr_inner (StableConj {} \<phi>) \<le> e" using 1
+        by (simp add: energy.sel(5) energy.sel(7))
+
       from Strat this show ?thesis by auto
     qed
   qed
