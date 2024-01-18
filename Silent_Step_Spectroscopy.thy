@@ -44,13 +44,54 @@ lemma winning_budget_implies_strategy_formula:
     case (Defender_Conj x1 x2)
     then show ?case sorry
   next
-    case (Defender_Stable_Conj x1 x2)
-    then show ?case proof
-      have Strat: "strategy_formula_inner (Defender_Stable_Conj x1 x2) e (StableConj {} \<phi>)" sorry
-      have " expr_pr_inner (StableConj {} \<phi>) \<le> e" sorry
-      from Strat this show ?thesis by auto
+    case (Defender_Stable_Conj p Q)
+    hence "\<forall>q\<in>Q. spectroscopy_moves (Defender_Stable_Conj p Q) (Attacker_Clause p q) = None"
+      by blast
+    hence "Q = {}" using local.conj_s_answer 
+      by simp
+    hence "\<exists>\<Phi>. (\<forall>q \<in> Q. spectroscopy_moves (Defender_Stable_Conj p Q) (Attacker_Clause p q) 
+        = (subtract 0 0 0 1 0 0 0 0) \<and> in_wina (e - (E 0 0 0 1 0 0 0 0)) (Attacker_Clause p q)
+          \<and> strategy_formula_conjunct (Attacker_Clause p q) (e - (E 0 0 0 1 0 0 0 0)) (\<Phi> q))"
+      by blast
+    then obtain \<Phi> where strat_pre: "(\<forall>q \<in> Q. spectroscopy_moves (Defender_Stable_Conj p Q) (Attacker_Clause p q) 
+        = (subtract 0 0 0 1 0 0 0 0) \<and> in_wina (e - (E 0 0 0 1 0 0 0 0)) (Attacker_Clause p q)
+          \<and> strategy_formula_conjunct (Attacker_Clause p q) (e - (E 0 0 0 1 0 0 0 0)) (\<Phi> q))"
+      by blast
+    then have Strat: "strategy_formula_inner (Defender_Stable_Conj p Q) e (StableConj {} \<Phi>)"
+      using \<open>Q = {}\<close> stable_conj by blast
+    from strat_pre Defender_Stable_Conj
+    have "modal_depth_srbb_inner (StableConj Q \<Phi>) = Sup ((modal_depth_srbb_conjunct \<circ> \<Phi>) ` Q)"
+"branch_conj_depth_inner (StableConj Q \<Phi>) = Sup ((branch_conj_depth_conjunct \<circ> \<Phi>) ` Q)"
+"inst_conj_depth_inner (StableConj Q \<Phi>) = Sup ((inst_conj_depth_conjunct \<circ> \<Phi>) ` Q)"
+"st_conj_depth_inner (StableConj Q \<Phi>) = 1 + Sup ((st_conj_depth_conjunct \<circ> \<Phi>) ` Q)"
+"imm_conj_depth_inner (StableConj Q \<Phi>) = Sup ((imm_conj_depth_conjunct \<circ> \<Phi>) ` Q)"
+"max_pos_conj_depth_inner (StableConj Q \<Phi>) = Sup ((max_pos_conj_depth_conjunct \<circ> \<Phi>) ` Q)"
+"max_neg_conj_depth_inner (StableConj Q \<Phi>) = Sup ((max_neg_conj_depth_conjunct \<circ> \<Phi>) ` Q)"
+"neg_depth_inner (StableConj Q \<Phi>) = Sup ((neg_depth_conjunct \<circ> \<Phi>) ` Q)"
+      using modal_depth_srbb_inner.simps(3) branch_conj_depth_inner.simps st_conj_depth_inner.simps
+      inst_conj_depth_inner.simps imm_conj_depth_inner.simps max_pos_conj_depth_inner.simps
+      max_neg_conj_depth_inner.simps neg_depth_inner.simps 
+      by auto+
+
+    hence "modal_depth_srbb_inner (StableConj Q \<Phi>) = 0"
+"branch_conj_depth_inner (StableConj Q \<Phi>) = 0"
+"inst_conj_depth_inner (StableConj Q \<Phi>) = 0"
+"st_conj_depth_inner (StableConj Q \<Phi>) = 1"
+"imm_conj_depth_inner (StableConj Q \<Phi>) = 0"
+"max_pos_conj_depth_inner (StableConj Q \<Phi>) = 0"
+"max_neg_conj_depth_inner (StableConj Q \<Phi>) = 0"
+"neg_depth_inner (StableConj Q \<Phi>) = 0"
+
+      using \<open>Q = {}\<close> image_empty comp_apply
+      by (simp add: bot_enat_def)+
+    hence "expr_pr_inner (StableConj Q \<Phi>) = (E 0 0 0 1 0 0 0 0)"
+      using expr_pr_inner.simps \<open>Q = {}\<close>
+      by force
+    hence "expr_pr_inner (StableConj Q \<Phi>) \<le> e"
+      sorry
+    then show ?case using Strat 
+      using \<open>Q = {}\<close> by auto
     qed
-  qed
 next
   case (2 g e)
   then show ?case sorry
