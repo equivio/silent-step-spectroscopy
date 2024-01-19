@@ -431,42 +431,43 @@ lemma distinction_implies_winning_budgets':
   shows "in_wina (expressiveness_price \<phi>) (Attacker_Immediate p Q)"
 proof-
 text \<open>
-The inductive property of lemma 1 is formalized as follows: \\
-
-1. At attacker positions, if \<open>\<phi> :: hml_srbb\<close> distinguishes \<open>p\<close> from \<open>Q \<noteq> {}\<close>,
+The inductive property of lemma 1 is formalized as follows
+\begin{itemize}
+\item [1.] At attacker positions, if \<open>\<phi> :: hml_srbb\<close> distinguishes \<open>p\<close> from \<open>Q \<noteq> {}\<close>,
    then \<open>expr(\<phi>) \<in> Win_a((p,Q)_a)\<close>.\\
 \<open>\<forall>Q p. Q \<noteq> {} \<longrightarrow> distinguishes_from \<phi> p Q
-       \<longrightarrow> in_wina (expressiveness_price \<phi>) (Attacker_Immediate p Q)\<close>\\
+       \<longrightarrow> in_wina (expressiveness_price \<phi>) (Attacker_Immediate p Q)\<close>
 
-2. At attacker positions, if \<open>\<chi>\<close> distinguishes \<open>p\<close> from \<open>Q \<noteq> {}\<close> and \<open>Q\<close> is closed under \<open>\<Zsurj>\<close> (i.e. \<open>Q \<Zsurj> Q\<close>),
+\item[2.] At attacker positions, if \<open>\<chi>\<close> distinguishes \<open>p\<close> from \<open>Q \<noteq> {}\<close> and \<open>Q\<close> is closed under \<open>\<Zsurj>\<close> (i.e. \<open>Q \<Zsurj> Q\<close>),
    then \<open>expr^\<epsilon>(\<chi>) \<in> Win_a((p,Q)^\<epsilon>_a)\<close>.\\
 \<open>\<forall>p Q. distinguishes_from_inner \<chi> p Q \<longrightarrow> Q \<Zsurj>S Q
-       \<longrightarrow> in_wina (expr_pr_inner \<chi>) (Attacker_Delayed p Q)\<close>\\
+       \<longrightarrow> in_wina (expr_pr_inner \<chi>) (Attacker_Delayed p Q)\<close>
 
-4. At defender positions, if \<open>\<And>\<Psi>\<close> distinguishes \<open>p\<close> from \<open>Q \<noteq> {}\<close>,
+\item [4.] At defender positions, if \<open>\<And>\<Psi>\<close> distinguishes \<open>p\<close> from \<open>Q \<noteq> {}\<close>,
    then \<open>expr^\<epsilon>(\<And>\<Psi>) \<in> Win_a((p,Q)_d)\<close>.\\
 \<open>\<forall>\<Psi>_I \<Psi> p Q. \<chi> = Conj \<Psi>_I \<Psi> \<longrightarrow>
        Q \<noteq> {} \<longrightarrow> distinguishes_from_inner \<chi> p Q
-       \<longrightarrow> in_wina (expr_pr_inner \<chi>) (Defender_Conj p Q)\<close>\\
+       \<longrightarrow> in_wina (expr_pr_inner \<chi>) (Defender_Conj p Q)\<close>
 
-5. At defender positions, if \<open>\<And>({\<not>\<langle>\<tau>\<rangle>\<top>} \<union> \<Psi>)\<close> distinguishes \<open>p\<close> from \<open>Q \<noteq> {}\<close> and the processes in \<open>Q\<close> are stable,
+\item[5.] At defender positions, if \<open>\<And>({\<not>\<langle>\<tau>\<rangle>\<top>} \<union> \<Psi>)\<close> distinguishes \<open>p\<close> from \<open>Q \<noteq> {}\<close> and the processes in \<open>Q\<close> are stable,
    then \<open>expr^\<epsilon>(\<And>({\<not>\<langle>\<tau>\<rangle>\<top>} \<union> \<Psi>)) \<in> Win_a((p,Q)^s_d)\<close>.\\
 \<open>\<forall>\<Psi>_I \<Psi> p Q. \<chi> = StableConj \<Psi>_I \<Psi> \<longrightarrow>
        Q \<noteq> {} \<longrightarrow> distinguishes_from_inner \<chi> p Q \<longrightarrow> (\<forall>q \<in> Q. \<nexists>q'. q \<mapsto> \<tau> q')
-       \<longrightarrow> in_wina (expr_pr_inner \<chi>) (Defender_Stable_Conj p Q)\<close>\\
+       \<longrightarrow> in_wina (expr_pr_inner \<chi>) (Defender_Stable_Conj p Q)\<close>
 
-6. At defender positions, if \<open>\<And>({(\<alpha>)\<phi>} \<union> \<Psi>)\<close> distinguishes \<open>p\<close> from \<open>Q\<close>,
+\item[6.] At defender positions, if \<open>\<And>({(\<alpha>)\<phi>} \<union> \<Psi>)\<close> distinguishes \<open>p\<close> from \<open>Q\<close>,
    for any \<open>p \<mapsto> \<alpha> p' \<in> \<lbrakk>\<phi>\<rbrakk>\<close> and \<open>Q \<inter> \<lbrakk>\<And>\<Psi>\<rbrakk> \<subseteq> Q_\<alpha> \<subseteq> Q - \<lbrakk>(\<alpha>)\<phi>\<rbrakk>\<close>,
    then \<open>expr^\<epsilon>(\<And>({(\<alpha>)\<phi>} \<union> \<Psi>)) \<in> Win_a((p,\<alpha>,p',Q - Q_\<alpha>, Q_\<alpha>)^\<eta>_d)\<close>.\\
 \<open>\<forall>\<Psi>_I \<Psi> \<alpha> \<phi> p Q p' Q_\<alpha>. \<chi> = BranchConj \<alpha> \<phi> \<Psi>_I \<Psi> \<longrightarrow>
        distinguishes_from_inner \<chi> p Q \<longrightarrow> p \<mapsto>\<alpha> p' \<longrightarrow> p' \<Turnstile>SRBB \<phi> \<longrightarrow>
        Q \<inter> model_set_inner (Conj \<Psi>_I \<Psi>) \<subseteq> Q_\<alpha> \<longrightarrow> Q_\<alpha> \<subseteq> Q - model_set_inner (Obs \<alpha> \<phi>)
-       \<longrightarrow> in_wina (expr_pr_inner \<chi>) (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>))\<close>\\
+       \<longrightarrow> in_wina (expr_pr_inner \<chi>) (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>))\<close>
 
-3. At attacker positions, if \<open>\<psi>\<close> distinguishes \<open>p\<close> from \<open>q\<close>,
+\item[3.] At attacker positions, if \<open>\<psi>\<close> distinguishes \<open>p\<close> from \<open>q\<close>,
    then \<open>expr^\^(\<psi>) \<in> Win_a((p,q)^\^_a)\<close>.\\
 \<open>\<forall>p q. distinguishes_conjunct \<psi> p q
        \<longrightarrow> in_wina (expr_pr_conjunct \<psi>) (Attacker_Clause p q)\<close>
+\end{itemize}
 \<close>
   have "\<And>\<phi> \<chi> \<psi>.
         (\<forall>Q p. Q \<noteq> {} \<longrightarrow> distinguishes_from \<phi> p Q
