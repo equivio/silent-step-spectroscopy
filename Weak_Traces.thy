@@ -7,7 +7,11 @@ inductive
   and is_trace_formula_inner :: "('act, 'i) hml_srbb_inner \<Rightarrow> bool" where
   "is_trace_formula TT" |
   "is_trace_formula (Internal \<chi>)" if "is_trace_formula_inner \<chi>" |
-  "is_trace_formula_inner (Obs \<alpha> \<phi>)" if "is_trace_formula \<phi>"
+  "is_trace_formula (ImmConj I \<psi>s)" if "I = {}" |
+
+  "is_trace_formula_inner (Obs \<alpha> \<phi>)" if "is_trace_formula \<phi>" |
+  "is_trace_formula_inner (Conj I \<psi>s)" if "I = {}" |
+  "is_trace_formula_inner (BranchConj \<alpha> \<phi> I \<psi>s)" if "I = {}" and "is_trace_formula \<phi>"
 
 
 fun wtrace_to_srbb :: "'act list \<Rightarrow> ('act, 'i) hml_srbb"
@@ -25,7 +29,7 @@ lemma trace_to_srbb_is_trace_formula:
   "is_trace_formula (wtrace_to_srbb trace)"
   apply (induct trace)
   using is_trace_formula_is_trace_formula_inner.intros
-  by fastforce+
+  by (simp add: is_trace_formula.simps is_trace_formula_is_trace_formula_inner.intros(4))+
 
 lemma trace_formula_to_expressiveness:
   fixes \<phi> :: "('act, 'i) hml_srbb"
@@ -33,7 +37,7 @@ lemma trace_formula_to_expressiveness:
   shows  "(is_trace_formula \<phi>             \<longrightarrow> (\<phi> \<in> \<O> (E \<infinity> 0 0 0 0 0 0 0)))
         \<and> (is_trace_formula_inner \<chi> \<longrightarrow> (\<chi> \<in> \<O>_inner (E \<infinity> 0 0 0 0 0 0 0)))"
   apply (rule is_trace_formula_is_trace_formula_inner.induct)
-  by (simp add: \<O>_def \<O>_inner_def leq_not_eneg)+
+  by (simp add: Sup_enat_def \<O>_def \<O>_inner_def leq_not_eneg)+
 
 lemma expressiveness_to_trace_formula:
   fixes \<phi> :: "('act, 'i) hml_srbb"
@@ -45,7 +49,91 @@ lemma expressiveness_to_trace_formula:
   using is_trace_formula_is_trace_formula_inner.intros(1) apply blast
   apply (simp add: \<O>_inner_def \<O>_def is_trace_formula_is_trace_formula_inner.intros(2))
   apply (simp add: \<O>_def leq_not_eneg)
-  by (simp add: \<O>_inner_def \<O>_def is_trace_formula_is_trace_formula_inner.intros(3) leq_not_eneg)+
+  apply auto
+  apply (simp add: is_trace_formula_is_trace_formula_inner.intros(3))
+proof -
+  fix \<alpha> \<phi>
+  assume "Obs \<alpha> \<phi> \<in> \<O>_inner (E \<infinity> 0 0 0 0 0 0 0)"
+    and "\<phi> \<notin> \<O> (E \<infinity> 0 0 0 0 0 0 0)"
+  from \<open>Obs \<alpha> \<phi> \<in> \<O>_inner (E \<infinity> 0 0 0 0 0 0 0)\<close>
+  have "expr_pr_inner (Obs \<alpha> \<phi>) \<le> E \<infinity> 0 0 0 0 0 0 0"
+    using \<O>_inner_def by blast
+  hence "expressiveness_price \<phi> \<le> E \<infinity> 0 0 0 0 0 0 0"
+    by (simp add: leq_not_eneg)
+  then have "\<phi> \<in> \<O> (E \<infinity> 0 0 0 0 0 0 0)"
+    using \<O>_def by blast
+  with \<open>\<phi> \<notin> \<O> (E \<infinity> 0 0 0 0 0 0 0)\<close>
+  show "is_trace_formula_inner (Obs \<alpha> \<phi>)" by contradiction
+next
+  fix \<alpha> \<phi>
+  assume "Obs \<alpha> \<phi> \<in> \<O>_inner (E \<infinity> 0 0 0 0 0 0 0)"
+    and "is_trace_formula \<phi>"
+  then show "is_trace_formula_inner (Obs \<alpha> \<phi>)"
+    by (simp add: is_trace_formula_is_trace_formula_inner.intros(4))
+next
+  fix I \<psi>s
+  assume "Conj I \<psi>s \<in> \<O>_inner (E \<infinity> 0 0 0 0 0 0 0)"
+  hence "expr_pr_inner (Conj I \<psi>s) \<le> E \<infinity> 0 0 0 0 0 0 0" 
+    using \<O>_inner_def by blast
+
+  have "I = {}"
+    apply (rule ccontr)
+    using \<open>expr_pr_inner (Conj I \<psi>s) \<le> E \<infinity> 0 0 0 0 0 0 0\<close> 
+    by (simp add: leq_not_eneg)
+
+  then show "is_trace_formula_inner (Conj I \<psi>s)"
+    by (simp add: is_trace_formula_is_trace_formula_inner.intros(5))
+next
+  fix I \<psi>s
+  assume "StableConj I \<psi>s \<in> \<O>_inner (E \<infinity> 0 0 0 0 0 0 0)"
+  then show "is_trace_formula_inner (StableConj I \<psi>s)" 
+    by (simp add: \<O>_inner_def leq_not_eneg)
+next
+  fix \<alpha> \<phi> I \<psi>s
+  assume "BranchConj \<alpha> \<phi> I \<psi>s \<in> \<O>_inner (E \<infinity> 0 0 0 0 0 0 0)"
+     and "\<phi> \<notin> \<O> (E \<infinity> 0 0 0 0 0 0 0)"
+
+
+  from \<open>BranchConj \<alpha> \<phi> I \<psi>s \<in> \<O>_inner (E \<infinity> 0 0 0 0 0 0 0)\<close>
+  have "expr_pr_inner (BranchConj \<alpha> \<phi> I \<psi>s) \<le> E \<infinity> 0 0 0 0 0 0 0"
+    unfolding \<O>_inner_def by simp
+
+  have "I = {}"
+    apply (rule ccontr)
+    using \<open>expr_pr_inner (BranchConj \<alpha> \<phi> I \<psi>s) \<le> E \<infinity> 0 0 0 0 0 0 0\<close> 
+    using leq_not_eneg by auto
+
+  from \<open>expr_pr_inner (BranchConj \<alpha> \<phi> I \<psi>s) \<le> E \<infinity> 0 0 0 0 0 0 0\<close>
+  have "expressiveness_price \<phi> \<le> E \<infinity> 0 0 0 0 0 0 0"
+    unfolding expr_pr_inner.simps 
+          and modal_depth_srbb_inner.simps
+          and branch_conj_depth_inner.simps
+          and inst_conj_depth_inner.simps
+          and st_conj_depth_inner.simps
+          and imm_conj_depth_inner.simps
+          and max_pos_conj_depth_inner.simps
+          and max_neg_conj_depth_inner.simps
+          and neg_depth_inner.simps
+          and \<open>I = {}\<close> 
+    by (simp add: leq_not_eneg)
+  then have "\<phi> \<in> \<O> (E \<infinity> 0 0 0 0 0 0 0)"
+    using \<O>_def by auto
+
+  with \<open>\<phi> \<notin> \<O> (E \<infinity> 0 0 0 0 0 0 0)\<close>
+  show "is_trace_formula_inner (BranchConj \<alpha> \<phi> I \<psi>s)" by contradiction
+next
+  fix \<alpha> \<phi> I \<psi>s
+  assume "BranchConj \<alpha> \<phi> I \<psi>s \<in> \<O>_inner (E \<infinity> 0 0 0 0 0 0 0)"
+     and "is_trace_formula \<phi>"
+
+  from \<open>BranchConj \<alpha> \<phi> I \<psi>s \<in> \<O>_inner (E \<infinity> 0 0 0 0 0 0 0)\<close>
+  have "I = {}" 
+    by (metis \<O>_inner_def add_eq_0_iff_both_eq_0 bot.extremum_uniqueI bot_enat_def branch_conj_depth_inner.simps(4) energy.distinct(1) energy.sel(2) expr_pr_inner.simps leq_not_eneg mem_Collect_eq zero_one_enat_neq(2))
+
+  with \<open>is_trace_formula \<phi>\<close>
+  show "is_trace_formula_inner (BranchConj \<alpha> \<phi> I \<psi>s)"
+    by (simp add: is_trace_formula_is_trace_formula_inner.intros(6))
+qed
 
 lemma modal_depth_only_is_trace_form: 
   "(is_trace_formula \<phi>) = (\<phi> \<in> \<O> (E \<infinity> 0 0 0 0 0 0 0))"
