@@ -15,12 +15,12 @@ lemma winning_budget_implies_strategy_formula:
   shows
   "case g of
     Attacker_Immediate p Q \<Rightarrow> (\<exists>\<phi>. strategy_formula g e \<phi> \<and> expressiveness_price \<phi> \<le> e)
-  | Attacker_Delayed p Q => (\<exists>\<phi>. strategy_formula_inner g e \<phi> \<and> expr_pr_inner \<phi> \<le> e)
-  | Attacker_Clause p q => (\<exists>\<phi>. strategy_formula_conjunct g e \<phi> \<and> expr_pr_conjunct \<phi> \<le> e)
+  | Attacker_Delayed p Q \<Rightarrow> (\<exists>\<phi>. strategy_formula_inner g e \<phi> \<and> expr_pr_inner \<phi> \<le> e)
+  | Attacker_Clause p q \<Rightarrow> (\<exists>\<phi>. strategy_formula_conjunct g e \<phi> \<and> expr_pr_conjunct \<phi> \<le> e)
   
   | Defender_Conj p Q \<Rightarrow> (\<exists>\<phi>. strategy_formula_inner g e \<phi> \<and> expr_pr_inner \<phi> \<le> e) \<and>  (\<exists>\<phi>. strategy_formula g e \<phi> \<and> expressiveness_price \<phi> \<le> e)
-  | Defender_Stable_Conj p Q => (\<exists>\<phi>. strategy_formula_inner g e \<phi> \<and> expr_pr_inner \<phi> \<le> e)
-  | Defender_Branch p \<alpha> p' Q Qa => (\<exists>\<phi>. strategy_formula_inner g e \<phi> \<and> expr_pr_inner \<phi> \<le> e)
+  | Defender_Stable_Conj p Q \<Rightarrow> (\<exists>\<phi>. strategy_formula_inner g e \<phi> \<and> expr_pr_inner \<phi> \<le> e)
+  | Defender_Branch p \<alpha> p' Q Qa \<Rightarrow> (\<exists>\<phi>. strategy_formula_inner g e \<phi> \<and> expr_pr_inner \<phi> \<le> e)
   | Attacker_Branch p Q \<Rightarrow> True"
   using assms proof(induction rule: in_wina.induct)
   case (1 g e)
@@ -41,8 +41,44 @@ lemma winning_budget_implies_strategy_formula:
     case (Defender_Branch x1 x2 x3 x4 x5)
     then show ?case sorry
   next
-    case (Defender_Conj x1 x2)
-    then show ?case sorry
+    case (Defender_Conj p Q)
+        from assms have A: "in_wina e (Defender_Conj p Q)" using Defender_Conj in_wina.intros(1) by blast
+        consider "in_wina e (Defender_Conj p Q) = (spectroscopy_defender g) \<and> (\<forall>g'. \<not>spectroscopy_moves g g' \<noteq> None)" | 
+                 "in_wina e (Defender_Conj p Q) = (\<not>spectroscopy_defender g) \<and> (\<exists>g'. spectroscopy_moves g g' \<noteq>  None \<and> (in_wina (the (spectroscopy_moves g g') e) g'))" |
+                 "in_wina e (Defender_Conj p Q) = (spectroscopy_defender g) \<and> (\<forall>g'. spectroscopy_moves g g' \<noteq>  None \<longrightarrow>  (in_wina (the (spectroscopy_moves g g') e) g'))"
+          using "1" A by blast
+      then show ?case
+      proof (cases)
+        case 1
+        have "(\<forall>g'. \<not>spectroscopy_moves g g' \<noteq> None)"
+          using "1.hyps" by blast
+        hence "\<forall>g'. spectroscopy_moves g g' = None"
+          by blast
+        then show ?thesis sorry
+      next
+        case 2
+        then show ?thesis
+          using "1" by blast
+      next
+        case 3
+        have "(\<forall>g'. spectroscopy_moves g g' \<noteq>  None \<longrightarrow>  (in_wina (the (spectroscopy_moves g g') e) g'))"
+          using "1" by blast
+        consider "\<forall>g'. spectroscopy_moves g g' \<noteq>  None"|
+                 "\<exists>g'. spectroscopy_moves g g' =  None"
+          by fastforce
+        then show ?thesis
+      proof (cases)
+        case 1
+        have "(\<forall>g'. in_wina (the (spectroscopy_moves g g') e) g')"
+          using "1" "1.hyps" by fastforce
+        then show ?thesis
+          using "1" "1.hyps" by auto 
+      next
+        case 2
+        from 2 obtain g' where "spectroscopy_moves g g' =  None" by (rule exE)
+        then show ?thesis sorry
+      qed
+    qed
   next
     case (Defender_Stable_Conj p Q)
     hence "\<forall>q\<in>Q. spectroscopy_moves (Defender_Stable_Conj p Q) (Attacker_Clause p q) = None"
@@ -61,26 +97,26 @@ lemma winning_budget_implies_strategy_formula:
       using \<open>Q = {}\<close> stable_conj by blast
     from strat_pre Defender_Stable_Conj
     have "modal_depth_srbb_inner (StableConj Q \<Phi>) = Sup ((modal_depth_srbb_conjunct \<circ> \<Phi>) ` Q)"
-"branch_conj_depth_inner (StableConj Q \<Phi>) = Sup ((branch_conj_depth_conjunct \<circ> \<Phi>) ` Q)"
-"inst_conj_depth_inner (StableConj Q \<Phi>) = Sup ((inst_conj_depth_conjunct \<circ> \<Phi>) ` Q)"
-"st_conj_depth_inner (StableConj Q \<Phi>) = 1 + Sup ((st_conj_depth_conjunct \<circ> \<Phi>) ` Q)"
-"imm_conj_depth_inner (StableConj Q \<Phi>) = Sup ((imm_conj_depth_conjunct \<circ> \<Phi>) ` Q)"
-"max_pos_conj_depth_inner (StableConj Q \<Phi>) = Sup ((max_pos_conj_depth_conjunct \<circ> \<Phi>) ` Q)"
-"max_neg_conj_depth_inner (StableConj Q \<Phi>) = Sup ((max_neg_conj_depth_conjunct \<circ> \<Phi>) ` Q)"
-"neg_depth_inner (StableConj Q \<Phi>) = Sup ((neg_depth_conjunct \<circ> \<Phi>) ` Q)"
+    "branch_conj_depth_inner (StableConj Q \<Phi>) = Sup ((branch_conj_depth_conjunct \<circ> \<Phi>) ` Q)"
+    "inst_conj_depth_inner (StableConj Q \<Phi>) = Sup ((inst_conj_depth_conjunct \<circ> \<Phi>) ` Q)"
+    "st_conj_depth_inner (StableConj Q \<Phi>) = 1 + Sup ((st_conj_depth_conjunct \<circ> \<Phi>) ` Q)"
+    "imm_conj_depth_inner (StableConj Q \<Phi>) = Sup ((imm_conj_depth_conjunct \<circ> \<Phi>) ` Q)"
+    "max_pos_conj_depth_inner (StableConj Q \<Phi>) = Sup ((max_pos_conj_depth_conjunct \<circ> \<Phi>) ` Q)"
+    "max_neg_conj_depth_inner (StableConj Q \<Phi>) = Sup ((max_neg_conj_depth_conjunct \<circ> \<Phi>) ` Q)"
+    "neg_depth_inner (StableConj Q \<Phi>) = Sup ((neg_depth_conjunct \<circ> \<Phi>) ` Q)"
       using modal_depth_srbb_inner.simps(3) branch_conj_depth_inner.simps st_conj_depth_inner.simps
       inst_conj_depth_inner.simps imm_conj_depth_inner.simps max_pos_conj_depth_inner.simps
       max_neg_conj_depth_inner.simps neg_depth_inner.simps 
       by auto+
 
     hence "modal_depth_srbb_inner (StableConj Q \<Phi>) = 0"
-"branch_conj_depth_inner (StableConj Q \<Phi>) = 0"
-"inst_conj_depth_inner (StableConj Q \<Phi>) = 0"
-"st_conj_depth_inner (StableConj Q \<Phi>) = 1"
-"imm_conj_depth_inner (StableConj Q \<Phi>) = 0"
-"max_pos_conj_depth_inner (StableConj Q \<Phi>) = 0"
-"max_neg_conj_depth_inner (StableConj Q \<Phi>) = 0"
-"neg_depth_inner (StableConj Q \<Phi>) = 0"
+    "branch_conj_depth_inner (StableConj Q \<Phi>) = 0"
+    "inst_conj_depth_inner (StableConj Q \<Phi>) = 0"
+    "st_conj_depth_inner (StableConj Q \<Phi>) = 1"
+    "imm_conj_depth_inner (StableConj Q \<Phi>) = 0"
+    "max_pos_conj_depth_inner (StableConj Q \<Phi>) = 0"
+    "max_neg_conj_depth_inner (StableConj Q \<Phi>) = 0"
+    "neg_depth_inner (StableConj Q \<Phi>) = 0"
 
       using \<open>Q = {}\<close> image_empty comp_apply
       by (simp add: bot_enat_def)+
@@ -99,7 +135,6 @@ next
   case (3 g e)
   then show ?case sorry
 qed
-
 
 lemma strategy_formulas_distinguish:
   assumes "strategy_formula (Attacker_Immediate p Q) e \<phi>"
