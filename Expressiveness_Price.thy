@@ -11,15 +11,15 @@ primrec
   and modal_depth_srbb_conjunct :: "('act, 'i) hml_srbb_conjunct \<Rightarrow> enat" where
 "modal_depth_srbb TT = 0" |
  "modal_depth_srbb (Internal \<chi>) = modal_depth_srbb_inner \<chi>" |
- "modal_depth_srbb (ImmConj I \<psi>s) = (if (I={}) then 0 else Sup ((modal_depth_srbb_conjunct \<circ> \<psi>s) ` I))" |
+ "modal_depth_srbb (ImmConj I \<psi>s) = Sup ((modal_depth_srbb_conjunct \<circ> \<psi>s) ` I)" |
 
  "modal_depth_srbb_inner (Obs \<alpha> \<phi>) = 1 + modal_depth_srbb \<phi>" |
  "modal_depth_srbb_inner (Conj I \<psi>s) =
-    (if (I={}) then 0 else Sup ((modal_depth_srbb_conjunct \<circ> \<psi>s) ` I))" |
+    Sup ((modal_depth_srbb_conjunct \<circ> \<psi>s) ` I)" |
  "modal_depth_srbb_inner (StableConj I \<psi>s) = 
-    (if (I={}) then 0 else Sup ((modal_depth_srbb_conjunct \<circ> \<psi>s) ` I))" |
+    Sup ((modal_depth_srbb_conjunct \<circ> \<psi>s) ` I)" |
  "modal_depth_srbb_inner (BranchConj a \<phi> I \<psi>s) =
-    (if (I={}) then 0 else Sup ({1 + modal_depth_srbb \<phi>} \<union> ((modal_depth_srbb_conjunct \<circ> \<psi>s) ` I)))" |
+    Sup ({1 + modal_depth_srbb \<phi>} \<union> ((modal_depth_srbb_conjunct \<circ> \<psi>s) ` I))" |
 
  "modal_depth_srbb_conjunct (Pos \<chi>) = modal_depth_srbb_inner \<chi>" |
  "modal_depth_srbb_conjunct (Neg \<chi>) = modal_depth_srbb_inner \<chi>" 
@@ -27,7 +27,7 @@ primrec
 lemma "modal_depth_srbb TT = 0"
   using Sup_enat_def by simp
 
-lemma "modal_depth_srbb (Internal (Obs \<alpha> (Internal (BranchConj \<beta> TT {} \<psi>s2)))) = 1"
+lemma "modal_depth_srbb (Internal (Obs \<alpha> (Internal (BranchConj \<beta> TT {} \<psi>s2)))) = 2"
   using Sup_enat_def by simp
 
 fun observe_n_alphas :: "'a \<Rightarrow> nat \<Rightarrow> ('a, nat) hml_srbb" where
@@ -58,21 +58,25 @@ lemma "modal_depth_srbb (ImmConj \<nat> (\<lambda>n. Pos (Obs \<alpha> (observe_
         and modal_depth_srbb_conjunct.simps(1)
         and modal_depth_srbb_inner.simps(1)
         and obs_n_\<alpha>_depth_n
-  by (metis Nats_0 emptyE sucs_of_nats_in_enats_sup_infinite) 
+  by (metis sucs_of_nats_in_enats_sup_infinite) 
 
 subsection \<open>Depth of branching conjunctions\<close>
 
-primrec branching_conjunction_depth :: "('a, 's) hml_srbb \<Rightarrow> enat"
+primrec
+      branching_conjunction_depth :: "('a, 's) hml_srbb \<Rightarrow> enat"
   and branch_conj_depth_inner :: "('a, 's) hml_srbb_inner \<Rightarrow> enat"
   and branch_conj_depth_conjunct :: "('a, 's) hml_srbb_conjunct \<Rightarrow> enat" where
   "branching_conjunction_depth TT = 0" |
   "branching_conjunction_depth (Internal \<chi>) = branch_conj_depth_inner \<chi>" |
-  "branching_conjunction_depth (ImmConj I \<psi>s) = (if (I={}) then 0 else Sup ((branch_conj_depth_conjunct \<circ> \<psi>s) ` I))" |
+  "branching_conjunction_depth (ImmConj I \<psi>s) = Sup ((branch_conj_depth_conjunct \<circ> \<psi>s) ` I)" |
 
   "branch_conj_depth_inner (Obs _ \<phi>) = branching_conjunction_depth \<phi>" |
-  "branch_conj_depth_inner (Conj I \<psi>s) = (if (I={}) then 0 else Sup ((branch_conj_depth_conjunct \<circ> \<psi>s) ` I))" |
-  "branch_conj_depth_inner (StableConj I \<psi>s) =(if (I={}) then 0 else Sup ((branch_conj_depth_conjunct \<circ> \<psi>s) ` I))" |
-  "branch_conj_depth_inner (BranchConj _ \<phi> I \<psi>s) = (if (I={}) then 0 else 1 + Sup ({branching_conjunction_depth \<phi>} \<union> ((branch_conj_depth_conjunct \<circ> \<psi>s) ` I)))" |
+  "branch_conj_depth_inner (Conj I \<psi>s) = Sup ((branch_conj_depth_conjunct \<circ> \<psi>s) ` I)" |
+  "branch_conj_depth_inner (StableConj I \<psi>s) = Sup ((branch_conj_depth_conjunct \<circ> \<psi>s) ` I)" |
+  "branch_conj_depth_inner (BranchConj _ \<phi> I \<psi>s) =
+    (if I = {}
+     then branching_conjunction_depth \<phi>
+     else 1 + Sup ({branching_conjunction_depth \<phi>} \<union> ((branch_conj_depth_conjunct \<circ> \<psi>s) ` I)))" |
 
   "branch_conj_depth_conjunct (Pos \<chi>) = branch_conj_depth_inner \<chi>" |
   "branch_conj_depth_conjunct (Neg \<chi>) = branch_conj_depth_inner \<chi>" 
@@ -80,17 +84,26 @@ primrec branching_conjunction_depth :: "('a, 's) hml_srbb \<Rightarrow> enat"
 subsection \<open>Depth of instable conjunctions\<close>
 
 primrec
-instable_conjunction_depth :: "('a, 's) hml_srbb \<Rightarrow> enat"
+      instable_conjunction_depth :: "('a, 's) hml_srbb \<Rightarrow> enat"
   and inst_conj_depth_inner :: "('a, 's) hml_srbb_inner \<Rightarrow> enat"
   and inst_conj_depth_conjunct :: "('a, 's) hml_srbb_conjunct \<Rightarrow> enat" where
   "instable_conjunction_depth TT = 0" |
   "instable_conjunction_depth (Internal \<chi>) = inst_conj_depth_inner \<chi>" |
-  "instable_conjunction_depth (ImmConj I \<psi>s) = (if (I={}) then 0 else 1 + Sup ((inst_conj_depth_conjunct \<circ> \<psi>s) ` I))" |
+  "instable_conjunction_depth (ImmConj I \<psi>s) =
+    (if I = {}
+     then 0
+     else 1 + Sup ((inst_conj_depth_conjunct \<circ> \<psi>s) ` I))" |
 
   "inst_conj_depth_inner (Obs _ \<phi>) = instable_conjunction_depth \<phi>" |
-  "inst_conj_depth_inner (Conj I \<psi>s) = (if (I={}) then 0 else 1 + Sup ((inst_conj_depth_conjunct \<circ> \<psi>s) ` I))" |
-  "inst_conj_depth_inner (StableConj I \<psi>s) = (if (I={}) then 0 else Sup ((inst_conj_depth_conjunct \<circ> \<psi>s) ` I))" |
-  "inst_conj_depth_inner (BranchConj _ \<phi> I \<psi>s) = (if (I={}) then 0 else Sup ({instable_conjunction_depth \<phi>} \<union> ((inst_conj_depth_conjunct \<circ> \<psi>s) ` I)))" |
+  "inst_conj_depth_inner (Conj I \<psi>s) =
+    (if I = {} 
+     then 0
+     else 1 + Sup ((inst_conj_depth_conjunct \<circ> \<psi>s) ` I))" |
+  "inst_conj_depth_inner (StableConj I \<psi>s) = Sup ((inst_conj_depth_conjunct \<circ> \<psi>s) ` I)" |
+  "inst_conj_depth_inner (BranchConj _ \<phi> I \<psi>s) =
+    (if I = {}
+     then instable_conjunction_depth \<phi>
+     else 1 + Sup ({instable_conjunction_depth \<phi>} \<union> ((inst_conj_depth_conjunct \<circ> \<psi>s) ` I)))" |
 
   "inst_conj_depth_conjunct (Pos \<chi>) = inst_conj_depth_inner \<chi>" |
   "inst_conj_depth_conjunct (Neg \<chi>) = inst_conj_depth_inner \<chi>" 
@@ -98,17 +111,17 @@ instable_conjunction_depth :: "('a, 's) hml_srbb \<Rightarrow> enat"
 subsection \<open>Depth of stable conjunctions\<close>
 
 primrec
-stable_conjunction_depth :: "('a, 's) hml_srbb \<Rightarrow> enat"
+      stable_conjunction_depth :: "('a, 's) hml_srbb \<Rightarrow> enat"
   and st_conj_depth_inner :: "('a, 's) hml_srbb_inner \<Rightarrow> enat"
   and st_conj_depth_conjunct :: "('a, 's) hml_srbb_conjunct \<Rightarrow> enat" where
   "stable_conjunction_depth TT = 0" |
   "stable_conjunction_depth (Internal \<chi>) = st_conj_depth_inner \<chi>" |
-  "stable_conjunction_depth (ImmConj I \<psi>s) = (if (I={}) then 0 else Sup ((st_conj_depth_conjunct \<circ> \<psi>s) ` I))" |
+  "stable_conjunction_depth (ImmConj I \<psi>s) = Sup ((st_conj_depth_conjunct \<circ> \<psi>s) ` I)" |
 
   "st_conj_depth_inner (Obs _ \<phi>) = stable_conjunction_depth \<phi>" |
-  "st_conj_depth_inner (Conj I \<psi>s) = (if (I={}) then 0 else Sup ((st_conj_depth_conjunct \<circ> \<psi>s) ` I))" |
-  "st_conj_depth_inner (StableConj I \<psi>s) = (if (I={}) then 0 else 1 + Sup ((st_conj_depth_conjunct \<circ> \<psi>s) ` I))" |
-  "st_conj_depth_inner (BranchConj _ \<phi> I \<psi>s) = (if (I={}) then 0 else Sup ({stable_conjunction_depth \<phi>} \<union> ((st_conj_depth_conjunct \<circ> \<psi>s) ` I)))" |
+  "st_conj_depth_inner (Conj I \<psi>s) = Sup ((st_conj_depth_conjunct \<circ> \<psi>s) ` I)" |
+  "st_conj_depth_inner (StableConj I \<psi>s) = 1 + Sup ((st_conj_depth_conjunct \<circ> \<psi>s) ` I)" |
+  "st_conj_depth_inner (BranchConj _ \<phi> I \<psi>s) = Sup ({stable_conjunction_depth \<phi>} \<union> ((st_conj_depth_conjunct \<circ> \<psi>s) ` I))" |
 
   "st_conj_depth_conjunct (Pos \<chi>) = st_conj_depth_inner \<chi>" |
   "st_conj_depth_conjunct (Neg \<chi>) = st_conj_depth_inner \<chi>" 
@@ -121,12 +134,15 @@ primrec
   and imm_conj_depth_conjunct :: "('a, 's) hml_srbb_conjunct \<Rightarrow> enat" where 
   "immediate_conjunction_depth TT = 0" |
   "immediate_conjunction_depth (Internal \<chi>) = imm_conj_depth_inner \<chi>" |
-  "immediate_conjunction_depth (ImmConj I \<psi>s) = (if (I={}) then 0 else 1 + Sup ((imm_conj_depth_conjunct \<circ> \<psi>s) ` I))" |
+  "immediate_conjunction_depth (ImmConj I \<psi>s) =
+    (if I = {}
+     then 0
+     else 1 + Sup ((imm_conj_depth_conjunct \<circ> \<psi>s) ` I))" |
 
   "imm_conj_depth_inner (Obs _ \<phi>) = immediate_conjunction_depth \<phi>" |
-  "imm_conj_depth_inner (Conj I \<psi>s) = (if (I={}) then 0 else Sup ((imm_conj_depth_conjunct \<circ> \<psi>s) ` I))" |
-  "imm_conj_depth_inner (StableConj I \<psi>s) = (if (I={}) then 0 else Sup ((imm_conj_depth_conjunct \<circ> \<psi>s) ` I))" |
-  "imm_conj_depth_inner (BranchConj _ \<phi> I \<psi>s) = (if (I={}) then 0 else Sup ({immediate_conjunction_depth \<phi>} \<union> ((imm_conj_depth_conjunct \<circ> \<psi>s) ` I)))" |
+  "imm_conj_depth_inner (Conj I \<psi>s) = Sup ((imm_conj_depth_conjunct \<circ> \<psi>s) ` I)" |
+  "imm_conj_depth_inner (StableConj I \<psi>s) = Sup ((imm_conj_depth_conjunct \<circ> \<psi>s) ` I)" |
+  "imm_conj_depth_inner (BranchConj _ \<phi> I \<psi>s) = Sup ({immediate_conjunction_depth \<phi>} \<union> ((imm_conj_depth_conjunct \<circ> \<psi>s) ` I))" |
 
   "imm_conj_depth_conjunct (Pos \<chi>) = imm_conj_depth_inner \<chi>" |
   "imm_conj_depth_conjunct (Neg \<chi>) = imm_conj_depth_inner \<chi>"
@@ -139,12 +155,12 @@ primrec
   and max_pos_conj_depth_conjunct :: "('a, 's) hml_srbb_conjunct \<Rightarrow> enat" where
   "max_positive_conjunct_depth TT = 0"|
   "max_positive_conjunct_depth (Internal \<chi>) = max_pos_conj_depth_inner \<chi>" |
-  "max_positive_conjunct_depth (ImmConj I \<psi>s) = (if (I={}) then 0 else Sup ((max_pos_conj_depth_conjunct \<circ> \<psi>s) ` I))" |
+  "max_positive_conjunct_depth (ImmConj I \<psi>s) = Sup ((max_pos_conj_depth_conjunct \<circ> \<psi>s) ` I)" |
 
   "max_pos_conj_depth_inner (Obs _ \<phi>) = max_positive_conjunct_depth \<phi>" |
-  "max_pos_conj_depth_inner (Conj I \<psi>s) = (if (I={}) then 0 else Sup ((max_pos_conj_depth_conjunct \<circ> \<psi>s) ` I))" |
-  "max_pos_conj_depth_inner (StableConj I \<psi>s) = (if (I={}) then 0 else Sup ((max_pos_conj_depth_conjunct \<circ> \<psi>s) ` I))" |
-  "max_pos_conj_depth_inner (BranchConj _ \<phi> I \<psi>s) = (if (I={}) then 0 else Sup ({max_positive_conjunct_depth \<phi>} \<union> ((max_pos_conj_depth_conjunct \<circ> \<psi>s) ` I)))" |
+  "max_pos_conj_depth_inner (Conj I \<psi>s) = Sup ((max_pos_conj_depth_conjunct \<circ> \<psi>s) ` I)" |
+  "max_pos_conj_depth_inner (StableConj I \<psi>s) = Sup ((max_pos_conj_depth_conjunct \<circ> \<psi>s) ` I)" |
+  "max_pos_conj_depth_inner (BranchConj _ \<phi> I \<psi>s) = Sup ({max_positive_conjunct_depth \<phi>} \<union> ((max_pos_conj_depth_conjunct \<circ> \<psi>s) ` I))" |
 
   "max_pos_conj_depth_conjunct (Pos \<chi>) = modal_depth_srbb_inner \<chi>" |
   "max_pos_conj_depth_conjunct (Neg \<chi>) = max_pos_conj_depth_inner \<chi>"
@@ -157,12 +173,12 @@ primrec
   and max_neg_conj_depth_conjunct :: "('a, 's) hml_srbb_conjunct \<Rightarrow> enat" where
   "max_negative_conjunct_depth TT = 0" |
   "max_negative_conjunct_depth (Internal \<chi>) = max_neg_conj_depth_inner \<chi>" |
-  "max_negative_conjunct_depth (ImmConj I \<psi>s) = (if (I={}) then 0 else Sup ((max_neg_conj_depth_conjunct \<circ> \<psi>s) ` I))" |
+  "max_negative_conjunct_depth (ImmConj I \<psi>s) = Sup ((max_neg_conj_depth_conjunct \<circ> \<psi>s) ` I)" |
 
   "max_neg_conj_depth_inner (Obs _ \<phi>) = max_negative_conjunct_depth \<phi>" |
-  "max_neg_conj_depth_inner (Conj I \<psi>s) = (if (I={}) then 0 else Sup ((max_neg_conj_depth_conjunct \<circ> \<psi>s) ` I))" |
-  "max_neg_conj_depth_inner (StableConj I \<psi>s) = (if (I={}) then 0 else Sup ((max_neg_conj_depth_conjunct \<circ> \<psi>s) ` I))" |
-  "max_neg_conj_depth_inner (BranchConj _ \<phi> I \<psi>s) = (if (I={}) then 0 else Sup ({max_negative_conjunct_depth \<phi>} \<union> ((max_neg_conj_depth_conjunct \<circ> \<psi>s) ` I)))" |
+  "max_neg_conj_depth_inner (Conj I \<psi>s) = Sup ((max_neg_conj_depth_conjunct \<circ> \<psi>s) ` I)" |
+  "max_neg_conj_depth_inner (StableConj I \<psi>s) = Sup ((max_neg_conj_depth_conjunct \<circ> \<psi>s) ` I)" |
+  "max_neg_conj_depth_inner (BranchConj _ \<phi> I \<psi>s) = Sup ({max_negative_conjunct_depth \<phi>} \<union> ((max_neg_conj_depth_conjunct \<circ> \<psi>s) ` I))" |
 
   "max_neg_conj_depth_conjunct (Pos \<chi>) = max_neg_conj_depth_inner \<chi>" |
   "max_neg_conj_depth_conjunct (Neg \<chi>) = modal_depth_srbb_inner \<chi>"
@@ -175,12 +191,12 @@ primrec
   and neg_depth_conjunct :: "('a, 's) hml_srbb_conjunct \<Rightarrow> enat" where
   "negation_depth TT = 0" |
   "negation_depth (Internal \<chi>) = neg_depth_inner \<chi>" |
-  "negation_depth (ImmConj I \<psi>s) = (if (I={}) then 0 else Sup ((neg_depth_conjunct \<circ> \<psi>s) ` I))" |
+  "negation_depth (ImmConj I \<psi>s) = Sup ((neg_depth_conjunct \<circ> \<psi>s) ` I)" |
 
   "neg_depth_inner (Obs _ \<phi>) = negation_depth \<phi>" |
-  "neg_depth_inner (Conj I \<psi>s) = (if (I={}) then 0 else Sup ((neg_depth_conjunct \<circ> \<psi>s) ` I))" |
-  "neg_depth_inner (StableConj I \<psi>s) = (if (I={}) then 0 else Sup ((neg_depth_conjunct \<circ> \<psi>s) ` I))" |
-  "neg_depth_inner (BranchConj _ \<phi> I \<psi>s) = (if (I={}) then 0 else Sup ({negation_depth \<phi>} \<union> ((neg_depth_conjunct \<circ> \<psi>s) ` I)))" |
+  "neg_depth_inner (Conj I \<psi>s) = Sup ((neg_depth_conjunct \<circ> \<psi>s) ` I)" |
+  "neg_depth_inner (StableConj I \<psi>s) = Sup ((neg_depth_conjunct \<circ> \<psi>s) ` I)" |
+  "neg_depth_inner (BranchConj _ \<phi> I \<psi>s) = Sup ({negation_depth \<phi>} \<union> ((neg_depth_conjunct \<circ> \<psi>s) ` I))" |
 
   "neg_depth_conjunct (Pos \<chi>) = neg_depth_inner \<chi>" |
   "neg_depth_conjunct (Neg \<chi>) = 1 + neg_depth_inner \<chi>" 
@@ -283,6 +299,18 @@ lemma "expressiveness_price (Internal
                            then (Pos (Obs b TT))
                            else undefined)))))) = E 2 0 1 0 0 1 0 0"
   by simp
+
+lemma "expressiveness_price TT = E 0 0 0 0 0 0 0 0"
+  by simp
+
+lemma "expressiveness_price (ImmConj {} \<psi>s) = E 0 0 0 0 0 0 0 0"
+  by (simp add: Sup_enat_def)
+
+lemma "expressiveness_price (Internal (Conj {} \<psi>s)) = E 0 0 0 0 0 0 0 0"
+  by (simp add: Sup_enat_def)
+
+lemma "expressiveness_price (Internal (BranchConj \<alpha> TT {} \<psi>s)) = E 1 0 0 0 0 0 0 0"
+  by (simp add: Sup_enat_def)
 
 end
 
