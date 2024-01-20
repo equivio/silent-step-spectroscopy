@@ -34,6 +34,111 @@ proof-
             by auto
         qed
 
+lemma expr_pos:
+  assumes "expr_pr_inner \<chi> \<le> (min1_6 e)"
+  shows "expr_pr_conjunct (Pos \<chi>) \<le> e"
+proof-
+  have expr_internal: "expr_pr_conjunct (Pos \<chi>) = E (modal_depth_srbb_conjunct (Pos \<chi>))
+                              (branch_conj_depth_conjunct (Pos \<chi>))
+                              (inst_conj_depth_conjunct  (Pos \<chi>))
+                              (st_conj_depth_conjunct    (Pos \<chi>))
+                              (imm_conj_depth_conjunct (Pos \<chi>))
+                              (max_pos_conj_depth_conjunct (Pos \<chi>))
+                              (max_neg_conj_depth_conjunct (Pos \<chi>))
+                              (neg_depth_conjunct            (Pos \<chi>))"
+            using expr_pr_conjunct.simps by blast
+          have pos_upd: "(modal_depth_srbb_conjunct (Pos \<chi>)) = modal_depth_srbb_inner \<chi>"
+            "(branch_conj_depth_conjunct (Pos \<chi>)) = branch_conj_depth_inner \<chi>"
+  "(inst_conj_depth_conjunct  (Pos \<chi>)) = inst_conj_depth_inner \<chi>"
+  "(st_conj_depth_conjunct    (Pos \<chi>)) = st_conj_depth_inner \<chi>"
+  "(imm_conj_depth_conjunct (Pos \<chi>)) = imm_conj_depth_inner \<chi>"
+  "(max_pos_conj_depth_conjunct (Pos \<chi>)) = modal_depth_srbb_inner \<chi>"
+  "(max_neg_conj_depth_conjunct (Pos \<chi>)) = max_neg_conj_depth_inner \<chi>"
+  "(neg_depth_conjunct            (Pos \<chi>)) = neg_depth_inner \<chi>"
+            by simp+
+          have "expr_pr_inner \<chi> \<le> (min1_6 e)"
+            using assms 
+            by blast
+          obtain e1 e2 e3 e4 e5 e6 e7 e8 where "e = E e1 e2 e3 e4 e5 e6 e7 e8"
+            by (metis antysim assms eneg_leq energy.exhaust_sel expr_pr_inner.simps min_eneg(1))
+          hence "min1_6 e = (E (min e1 e6) e2 e3 e4 e5 e6 e7 e8)"  
+            by (simp add: min1_6_def)
+          hence "modal_depth_srbb_inner \<chi> \<le> (min e1 e6)"
+            using \<open> expr_pr_inner \<chi> \<le> (min1_6 e)\<close> expr_pr_inner.simps 
+            by (simp add: leq_not_eneg)
+          hence "modal_depth_srbb_inner \<chi> \<le> e6"
+            using min.boundedE by blast
+          thus "expr_pr_conjunct (Pos \<chi>) \<le> e"
+            using expr_internal pos_upd \<open>e = E e1 e2 e3 e4 e5 e6 e7 e8\<close>
+            using \<open> expr_pr_inner \<chi> \<le> min1_6 e\<close> \<open>min1_6 e = E (min e1 e6) e2 e3 e4 e5 e6 e7 e8\<close> leq_not_eneg by force
+        qed
+
+lemma expr_neg:
+  assumes "expr_pr_inner \<chi> \<le> (min1_7 (e - E 0 0 0 0 0 0 0 1))"
+  shows "expr_pr_conjunct (Neg \<chi>) \<le> e"
+proof-
+  have expr_neg: "expr_pr_conjunct (Neg \<chi>) =
+  E (modal_depth_srbb_conjunct (Neg \<chi>))
+                                (branch_conj_depth_conjunct (Neg \<chi>))
+                                (inst_conj_depth_conjunct (Neg \<chi>))
+                                (st_conj_depth_conjunct (Neg \<chi>))
+                                (imm_conj_depth_conjunct (Neg \<chi>))
+                                (max_pos_conj_depth_conjunct (Neg \<chi>))
+                                (max_neg_conj_depth_conjunct (Neg \<chi>))
+                                (neg_depth_conjunct (Neg \<chi>))"
+              using expr_pr_conjunct.simps by blast
+  
+            have neg_ups: "modal_depth_srbb_conjunct (Neg \<chi>) = modal_depth_srbb_inner \<chi>" 
+  "(branch_conj_depth_conjunct (Neg \<chi>)) = branch_conj_depth_inner \<chi>"
+  "inst_conj_depth_conjunct (Neg \<chi>) = inst_conj_depth_inner \<chi>" 
+  "st_conj_depth_conjunct (Neg \<chi>) = st_conj_depth_inner \<chi>"
+  "imm_conj_depth_conjunct (Neg \<chi>) = imm_conj_depth_inner \<chi>"
+  "max_pos_conj_depth_conjunct (Neg \<chi>) = max_pos_conj_depth_inner \<chi>"
+  "max_neg_conj_depth_conjunct (Neg \<chi>) = modal_depth_srbb_inner \<chi>"
+  "neg_depth_conjunct (Neg \<chi>) = 1 + neg_depth_inner \<chi>" 
+              by simp+
+
+          have "expr_pr_inner \<chi> \<le> (min1_7 (e - E 0 0 0 0 0 0 0 1))"
+            using assms
+            by blast
+          obtain e1 e2 e3 e4 e5 e6 e7 e8 where "e = E e1 e2 e3 e4 e5 e6 e7 e8"
+            by (metis antysim assms eneg_leq energy.exhaust_sel expr_pr_inner.simps min_eneg(2) minus_energy_def)
+          hence "(e - (E 0 0 0 0 0 0 0 1)) = (E e1 e2 e3 e4 e5 e6 e7 (e8-1)) \<or> 
+                  ((e - (E 0 0 0 0 0 0 0 1)) = eneg)"
+            using minus_energy_def
+            by simp
+          then show ?thesis
+          proof(rule disjE)
+            assume "e - E 0 0 0 0 0 0 0 1 = eneg"
+            hence "e = (E 0 0 0 0 0 0 0 0)"
+              using assms
+              using antysim eneg_leq min_eneg(2) by fastforce
+            then show ?thesis 
+              using \<open>e - E 0 0 0 0 0 0 0 1 = eneg\<close> assms 
+              by (metis antysim eneg_leq energy.distinct(1) expr_pr_inner.simps min_eneg(2))
+          next
+            assume "e - E 0 0 0 0 0 0 0 1 = E e1 e2 e3 e4 e5 e6 e7 (e8 - 1)"
+            hence "(min1_7 (e - E 0 0 0 0 0 0 0 1)) = (E (min e1 e7) e2 e3 e4 e5 e6 e7 (e8-1))"
+            using min1_7_def
+            by simp
+            hence "modal_depth_srbb_inner \<chi> \<le> (min e1 e7)"
+              using expr_pr_inner.simps
+              using \<open>expr_pr_inner \<chi> \<le> min1_7 (e - E 0 0 0 0 0 0 0 1)\<close> leq_not_eneg by auto
+            
+            have "neg_depth_inner \<chi> \<le> (e8-1)"
+              using \<open>(min1_7 (e - E 0 0 0 0 0 0 0 1)) = (E (min e1 e7) e2 e3 e4 e5 e6 e7 (e8-1))\<close>
+\<open>e = E e1 e2 e3 e4 e5 e6 e7 e8\<close> \<open>expr_pr_inner \<chi> \<le> (min1_7 (e - E 0 0 0 0 0 0 0 1))\<close>
+              using leq_not_eneg by force
+            hence "neg_depth_conjunct (Neg \<chi>) \<le> e8"
+              using \<open>neg_depth_conjunct (Neg \<chi>) = 1 + neg_depth_inner \<chi>\<close>
+              by (metis \<open>e - E 0 0 0 0 0 0 0 1 = E e1 e2 e3 e4 e5 e6 e7 (e8 - 1)\<close> \<open>e = E e1 e2 e3 e4 e5 e6 e7 e8\<close> add_diff_cancel_enat enat_add_left_cancel_le energy.sel(8) energy.simps(3) le_iff_add leq_not_eneg minus_energy_def)
+          thus "expr_pr_conjunct (Neg \<chi>) \<le> e"
+            using expr_neg \<open>e = E e1 e2 e3 e4 e5 e6 e7 e8\<close> \<open>modal_depth_srbb_inner \<chi> \<le> (min e1 e7)\<close>
+            using \<open>expr_pr_inner \<chi> \<le> min1_7 (e - E 0 0 0 0 0 0 0 1)\<close> \<open>(min1_7 (e - E 0 0 0 0 0 0 0 1)) = (E (min e1 e7) e2 e3 e4 e5 e6 e7 (e8-1))\<close> leq_not_eneg 
+            by (simp add: \<open>e = E e1 e2 e3 e4 e5 e6 e7 e8\<close> neg_ups(7))
+        qed
+      qed
+
 lemma winning_budget_implies_strategy_formula:
   fixes g e
   assumes "in_wina e g"
@@ -286,7 +391,6 @@ expr_internal_eq
 
           then obtain \<phi> where "(strategy_formula (Defender_Conj p Q) (e - (E 0 0 0 0 1 0 0 0)) \<phi> \<and> expressiveness_price \<phi> \<le> (e - (E 0 0 0 0 1 0 0 0)))"
             by blast
-  
           hence "strategy_formula (Attacker_Immediate p Q) e \<phi>"
             using strategy_formula_strategy_formula_inner_strategy_formula_conjunct.delay early_conj False \<open>Q = Q'\<close>
             by (metis (no_types, lifting) \<open>in_wina (e - E 0 0 0 0 1 0 0 0) (Defender_Conj p Q')\<close> local.finishing_or_early_conj)
@@ -304,7 +408,97 @@ expr_internal_eq
     then show ?case sorry
   next
     case 3
-    then show ?case sorry
+    then obtain p q where "g = Attacker_Clause p q" by blast
+    hence "(\<exists>g'. (((spectroscopy_moves (Attacker_Clause p q) g')\<noteq>None) \<and> (in_wina (the (spectroscopy_moves (Attacker_Clause p q) g') e) g')))"
+      using energy_game_axioms 3 "2" 
+      by metis
+    then obtain g' where move: "((spectroscopy_moves (Attacker_Clause p q) g')\<noteq>None) \<and> (in_wina (the (spectroscopy_moves (Attacker_Clause p q) g') e) g')" 
+      and IH: "(\<exists>p Q. g' = Attacker_Delayed p Q) \<longrightarrow>
+                   (\<exists>\<phi>. strategy_formula_inner g' (weight g g' e) \<phi> \<and>
+                         expr_pr_inner \<phi> \<le> weight g g' e)"
+      using in_wina.cases 3 "2" \<open>g = Attacker_Clause p q\<close> 
+      by metis
+    hence "(\<exists>p' Q'. g' = (Attacker_Delayed p' Q'))"
+      using spectroscopy_moves.simps move spectroscopy_moves.elims
+      by (smt (verit) spectroscopy_defender.elims(1))
+    then obtain p' Q' where g'_att_del: "g' = Attacker_Delayed p' Q'"
+      and IH: "(\<exists>\<phi>. strategy_formula_inner g' (weight g g' e) \<phi> \<and>
+                         expr_pr_inner \<phi> \<le> weight g g' e)" using IH by blast
+    show ?case
+    proof(cases \<open>p = p'\<close>)
+      case True
+      hence "{q} \<Zsurj>S Q'"
+        using g'_att_del local.pos_neg_clause move by presburger
+
+      have "(\<exists>Q'. (spectroscopy_moves (Attacker_Clause p q) (Attacker_Delayed p Q') 
+      = (Some min1_6)))"
+          by auto
+        hence "(the (spectroscopy_moves (Attacker_Clause p q) g') e) = min1_6 e"
+          using True \<open>{q} \<Zsurj>S Q'\<close> g'_att_del
+          by simp
+      have "(in_wina (min1_6 e) (Attacker_Delayed p Q'))"
+        using \<open>g' = Attacker_Delayed p' Q'\<close> \<open>{q} \<Zsurj>S Q'\<close> move update_gets_smaller win_a_upwards_closure 
+        by (simp add: True)
+        then obtain \<chi> where "(strategy_formula_inner (Attacker_Delayed p Q') (min1_6 e) \<chi> \<and> expr_pr_inner \<chi> \<le> (min1_6 e))"
+          using IH True \<open>g = Attacker_Clause p q\<close> \<open>weight (Attacker_Clause p q) g' e = min1_6 e\<close> g'_att_del by auto
+        hence "((\<exists>Q'. (spectroscopy_moves (Attacker_Clause p q) (Attacker_Delayed p Q') 
+        = (Some (min1_6))) \<and> (in_wina (min1_6 e) (Attacker_Delayed p Q')) 
+          \<and> strategy_formula_inner (Attacker_Delayed p Q') (min1_6 e) \<chi>))"
+          by (meson \<open>in_wina (min1_6 e) (Attacker_Delayed p Q')\<close> \<open>{q} \<Zsurj>S Q'\<close> local.pos_neg_clause)
+        hence "strategy_formula_conjunct (Attacker_Clause p q) e (Pos \<chi>)"
+          using strategy_formula_strategy_formula_inner_strategy_formula_conjunct.delay
+          using pos by blast
+
+        have "expr_pr_conjunct (Pos \<chi>) \<le> e"
+          using \<open>(strategy_formula_inner (Attacker_Delayed p Q') (min1_6 e) \<chi> \<and> expr_pr_inner \<chi> \<le> (min1_6 e))\<close> expr_pos 
+          by blast 
+        then show ?thesis 
+          using \<open>strategy_formula_conjunct (Attacker_Clause p q) e (Pos \<chi>)\<close>
+          using \<open>g = Attacker_Clause p q\<close> by blast
+      next
+        case False
+        hence "{p} \<Zsurj>S Q'"
+          using g'_att_del local.pos_neg_clause move by presburger
+
+        have "p' = q"
+          using False 
+          using g'_att_del local.pos_neg_clause move by presburger
+
+        have "(\<exists>Q'. (spectroscopy_moves (Attacker_Clause p q) (Attacker_Delayed p' Q') 
+        = Some (min1_7 \<circ> (\<lambda>x. x- E 0 0 0 0 0 0 0 1))))"  
+          using False \<open>p' = q\<close> by auto
+        hence "(the (spectroscopy_moves (Attacker_Clause p q) g') e) = (min1_7 (e - E 0 0 0 0 0 0 0 1))"
+          using False \<open>{p} \<Zsurj>S Q'\<close> g'_att_del \<open>p' = q\<close>
+          by simp
+        have "(in_wina ((min1_7 (e - E 0 0 0 0 0 0 0 1))) (Attacker_Delayed p' Q'))"
+          using \<open>g' = Attacker_Delayed p' Q'\<close> \<open>{p} \<Zsurj>S Q'\<close> move update_gets_smaller win_a_upwards_closure False \<open>p' = q\<close>
+          by auto
+        
+        hence "(\<exists>\<phi>. strategy_formula_inner (Attacker_Delayed p' Q') (min1_7 (e - E 0 0 0 0 0 0 0 1)) \<phi> \<and> expr_pr_inner \<phi> \<le> (min1_7 (e - E 0 0 0 0 0 0 0 1)))"
+          using \<open>in_wina (min1_7 (e - E 0 0 0 0 0 0 0 1)) (Attacker_Delayed p' Q')\<close> IH 
+          using strategy_formula_conjunct.simps 
+          using \<open>g = Attacker_Clause p q\<close> \<open>weight (Attacker_Clause p q) g' e = min1_7 (e - E 0 0 0 0 0 0 0 1)\<close> g'_att_del by auto
+        then obtain \<chi> where "(strategy_formula_inner (Attacker_Delayed p' Q') (min1_7 (e - E 0 0 0 0 0 0 0 1)) \<chi> \<and> expr_pr_inner \<chi> \<le> (min1_7 (e - E 0 0 0 0 0 0 0 1)))"
+          by blast
+        hence "((\<exists>Q'. (spectroscopy_moves (Attacker_Clause p q) (Attacker_Delayed p' Q') 
+        = (Some (min1_7 \<circ> (\<lambda>x. x- E 0 0 0 0 0 0 0 1)))) \<and> (in_wina (min1_7 (e - E 0 0 0 0 0 0 0 1)) (Attacker_Delayed p' Q')) 
+          \<and> strategy_formula_inner (Attacker_Delayed p' Q') (min1_7 (e - E 0 0 0 0 0 0 0 1)) \<chi>))"
+          using \<open>in_wina (min1_7 (e - E 0 0 0 0 0 0 0 1)) (Attacker_Delayed p' Q')\<close> local.pos_neg_clause
+          using False \<open>{p} \<Zsurj>S Q'\<close> \<open>p' = q\<close> by fastforce
+
+        hence "strategy_formula_conjunct (Attacker_Clause p q) e (Neg \<chi>)"
+          using strategy_formula_strategy_formula_inner_strategy_formula_conjunct.delay
+          using neg \<open>p' = q\<close> by blast
+
+        have "expr_pr_conjunct (Neg \<chi>) \<le> e"
+          using \<open>(strategy_formula_inner (Attacker_Delayed p' Q') (min1_7 (e - E 0 0 0 0 0 0 0 1)) \<chi> \<and> expr_pr_inner \<chi> \<le> (min1_7 (e - E 0 0 0 0 0 0 0 1)))\<close>
+        expr_neg
+          by blast
+        
+        then show ?thesis 
+          using \<open>strategy_formula_conjunct (Attacker_Clause p q) e (hml_srbb_conjunct.Neg \<chi>)\<close>
+          using \<open>g = Attacker_Clause p q\<close> by blast 
+      qed
   next
     case 4
     then show ?case sorry
