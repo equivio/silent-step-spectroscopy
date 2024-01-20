@@ -7,7 +7,11 @@ inductive
   and is_trace_formula_inner :: "('act, 'i) hml_srbb_inner \<Rightarrow> bool" where
   "is_trace_formula TT" |
   "is_trace_formula (Internal \<chi>)" if "is_trace_formula_inner \<chi>" |
-  "is_trace_formula_inner (Obs \<alpha> \<phi>)" if "is_trace_formula \<phi>"
+  "is_trace_formula (ImmConj I \<psi>s)" if "I = {}" |
+
+  "is_trace_formula_inner (Obs \<alpha> \<phi>)" if "is_trace_formula \<phi>" |
+  "is_trace_formula_inner (Conj I \<psi>s)" if "I = {}" |
+  "is_trace_formula_inner (BranchConj \<alpha> \<phi> I \<psi>s)" if "I = {}" and "is_trace_formula \<phi>"
 
 
 fun wtrace_to_srbb :: "'act list \<Rightarrow> ('act, 'i) hml_srbb"
@@ -25,15 +29,20 @@ lemma trace_to_srbb_is_trace_formula:
   "is_trace_formula (wtrace_to_srbb trace)"
   apply (induct trace)
   using is_trace_formula_is_trace_formula_inner.intros
+    and is_trace_formula.simps
+    and is_trace_formula_is_trace_formula_inner.intros(4)
+    and wtrace_to_inner.simps(2)
+    and wtrace_to_srbb.simps(2)
   by fastforce+
 
 lemma trace_formula_to_expressiveness:
   fixes \<phi> :: "('act, 'i) hml_srbb"
   fixes \<chi> :: "('act, 'i) hml_srbb_inner"
-  shows  "(is_trace_formula \<phi>             \<longrightarrow> (\<phi> \<in> \<O> (E \<infinity> 0 0 0 0 0 0 0)))
+  shows  "(is_trace_formula \<phi>       \<longrightarrow> (\<phi> \<in> \<O>       (E \<infinity> 0 0 0 0 0 0 0)))
         \<and> (is_trace_formula_inner \<chi> \<longrightarrow> (\<chi> \<in> \<O>_inner (E \<infinity> 0 0 0 0 0 0 0)))"
   apply (rule is_trace_formula_is_trace_formula_inner.induct)
-  by (simp add: \<O>_def \<O>_inner_def leq_not_eneg)+
+  by (simp add: Sup_enat_def \<O>_def \<O>_inner_def leq_not_eneg)+
+
 
 lemma expressiveness_to_trace_formula:
   fixes \<phi> :: "('act, 'i) hml_srbb"
@@ -41,12 +50,54 @@ lemma expressiveness_to_trace_formula:
   shows "(\<phi> \<in> \<O> (E \<infinity> 0 0 0 0 0 0 0) \<longrightarrow> is_trace_formula \<phi>)
        \<and> (\<chi> \<in> \<O>_inner (E \<infinity> 0 0 0 0 0 0 0) \<longrightarrow> is_trace_formula_inner \<chi>) 
        \<and> True"
-  apply (rule hml_srbb_hml_srbb_inner_hml_srbb_conjunct.induct)
-  using is_trace_formula_is_trace_formula_inner.intros(1) apply blast
-  apply (simp add: \<O>_inner_def \<O>_def is_trace_formula_is_trace_formula_inner.intros(2))
-        apply (simp add: \<O>_def leq_not_eneg)
+proof (induct rule: hml_srbb_hml_srbb_inner_hml_srbb_conjunct.induct)
+  case TT
+  then show ?case
+    using is_trace_formula_is_trace_formula_inner.intros(1) by blast
+next
+  case (Internal x)
+  then show ?case
+    by (simp add: \<O>_inner_def \<O>_def is_trace_formula_is_trace_formula_inner.intros(2))
+next
+  case (ImmConj x1 x2)
+  then show ?case apply (simp add: \<O>_def leq_not_eneg)
+  using \<O>_def leq_not_eneg is_trace_formula_is_trace_formula_inner.intros(3) by blast
+next
+  case (Obs x1 x2)
+  then show ?case by (simp add: \<O>_def \<O>_inner_def is_trace_formula_is_trace_formula_inner.intros(4) leq_not_eneg)
+next
+  case (Conj I \<psi>s)
+  show ?case
+  proof (rule impI)
+    assume "Conj I \<psi>s \<in> \<O>_inner (E \<infinity> 0 0 0 0 0 0 0)"
+    hence "I = {}" 
+      by (metis \<O>_inner_def add_eq_0_iff_both_eq_0 bot.extremum_uniqueI bot_enat_def energy.distinct(1) energy.sel(3) expr_pr_inner.simps inst_conj_depth_inner.simps(2) leq_not_eneg mem_Collect_eq zero_one_enat_neq(2))
+    then show "is_trace_formula_inner (Conj I \<psi>s)" 
+      by (simp add: is_trace_formula_is_trace_formula_inner.intros(5))
+  qed
+next
+  case (StableConj I \<psi>s)
+  then show ?case sorry
+next
+  case (BranchConj \<alpha> \<phi> I \<psi>s)
+  show ?case
+  proof (rule impI)
+    assume "BranchConj \<alpha> \<phi> I \<psi>s \<in> \<O>_inner (E \<infinity> 0 0 0 0 0 0 0)"
+    hence "I = {}" 
+      by (metis \<O>_inner_def add_eq_0_iff_both_eq_0 bot.extremum_uniqueI bot_enat_def branch_conj_depth_inner.simps(4) energy.distinct(1) energy.sel(2) expr_pr_inner.simps leq_not_eneg mem_Collect_eq zero_one_enat_neq(2))
+    from \<open>BranchConj \<alpha> \<phi> I \<psi>s \<in> \<O>_inner (E \<infinity> 0 0 0 0 0 0 0)\<close>
+    have "\<phi> \<in> \<O> (E \<infinity> 0 0 0 0 0 0 0)" sorry
+    with \<open>I = {}\<close>
+    show "is_trace_formula_inner (BranchConj \<alpha> \<phi> I \<psi>s)" 
+      by (simp add: BranchConj.hyps(1) is_trace_formula_is_trace_formula_inner.intros(6))
+  qed
+next
+  case (Pos x)
+  then show ?case by auto
+next
+  case (Neg x)
+  then show ?case by auto
   oops
-  (*by (simp add: \<O>_inner_def \<O>_def is_trace_formula_is_trace_formula_inner.intros(3) leq_not_eneg)+*)
 
 lemma modal_depth_only_is_trace_form: 
   "(is_trace_formula \<phi>) = (\<phi> \<in> \<O> (E \<infinity> 0 0 0 0 0 0 0))"
