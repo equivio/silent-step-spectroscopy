@@ -23,12 +23,12 @@ proof-
             using expressiveness_price.simps by blast
           have "modal_depth_srbb (Internal \<chi>) = modal_depth_srbb_inner \<chi>"
             "(branching_conjunction_depth (Internal \<chi>)) = branch_conj_depth_inner \<chi>"
-"(instable_conjunction_depth  (Internal \<chi>)) = inst_conj_depth_inner \<chi>"
-"(stable_conjunction_depth    (Internal \<chi>)) = st_conj_depth_inner \<chi>"
-"(immediate_conjunction_depth (Internal \<chi>)) = imm_conj_depth_inner \<chi>"
-"max_positive_conjunct_depth (Internal \<chi>) = max_pos_conj_depth_inner \<chi>"
-"max_negative_conjunct_depth (Internal \<chi>) = max_neg_conj_depth_inner \<chi>"
-"negation_depth (Internal \<chi>) = neg_depth_inner \<chi>"
+            "(instable_conjunction_depth  (Internal \<chi>)) = inst_conj_depth_inner \<chi>"
+            "(stable_conjunction_depth    (Internal \<chi>)) = st_conj_depth_inner \<chi>"
+            "(immediate_conjunction_depth (Internal \<chi>)) = imm_conj_depth_inner \<chi>"
+            "max_positive_conjunct_depth (Internal \<chi>) = max_pos_conj_depth_inner \<chi>"
+            "max_negative_conjunct_depth (Internal \<chi>) = max_neg_conj_depth_inner \<chi>"
+            "negation_depth (Internal \<chi>) = neg_depth_inner \<chi>"
             by simp+
           with expr_internal show ?thesis
             by auto
@@ -143,13 +143,13 @@ lemma winning_budget_implies_strategy_formula:
   fixes g e
   assumes "in_wina e g"
   shows
-  "(\<exists>p Q. g = Attacker_Immediate p Q) \<Longrightarrow> (\<exists>\<phi>. strategy_formula g e \<phi> \<and> expressiveness_price \<phi> \<le> e)"
- "(\<exists> p Q. g = Attacker_Delayed p Q) ==> (\<exists>\<phi>. strategy_formula_inner g e \<phi> \<and> expr_pr_inner \<phi> \<le> e)"
- " (\<exists> p q. g = Attacker_Clause p q) \<Longrightarrow> (\<exists>\<phi>. strategy_formula_conjunct g e \<phi> \<and> expr_pr_conjunct \<phi> \<le> e)"
-"(\<exists>p Q. g = Defender_Conj p Q) \<Longrightarrow> (\<exists>\<phi>. strategy_formula_inner g e \<phi> \<and> expr_pr_inner \<phi> \<le> e) \<and>  (\<exists>\<phi>. strategy_formula g e \<phi> \<and> expressiveness_price \<phi> \<le> e)"
-"(\<exists>p Q. g =  Defender_Stable_Conj p Q) \<Longrightarrow> (\<exists>\<phi>. strategy_formula_inner g e \<phi> \<and> expr_pr_inner \<phi> \<le> e)"
-"(\<exists>p \<alpha> p' Q Qa. g = Defender_Branch p \<alpha> p' Q Qa) \<Longrightarrow> (\<exists>\<phi>. strategy_formula_inner g e \<phi> \<and> expr_pr_inner \<phi> \<le> e)"
-"(\<exists>p Q. g = Attacker_Branch p Q) \<Longrightarrow> True"
+    "(\<exists>p Q. g = Attacker_Immediate p Q) \<Longrightarrow> (\<exists>\<phi>. strategy_formula g e \<phi> \<and> expressiveness_price \<phi> \<le> e)"
+    "(\<exists>p Q. g = Attacker_Delayed p Q) \<Longrightarrow> (\<exists>\<phi>. strategy_formula_inner g e \<phi> \<and> expr_pr_inner \<phi> \<le> e)"
+    "(\<exists>p q. g = Attacker_Clause p q) \<Longrightarrow> (\<exists>\<phi>. strategy_formula_conjunct g e \<phi> \<and> expr_pr_conjunct \<phi> \<le> e)"
+    "(\<exists>p Q. g = Defender_Conj p Q) \<Longrightarrow> (\<exists>\<phi>. strategy_formula_inner g e \<phi> \<and> expr_pr_inner \<phi> \<le> e) \<and>  (\<exists>\<phi>. strategy_formula g e \<phi> \<and> expressiveness_price \<phi> \<le> e)"
+    "(\<exists>p Q. g =  Defender_Stable_Conj p Q) \<Longrightarrow> (\<exists>\<phi>. strategy_formula_inner g e \<phi> \<and> expr_pr_inner \<phi> \<le> e)"
+    "(\<exists>p \<alpha> p' Q Qa. g = Defender_Branch p \<alpha> p' Q Qa) \<Longrightarrow> (\<exists>\<phi>. strategy_formula_inner g e \<phi> \<and> expr_pr_inner \<phi> \<le> e)"
+    "(\<exists>p Q. g = Attacker_Branch p Q) \<Longrightarrow> True"
   using assms proof(induction rule: in_wina.induct)
   case (1 g e)
   {
@@ -166,11 +166,11 @@ lemma winning_budget_implies_strategy_formula:
       using "1.hyps" by force
   next
     case 4
-from assms obtain p Q where A: "in_wina e (Defender_Conj p Q)" using 4 in_wina.intros(1) "1" by blast
-        consider "in_wina e (Defender_Conj p Q) = (spectroscopy_defender g) \<and> (\<forall>g'. \<not>spectroscopy_moves g g' \<noteq> None)" | 
-                 "in_wina e (Defender_Conj p Q) = (\<not>spectroscopy_defender g) \<and> (\<exists>g'. spectroscopy_moves g g' \<noteq>  None \<and> (in_wina (the (spectroscopy_moves g g') e) g'))" |
-                 "in_wina e (Defender_Conj p Q) = (spectroscopy_defender g) \<and> (\<forall>g'. spectroscopy_moves g g' \<noteq>  None \<longrightarrow>  (in_wina (the (spectroscopy_moves g g') e) g'))"
-          using "1" A by blast
+    from assms obtain p Q where A: "in_wina e (Defender_Conj p Q)" using 4 in_wina.intros(1) "1" by blast
+            consider "in_wina e (Defender_Conj p Q) = (spectroscopy_defender g) \<and> (\<forall>g'. \<not>spectroscopy_moves g g' \<noteq> None)" | 
+                     "in_wina e (Defender_Conj p Q) = (\<not>spectroscopy_defender g) \<and> (\<exists>g'. spectroscopy_moves g g' \<noteq>  None \<and> (in_wina (the (spectroscopy_moves g g') e) g'))" |
+                     "in_wina e (Defender_Conj p Q) = (spectroscopy_defender g) \<and> (\<forall>g'. spectroscopy_moves g g' \<noteq>  None \<longrightarrow>  (in_wina (the (spectroscopy_moves g g') e) g'))"
+              using "1" A by blast
       then show ?case
       proof (cases)
         case 1
@@ -221,27 +221,27 @@ from assms obtain p Q where A: "in_wina e (Defender_Conj p Q)" using 4 in_wina.i
     then have Strat: "strategy_formula_inner (Defender_Stable_Conj p Q) e (StableConj {} \<Phi>)"
       using \<open>Q = {}\<close> stable_conj by blast
     from strat_pre 5
-    have "modal_depth_srbb_inner (StableConj Q \<Phi>) = Sup ((modal_depth_srbb_conjunct \<circ> \<Phi>) ` Q)"
-    "branch_conj_depth_inner (StableConj Q \<Phi>) = Sup ((branch_conj_depth_conjunct \<circ> \<Phi>) ` Q)"
-    "inst_conj_depth_inner (StableConj Q \<Phi>) = Sup ((inst_conj_depth_conjunct \<circ> \<Phi>) ` Q)"
-    "st_conj_depth_inner (StableConj Q \<Phi>) = 1 + Sup ((st_conj_depth_conjunct \<circ> \<Phi>) ` Q)"
-    "imm_conj_depth_inner (StableConj Q \<Phi>) = Sup ((imm_conj_depth_conjunct \<circ> \<Phi>) ` Q)"
-    "max_pos_conj_depth_inner (StableConj Q \<Phi>) = Sup ((max_pos_conj_depth_conjunct \<circ> \<Phi>) ` Q)"
-    "max_neg_conj_depth_inner (StableConj Q \<Phi>) = Sup ((max_neg_conj_depth_conjunct \<circ> \<Phi>) ` Q)"
-    "neg_depth_inner (StableConj Q \<Phi>) = Sup ((neg_depth_conjunct \<circ> \<Phi>) ` Q)"
+    have  "modal_depth_srbb_inner (StableConj Q \<Phi>) = Sup ((modal_depth_srbb_conjunct \<circ> \<Phi>) ` Q)"
+          "branch_conj_depth_inner (StableConj Q \<Phi>) = Sup ((branch_conj_depth_conjunct \<circ> \<Phi>) ` Q)"
+          "inst_conj_depth_inner (StableConj Q \<Phi>) = Sup ((inst_conj_depth_conjunct \<circ> \<Phi>) ` Q)"
+          "st_conj_depth_inner (StableConj Q \<Phi>) = 1 + Sup ((st_conj_depth_conjunct \<circ> \<Phi>) ` Q)"
+          "imm_conj_depth_inner (StableConj Q \<Phi>) = Sup ((imm_conj_depth_conjunct \<circ> \<Phi>) ` Q)"
+          "max_pos_conj_depth_inner (StableConj Q \<Phi>) = Sup ((max_pos_conj_depth_conjunct \<circ> \<Phi>) ` Q)"
+          "max_neg_conj_depth_inner (StableConj Q \<Phi>) = Sup ((max_neg_conj_depth_conjunct \<circ> \<Phi>) ` Q)"
+          "neg_depth_inner (StableConj Q \<Phi>) = Sup ((neg_depth_conjunct \<circ> \<Phi>) ` Q)"
       using modal_depth_srbb_inner.simps(3) branch_conj_depth_inner.simps st_conj_depth_inner.simps
       inst_conj_depth_inner.simps imm_conj_depth_inner.simps max_pos_conj_depth_inner.simps
       max_neg_conj_depth_inner.simps neg_depth_inner.simps 
       by auto+
 
     hence "modal_depth_srbb_inner (StableConj Q \<Phi>) = 0"
-    "branch_conj_depth_inner (StableConj Q \<Phi>) = 0"
-    "inst_conj_depth_inner (StableConj Q \<Phi>) = 0"
-    "st_conj_depth_inner (StableConj Q \<Phi>) = 1"
-    "imm_conj_depth_inner (StableConj Q \<Phi>) = 0"
-    "max_pos_conj_depth_inner (StableConj Q \<Phi>) = 0"
-    "max_neg_conj_depth_inner (StableConj Q \<Phi>) = 0"
-    "neg_depth_inner (StableConj Q \<Phi>) = 0"
+          "branch_conj_depth_inner (StableConj Q \<Phi>) = 0"
+          "inst_conj_depth_inner (StableConj Q \<Phi>) = 0"
+          "st_conj_depth_inner (StableConj Q \<Phi>) = 1"
+          "imm_conj_depth_inner (StableConj Q \<Phi>) = 0"
+          "max_pos_conj_depth_inner (StableConj Q \<Phi>) = 0"
+          "max_neg_conj_depth_inner (StableConj Q \<Phi>) = 0"
+          "neg_depth_inner (StableConj Q \<Phi>) = 0"
 
       using \<open>Q = {}\<close> image_empty comp_apply
       by (simp add: bot_enat_def)+
@@ -270,11 +270,11 @@ next
       using energy_game.in_wina_Ga energy_game_axioms "2" 
       by blast
     then obtain g' where move: "((spectroscopy_moves (Attacker_Immediate p Q) g')\<noteq>None) \<and> (in_wina (the (spectroscopy_moves (Attacker_Immediate p Q) g') e) g') \<and>
-((\<exists>p Q. g' = Defender_Conj p Q) \<longrightarrow>
-  (\<exists>\<phi>. strategy_formula_inner g' (weight g g' e) \<phi> \<and> expr_pr_inner \<phi> \<le> weight g g' e) \<and> 
-  (\<exists>\<phi>. strategy_formula g' (weight g g' e) \<phi> \<and> expressiveness_price \<phi> \<le> weight g g' e)) \<and> 
-((\<exists>p Q. g' = Attacker_Delayed p Q) \<longrightarrow>
-  (\<exists>\<phi>. strategy_formula_inner g' (weight g g' e) \<phi> \<and> expr_pr_inner \<phi> \<le> weight g g' e))" 
+    ((\<exists>p Q. g' = Defender_Conj p Q) \<longrightarrow>
+      (\<exists>\<phi>. strategy_formula_inner g' (weight g g' e) \<phi> \<and> expr_pr_inner \<phi> \<le> weight g g' e) \<and> 
+      (\<exists>\<phi>. strategy_formula g' (weight g g' e) \<phi> \<and> expressiveness_price \<phi> \<le> weight g g' e)) \<and> 
+    ((\<exists>p Q. g' = Attacker_Delayed p Q) \<longrightarrow>
+      (\<exists>\<phi>. strategy_formula_inner g' (weight g g' e) \<phi> \<and> expr_pr_inner \<phi> \<le> weight g g' e))" 
       using in_wina.cases 1 "2" 
       by (metis \<open>g = Attacker_Immediate p Q\<close>)     
       from move have move_cases: "(\<exists>p' Q'. g' = (Attacker_Delayed p' Q')) \<or> (\<exists> p' Q'. g' = (Defender_Conj p' Q'))"
@@ -321,7 +321,6 @@ next
           using strategy_formula_strategy_formula_inner_strategy_formula_conjunct.delay by blast
         have "expressiveness_price (Internal \<chi>) \<le> e"
           using \<open>(strategy_formula_inner (Attacker_Delayed p Q') e \<chi> \<and> expr_pr_inner \<chi> \<le> e)\<close>
-expr_internal_eq
           by auto
         then show ?case 
           using \<open>strategy_formula (Attacker_Immediate p Q) e (Internal \<chi>)\<close>
@@ -357,7 +356,6 @@ expr_internal_eq
   
           hence "strategy_formula (Attacker_Immediate p Q) e \<phi>"
             using strategy_formula_strategy_formula_inner_strategy_formula_conjunct.delay early_conj True
-            
             by (metis \<open>in_wina e (Defender_Conj p Q')\<close> local.finishing_or_early_conj)
           have "expressiveness_price \<phi> \<le> e"
             using \<open>strategy_formula (Defender_Conj p Q') e \<phi> \<and> expressiveness_price \<phi> \<le> e\<close> by blast
