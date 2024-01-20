@@ -3,7 +3,56 @@ theory Expressiveness_Price
 begin
 
 section \<open>The expressiveness price function\<close>
+
+text \<open>
+The expressiveness price function assigns a price - an eight element tuple - to a \<open>hml_srbb\<close> formula.
+It may be defined as a single function:
+\begin{align*}
+  expr(\top) := expr^\varepsilon(\top) :=& 0 \\
+  expr(\langle\varepsilon\rangle\chi) :=& expr^\varepsilon(\chi) \\
+  expr(\bigwedge\Psi) :=& \hat{e}_5 + expr^\varepsilon(\bigwedge\Psi) \\
+  expr^\varepsilon((\alpha)\varphi) :=& \hat{e}_1 + expr(\varphi) \\
+  expr^\varepsilon(\bigwedge(\{(\alpha)\varphi\} \cup \Psi)) :=& \hat{e}_2 + expr^\varepsilon(\bigwedge(\{\langle\varepsilon\rangle(\alpha)\varphi\} \cup \Psi \setminus \{(\alpha)\varphi\})) \\
+  expr^\varepsilon(\bigwedge\Psi) :=& \sup \{expr^\wedge(\psi) | \psi \in \Psi\} + 
+    \begin{cases}
+      \hat{e}_4 & \text{if} \neg\langle\tau\rangle\top \in \Psi \\
+      \hat{e}_3 & \text{otherwise}
+    \end{cases} \\
+  expr^\wedge(\neg\langle\tau\rangle\top) :=&  0 \\
+  expr^\wedge(\neg\varphi) :=& \sup \{\hat{e}_8 + expr(\varphi), (0,0,0,0,0,0,expr_1(\varphi),0)\} \\
+  expr^\wedge(\varphi) :=& \sup \{expr(\varphi), (0,0,0,0,0,expr_1(\varphi),0,0)\}
+\end{align*}
+
+The eight dimensions are intended to measure the following properties of formulas:
+\begin{enumerate}
+  \item Modal depth (of observations $\langle\alpha\rangle$, $(\alpha)$),
+  \item Depth of branching conjunctions (with one observation clause not starting with $\langle\varepsilon\rangle$),
+  \item Depth of instable conjunctions (that do not enforce stability by a $\neg\langle\tau\rangle\top$-conjunct),
+  \item Depth of stable conjunctions (that do enforce stability by a $\neg\langle\tau\rangle\top$-conjunct),
+  \item Depth of immediate conjunctions (that are not preceded by $\langle\varepsilon\rangle$),
+  \item Maximal modal depth of positive clauses in conjunctions,
+  \item Maximal modal depth of negative clauses in conjunctions,
+  \item Depth of negations
+\end{enumerate}
+
+Instead of defining the expressiveness price function in one go, we instead define eight functions (one for each dimension)
+and then use them in combination to build the result tupel.\\
+
+Note that, since all these functions stem from the above singular function, they all look very similar,
+and differ mostly in where the $1+$ is placed.
+\<close>
+
 subsection \<open>Modal depth\<close>
+
+text \<open>
+(Maximal) Modal depth (of observations $\langle\alpha\rangle$, $(\alpha)$)\\
+
+This counter is increased on each:
+\begin{itemize}
+  \item \<open>Obs\<close>
+  \item \<open>BranchConj\<close>
+\end{itemize}
+\<close>
 
 primrec
       modal_depth_srbb :: "('act, 'i) hml_srbb \<Rightarrow> enat"
@@ -58,11 +107,25 @@ lemma "modal_depth_srbb (ImmConj \<nat> (\<lambda>n. Pos (Obs \<alpha> (observe_
         and modal_depth_srbb_conjunct.simps(1)
         and modal_depth_srbb_inner.simps(1)
         and obs_n_\<alpha>_depth_n
-  by (rule sucs_of_nats_in_enats_sup_infinite)
+  by (metis sucs_of_nats_in_enats_sup_infinite) 
+
 
 subsection \<open>Depth of branching conjunctions\<close>
 
-primrec branching_conjunction_depth :: "('a, 's) hml_srbb \<Rightarrow> enat"
+text \<open>
+Depth of branching conjunctions (with one observation clause not starting with $\langle\varepsilon\rangle$)\\
+
+This counter is increased on each:
+\begin{itemize}
+  \item \<open>BranchConj\<close> if there are other conjuncts besides the branching conjunct
+\end{itemize}
+
+Note that if the \<open>BranchConj\<close> is empty (i.e. has no other conjuncts),
+then it is treated like a simple \<open>Obs\<close>.
+\<close>
+
+primrec
+      branching_conjunction_depth :: "('a, 's) hml_srbb \<Rightarrow> enat"
   and branch_conj_depth_inner :: "('a, 's) hml_srbb_inner \<Rightarrow> enat"
   and branch_conj_depth_conjunct :: "('a, 's) hml_srbb_conjunct \<Rightarrow> enat" where
   "branching_conjunction_depth TT = 0" |
@@ -72,33 +135,73 @@ primrec branching_conjunction_depth :: "('a, 's) hml_srbb \<Rightarrow> enat"
   "branch_conj_depth_inner (Obs _ \<phi>) = branching_conjunction_depth \<phi>" |
   "branch_conj_depth_inner (Conj I \<psi>s) = Sup ((branch_conj_depth_conjunct \<circ> \<psi>s) ` I)" |
   "branch_conj_depth_inner (StableConj I \<psi>s) = Sup ((branch_conj_depth_conjunct \<circ> \<psi>s) ` I)" |
-  "branch_conj_depth_inner (BranchConj _ \<phi> I \<psi>s) = 1 + Sup ({branching_conjunction_depth \<phi>} \<union> ((branch_conj_depth_conjunct \<circ> \<psi>s) ` I))" |
+  "branch_conj_depth_inner (BranchConj _ \<phi> I \<psi>s) =
+    (if I = {}
+     then branching_conjunction_depth \<phi>
+     else 1 + Sup ({branching_conjunction_depth \<phi>} \<union> ((branch_conj_depth_conjunct \<circ> \<psi>s) ` I)))" |
 
   "branch_conj_depth_conjunct (Pos \<chi>) = branch_conj_depth_inner \<chi>" |
   "branch_conj_depth_conjunct (Neg \<chi>) = branch_conj_depth_inner \<chi>" 
 
+
 subsection \<open>Depth of instable conjunctions\<close>
 
+text \<open>
+Depth of instable conjunctions (that do not enforce stability by a $\neg\langle\tau\rangle\top$-conjunct)
+
+This counter is increased on each:
+\begin{itemize}
+  \item \<open>ImmConj\<close> if there are conjuncts (i.e. $\bigwedge\{\}$ is not counted)
+  \item \<open>Conj\<close> if there are conjuncts, (i.e. the conjunction is not empty)
+  \item \<open>BranchConj\<close> if there are other conjuncts besides the branching conjunct
+\end{itemize}
+
+Note that if the \<open>BranchConj\<close> is empty (i.e. has no other conjuncts),
+then it is treated like a simple \<open>Obs\<close>.
+\<close>
+
 primrec
-instable_conjunction_depth :: "('a, 's) hml_srbb \<Rightarrow> enat"
+      instable_conjunction_depth :: "('a, 's) hml_srbb \<Rightarrow> enat"
   and inst_conj_depth_inner :: "('a, 's) hml_srbb_inner \<Rightarrow> enat"
   and inst_conj_depth_conjunct :: "('a, 's) hml_srbb_conjunct \<Rightarrow> enat" where
   "instable_conjunction_depth TT = 0" |
   "instable_conjunction_depth (Internal \<chi>) = inst_conj_depth_inner \<chi>" |
-  "instable_conjunction_depth (ImmConj I \<psi>s) = 1 + Sup ((inst_conj_depth_conjunct \<circ> \<psi>s) ` I)" |
+  "instable_conjunction_depth (ImmConj I \<psi>s) =
+    (if I = {}
+     then 0
+     else 1 + Sup ((inst_conj_depth_conjunct \<circ> \<psi>s) ` I))" |
 
   "inst_conj_depth_inner (Obs _ \<phi>) = instable_conjunction_depth \<phi>" |
-  "inst_conj_depth_inner (Conj I \<psi>s) = 1 + Sup ((inst_conj_depth_conjunct \<circ> \<psi>s) ` I)" |
+  "inst_conj_depth_inner (Conj I \<psi>s) =
+    (if I = {} 
+     then 0
+     else 1 + Sup ((inst_conj_depth_conjunct \<circ> \<psi>s) ` I))" |
   "inst_conj_depth_inner (StableConj I \<psi>s) = Sup ((inst_conj_depth_conjunct \<circ> \<psi>s) ` I)" |
-  "inst_conj_depth_inner (BranchConj _ \<phi> I \<psi>s) = Sup ({instable_conjunction_depth \<phi>} \<union> ((inst_conj_depth_conjunct \<circ> \<psi>s) ` I))" |
+  "inst_conj_depth_inner (BranchConj _ \<phi> I \<psi>s) =
+    (if I = {}
+     then instable_conjunction_depth \<phi>
+     else 1 + Sup ({instable_conjunction_depth \<phi>} \<union> ((inst_conj_depth_conjunct \<circ> \<psi>s) ` I)))" |
 
   "inst_conj_depth_conjunct (Pos \<chi>) = inst_conj_depth_inner \<chi>" |
   "inst_conj_depth_conjunct (Neg \<chi>) = inst_conj_depth_inner \<chi>" 
 
+
 subsection \<open>Depth of stable conjunctions\<close>
 
+text \<open>
+Depth of stable conjunctions (that do enforce stability by a $\neg\langle\tau\rangle\top$-conjunct)
+
+This counter is increased on each:
+\begin{itemize}
+  \item \<open>StableConj\<close>
+\end{itemize}
+
+Note that if the \<open>StableConj\<close> is empty (i.e. has no other conjuncts),
+it is still counted!
+\<close>
+
 primrec
-stable_conjunction_depth :: "('a, 's) hml_srbb \<Rightarrow> enat"
+      stable_conjunction_depth :: "('a, 's) hml_srbb \<Rightarrow> enat"
   and st_conj_depth_inner :: "('a, 's) hml_srbb_inner \<Rightarrow> enat"
   and st_conj_depth_conjunct :: "('a, 's) hml_srbb_conjunct \<Rightarrow> enat" where
   "stable_conjunction_depth TT = 0" |
@@ -113,7 +216,17 @@ stable_conjunction_depth :: "('a, 's) hml_srbb \<Rightarrow> enat"
   "st_conj_depth_conjunct (Pos \<chi>) = st_conj_depth_inner \<chi>" |
   "st_conj_depth_conjunct (Neg \<chi>) = st_conj_depth_inner \<chi>" 
 
+
 subsection \<open>Depth of immediate conjunctions\<close>
+
+text \<open>
+Depth of immediate conjunctions (that are not preceded by $\langle\varepsilon\rangle$)
+
+This counter is increased on each:
+\begin{itemize}
+  \item \<open>ImmConj\<close> if there are conjuncts (i.e. $\bigwedge\{\}$ is not counted)
+\end{itemize}
+\<close>
 
 primrec
       immediate_conjunction_depth :: "('a, 's) hml_srbb \<Rightarrow> enat"
@@ -121,7 +234,10 @@ primrec
   and imm_conj_depth_conjunct :: "('a, 's) hml_srbb_conjunct \<Rightarrow> enat" where 
   "immediate_conjunction_depth TT = 0" |
   "immediate_conjunction_depth (Internal \<chi>) = imm_conj_depth_inner \<chi>" |
-  "immediate_conjunction_depth (ImmConj I \<psi>s) = 1 + Sup ((imm_conj_depth_conjunct \<circ> \<psi>s) ` I)" |
+  "immediate_conjunction_depth (ImmConj I \<psi>s) =
+    (if I = {}
+     then 0
+     else 1 + Sup ((imm_conj_depth_conjunct \<circ> \<psi>s) ` I))" |
 
   "imm_conj_depth_inner (Obs _ \<phi>) = immediate_conjunction_depth \<phi>" |
   "imm_conj_depth_inner (Conj I \<psi>s) = Sup ((imm_conj_depth_conjunct \<circ> \<psi>s) ` I)" |
@@ -130,6 +246,7 @@ primrec
 
   "imm_conj_depth_conjunct (Pos \<chi>) = imm_conj_depth_inner \<chi>" |
   "imm_conj_depth_conjunct (Neg \<chi>) = imm_conj_depth_inner \<chi>"
+
 
 section \<open>Maximal modal depth of positive clauses in conjunctions\<close>
 
@@ -283,6 +400,18 @@ lemma "expressiveness_price (Internal
                            then (Pos (Obs b TT))
                            else undefined)))))) = E 2 0 1 0 0 1 0 0"
   by simp
+
+lemma "expressiveness_price TT = E 0 0 0 0 0 0 0 0"
+  by simp
+
+lemma "expressiveness_price (ImmConj {} \<psi>s) = E 0 0 0 0 0 0 0 0"
+  by (simp add: Sup_enat_def)
+
+lemma "expressiveness_price (Internal (Conj {} \<psi>s)) = E 0 0 0 0 0 0 0 0"
+  by (simp add: Sup_enat_def)
+
+lemma "expressiveness_price (Internal (BranchConj \<alpha> TT {} \<psi>s)) = E 1 0 0 0 0 0 0 0"
+  by (simp add: Sup_enat_def)
 
 end
 
