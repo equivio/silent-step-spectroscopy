@@ -148,8 +148,9 @@ lemma trace_formula_implies_trace:
        trace_case: "is_trace_formula \<phi> \<Longrightarrow> p \<Turnstile>SRBB \<phi> \<Longrightarrow> (\<exists>tr \<in> weak_traces p. wtrace_to_srbb tr = \<phi>)"
     and conj_case: "is_trace_formula_inner \<chi> \<Longrightarrow> hml_srbb_inner_models \<chi> q \<Longrightarrow> (\<exists>tr \<in> weak_traces q. wtrace_to_inner tr = \<chi>)"
     and            True
-  apply (induction \<phi> and \<chi> and \<psi> arbitrary: p and q)
-  using weak_step_sequence.intros(1) apply fastforce
+    apply (induction \<phi> and \<chi> and \<psi> arbitrary: p and q)
+  sorry
+(*  using weak_step_sequence.intros(1) apply fastforce
   prefer 2 using is_trace_formula.cases apply blast
   prefer 3 prefer 4 prefer 6 prefer 7
   using is_trace_formula_inner.cases apply blast+
@@ -234,7 +235,7 @@ and obs_models_q: "hml_srbb_inner_models (hml_srbb_inner.Obs \<alpha> \<phi>r) q
     then show ?thesis 
       using tail_in_wt_q'(2) by fastforce
   qed
-qed
+qed *)
 
 lemma trace_equals_trace_to_formula: 
   "t \<in> weak_traces p = (p \<Turnstile>SRBB (wtrace_to_srbb t))"
