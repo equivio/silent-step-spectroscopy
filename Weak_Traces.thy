@@ -7,11 +7,7 @@ inductive
   and is_trace_formula_inner :: "('act, 'i) hml_srbb_inner \<Rightarrow> bool" where
   "is_trace_formula TT" |
   "is_trace_formula (Internal \<chi>)" if "is_trace_formula_inner \<chi>" |
-  "is_trace_formula (ImmConj I \<psi>s)" if "I = {}" |
-
-  "is_trace_formula_inner (Obs \<alpha> \<phi>)" if "is_trace_formula \<phi>" |
-  "is_trace_formula_inner (Conj I \<psi>s)" if "I = {}" |
-  "is_trace_formula_inner (BranchConj \<alpha> \<phi> I \<psi>s)" if "I = {}" and "is_trace_formula \<phi>"
+  "is_trace_formula_inner (Obs \<alpha> \<phi>)" if "is_trace_formula \<phi>"
 
 
 fun wtrace_to_srbb :: "'act list \<Rightarrow> ('act, 'i) hml_srbb"
@@ -29,7 +25,7 @@ lemma trace_to_srbb_is_trace_formula:
   "is_trace_formula (wtrace_to_srbb trace)"
   apply (induct trace)
   using is_trace_formula_is_trace_formula_inner.intros
-  by (simp add: is_trace_formula.simps is_trace_formula_is_trace_formula_inner.intros(4))+
+  by fastforce+
 
 lemma trace_formula_to_expressiveness:
   fixes \<phi> :: "('act, 'i) hml_srbb"
@@ -37,7 +33,7 @@ lemma trace_formula_to_expressiveness:
   shows  "(is_trace_formula \<phi>             \<longrightarrow> (\<phi> \<in> \<O> (E \<infinity> 0 0 0 0 0 0 0)))
         \<and> (is_trace_formula_inner \<chi> \<longrightarrow> (\<chi> \<in> \<O>_inner (E \<infinity> 0 0 0 0 0 0 0)))"
   apply (rule is_trace_formula_is_trace_formula_inner.induct)
-  by (simp add: Sup_enat_def \<O>_def \<O>_inner_def leq_not_eneg)+
+  by (simp add: \<O>_def \<O>_inner_def leq_not_eneg)+
 
 lemma expressiveness_to_trace_formula:
   fixes \<phi> :: "('act, 'i) hml_srbb"
@@ -48,96 +44,14 @@ lemma expressiveness_to_trace_formula:
   apply (rule hml_srbb_hml_srbb_inner_hml_srbb_conjunct.induct)
   using is_trace_formula_is_trace_formula_inner.intros(1) apply blast
   apply (simp add: \<O>_inner_def \<O>_def is_trace_formula_is_trace_formula_inner.intros(2))
-  apply (simp add: \<O>_def leq_not_eneg)
-  apply auto
-  apply (simp add: is_trace_formula_is_trace_formula_inner.intros(3))
-proof -
-  fix \<alpha> \<phi>
-  assume "Obs \<alpha> \<phi> \<in> \<O>_inner (E \<infinity> 0 0 0 0 0 0 0)"
-    and "\<phi> \<notin> \<O> (E \<infinity> 0 0 0 0 0 0 0)"
-  from \<open>Obs \<alpha> \<phi> \<in> \<O>_inner (E \<infinity> 0 0 0 0 0 0 0)\<close>
-  have "expr_pr_inner (Obs \<alpha> \<phi>) \<le> E \<infinity> 0 0 0 0 0 0 0"
-    using \<O>_inner_def by blast
-  hence "expressiveness_price \<phi> \<le> E \<infinity> 0 0 0 0 0 0 0"
-    by (simp add: leq_not_eneg)
-  then have "\<phi> \<in> \<O> (E \<infinity> 0 0 0 0 0 0 0)"
-    using \<O>_def by blast
-  with \<open>\<phi> \<notin> \<O> (E \<infinity> 0 0 0 0 0 0 0)\<close>
-  show "is_trace_formula_inner (Obs \<alpha> \<phi>)" by contradiction
-next
-  fix \<alpha> \<phi>
-  assume "Obs \<alpha> \<phi> \<in> \<O>_inner (E \<infinity> 0 0 0 0 0 0 0)"
-    and "is_trace_formula \<phi>"
-  then show "is_trace_formula_inner (Obs \<alpha> \<phi>)"
-    by (simp add: is_trace_formula_is_trace_formula_inner.intros(4))
-next
-  fix I \<psi>s
-  assume "Conj I \<psi>s \<in> \<O>_inner (E \<infinity> 0 0 0 0 0 0 0)"
-  hence "expr_pr_inner (Conj I \<psi>s) \<le> E \<infinity> 0 0 0 0 0 0 0" 
-    using \<O>_inner_def by blast
-
-  have "I = {}"
-    apply (rule ccontr)
-    using \<open>expr_pr_inner (Conj I \<psi>s) \<le> E \<infinity> 0 0 0 0 0 0 0\<close> 
-    by (simp add: leq_not_eneg)
-
-  then show "is_trace_formula_inner (Conj I \<psi>s)"
-    by (simp add: is_trace_formula_is_trace_formula_inner.intros(5))
-next
-  fix I \<psi>s
-  assume "StableConj I \<psi>s \<in> \<O>_inner (E \<infinity> 0 0 0 0 0 0 0)"
-  then show "is_trace_formula_inner (StableConj I \<psi>s)" 
-    by (simp add: \<O>_inner_def leq_not_eneg)
-next
-  fix \<alpha> \<phi> I \<psi>s
-  assume "BranchConj \<alpha> \<phi> I \<psi>s \<in> \<O>_inner (E \<infinity> 0 0 0 0 0 0 0)"
-     and "\<phi> \<notin> \<O> (E \<infinity> 0 0 0 0 0 0 0)"
-
-
-  from \<open>BranchConj \<alpha> \<phi> I \<psi>s \<in> \<O>_inner (E \<infinity> 0 0 0 0 0 0 0)\<close>
-  have "expr_pr_inner (BranchConj \<alpha> \<phi> I \<psi>s) \<le> E \<infinity> 0 0 0 0 0 0 0"
-    unfolding \<O>_inner_def by simp
-
-  have "I = {}"
-    apply (rule ccontr)
-    using \<open>expr_pr_inner (BranchConj \<alpha> \<phi> I \<psi>s) \<le> E \<infinity> 0 0 0 0 0 0 0\<close> 
-    using leq_not_eneg by auto
-
-  from \<open>expr_pr_inner (BranchConj \<alpha> \<phi> I \<psi>s) \<le> E \<infinity> 0 0 0 0 0 0 0\<close>
-  have "expressiveness_price \<phi> \<le> E \<infinity> 0 0 0 0 0 0 0"
-    unfolding expr_pr_inner.simps 
-          and modal_depth_srbb_inner.simps
-          and branch_conj_depth_inner.simps
-          and inst_conj_depth_inner.simps
-          and st_conj_depth_inner.simps
-          and imm_conj_depth_inner.simps
-          and max_pos_conj_depth_inner.simps
-          and max_neg_conj_depth_inner.simps
-          and neg_depth_inner.simps
-          and \<open>I = {}\<close> 
-    by (simp add: leq_not_eneg)
-  then have "\<phi> \<in> \<O> (E \<infinity> 0 0 0 0 0 0 0)"
-    using \<O>_def by auto
-
-  with \<open>\<phi> \<notin> \<O> (E \<infinity> 0 0 0 0 0 0 0)\<close>
-  show "is_trace_formula_inner (BranchConj \<alpha> \<phi> I \<psi>s)" by contradiction
-next
-  fix \<alpha> \<phi> I \<psi>s
-  assume "BranchConj \<alpha> \<phi> I \<psi>s \<in> \<O>_inner (E \<infinity> 0 0 0 0 0 0 0)"
-     and "is_trace_formula \<phi>"
-
-  from \<open>BranchConj \<alpha> \<phi> I \<psi>s \<in> \<O>_inner (E \<infinity> 0 0 0 0 0 0 0)\<close>
-  have "I = {}" 
-    by (metis \<O>_inner_def add_eq_0_iff_both_eq_0 bot.extremum_uniqueI bot_enat_def branch_conj_depth_inner.simps(4) energy.distinct(1) energy.sel(2) expr_pr_inner.simps leq_not_eneg mem_Collect_eq zero_one_enat_neq(2))
-
-  with \<open>is_trace_formula \<phi>\<close>
-  show "is_trace_formula_inner (BranchConj \<alpha> \<phi> I \<psi>s)"
-    by (simp add: is_trace_formula_is_trace_formula_inner.intros(6))
-qed
+        apply (simp add: \<O>_def leq_not_eneg)
+  oops
+  (*by (simp add: \<O>_inner_def \<O>_def is_trace_formula_is_trace_formula_inner.intros(3) leq_not_eneg)+*)
 
 lemma modal_depth_only_is_trace_form: 
   "(is_trace_formula \<phi>) = (\<phi> \<in> \<O> (E \<infinity> 0 0 0 0 0 0 0))"
-  using expressiveness_to_trace_formula trace_formula_to_expressiveness by blast
+  oops
+  (* using expressiveness_to_trace_formula trace_formula_to_expressiveness by blast *)
 
 context Inhabited_Tau_LTS
 begin                 
@@ -148,9 +62,8 @@ lemma trace_formula_implies_trace:
        trace_case: "is_trace_formula \<phi> \<Longrightarrow> p \<Turnstile>SRBB \<phi> \<Longrightarrow> (\<exists>tr \<in> weak_traces p. wtrace_to_srbb tr = \<phi>)"
     and conj_case: "is_trace_formula_inner \<chi> \<Longrightarrow> hml_srbb_inner_models \<chi> q \<Longrightarrow> (\<exists>tr \<in> weak_traces q. wtrace_to_inner tr = \<chi>)"
     and            True
-    apply (induction \<phi> and \<chi> and \<psi> arbitrary: p and q)
-  sorry
-(*  using weak_step_sequence.intros(1) apply fastforce
+  apply (induction \<phi> and \<chi> and \<psi> arbitrary: p and q)
+  using weak_step_sequence.intros(1) apply fastforce
   prefer 2 using is_trace_formula.cases apply blast
   prefer 3 prefer 4 prefer 6 prefer 7
   using is_trace_formula_inner.cases apply blast+
@@ -235,7 +148,7 @@ and obs_models_q: "hml_srbb_inner_models (hml_srbb_inner.Obs \<alpha> \<phi>r) q
     then show ?thesis 
       using tail_in_wt_q'(2) by fastforce
   qed
-qed *)
+qed
 
 lemma trace_equals_trace_to_formula: 
   "t \<in> weak_traces p = (p \<Turnstile>SRBB (wtrace_to_srbb t))"
@@ -377,20 +290,22 @@ lemma expr_preorder_characterizes_relational_preorder_traces: "(p \<lesssim>WT q
 proof
   assume "p \<lesssim>WT q"
   then show "\<forall>\<phi>\<in>\<O> (E \<infinity> 0 0 0 0 0 0 0). p \<Turnstile>SRBB \<phi> \<longrightarrow> q \<Turnstile>SRBB \<phi>"
-    using aux expressiveness_to_trace_formula weakly_trace_preordered_def
-    by blast+
+    oops
+    (* using aux expressiveness_to_trace_formula weakly_trace_preordered_def
+    by blast+ 
 next
   assume \<phi>_eneg: "\<forall>\<phi>\<in>\<O> (E \<infinity> 0 0 0 0 0 0 0). p \<Turnstile>SRBB \<phi> \<longrightarrow> q \<Turnstile>SRBB \<phi>"
   show "p \<lesssim>WT q"
     unfolding weakly_trace_preordered_def
     using \<phi>_eneg trace_equals_trace_to_formula trace_formula_to_expressiveness trace_to_srbb_is_trace_formula
     by (simp, blast+)
-qed
+qed *)
 
 lemma "(p \<simeq>WT q) = (p \<sim> (E \<infinity> 0 0 0 0 0 0 0) q)"
   unfolding weakly_trace_equivalent_def expr_equiv_def \<O>_def hml_equivalent_def hml_preordered_def
-  using expr_preorder_characterizes_relational_preorder_traces
-  by (simp add: \<O>_def expr_preord_def hml_preordered_def) 
+  oops
+  (* using expr_preorder_characterizes_relational_preorder_traces
+  by (simp add: \<O>_def expr_preord_def hml_preordered_def) *)
 end
 
 end
