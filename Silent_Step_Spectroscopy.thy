@@ -54,7 +54,8 @@ lemma strategy_formulas_distinguish:
       | Attacker_Branch p Q \<Rightarrow> True))"
 proof(induction rule: strategy_formula_strategy_formula_inner_strategy_formula_conjunct.induct)
   case (delay p Q e \<chi>)
-  then show ?case sorry
+  then show ?case
+    by (smt (verit) distinguishes_from_def option.discI silent_reachable.intros(1) silent_reachable_trans spectroscopy_moves.simps(1) spectroscopy_position.simps(50) spectroscopy_position.simps(53))
 next
   case (procrastination p Q e \<chi>)
   then show ?case sorry
@@ -63,7 +64,8 @@ next
   then show ?case sorry
 next
   case (early_conj Q p Q' e \<phi>)
-  then show ?case sorry
+  then show ?case
+    by (smt (verit, del_insts) local.finishing_or_early_conj option.distinct(1) spectroscopy_position.simps(50) spectroscopy_position.simps(55))
 next
   case (late_conj p Q e \<chi>)
   then show ?case sorry
