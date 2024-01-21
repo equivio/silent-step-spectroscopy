@@ -131,7 +131,22 @@ next
   then show ?case by simp 
 next
   case (pos p q e \<chi>)
-  then show ?case sorry
+  then obtain Q' where IH: "spectroscopy_moves (Attacker_Clause p q) (Attacker_Delayed p Q') = Some min1_6 \<and>
+       in_wina (min1_6 e) (Attacker_Delayed p Q') \<and>
+       strategy_formula_inner (Attacker_Delayed p Q') (min1_6 e) \<chi> \<and>
+       (case Attacker_Delayed p Q' of Attacker_Delayed p Q \<Rightarrow> Q \<Zsurj>S Q \<longrightarrow> distinguishes_from (hml_srbb.Internal \<chi>) p Q
+        | Defender_Branch p \<alpha> p' Q Qa \<Rightarrow> Qa \<inter> Q = {} \<longrightarrow> distinguishes_from_inner \<chi> p (Q \<union> Qa)
+        | Defender_Conj p Q \<Rightarrow> distinguishes_from_inner \<chi> p Q
+        | Defender_Stable_Conj p Q \<Rightarrow> (\<forall>q. \<not> p \<mapsto>\<tau> q) \<longrightarrow> distinguishes_from_inner \<chi> p Q | _ \<Rightarrow> True)" by auto
+  hence "Q' \<Zsurj>S Q' \<longrightarrow> distinguishes_from (hml_srbb.Internal \<chi>) p Q'" by simp
+  have "spectroscopy_moves (Attacker_Clause p q) (Attacker_Delayed p Q')= Some min1_6" using IH by simp
+  hence "{q} \<Zsurj>S Q'" using spectroscopy_moves.simps
+    by (metis (no_types, lifting) option.discI) 
+  have "Q' \<Zsurj>S Q' \<longrightarrow> q \<in> Q'"
+    by (simp add: \<open>{q} \<Zsurj>S Q'\<close> silent_reachable.intros(1)) 
+  hence "distinguishes_conjunct (hml_srbb_conjunct.Pos \<chi>) p q"
+    by (smt (verit, ccfv_threshold) LTS_Tau.silent_reachable_trans \<open>Q' \<Zsurj>S Q' \<longrightarrow> distinguishes_from (hml_srbb.Internal \<chi>) p Q'\<close> \<open>{q} \<Zsurj>S Q'\<close> distinguishes_conjunct_def distinguishes_def distinguishes_from_def hml_conjunct_models.simps(1) hml_srbb_conjunct_models.elims(2) hml_srbb_conjunct_models.elims(3) hml_srbb_conjunct_to_hml_conjunct.simps(1) hml_srbb_models.elims(1) hml_srbb_to_hml.simps(2) silent_reachable.intros(1)) 
+  then show ?case by simp
 next
   case (neg p q e P' \<chi>)
   then show ?case sorry
