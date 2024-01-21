@@ -86,7 +86,11 @@ next
        | Defender_Conj p Q \<Rightarrow> distinguishes_from \<phi> p Q | _ \<Rightarrow> True)) \<and>
      p \<mapsto>\<alpha> p' \<and> Q \<mapsto>S \<alpha> Q' " by auto
   hence D: "distinguishes_from \<phi> p' Q'" by auto 
-  hence "p' \<Turnstile>SRBB \<phi>" using distinguishes_from_def distinguishes_def sorry (* should work?! *)
+  hence D1: "\<forall>q\<in> Q'. distinguishes \<phi> p' q" using distinguishes_from_def by auto 
+  have "\<exists>q. q \<in> Q'" sorry (* does this hold? *)
+  then obtain q where "q\<in> Q'" by auto
+  hence "distinguishes \<phi> p' q" using D1 by simp
+  hence "p' \<Turnstile>SRBB \<phi>" using distinguishes_def by auto 
   from IH have "p \<mapsto>\<alpha> p'" and "Q \<mapsto>S \<alpha> Q'" by auto 
   hence P: "p \<Turnstile>SRBB (Internal (Obs \<alpha> \<phi>))" using \<open>p' \<Turnstile>SRBB \<phi>\<close>
     using silent_reachable.intros(1) by auto
@@ -170,14 +174,28 @@ next
     using spectroscopy_position.distinct(41) strategy_formula.cases by auto 
 next
   case (stable_conj Q p e \<Phi>)
-  then show ?case sorry
+  hence "\<forall>q\<in> Q. distinguishes_conjunct (\<Phi> q) p q" by simp
+  have "(\<forall>q. \<not> p \<mapsto>\<tau> q) \<longrightarrow> distinguishes_from_inner (StableConj Q \<Phi>) p Q" sorry
+  then show ?case by simp
 next
   case (branch p Q p'' e \<chi>)
   then show ?case
     by (smt (verit) full_spec_game.strategy_formula.cases full_spec_game_axioms spectroscopy_position.distinct(31) spectroscopy_position.distinct(37) spectroscopy_position.distinct(7))
 next
   case (branch_conj p \<alpha> p' Q Q\<alpha> e e' \<psi> \<Phi> Qa)
-  then show ?case sorry
+  then obtain Q' where IH_BB: "spectroscopy_moves (Defender_Branch p \<alpha> p' Q Q\<alpha>) (Attacker_Branch p' Q') =
+         Some (min1_6 \<circ> (\<lambda>x. x - E 0 1 1 0 0 0 0 0)) \<and>
+         spectroscopy_moves (Attacker_Branch p' Q') (Attacker_Immediate p' Q') = subtract 1 0 0 0 0 0 0 0 \<and>
+         in_wina (min1_6 (e - E 0 1 1 0 0 0 0 0) - E 1 0 0 0 0 0 0 0) (Attacker_Immediate p' Q') \<and>
+         strategy_formula (Attacker_Immediate p' Q') e' \<psi> \<and>
+         (case Attacker_Immediate p' Q' of Attacker_Immediate p Q \<Rightarrow> distinguishes_from \<psi> p Q
+          | Attacker_Delayed p Q \<Rightarrow>
+              Q \<Zsurj>S Q \<longrightarrow>
+              strategy_formula_inner (Attacker_Immediate p' Q') e' \<chi> \<and> Q \<Zsurj>S Q \<longrightarrow>
+              distinguishes_from (hml_srbb.Internal \<chi>) p Q
+          | Defender_Conj p Q \<Rightarrow> distinguishes_from \<psi> p Q | _ \<Rightarrow> True)" by auto
+  have " Qa \<inter> Q = {} \<longrightarrow> distinguishes_from_inner (BranchConj \<alpha> \<psi> Q \<Phi>) p (Q \<union> Qa)" sorry
+  then show ?case by simp
 qed
 
 theorem spectroscopy_game_correctness:
