@@ -83,13 +83,15 @@ next
   then show ?case sorry
 next
   case (stable p Q e \<chi>)
-  then show ?case sorry
+  then show ?case
+    using spectroscopy_position.distinct(41) strategy_formula.cases by auto 
 next
   case (stable_conj Q p e \<Phi>)
   then show ?case sorry
 next
   case (branch p Q p'' e \<chi>)
-  then show ?case sorry
+  then show ?case
+    by (smt (verit) full_spec_game.strategy_formula.cases full_spec_game_axioms spectroscopy_position.distinct(31) spectroscopy_position.distinct(37) spectroscopy_position.distinct(7))
 next
   case (branch_conj p \<alpha> p' Q Q\<alpha> e e' \<psi> \<Phi> Qa)
   then show ?case sorry
