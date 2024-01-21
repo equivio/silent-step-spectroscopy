@@ -120,10 +120,85 @@ begin
 lemma trace_formula_implies_trace:
   fixes \<psi> ::"('a, 's) hml_srbb_conjunct"
   shows
-       trace_case: "is_trace_formula \<phi> \<Longrightarrow> p \<Turnstile>SRBB \<phi> \<Longrightarrow> (\<exists>tr \<in> weak_traces p. wtrace_to_srbb tr = \<phi>)"
-    and conj_case: "is_trace_formula_inner \<chi> \<Longrightarrow> hml_srbb_inner_models \<chi> q \<Longrightarrow> (\<exists>tr \<in> weak_traces q. wtrace_to_inner tr = \<chi>)"
+       trace_case: "is_trace_formula \<phi> \<Longrightarrow> p \<Turnstile>SRBB \<phi> \<Longrightarrow> (\<exists>tr \<in> weak_traces p. wtrace_to_srbb tr \<Lleftarrow>srbb\<Rrightarrow> \<phi>)"
+    and conj_case: "is_trace_formula_inner \<chi> \<Longrightarrow> hml_srbb_inner_models \<chi> q \<Longrightarrow> (\<exists>tr \<in> weak_traces q. wtrace_to_inner tr \<Lleftarrow>\<chi>\<Rrightarrow> \<chi>)"
     and            True
-    apply (induction \<phi> and \<chi> and \<psi> arbitrary: p and q)
+proof (induction \<phi> and \<chi> and \<psi> arbitrary: p and q)
+  case TT
+  then have "[] \<in> weak_traces p" 
+    using weak_step_sequence.intros(1) silent_reachable.intros(1) by fastforce
+  moreover have "wtrace_to_srbb [] \<Lleftarrow>srbb\<Rrightarrow> TT"
+    unfolding wtrace_to_srbb.simps
+    using hml_srbb_eq_equiv 
+    by (simp add: equivp_reflp)
+  ultimately show ?case by auto
+next
+  case (Internal \<chi>)
+
+  from \<open>is_trace_formula (Internal \<chi>)\<close>
+  have "is_trace_formula_inner \<chi>" 
+    using is_trace_formula.cases by auto
+
+  from \<open>p \<Turnstile>SRBB Internal \<chi>\<close>
+  have "\<exists>p'. p \<Zsurj> p' \<and> p' \<Turnstile> hml_srbb_inner_to_hml \<chi>"
+    unfolding hml_srbb_models.simps and hml_srbb_to_hml.simps and hml_models.simps.
+  then obtain p' where "p \<Zsurj> p'" and "p' \<Turnstile> hml_srbb_inner_to_hml \<chi>" by auto
+  hence "hml_srbb_inner_models \<chi> p'"
+    unfolding hml_srbb_inner_models.simps by auto
+  with \<open>is_trace_formula_inner \<chi>\<close>
+  have "\<exists>tr\<in>weak_traces p'. wtrace_to_inner tr \<Lleftarrow>\<chi>\<Rrightarrow> \<chi>"
+    using Internal.IH by blast
+  then obtain tr where "tr \<in> weak_traces p'" and "wtrace_to_inner tr \<Lleftarrow>\<chi>\<Rrightarrow> \<chi>" by auto
+
+  from \<open>tr \<in> weak_traces p'\<close>
+   and \<open>p \<Zsurj> p'\<close>
+  have "tr \<in> weak_traces p"
+    using silent_prepend_weak_traces by auto
+
+  moreover from \<open>wtrace_to_inner tr \<Lleftarrow>\<chi>\<Rrightarrow> \<chi>\<close>
+  have "wtrace_to_srbb tr \<Lleftarrow>srbb\<Rrightarrow> Internal \<chi>"
+  proof (induct tr arbitrary: \<chi>)
+    case Nil
+    then have "(Conj {} (\<lambda>_. undefined)) \<Lleftarrow>\<chi>\<Rrightarrow> \<chi>"
+      unfolding wtrace_to_inner.simps.
+
+    with srbb_TT_is_\<chi>TT
+      and srbb_internal_subst
+    have "TT \<Lleftarrow>srbb\<Rrightarrow> Internal \<chi>" 
+      by blast
+
+    then show ?case
+      unfolding wtrace_to_srbb.simps.
+  next
+    case (Cons a tr)
+    then show ?case
+      unfolding wtrace_to_inner.simps and wtrace_to_srbb.simps
+      using internal_srbb_cong by auto
+    (* This is not truly an induction since the IH is not needed. *)
+  qed
+
+  ultimately show ?case by auto
+next
+  case (ImmConj I \<psi>s)
+  then show ?case sorry
+next
+  case (Obs \<alpha> \<phi>)
+  then show ?case sorry
+next
+  case (Conj I \<psi>s)
+  then show ?case sorry
+next
+  case (StableConj I \<psi>s)
+  then show ?case sorry
+next
+  case (BranchConj \<alpha> \<phi> I \<psi>s)
+  then show ?case sorry
+next
+  case (Pos \<chi>)
+  then show ?case by auto
+next
+  case (Neg \<chi>)
+  then show ?case by auto
   oops
   (*using weak_step_sequence.intros(1) apply fastforce
   prefer 2 using is_trace_formula.cases apply blast
@@ -263,7 +338,7 @@ next
   proof(induction t arbitrary: p)
     case Nil
     then show ?case
-      using weak_step_sequence.intros(1) by fastforce
+      using weak_step_sequence.intros(1) silent_reachable.intros(1) by auto
   next
     case (Cons a tail)
     hence "p \<Turnstile>SRBB (Internal (Obs a (wtrace_to_srbb tail)))"
