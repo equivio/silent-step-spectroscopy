@@ -266,7 +266,17 @@ lemma winning_budget_implies_strategy_formula:
          next
            assume "\<exists>p' q'. g' = Attacker_Clause p' q'"
            from this obtain p' q' where "g' = Attacker_Clause p' q'" by auto
+           hence "spectroscopy_moves (Defender_Conj p Q) (Attacker_Clause p' q') =  None" using 2 sorry
+           hence "p \<noteq> p' \<or> q' \<notin> Q"
+             by force 
            show ?thesis sorry
+           (*proof (rule disjE)
+             assume "p \<noteq> p'"
+             show ?thesis sorry
+           next
+             assume "q' \<notin> Q"
+             show ?thesis sorry
+           qed*)
          next
            assume "\<exists>p \<alpha> p' Q Qa. g' = Defender_Branch p \<alpha> p' Q Qa"
            from this obtain p \<alpha> p' Q Qa where "g' = Defender_Branch p \<alpha> p' Q Qa" by auto
