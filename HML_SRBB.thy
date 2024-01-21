@@ -147,6 +147,9 @@ lemma srbb_impl_to_hml_impl:
   using assms
   by (simp add: LTS_Tau.hml_impl_iffI hml_srbb_impl_def)
 
+lemma hml_srbb_impl_preord: "reflp (hml_srbb_impl) \<and> transp (hml_srbb_impl)"
+  by (metis hml_srbb_impl_def reflpI transpI)
+
 
 definition hml_srbb_impl_inner :: "('a, 's) hml_srbb_inner \<Rightarrow> ('a, 's) hml_srbb_inner \<Rightarrow> bool" (infix "\<chi>\<Rrightarrow>" 70) where
   "\<chi>l \<chi>\<Rrightarrow> \<chi>r \<equiv> \<forall>p. hml_srbb_inner_models \<chi>l p \<longrightarrow> hml_srbb_inner_models \<chi>r p"
@@ -173,11 +176,24 @@ subsection \<open> \<open>hml__srbb\<close> Equivalence \<close>
 definition hml_srbb_eq :: "('a, 's) hml_srbb \<Rightarrow> ('a, 's) hml_srbb \<Rightarrow> bool" (infix "\<Lleftarrow>srbb\<Rrightarrow>" 70) where
   "\<phi>l \<Lleftarrow>srbb\<Rrightarrow> \<phi>r \<equiv> \<phi>l \<Rrightarrow> \<phi>r \<and> \<phi>r \<Rrightarrow> \<phi>l"
 
+lemma hml_srbb_eq_equiv: "equivp (\<Lleftarrow>srbb\<Rrightarrow>)"
+  by (smt (verit, ccfv_threshold) equivpI hml_srbb_eq_def hml_srbb_impl_preord reflp_on_def sympI transpE transpI)
+
+
 definition hml_srbb_eq_inner :: "('a, 's) hml_srbb_inner \<Rightarrow> ('a, 's) hml_srbb_inner \<Rightarrow> bool" (infix "\<Lleftarrow>\<chi>\<Rrightarrow>" 70) where
   "\<chi>l \<Lleftarrow>\<chi>\<Rrightarrow> \<chi>r \<equiv> \<chi>l \<chi>\<Rrightarrow> \<chi>r \<and> \<chi>r \<chi>\<Rrightarrow> \<chi>l"
 
 definition hml_srbb_eq_conjunct :: "('a, 's) hml_srbb_conjunct \<Rightarrow> ('a, 's) hml_srbb_conjunct \<Rightarrow> bool" (infix "\<Lleftarrow>\<psi>\<Rrightarrow>" 70) where
   "\<psi>l \<Lleftarrow>\<psi>\<Rrightarrow> \<psi>r \<equiv> \<psi>l \<psi>\<Rrightarrow> \<psi>r \<and> \<psi>r \<psi>\<Rrightarrow> \<psi>l"
+
+
+subsection \<open> Substitution \<close>
+
+lemma srbb_internal_subst:
+  assumes "\<chi>l \<Lleftarrow>\<chi>\<Rrightarrow> \<chi>r"
+      and "\<phi> \<Lleftarrow>srbb\<Rrightarrow> (Internal \<chi>l)"
+    shows "\<phi> \<Lleftarrow>srbb\<Rrightarrow> (Internal \<chi>r)"
+  by (smt (verit) assms(1) assms(2) hml_impl_iffI hml_models.simps(3) hml_srbb_eq_def hml_srbb_eq_inner_def hml_srbb_impl_def hml_srbb_models.elims(2) hml_srbb_models.elims(3) hml_srbb_to_hml.simps(2) srbb_impl_inner_to_hml_impl)
 
 
 subsection \<open> Congruence \<close>
@@ -266,8 +282,11 @@ qed
 
 subsection \<open> Known Equivalence Elements \<close>
 
-lemma "Obs \<tau> TT \<Lleftarrow>\<chi>\<Rrightarrow> Conj {} \<psi>s"
+lemma srbb_obs_\<tau>_is_\<chi>TT: "Obs \<tau> TT \<Lleftarrow>\<chi>\<Rrightarrow> Conj {} \<psi>s"
   by (simp add: hml_srbb_eq_inner_def hml_srbb_impl_inner_def)
+
+lemma srbb_TT_is_\<chi>TT: "TT \<Lleftarrow>srbb\<Rrightarrow> Internal (Conj {} \<psi>s)"
+  using \<epsilon>T_is_T hml_eq_def hml_impl_iffI hml_srbb_eq_def hml_srbb_impl_def by auto
 
 subsection \<open> Distinguishing Conjunction Thinning \<close>
 
