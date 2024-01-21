@@ -288,6 +288,9 @@ lemma srbb_obs_\<tau>_is_\<chi>TT: "Obs \<tau> TT \<Lleftarrow>\<chi>\<Rrightarr
 lemma srbb_TT_is_\<chi>TT: "TT \<Lleftarrow>srbb\<Rrightarrow> Internal (Conj {} \<psi>s)"
   using \<epsilon>T_is_T hml_eq_def hml_impl_iffI hml_srbb_eq_def hml_srbb_impl_def by auto
 
+lemma srbb_TT_is_empty_conj: "TT \<Lleftarrow>srbb\<Rrightarrow> ImmConj {} \<psi>s"
+  by (simp add: hml_srbb_eq_def hml_srbb_impl_def)
+
 subsection \<open> Distinguishing Conjunction Thinning \<close>
 
 text \<open>
