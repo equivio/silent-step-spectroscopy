@@ -58,17 +58,19 @@ proof(induction rule: strategy_formula_strategy_formula_inner_strategy_formula_c
     by (smt (verit) distinguishes_from_def option.discI silent_reachable.intros(1) silent_reachable_trans spectroscopy_moves.simps(1) spectroscopy_position.simps(50) spectroscopy_position.simps(53))
 next
   case (procrastination p Q e \<chi>)
-  from this obtain p' where " spectroscopy_moves (Attacker_Delayed p Q) (Attacker_Delayed p' Q) = Some id \<and>
+  from this obtain p' where IH: "spectroscopy_moves (Attacker_Delayed p Q) (Attacker_Delayed p' Q) = Some id \<and>
        in_wina e (Attacker_Delayed p' Q) \<and>
        strategy_formula_inner (Attacker_Delayed p' Q) e \<chi> \<and>
        (case Attacker_Delayed p' Q of Attacker_Delayed p Q \<Rightarrow> Q \<Zsurj>S Q \<longrightarrow> distinguishes_from (hml_srbb.Internal \<chi>) p Q
         | Defender_Branch p \<alpha> p' Q Qa \<Rightarrow> Qa \<inter> Q = {} \<longrightarrow> distinguishes_from_inner \<chi> p (Q \<union> Qa)
         | Defender_Conj p Q \<Rightarrow> distinguishes_from_inner \<chi> p Q
         | Defender_Stable_Conj p Q \<Rightarrow> (\<forall>q. \<not> p \<mapsto>\<tau> q) \<longrightarrow> distinguishes_from_inner \<chi> p Q | _ \<Rightarrow> True)" by auto
-  hence IH: "Q \<Zsurj>S Q \<longrightarrow> distinguishes_from (hml_srbb.Internal \<chi>) p' Q"
+  hence D: "Q \<Zsurj>S Q \<longrightarrow> distinguishes_from (hml_srbb.Internal \<chi>) p' Q"
     using spectroscopy_position.simps(53) by fastforce
-  have "p \<Zsurj>p'" sorry
-  hence "Q \<Zsurj>S Q \<longrightarrow> distinguishes_from (hml_srbb.Internal \<chi>) p Q" using IH
+  from IH have "spectroscopy_moves (Attacker_Delayed p Q) (Attacker_Delayed p' Q) = Some id" by auto
+  hence "p \<Zsurj>p'"
+    by (metis option.discI silent_reachable.intros(1) silent_reachable_append_\<tau> spectroscopy_moves.simps(2)) 
+  hence "Q \<Zsurj>S Q \<longrightarrow> distinguishes_from (hml_srbb.Internal \<chi>) p Q" using D
     by (smt (verit, del_insts) distinguishes_def distinguishes_from_def hml_models.simps(3) hml_srbb_models.elims(2) hml_srbb_models.elims(3) hml_srbb_to_hml.simps(2) silent_reachable_trans)
   then show ?case by simp
 next
