@@ -180,7 +180,22 @@ next
   ultimately show ?case by auto
 next
   case (ImmConj I \<psi>s)
-  then show ?case sorry
+
+  from \<open>is_trace_formula (ImmConj I \<psi>s)\<close>
+  have "I = {}" 
+    by (simp add: is_trace_formula.simps)
+
+  have "[] \<in> weak_traces p" 
+    using silent_reachable.intros(1) weak_step_sequence.intros(1) by auto
+
+  from srbb_TT_is_empty_conj
+   and \<open>I = {}\<close>
+  have "wtrace_to_srbb [] \<Lleftarrow>srbb\<Rrightarrow> ImmConj I \<psi>s"
+    unfolding wtrace_to_srbb.simps by auto
+
+  from \<open>[] \<in> weak_traces p\<close>
+   and \<open>wtrace_to_srbb [] \<Lleftarrow>srbb\<Rrightarrow> ImmConj I \<psi>s\<close>
+  show "\<exists>tr\<in>weak_traces p. wtrace_to_srbb tr \<Lleftarrow>srbb\<Rrightarrow> ImmConj I \<psi>s" by auto
 next
   case (Obs \<alpha> \<phi>)
   then show ?case sorry
