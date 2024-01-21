@@ -49,12 +49,12 @@ proof-
             using expr_pr_conjunct.simps by blast
           have pos_upd: "(modal_depth_srbb_conjunct (Pos \<chi>)) = modal_depth_srbb_inner \<chi>"
             "(branch_conj_depth_conjunct (Pos \<chi>)) = branch_conj_depth_inner \<chi>"
-  "(inst_conj_depth_conjunct  (Pos \<chi>)) = inst_conj_depth_inner \<chi>"
-  "(st_conj_depth_conjunct    (Pos \<chi>)) = st_conj_depth_inner \<chi>"
-  "(imm_conj_depth_conjunct (Pos \<chi>)) = imm_conj_depth_inner \<chi>"
-  "(max_pos_conj_depth_conjunct (Pos \<chi>)) = modal_depth_srbb_inner \<chi>"
-  "(max_neg_conj_depth_conjunct (Pos \<chi>)) = max_neg_conj_depth_inner \<chi>"
-  "(neg_depth_conjunct            (Pos \<chi>)) = neg_depth_inner \<chi>"
+            "(inst_conj_depth_conjunct  (Pos \<chi>)) = inst_conj_depth_inner \<chi>"
+            "(st_conj_depth_conjunct    (Pos \<chi>)) = st_conj_depth_inner \<chi>"
+            "(imm_conj_depth_conjunct (Pos \<chi>)) = imm_conj_depth_inner \<chi>"
+            "(max_pos_conj_depth_conjunct (Pos \<chi>)) = modal_depth_srbb_inner \<chi>"
+            "(max_neg_conj_depth_conjunct (Pos \<chi>)) = max_neg_conj_depth_inner \<chi>"
+            "(neg_depth_conjunct            (Pos \<chi>)) = neg_depth_inner \<chi>"
             by simp+
           have "expr_pr_inner \<chi> \<le> (min1_6 e)"
             using assms 
@@ -89,13 +89,13 @@ proof-
               using expr_pr_conjunct.simps by blast
   
             have neg_ups: "modal_depth_srbb_conjunct (Neg \<chi>) = modal_depth_srbb_inner \<chi>" 
-  "(branch_conj_depth_conjunct (Neg \<chi>)) = branch_conj_depth_inner \<chi>"
-  "inst_conj_depth_conjunct (Neg \<chi>) = inst_conj_depth_inner \<chi>" 
-  "st_conj_depth_conjunct (Neg \<chi>) = st_conj_depth_inner \<chi>"
-  "imm_conj_depth_conjunct (Neg \<chi>) = imm_conj_depth_inner \<chi>"
-  "max_pos_conj_depth_conjunct (Neg \<chi>) = max_pos_conj_depth_inner \<chi>"
-  "max_neg_conj_depth_conjunct (Neg \<chi>) = modal_depth_srbb_inner \<chi>"
-  "neg_depth_conjunct (Neg \<chi>) = 1 + neg_depth_inner \<chi>" 
+                          "(branch_conj_depth_conjunct (Neg \<chi>)) = branch_conj_depth_inner \<chi>"
+                          "inst_conj_depth_conjunct (Neg \<chi>) = inst_conj_depth_inner \<chi>" 
+                          "st_conj_depth_conjunct (Neg \<chi>) = st_conj_depth_inner \<chi>"
+                          "imm_conj_depth_conjunct (Neg \<chi>) = imm_conj_depth_inner \<chi>"
+                          "max_pos_conj_depth_conjunct (Neg \<chi>) = max_pos_conj_depth_inner \<chi>"
+                          "max_neg_conj_depth_conjunct (Neg \<chi>) = modal_depth_srbb_inner \<chi>"
+                          "neg_depth_conjunct (Neg \<chi>) = 1 + neg_depth_inner \<chi>" 
               by simp+
 
           have "expr_pr_inner \<chi> \<le> (min1_7 (e - E 0 0 0 0 0 0 0 1))"
@@ -127,7 +127,7 @@ proof-
             
             have "neg_depth_inner \<chi> \<le> (e8-1)"
               using \<open>(min1_7 (e - E 0 0 0 0 0 0 0 1)) = (E (min e1 e7) e2 e3 e4 e5 e6 e7 (e8-1))\<close>
-\<open>e = E e1 e2 e3 e4 e5 e6 e7 e8\<close> \<open>expr_pr_inner \<chi> \<le> (min1_7 (e - E 0 0 0 0 0 0 0 1))\<close>
+                    \<open>e = E e1 e2 e3 e4 e5 e6 e7 e8\<close> \<open>expr_pr_inner \<chi> \<le> (min1_7 (e - E 0 0 0 0 0 0 0 1))\<close>
               using leq_not_eneg by force
             hence "neg_depth_conjunct (Neg \<chi>) \<le> e8"
               using \<open>neg_depth_conjunct (Neg \<chi>) = 1 + neg_depth_inner \<chi>\<close>
@@ -191,9 +191,9 @@ lemma winning_budget_implies_strategy_formula:
                  \<or> g' = (Attacker_Immediate p' Q')
                  \<or> g' = (Defender_Stable_Conj p' Q')
                  \<or> g' = (Attacker_Branch p' Q'))
-                 \<or> (\<exists>p' q'. g' = Defender_Conj p' q')
+                 \<or> (\<exists>p' q'. g' = (Attacker_Clause p' q')) 
                  \<or> (\<exists>p \<alpha> p' Q Qa. g' = Defender_Branch p \<alpha> p' Q Qa))"
-            sorry
+            by (meson spectroscopy_defender.cases)
         then show ?thesis sorry
       next
         case 2
@@ -216,15 +216,14 @@ lemma winning_budget_implies_strategy_formula:
       next
         case 2
         from 2 obtain g' where "spectroscopy_moves g g' =  None" by (rule exE)
-        have A1: "((\<exists>p' Q'. g' = (Attacker_Delayed p' Q') 
-                 \<or> g' = (Defender_Conj p' Q')
-                 \<or> g' = (Attacker_Immediate p' Q')
-                 \<or> g' = (Defender_Stable_Conj p' Q')
-                 \<or> g' = (Attacker_Branch p' Q'))
-                 \<or> (\<exists>p' q'. g' = Defender_Conj p' q')
-                 \<or> (\<exists>p \<alpha> p' Q Qa. g' = Defender_Branch p \<alpha> p' Q Qa))"
-           using spectroscopy_moves.simps
-           sorry
+        have A1:  "((\<exists>p' Q'. g' = (Attacker_Delayed p' Q') 
+                   \<or> g' = (Defender_Conj p' Q')
+                   \<or> g' = (Attacker_Immediate p' Q')
+                   \<or> g' = (Defender_Stable_Conj p' Q')
+                   \<or> g' = (Attacker_Branch p' Q'))
+                   \<or> (\<exists>p' q'. g' = (Attacker_Clause p' q')) 
+                   \<or> (\<exists>p \<alpha> p' Q Qa. g' = Defender_Branch p \<alpha> p' Q Qa))"
+          by (meson spectroscopy_defender.cases)
          then show ?thesis 
          proof (elim disjE)
            assume A2: "\<exists>p' Q'.
@@ -244,24 +243,29 @@ lemma winning_budget_implies_strategy_formula:
              then show ?thesis
              proof (elim disjE)
                assume "g' = Attacker_Delayed p' Q'"
+               from this have "spectroscopy_moves (Defender_Conj p Q) (Attacker_Delayed p' Q') =  None" by auto
                show ?thesis sorry
              next
                assume "g' = Defender_Conj p' Q'"
+               have "spectroscopy_moves (Defender_Conj p Q) (Defender_Conj p' Q') =  None" by auto
                show ?thesis sorry
              next
                assume "g' = Attacker_Immediate p' Q'"
+               have "spectroscopy_moves (Defender_Conj p Q) (Attacker_Immediate p' Q') =  None" by auto
                show ?thesis sorry
              next
                assume "g' = Defender_Stable_Conj p' Q'"
+               have "spectroscopy_moves (Defender_Conj p Q) (Defender_Stable_Conj p' Q') =  None" by auto
                show ?thesis sorry
              next 
                assume "g' = Attacker_Branch p' Q'"
+               have "spectroscopy_moves (Defender_Conj p Q) (Attacker_Branch p' Q') =  None" by auto
                show ?thesis sorry
              qed
            qed
          next
-           assume "\<exists>p' q'. g' = Defender_Conj p' q'"
-           from this obtain p' q' where "g' = Defender_Conj p' q'" by auto
+           assume "\<exists>p' q'. g' = Attacker_Clause p' q'"
+           from this obtain p' q' where "g' = Attacker_Clause p' q'" by auto
            show ?thesis sorry
          next
            assume "\<exists>p \<alpha> p' Q Qa. g' = Defender_Branch p \<alpha> p' Q Qa"
