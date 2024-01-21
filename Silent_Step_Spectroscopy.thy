@@ -148,7 +148,12 @@ next
     by (smt (verit, ccfv_threshold) LTS_Tau.silent_reachable_trans \<open>Q' \<Zsurj>S Q' \<longrightarrow> distinguishes_from (hml_srbb.Internal \<chi>) p Q'\<close> \<open>{q} \<Zsurj>S Q'\<close> distinguishes_conjunct_def distinguishes_def distinguishes_from_def hml_conjunct_models.simps(1) hml_srbb_conjunct_models.elims(2) hml_srbb_conjunct_models.elims(3) hml_srbb_conjunct_to_hml_conjunct.simps(1) hml_srbb_models.elims(1) hml_srbb_to_hml.simps(2) silent_reachable.intros(1)) 
   then show ?case by simp
 next
-  case (neg p q e P' \<chi>)
+  case (neg p q e P \<chi>) 
+  from this obtain P' where "spectroscopy_moves (Attacker_Clause p q) (Attacker_Delayed q P') = Some (min1_7 \<circ> (\<lambda>x. x - E 0 0 0 0 0 0 0 1))" by auto
+  hence "{p} \<Zsurj>S P'" using spectroscopy_moves.simps
+    by (metis (no_types, lifting) not_Some_eq) 
+  from neg have " P \<Zsurj>S P \<longrightarrow> distinguishes_from (hml_srbb.Internal \<chi>) q P" by simp
+  have "distinguishes_conjunct (hml_srbb_conjunct.Neg \<chi>) p q" sorry
   then show ?case sorry
 next
   case (stable p Q e \<chi>)
