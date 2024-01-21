@@ -368,10 +368,10 @@ where
   
   neg:
   "strategy_formula_conjunct (Attacker_Clause p q) e (Neg \<chi>)" 
-    if "(\<exists>P'. spectroscopy_moves (Attacker_Clause p q) (Attacker_Delayed q P') 
-      = Some (min1_7 \<circ> (\<lambda>x. x- E 0 0 0 0 0 0 0 1)
+    if "\<exists>P'. (spectroscopy_moves (Attacker_Clause p q) (Attacker_Delayed q P') 
+      = Some (min1_7 \<circ> (\<lambda>x. x- E 0 0 0 0 0 0 0 1))
         \<and> in_wina ((min1_7 (e - (E 0 0 0 0 0 0 0 1)))) (Attacker_Delayed q P'))
-        \<and> strategy_formula_inner (Attacker_Delayed q P') ((min1_7 (e - (E 0 0 0 0 0 0 0 1)))) \<chi>)" |
+        \<and> strategy_formula_inner (Attacker_Delayed q P') ((min1_7 (e - (E 0 0 0 0 0 0 0 1)))) \<chi>" |
   
   stable:
   "strategy_formula (Attacker_Delayed p Q) e \<chi>" 
