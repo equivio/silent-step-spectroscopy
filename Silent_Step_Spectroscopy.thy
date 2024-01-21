@@ -125,8 +125,15 @@ next
   then show ?case by simp 
 next
   case (conj Q p e \<Phi>)
-  hence "\<forall>q \<in> Q. distinguishes_conjunct (\<Phi> q) p q" by auto 
-  hence "distinguishes_from_inner (hml_srbb_inner.Conj Q \<Phi>) p Q" sorry (* Der Bezug von dis_conj zu dis_inner fehlt...*)
+  have "\<forall>q\<in>Q. distinguishes_inner (hml_srbb_inner.Conj Q \<Phi>) p q" proof 
+    fix q 
+    assume "q\<in> Q"
+    from conj have "\<forall>q \<in> Q. distinguishes_conjunct (\<Phi> q) p q" by auto 
+    hence "distinguishes_conjunct (\<Phi> q) p q" using \<open>q\<in> Q\<close> by auto
+    show "distinguishes_inner (hml_srbb_inner.Conj Q \<Phi>) p q" sorry (* Der Bezug von dis_conj zu dis_inner fehlt noch ...*)
+  qed
+  hence "distinguishes_from_inner (hml_srbb_inner.Conj Q \<Phi>) p Q"
+    by (simp add: distinguishes_from_inner_def)
   then show ?case by simp 
 next
   case (imm_conj Q p e \<Phi>)
