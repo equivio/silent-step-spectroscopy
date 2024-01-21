@@ -80,11 +80,17 @@ definition distinguishes :: "('a, 's) hml_srbb \<Rightarrow> 's \<Rightarrow> 's
 definition distinguishes_inner :: "('a, 's) hml_srbb_inner \<Rightarrow> 's \<Rightarrow> 's \<Rightarrow> bool" where
   "distinguishes_inner \<chi> p q \<equiv> hml_srbb_inner_models \<chi> p \<and> \<not>(hml_srbb_inner_models \<chi> q)"
 
+definition distinguishes_conjunct :: "('a, 's) hml_srbb_conjunct \<Rightarrow> 's \<Rightarrow> 's \<Rightarrow> bool" where
+  "distinguishes_conjunct \<chi> p q \<equiv> hml_srbb_conjunct_models \<chi> p \<and> \<not>(hml_srbb_conjunct_models \<chi> q)"
+
 definition distinguishes_from :: "('a, 's) hml_srbb \<Rightarrow> 's \<Rightarrow> 's set \<Rightarrow> bool" where
   "distinguishes_from \<phi> p Q \<equiv> \<forall>q \<in> Q. distinguishes \<phi> p q"
 
 definition distinguishes_from_inner :: "('a, 's) hml_srbb_inner \<Rightarrow> 's \<Rightarrow> 's set \<Rightarrow> bool" where
   "distinguishes_from_inner \<chi> p Q \<equiv> \<forall>q \<in> Q. distinguishes_inner \<chi> p q"
+
+definition distinguishes_from_conjunct :: "('a, 's) hml_srbb_conjunct \<Rightarrow> 's \<Rightarrow> 's set \<Rightarrow> bool" where
+  "distinguishes_from_conjunct \<chi> p Q \<equiv> \<forall>q \<in> Q. distinguishes_conjunct \<chi> p q"
 
 
 definition hml_preordered :: "(('a, 's) hml_srbb) set \<Rightarrow> 's \<Rightarrow> 's \<Rightarrow> bool" where
