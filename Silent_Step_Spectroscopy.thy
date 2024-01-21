@@ -20,7 +20,7 @@ thm strategy_formula_inner.simps
 thm strategy_formula_conjunct.simps
 
 lemma strategy_formulas_distinguish:
-  shows "strategy_formula g e \<phi> \<Longrightarrow>
+  shows "(strategy_formula g e \<phi> \<longrightarrow>
         (case g of
         Attacker_Immediate p Q \<Rightarrow>  distinguishes_from \<phi> p Q
       | Attacker_Delayed p Q \<Rightarrow> (Q \<Zsurj>S Q)\<longrightarrow>((strategy_formula_inner g e \<chi> \<and> Q \<Zsurj>S Q) \<longrightarrow> distinguishes_from (Internal \<chi>) p Q)
@@ -29,9 +29,9 @@ lemma strategy_formulas_distinguish:
       | Defender_Conj p Q \<Rightarrow> distinguishes_from \<phi> p Q
       | Defender_Stable_Conj p Q \<Rightarrow> True
       | Defender_Branch p \<alpha> p' Q Qa \<Rightarrow> True
-      | Attacker_Branch p Q \<Rightarrow> True)" 
-      and 
-       "strategy_formula_inner g e \<chi> \<Longrightarrow>
+      | Attacker_Branch p Q \<Rightarrow> True))
+      \<and> 
+      (strategy_formula_inner g e \<chi> \<longrightarrow>
         (case g of
         Attacker_Immediate p Q \<Rightarrow>  True
       | Attacker_Delayed p Q \<Rightarrow> (Q \<Zsurj>S Q) \<longrightarrow> distinguishes_from (Internal \<chi>) p Q
@@ -40,9 +40,9 @@ lemma strategy_formulas_distinguish:
       | Defender_Conj p Q \<Rightarrow> distinguishes_from_inner \<chi> p Q
       | Defender_Stable_Conj p Q \<Rightarrow> (\<forall>q. \<not> p \<mapsto> \<tau> q) \<longrightarrow> distinguishes_from_inner \<chi> p Q
       | Defender_Branch p \<alpha> p' Q Qa \<Rightarrow> (Qa\<inter>Q={}) \<longrightarrow> distinguishes_from_inner \<chi> p (Q\<union>Qa)
-      | Attacker_Branch p Q \<Rightarrow> True)"
-      and 
-      "strategy_formula_conjunct g e \<psi> \<Longrightarrow>
+      | Attacker_Branch p Q \<Rightarrow> True))
+      \<and>
+      (strategy_formula_conjunct g e \<psi> \<longrightarrow>
         (case g of
         Attacker_Immediate p Q \<Rightarrow>  True
       | Attacker_Delayed p Q \<Rightarrow> True
@@ -51,9 +51,47 @@ lemma strategy_formulas_distinguish:
       | Defender_Conj p Q \<Rightarrow> True
       | Defender_Stable_Conj p Q \<Rightarrow> True
       | Defender_Branch p \<alpha> p' Q Qa \<Rightarrow> True
-      | Attacker_Branch p Q \<Rightarrow> True)"
-  sorry
-
+      | Attacker_Branch p Q \<Rightarrow> True))"
+proof(induction rule: strategy_formula_strategy_formula_inner_strategy_formula_conjunct.induct)
+  case (delay p Q e \<chi>)
+  then show ?case sorry
+next
+  case (procrastination p Q e \<chi>)
+  then show ?case sorry
+next
+  case (observation p Q e \<phi> \<alpha>)
+  then show ?case sorry
+next
+  case (early_conj Q p Q' e \<phi>)
+  then show ?case sorry
+next
+  case (late_conj p Q e \<chi>)
+  then show ?case sorry
+next
+  case (conj Q p e \<Phi>)
+  then show ?case sorry
+next
+  case (imm_conj Q p e \<Phi>)
+  then show ?case sorry
+next
+  case (pos p q e \<chi>)
+  then show ?case sorry
+next
+  case (neg p q e P' \<chi>)
+  then show ?case sorry
+next
+  case (stable p Q e \<chi>)
+  then show ?case sorry
+next
+  case (stable_conj Q p e \<Phi>)
+  then show ?case sorry
+next
+  case (branch p Q p'' e \<chi>)
+  then show ?case sorry
+next
+  case (branch_conj p \<alpha> p' Q Q\<alpha> e e' \<psi> \<Phi> Qa)
+  then show ?case sorry
+qed
 
 (*
 proof (cases g)
