@@ -82,7 +82,10 @@ next
     by (smt (verit, del_insts) local.finishing_or_early_conj option.distinct(1) spectroscopy_position.simps(50) spectroscopy_position.simps(55))
 next
   case (late_conj p Q e \<chi>)
-  then show ?case sorry
+  hence "distinguishes_from_inner \<chi> p Q" by simp
+  hence "Q \<Zsurj>S Q \<longrightarrow> distinguishes_from (hml_srbb.Internal \<chi>) p Q"
+    by (metis distinguishes_def distinguishes_from_def distinguishes_from_inner_def distinguishes_inner_def hml_models.simps(3) hml_srbb_inner_models.elims(2) hml_srbb_inner_models.elims(3) hml_srbb_models.simps hml_srbb_to_hml.simps(2) silent_reachable.intros(1))
+  then show ?case by simp 
 next
   case (conj Q p e \<Phi>)
   then show ?case sorry
