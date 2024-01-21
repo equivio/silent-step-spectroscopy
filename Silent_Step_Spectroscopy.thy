@@ -46,31 +46,14 @@ lemma strategy_formulas_distinguish:
         (case g of
         Attacker_Immediate p Q \<Rightarrow>  True
       | Attacker_Delayed p Q \<Rightarrow> True
-      | Attacker_Clause p q \<Rightarrow> True
+      | Attacker_Clause p q \<Rightarrow> distinguishes_conjunct \<psi> p q
 
       | Defender_Conj p Q \<Rightarrow> True
       | Defender_Stable_Conj p Q \<Rightarrow> True
       | Defender_Branch p \<alpha> p' Q Qa \<Rightarrow> True
       | Attacker_Branch p Q \<Rightarrow> True)"
-(* conjunct: A_Clause: distinguishes_from_inner \<psi> p {q} *)
-(* inner: D_Branch: Q\Qa *)
   sorry
 
-(*
-  fixes g
-  shows "case g of 
-        Attacker_Immediate p Q \<Rightarrow> (strategy_formula g e \<phi> \<longrightarrow> distinguishes_from \<phi> p Q)
-      | Attacker_Delayed p Q \<Rightarrow> ((strategy_formula_inner g e \<chi> \<and> Q \<Zsurj>S Q) \<longrightarrow> distinguishes_from (Internal \<chi>) p Q)
-      | Attacker_Clause p q \<Rightarrow> (strategy_formula_conjunct g e \<psi> \<longrightarrow> True)
-
-      | Defender_Conj p Q \<Rightarrow> (strategy_formula_inner g e (Conj Q \<Phi>) \<longrightarrow>  distinguishes_from_inner (Conj Q \<Phi>) p Q) \<and> (strategy_formula g e (ImmConj Q \<Phi>) \<longrightarrow> distinguishes_from (ImmConj Q \<Phi>) p Q)
-      | Defender_Stable_Conj p Q \<Rightarrow> (strategy_formula_inner g e (StableConj Q \<Phi>) \<and> (\<forall>q. \<not> p \<mapsto> \<tau> q) \<longrightarrow> distinguishes_from_inner (StableConj Q \<Phi>) p Q)
-      | Defender_Branch p \<alpha> p' Q Qa \<Rightarrow> ((strategy_formula_inner g e (BranchConj \<alpha> \<phi> Q \<Phi>) \<and> (Qa\<inter>Q={})) \<longrightarrow> distinguishes_from_inner (BranchConj \<alpha> \<phi> Q \<Phi>) p (Q\<union>Qa))
-      | Attacker_Branch p Q \<Rightarrow> True"
-*)
-
-(* A_Clause: distinguishes_from_inner \<psi> p {q} *)
-(* D_Branch: Q\Qa *)
 
 (*
 proof (cases g)
@@ -132,7 +115,7 @@ next
   case (Defender_Stable_Conj x71 x72)
   then show ?thesis sorry
 qed
-  
+*)
 
 theorem spectroscopy_game_correctness:
   shows "(\<exists>\<phi> \<in> \<O> e. distinguishes_from \<phi> p Q)
@@ -151,9 +134,9 @@ next
     have "\<exists>\<phi>. strategy_formula (Attacker_Immediate p Q) e \<phi> \<and> expressiveness_price \<phi> \<le> e" .
   hence "\<exists>\<phi>\<in>\<O> e. strategy_formula (Attacker_Immediate p Q) e \<phi>" unfolding \<O>_def by blast
   thus "\<exists>\<phi>\<in>\<O> e. distinguishes_from \<phi> p Q"
-    using strategy_formulas_distinguish by blast
+    using strategy_formulas_distinguish by fastforce 
 qed
-*)
+
 
 end (* context full_spec_game *)
 
