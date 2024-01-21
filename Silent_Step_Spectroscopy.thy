@@ -75,7 +75,40 @@ next
   then show ?case by simp
 next
   case (observation p Q e \<phi> \<alpha>)
-  then show ?case sorry
+  then obtain p' Q' where IH: "spectroscopy_moves (Attacker_Delayed p Q) (Attacker_Immediate p' Q') = subtract 1 0 0 0 0 0 0 0 \<and>
+     in_wina (e - E 1 0 0 0 0 0 0 0) (Attacker_Immediate p' Q') \<and>
+     (strategy_formula (Attacker_Immediate p' Q') (e - E 1 0 0 0 0 0 0 0) \<phi> \<and>
+      (case Attacker_Immediate p' Q' of Attacker_Immediate p Q \<Rightarrow> distinguishes_from \<phi> p Q
+       | Attacker_Delayed p Q \<Rightarrow>
+           Q \<Zsurj>S Q \<longrightarrow>
+           strategy_formula_inner (Attacker_Immediate p' Q') (e - E 1 0 0 0 0 0 0 0) \<chi> \<and> Q \<Zsurj>S Q \<longrightarrow>
+           distinguishes_from (hml_srbb.Internal \<chi>) p Q
+       | Defender_Conj p Q \<Rightarrow> distinguishes_from \<phi> p Q | _ \<Rightarrow> True)) \<and>
+     p \<mapsto>\<alpha> p' \<and> Q \<mapsto>S \<alpha> Q' " by auto
+  hence D: "distinguishes_from \<phi> p' Q'" by auto 
+  hence "p' \<Turnstile>SRBB \<phi>" using distinguishes_from_def distinguishes_def sorry (* should work?! *)
+  from IH have "p \<mapsto>\<alpha> p'" and "Q \<mapsto>S \<alpha> Q'" by auto 
+  hence P: "p \<Turnstile>SRBB (Internal (Obs \<alpha> \<phi>))" using \<open>p' \<Turnstile>SRBB \<phi>\<close>
+    using silent_reachable.intros(1) by auto
+  have "Q \<Zsurj>S Q \<longrightarrow> (\<forall>q\<in>Q. \<not>(q \<Turnstile>SRBB (Internal (Obs \<alpha> \<phi>))))" proof (rule impI)
+    assume "Q \<Zsurj>S Q"
+    show "\<forall>q\<in>Q. \<not> q \<Turnstile>SRBB Internal (Obs \<alpha> \<phi>)" proof 
+      fix q 
+      show "q \<in> Q \<Longrightarrow> \<not> q \<Turnstile>SRBB Internal (Obs \<alpha> \<phi>)" proof 
+        assume "q \<in> Q" and "q \<Turnstile>SRBB Internal (Obs \<alpha> \<phi>)" 
+        hence "\<exists>q'.  q \<Zsurj> q' \<and> hml_srbb_inner_models (Obs \<alpha> \<phi>) q'" by simp 
+        then obtain q' where X: "q \<Zsurj> q' \<and> hml_srbb_inner_models (Obs \<alpha> \<phi>) q'" by auto
+        hence "hml_srbb_inner_models (Obs \<alpha> \<phi>) q'" by simp
+        hence "\<exists>q''. q' \<mapsto> \<alpha> q'' \<and> q'' \<Turnstile>SRBB \<phi>" sorry
+        hence "\<exists>q' q''. q \<Zsurj> q' \<and> q' \<mapsto> \<alpha> q'' \<and> q'' \<Turnstile>SRBB \<phi>" using X by auto
+        then show "False" using \<open>Q \<Zsurj>S Q\<close>
+          by (metis D \<open>Q \<mapsto>S \<alpha> Q'\<close> \<open>q \<in> Q\<close> distinguishes_def distinguishes_from_def) 
+      qed
+    qed
+  qed
+  hence "Q \<Zsurj>S Q \<longrightarrow> distinguishes_from (hml_srbb.Internal (hml_srbb_inner.Obs \<alpha> \<phi>)) p Q" using P
+    by (meson distinguishes_def distinguishes_from_def)
+  then show ?case by simp
 next
   case (early_conj Q p Q' e \<phi>)
   then show ?case
@@ -88,10 +121,14 @@ next
   then show ?case by simp 
 next
   case (conj Q p e \<Phi>)
-  then show ?case sorry
+  hence "\<forall>q \<in> Q. distinguishes_conjunct (\<Phi> q) p q" by auto 
+  hence "distinguishes_from_inner (hml_srbb_inner.Conj Q \<Phi>) p Q" sorry (* Der Bezug von dis_conj zu dis_inner fehlt...*)
+  then show ?case by simp 
 next
   case (imm_conj Q p e \<Phi>)
-  then show ?case sorry
+  hence "\<forall>q \<in> Q. distinguishes_conjunct (\<Phi> q) p q" by auto
+  have "distinguishes_from (ImmConj Q \<Phi>) p Q" sorry (* wie bei conj *)
+  then show ?case by simp 
 next
   case (pos p q e \<chi>)
   then show ?case sorry
