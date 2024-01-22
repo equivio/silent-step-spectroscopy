@@ -616,6 +616,18 @@ lemma T_is_\<epsilon>_empty_conj: "TT \<Lleftarrow>\<Rrightarrow> Internal (Conj
      and T_is_empty_conj
   by (meson LTS_Tau.internal_subst equivp_symp hml_eq_equiv)
 
+lemma soft_\<tau>_is_silent:
+  assumes "\<alpha> = \<tau>"
+  shows "Silent \<phi> \<Lleftarrow>\<Rrightarrow> HML_soft_poss \<alpha> \<phi>"
+  using assms by (simp add: hml_eq_equality)
+
+lemma soft_non_\<alpha>_is_obs:
+  assumes "\<alpha> \<noteq> \<tau>"
+  shows "Obs \<alpha> \<phi> \<Lleftarrow>\<Rrightarrow> HML_soft_poss \<alpha> \<phi>"
+  using assms
+    and hml_eq_equality
+  by auto
+
 end
 
 context Inhabited_Tau_LTS

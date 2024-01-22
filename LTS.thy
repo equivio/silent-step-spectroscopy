@@ -118,6 +118,16 @@ lemma empty_trace_allways_weak_trace:
   shows "[] \<in> weak_traces p"
   using silent_reachable.intros(1) weak_step_sequence.intros(1) by fastforce
 
+lemma prepend_\<tau>_weak_trace:
+  assumes "tr \<in> weak_traces p"
+  shows "(\<tau> # tr) \<in> weak_traces p"
+  using silent_reachable.intros(1)
+    and weak_step_def
+    and assms
+    and mem_Collect_eq
+    and weak_step_sequence.intros(2)
+  by fastforce
+
 lemma silent_prepend_weak_traces:
   assumes "p \<Zsurj> p'"
       and "tr \<in> weak_traces p'"
@@ -137,6 +147,22 @@ proof-
   hence "\<exists>p''. p \<Zsurj>\<mapsto>\<Zsurj>$ tr p''" by auto
   then show "tr \<in> weak_traces p" 
     by blast
+qed
+
+lemma step_prepend_weak_traces:
+  assumes "p \<mapsto> \<alpha> p'"
+      and "tr \<in> weak_traces p'"
+    shows "(\<alpha> # tr) \<in> weak_traces p"
+  using assms
+proof -
+  from \<open>tr \<in> weak_traces p'\<close>
+  have "\<exists>p''. p' \<Zsurj>\<mapsto>\<Zsurj>$ tr p''" by auto
+  then obtain p'' where "p' \<Zsurj>\<mapsto>\<Zsurj>$ tr p''" by auto
+  with \<open>p \<mapsto> \<alpha> p'\<close>
+  have "p \<Zsurj>\<mapsto>\<Zsurj>$ (\<alpha> # tr) p''" 
+    by (metis LTS_Tau.silent_reachable.intros(1) LTS_Tau.silent_reachable_append_\<tau> LTS_Tau.weak_step_def LTS_Tau.weak_step_sequence.intros(2))
+  then have "\<exists>p''. p \<Zsurj>\<mapsto>\<Zsurj>$ (\<alpha> # tr) p''" by auto
+  then show "(\<alpha> # tr) \<in> weak_traces p" by auto
 qed
 
 definition weakly_trace_preordered (infix "\<lesssim>WT" 60) where
