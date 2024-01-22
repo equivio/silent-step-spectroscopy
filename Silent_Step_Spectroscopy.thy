@@ -139,6 +139,12 @@ proof-
         qed
       qed
 
+lemma expr_obs:
+  assumes "expressiveness_price \<phi> \<le> (e - E 1 0 0 0 0 0 0 0)"
+  shows "expr_pr_inner (Obs \<alpha> \<phi>) \<le> e"
+proof-
+  oops
+
 lemma winning_budget_implies_strategy_formula:
   fixes g e
   assumes "in_wina e g"
@@ -416,19 +422,17 @@ next
     hence move_cases: "(\<exists>p Q. g' = Attacker_Delayed p Q) \<or> (\<exists>p' Q'. g' = (Attacker_Immediate p' Q')) \<or> 
 (\<exists>p Q. g' = (Defender_Conj p Q)) \<or> (\<exists>p Q. g' = (Defender_Stable_Conj p Q)) \<or> (\<exists>p' \<alpha> p'' Q' Q\<alpha>. g' = (Defender_Branch p' \<alpha> p'' Q' Q\<alpha>))"
       by (metis spectroscopy_defender.cases spectroscopy_moves.simps(53) spectroscopy_moves.simps(59))
-    hence move_cases: "((\<exists>p Q. g' = Attacker_Delayed p Q) \<Longrightarrow> (\<exists>\<phi>. strategy_formula_inner g e \<phi> \<and> expr_pr_inner \<phi> \<le> e)) \<Longrightarrow>
-((\<exists>p' Q'. g' = Attacker_Immediate p' Q') \<Longrightarrow> (\<exists>\<phi>. strategy_formula_inner g e \<phi> \<and> expr_pr_inner \<phi> \<le> e)) ==>
-((\<exists>p Q. g' = Defender_Conj p Q) \<Longrightarrow> (\<exists>\<phi>. strategy_formula_inner g e \<phi> \<and> expr_pr_inner \<phi> \<le> e)) \<Longrightarrow>
-((\<exists>p Q. g' = Defender_Stable_Conj p Q) \<Longrightarrow> (\<exists>\<phi>. strategy_formula_inner g e \<phi> \<and> expr_pr_inner \<phi> \<le> e)) ==>
-((\<exists>p' \<alpha> p'' Q' Q\<alpha>. g' = Defender_Branch p' \<alpha> p'' Q' Q\<alpha>) \<Longrightarrow>(\<exists>\<phi>. strategy_formula_inner g e \<phi> \<and> expr_pr_inner \<phi> \<le> e))
-\<Longrightarrow> ?case"
+
+    then consider (Att_Del) "(\<exists>p Q. g' = Attacker_Delayed p Q)" | (Att_Imm) "(\<exists>p' Q'. g' = (Attacker_Immediate p' Q'))" |
+                  (Def_Conj) "(\<exists>p Q. g' = (Defender_Conj p Q))" | (Def_St_Conj) "(\<exists>p Q. g' = (Defender_Stable_Conj p Q))" |
+                  (Def_Branch) "(\<exists>p' \<alpha> p'' Q' Q\<alpha>. g' = (Defender_Branch p' \<alpha> p'' Q' Q\<alpha>))"
       by blast
-    have "((\<exists>p Q. g' = Attacker_Delayed p Q) \<Longrightarrow> (\<exists>\<phi>. strategy_formula_inner g e \<phi> \<and> expr_pr_inner \<phi> \<le> e))"
-    proof-
+    then show ?case proof(cases)
+      case Att_Del
       assume "\<exists>p Q. g' = Attacker_Delayed p Q"
       then obtain p' Q' where g'_att_del: "g' = Attacker_Delayed p' Q'" and
-IH: "(\<exists>\<phi>. strategy_formula_inner g' (weight g g' e) \<phi> \<and>
-                         expr_pr_inner \<phi> \<le> weight g g' e)" using IH by blast
+                          IH: "(\<exists>\<phi>. strategy_formula_inner g' (weight g g' e) \<phi> \<and>
+                          expr_pr_inner \<phi> \<le> weight g g' e)" using IH by blast
 
       show "\<exists>\<phi>. strategy_formula_inner g e \<phi> \<and> expr_pr_inner \<phi> \<le> e"
       proof-
@@ -466,9 +470,64 @@ IH: "(\<exists>\<phi>. strategy_formula_inner g' (weight g g' e) \<phi> \<and>
         then show ?thesis 
           using \<open>strategy_formula_inner (Attacker_Delayed p Q) e \<chi>\<close> g_att_del by blast
       qed
-    qed
-    then show ?case sorry
+    next
+      case Att_Imm
+      assume "\<exists>p' Q'. g' = Attacker_Immediate p' Q'"
+      then obtain p' Q' where g'_att_imm: "g' = Attacker_Immediate p' Q'" and
+                          IH: "(\<exists>\<phi>. strategy_formula g' (weight g g' e) \<phi> \<and>
+                          expressiveness_price \<phi> \<le> weight g g' e)" using IH by blast 
+      hence "(\<exists>a. p \<mapsto> a p' \<and> Q \<mapsto>S a Q' \<and> a \<noteq> \<tau>)" using local.observation move g_att_del 
+        by (smt (verit, best) Inhabited_Tau_LTS_axioms Spectroscopy_Game.Inhabited_Tau_LTS.observation)
+      then obtain \<alpha> where \<alpha>_prop: "p \<mapsto> \<alpha> p'" "Q \<mapsto>S \<alpha> Q'" "\<alpha> \<noteq> \<tau>" by blast
+      hence "(the (spectroscopy_moves (Attacker_Delayed p Q) (Attacker_Immediate p' Q')) e) = (e - (E 1 0 0 0 0 0 0 0))"
+        by fastforce
+      hence "(in_wina (e - (E 1 0 0 0 0 0 0 0)) (Attacker_Immediate p' Q'))"
+        using g'_att_imm \<open>p \<mapsto> \<alpha> p'\<close> \<open>Q \<mapsto>S \<alpha> Q'\<close> \<open>\<alpha> \<noteq> \<tau>\<close> "2.IH" \<open>g = Attacker_Delayed p Q\<close> id_apply in_wina.intros(2) move
+        by presburger
 
+      have "(weight g g' e) = (e - (E 1 0 0 0 0 0 0 0))"
+        using g'_att_imm g_att_del
+        using \<open>weight (Attacker_Delayed p Q) (Attacker_Immediate p' Q') e = e - E 1 0 0 0 0 0 0 0\<close> by blast
+
+      then obtain \<phi> where \<phi>_prop: "(strategy_formula (Attacker_Immediate p' Q') (e - (E 1 0 0 0 0 0 0 0)) \<phi> \<and> expressiveness_price \<phi> \<le> (e - (E 1 0 0 0 0 0 0 0)))"
+        using IH g'_att_imm
+        by auto 
+
+      have "\<exists>p' Q'. spectroscopy_moves (Attacker_Delayed p Q) (Attacker_Immediate p' Q') 
+       = (subtract 1 0 0 0 0 0 0 0) \<and> in_wina (e - (E 1 0 0 0 0 0 0 0)) (Attacker_Immediate p' Q')"
+        by (smt (verit, best) Inhabited_Tau_LTS_axioms Spectroscopy_Game.Inhabited_Tau_LTS.observation \<open>in_wina (e - E 1 0 0 0 0 0 0 0) (Attacker_Immediate p' Q')\<close> g'_att_imm move)
+
+      hence "\<exists>p' Q'. spectroscopy_moves (Attacker_Delayed p Q) (Attacker_Immediate p' Q') 
+       = (subtract 1 0 0 0 0 0 0 0) \<and> in_wina (e - (E 1 0 0 0 0 0 0 0)) (Attacker_Immediate p' Q')
+        \<and> strategy_formula (Attacker_Immediate p' Q') (e - (E 1 0 0 0 0 0 0 0)) \<phi>
+        \<and> p \<mapsto>\<alpha> p' \<and> Q \<mapsto>S \<alpha> Q'"
+        using strategy_formula_strategy_formula_inner_strategy_formula_conjunct.delay observation
+          \<alpha>_prop \<phi>_prop \<open>in_wina (e - E 1 0 0 0 0 0 0 0) (Attacker_Immediate p' Q')\<close> local.observation
+        by auto
+
+      hence "strategy_formula_inner (Attacker_Delayed p Q) e (Obs \<alpha> \<phi>)"
+        using local.observation 
+        by presburger
+
+      have "expr_pr_inner (Obs \<alpha> \<phi>) \<le> e" sorry
+
+      then show ?thesis using \<open>strategy_formula_inner (Attacker_Delayed p Q) e (Obs \<alpha> \<phi>)\<close>
+        using g_att_del by blast
+    next
+      case Def_Conj
+      assume "\<exists>p Q. g' = Defender_Conj p Q"
+      then obtain p' Q' where "g' = Defender_Conj p' Q'" and
+                          IH: "(\<exists>\<phi>. strategy_formula_inner g' (weight g g' e) \<phi> \<and> expr_pr_inner \<phi> \<le> weight g g' e) \<and>
+                              (\<exists>\<phi>. strategy_formula g' (weight g g' e) \<phi> \<and> expressiveness_price \<phi> \<le> weight g g' e)" 
+        using IH by blast
+      then show ?thesis sorry
+    next
+      case Def_St_Conj
+      then show ?thesis sorry
+    next
+      case Def_Branch
+      then show ?thesis sorry
+    qed
 
   next
 
