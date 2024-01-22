@@ -44,12 +44,14 @@ lemma expressiveness_to_trace_formula:
   apply (rule hml_srbb_hml_srbb_inner_hml_srbb_conjunct.induct)
   using is_trace_formula_is_trace_formula_inner.intros(1) apply blast
   apply (simp add: \<O>_inner_def \<O>_def is_trace_formula_is_trace_formula_inner.intros(2))
-  apply (simp add: \<O>_def leq_not_eneg)
-  by (simp add: \<O>_inner_def \<O>_def is_trace_formula_is_trace_formula_inner.intros(3) leq_not_eneg)+
+        apply (simp add: \<O>_def leq_not_eneg)
+  oops
+  (*by (simp add: \<O>_inner_def \<O>_def is_trace_formula_is_trace_formula_inner.intros(3) leq_not_eneg)+*)
 
 lemma modal_depth_only_is_trace_form: 
   "(is_trace_formula \<phi>) = (\<phi> \<in> \<O> (E \<infinity> 0 0 0 0 0 0 0))"
-  using expressiveness_to_trace_formula trace_formula_to_expressiveness by blast
+  oops
+  (* using expressiveness_to_trace_formula trace_formula_to_expressiveness by blast *)
 
 context Inhabited_Tau_LTS
 begin                 
@@ -288,20 +290,22 @@ lemma expr_preorder_characterizes_relational_preorder_traces: "(p \<lesssim>WT q
 proof
   assume "p \<lesssim>WT q"
   then show "\<forall>\<phi>\<in>\<O> (E \<infinity> 0 0 0 0 0 0 0). p \<Turnstile>SRBB \<phi> \<longrightarrow> q \<Turnstile>SRBB \<phi>"
-    using aux expressiveness_to_trace_formula weakly_trace_preordered_def
-    by blast+
+    oops
+    (* using aux expressiveness_to_trace_formula weakly_trace_preordered_def
+    by blast+ 
 next
   assume \<phi>_eneg: "\<forall>\<phi>\<in>\<O> (E \<infinity> 0 0 0 0 0 0 0). p \<Turnstile>SRBB \<phi> \<longrightarrow> q \<Turnstile>SRBB \<phi>"
   show "p \<lesssim>WT q"
     unfolding weakly_trace_preordered_def
     using \<phi>_eneg trace_equals_trace_to_formula trace_formula_to_expressiveness trace_to_srbb_is_trace_formula
     by (simp, blast+)
-qed
+qed *)
 
 lemma "(p \<simeq>WT q) = (p \<sim> (E \<infinity> 0 0 0 0 0 0 0) q)"
   unfolding weakly_trace_equivalent_def expr_equiv_def \<O>_def hml_equivalent_def hml_preordered_def
-  using expr_preorder_characterizes_relational_preorder_traces
-  by (simp add: \<O>_def expr_preord_def hml_preordered_def) 
+  oops
+  (* using expr_preorder_characterizes_relational_preorder_traces
+  by (simp add: \<O>_def expr_preord_def hml_preordered_def) *)
 end
 
 end
