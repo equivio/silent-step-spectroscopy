@@ -284,6 +284,24 @@ lemma winning_budget_implies_strategy_formula:
       using \<open>g = Defender_Stable_Conj p Q\<close> by blast
   next
     case 6
+    from 6 obtain p \<alpha> p' Q Qa  where G: "g =  Defender_Branch p \<alpha> p' Q Qa"
+    by auto
+    from assms have A: "in_wina e ( Defender_Branch p \<alpha> p' Q Qa)"
+    using "1" G in_wina.intros(1) by blast 
+    have "in_wina e (Defender_Branch p \<alpha> p' Q Qa) = (spectroscopy_defender g) \<and> (\<forall>g'. \<not>spectroscopy_moves g g' \<noteq> None)"
+      using "1" A by blast
+    hence "(\<forall>g'. \<not>spectroscopy_moves g g' \<noteq> None)" by auto
+    hence "\<forall>g'. spectroscopy_moves g g' = None" by blast
+    hence A1: "\<forall>g'. spectroscopy_moves (Defender_Branch p \<alpha> p' Q Qa) g' = None"
+      using \<open>g =  Defender_Branch p \<alpha> p' Q Qa\<close> by blast
+    have "\<forall>Q'. spectroscopy_moves (Defender_Branch p \<alpha> p' Q Qa) (Attacker_Branch p' Q') = None"
+      using A1 by blast
+    from this obtain Q' where "spectroscopy_moves (Defender_Branch p \<alpha> p' Q Qa) (Attacker_Branch p' Q') = None" by auto
+    (*hence "\<exists>\<psi>. (\<forall>q \<in> Q. spectroscopy_moves (Defender_Branch p \<alpha> p' Q Qa) (Attacker_Branch p q) 
+        = subtract 1 0 0 0 0 0 0 0 
+            \<and> (in_wina ((min1_6 (e - E 0 1 1 0 0 0 0 0)) - (E 1 0 0 0 0 0 0 0)) (Attacker_Immediate p' Q'))
+            \<and> strategy_formula (Attacker_Immediate p' Q') e \<psi>)"
+      by blast*)
     then show ?case sorry
   next
     case 7
