@@ -197,6 +197,17 @@ fun expressiveness_price :: "('a, 's) hml_srbb \<Rightarrow> energy" where
                               (max_negative_conjunct_depth \<phi>)
                               (negation_depth              \<phi>)"
 
+lemma expressiveness_price_ImmConj_def:
+  shows "expressiveness_price (ImmConj I \<psi>s) = E 
+    (Sup ((modal_depth_srbb_conjunct \<circ> \<psi>s) ` I))
+    (Sup ((branch_conj_depth_conjunct \<circ> \<psi>s) ` I))
+    (1 + Sup ((inst_conj_depth_conjunct \<circ> \<psi>s) ` I))
+    (Sup ((st_conj_depth_conjunct \<circ> \<psi>s) ` I))
+    (1 + Sup ((imm_conj_depth_conjunct \<circ> \<psi>s) ` I))
+    (Sup ((max_pos_conj_depth_conjunct \<circ> \<psi>s) ` I))
+    (Sup ((max_neg_conj_depth_conjunct \<circ> \<psi>s) ` I))
+    (Sup ((neg_depth_conjunct \<circ> \<psi>s) ` I))" by simp
+
 lemma srbb_price_never_neg : "expressiveness_price \<phi> \<noteq> eneg"
   by simp
 
@@ -231,6 +242,36 @@ fun expr_pr_conjunct :: "('a, 's) hml_srbb_conjunct \<Rightarrow> energy" where
 
 definition \<O>_conjunct :: "energy \<Rightarrow> (('a, 's) hml_srbb_conjunct) set" where
   "\<O>_conjunct energy \<equiv> {\<chi> . expr_pr_conjunct \<chi> \<le> energy}"
+
+lemma \<psi>_price_never_neg:
+  shows "expr_pr_conjunct \<psi> \<noteq> eneg"
+  by simp
+
+lemma expressiveness_price_ImmConj_geq_parts:
+  assumes "i \<in> I"
+  shows "expressiveness_price (ImmConj I \<psi>s) - E 0 0 1 0 1 0 0 0 \<ge> expr_pr_conjunct (\<psi>s i)"
+proof-
+  from expressiveness_price_ImmConj_def have "expressiveness_price (ImmConj I \<psi>s) \<ge> E 0 0 1 0 1 0 0 0"
+    using energy_leq_cases by force
+  from direct_minus_eq[OF this] have
+  "expressiveness_price (ImmConj I \<psi>s) - E 0 0 1 0 1 0 0 0 = E
+    (Sup ((modal_depth_srbb_conjunct \<circ> \<psi>s) ` I))
+    (Sup ((branch_conj_depth_conjunct \<circ> \<psi>s) ` I))
+    (Sup ((inst_conj_depth_conjunct \<circ> \<psi>s) ` I))
+    (Sup ((st_conj_depth_conjunct \<circ> \<psi>s) ` I))
+    (Sup ((imm_conj_depth_conjunct \<circ> \<psi>s) ` I))
+    (Sup ((max_pos_conj_depth_conjunct \<circ> \<psi>s) ` I))
+    (Sup ((max_neg_conj_depth_conjunct \<circ> \<psi>s) ` I))
+    (Sup ((neg_depth_conjunct \<circ> \<psi>s) ` I))" unfolding expressiveness_price_ImmConj_def by auto
+  also have "... \<ge> expr_pr_conjunct (\<psi>s i)" using assms using SUP_upper leq_not_eneg by fastforce
+  finally show ?thesis .
+qed
+
+lemma expressiveness_price_ImmConj_geq_parts':
+  assumes "i \<in> I"
+  shows "(expressiveness_price (ImmConj I \<psi>s) - E 0 0 0 0 1 0 0 0) - E 0 0 1 0 0 0 0 0 \<ge> expr_pr_conjunct (\<psi>s i)"
+  using expressiveness_price_ImmConj_geq_parts[OF assms]
+  using less_eq_energy_def minus_energy_def by force 
 
 subsection \<open>characterizing equivalence by energy coordinates\<close>
 

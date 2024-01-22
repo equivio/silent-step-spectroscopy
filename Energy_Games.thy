@@ -256,10 +256,29 @@ lemma attacker_wins_last_wina_notempty:
   shows "\<exists>e. in_wina e (last p)"
   using assms won_by_attacker_def finite_play.intros(2) in_wina.intros(1) by meson
 
-lemma in_wina_Ga:
+lemma in_wina_GaE:
   assumes "in_wina e g" and "Ga g" 
   shows "\<exists>g'. ((g \<Zinj> g') \<and> (in_wina ((weight g g') e) g'))"
   using assms(1) assms(2) in_wina.simps by blast
+
+lemma in_wina_Ga:
+  assumes "in_wina (u e) g'" "g \<Zinj>wgt u g'" "Ga g"
+  shows "in_wina e g"
+  using assms in_wina.simps by (metis antysim dwl_min update_gets_smaller)
+
+lemma in_wina_Ga_with_id_step:
+  assumes "in_wina e g'" "g \<Zinj>wgt id g'" "Ga g"
+  shows "in_wina e g"
+  using assms by (metis id_apply in_wina.simps)
+
+
+lemma in_wina_Gd:
+  fixes update
+  assumes "Gd g"
+  "e \<noteq> defender_win_level"
+  "\<And>g'. g \<Zinj> g' \<Longrightarrow>  weight g g' = update"
+  "\<And>g'. g \<Zinj> g' \<Longrightarrow> in_wina (update e) g'"
+shows "in_wina e g" using assms in_wina.intros(3) by blast
 
 text\<open>The intuitively true statement "with more energy the attacker will win at least as much as 
 before" can be proven when given a partial order on energies such that the \<open>defender_win_leve\<close>l is 
@@ -284,11 +303,6 @@ next
   then show ?case
     using antysim dwl_min in_wina.intros(3) monotonicity by blast 
 qed
-
-lemma in_wina_with_id_step:
-  assumes "in_wina e p'" "p \<Zinj>wgt id p'" "Ga p"
-  shows "in_wina e p"
-  using assms  by (metis id_apply in_wina.simps)
 
 end (*End of context energy_game*)
 end
