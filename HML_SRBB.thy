@@ -154,6 +154,9 @@ lemma hml_srbb_impl_preord: "reflp (hml_srbb_impl) \<and> transp (hml_srbb_impl)
 definition hml_srbb_impl_inner :: "('a, 's) hml_srbb_inner \<Rightarrow> ('a, 's) hml_srbb_inner \<Rightarrow> bool" (infix "\<chi>\<Rrightarrow>" 70) where
   "\<chi>l \<chi>\<Rrightarrow> \<chi>r \<equiv> \<forall>p. hml_srbb_inner_models \<chi>l p \<longrightarrow> hml_srbb_inner_models \<chi>r p"
 
+lemma hml_srbb_impl_inner_preord: "reflp (hml_srbb_impl_inner) \<and> transp (hml_srbb_impl_inner)"
+  by (metis hml_srbb_impl_inner_def reflpI transpI)
+
 lemma srbb_impl_inner_to_hml_impl:
   assumes "\<chi>l \<chi>\<Rrightarrow> \<chi>r"
   shows "hml_srbb_inner_to_hml \<chi>l \<Rrightarrow> hml_srbb_inner_to_hml \<chi>r"
@@ -163,6 +166,9 @@ lemma srbb_impl_inner_to_hml_impl:
 
 definition hml_srbb_impl_conjunct :: "('a, 's) hml_srbb_conjunct \<Rightarrow> ('a, 's) hml_srbb_conjunct \<Rightarrow> bool" (infix "\<psi>\<Rrightarrow>" 70) where
   "\<psi>l \<psi>\<Rrightarrow> \<psi>r \<equiv> \<forall>p. hml_srbb_conjunct_models \<psi>l p \<longrightarrow> hml_srbb_conjunct_models \<psi>r p"
+
+lemma hml_srbb_impl_conjunct_preord: "reflp (hml_srbb_impl_conjunct) \<and> transp (hml_srbb_impl_conjunct)"
+  by (metis hml_srbb_impl_conjunct_def reflpI transpI)
 
 lemma srbb_impl_conjunct_to_hml_impl:
   assumes "\<psi>l \<psi>\<Rrightarrow> \<psi>r"
@@ -176,6 +182,13 @@ subsection \<open> \<open>hml__srbb\<close> Equivalence \<close>
 definition hml_srbb_eq :: "('a, 's) hml_srbb \<Rightarrow> ('a, 's) hml_srbb \<Rightarrow> bool" (infix "\<Lleftarrow>srbb\<Rrightarrow>" 70) where
   "\<phi>l \<Lleftarrow>srbb\<Rrightarrow> \<phi>r \<equiv> \<phi>l \<Rrightarrow> \<phi>r \<and> \<phi>r \<Rrightarrow> \<phi>l"
 
+lemma hml_srbb_eq_iff: "\<phi>l \<Lleftarrow>srbb\<Rrightarrow> \<phi>r = (\<forall>p. p \<Turnstile>SRBB \<phi>l \<longleftrightarrow> p \<Turnstile>SRBB \<phi>r)"
+  using hml_srbb_eq_def hml_srbb_impl_def by blast
+
+lemma srbb_eq_hml_eq:
+  shows "\<phi>l \<Lleftarrow>srbb\<Rrightarrow> \<phi>r = (hml_srbb_to_hml \<phi>l \<Lleftarrow>\<Rrightarrow> hml_srbb_to_hml \<phi>r)"
+  by (simp add: hml_eq_equality hml_srbb_eq_iff)
+
 lemma hml_srbb_eq_equiv: "equivp (\<Lleftarrow>srbb\<Rrightarrow>)"
   by (smt (verit, ccfv_threshold) equivpI hml_srbb_eq_def hml_srbb_impl_preord reflp_on_def sympI transpE transpI)
 
@@ -183,8 +196,30 @@ lemma hml_srbb_eq_equiv: "equivp (\<Lleftarrow>srbb\<Rrightarrow>)"
 definition hml_srbb_eq_inner :: "('a, 's) hml_srbb_inner \<Rightarrow> ('a, 's) hml_srbb_inner \<Rightarrow> bool" (infix "\<Lleftarrow>\<chi>\<Rrightarrow>" 70) where
   "\<chi>l \<Lleftarrow>\<chi>\<Rrightarrow> \<chi>r \<equiv> \<chi>l \<chi>\<Rrightarrow> \<chi>r \<and> \<chi>r \<chi>\<Rrightarrow> \<chi>l"
 
+lemma hml_srbb_eq_inner_iff: "\<chi>l \<Lleftarrow>\<chi>\<Rrightarrow> \<chi>r = (\<forall>p. hml_srbb_inner_models \<chi>l p  \<longleftrightarrow> hml_srbb_inner_models \<chi>r p)"
+  using hml_srbb_eq_inner_def hml_srbb_impl_inner_def by blast
+
+lemma srbb_eq_inner_hml_eq:
+  shows "\<chi>l \<Lleftarrow>\<chi>\<Rrightarrow> \<chi>r = (hml_srbb_inner_to_hml \<chi>l \<Lleftarrow>\<Rrightarrow> hml_srbb_inner_to_hml \<chi>r)"
+  by (simp add: hml_eq_equality hml_srbb_eq_inner_iff)
+
+lemma hml_srbb_eq_inner_equiv: "equivp (\<Lleftarrow>\<chi>\<Rrightarrow>)"
+  using hml_srbb_impl_inner_preord
+  by (smt (verit, best) hml_srbb_eq_inner_def Inhabited_Tau_LTS_axioms equivpI reflpD reflpI symp_def transpE transpI)
+
+
 definition hml_srbb_eq_conjunct :: "('a, 's) hml_srbb_conjunct \<Rightarrow> ('a, 's) hml_srbb_conjunct \<Rightarrow> bool" (infix "\<Lleftarrow>\<psi>\<Rrightarrow>" 70) where
   "\<psi>l \<Lleftarrow>\<psi>\<Rrightarrow> \<psi>r \<equiv> \<psi>l \<psi>\<Rrightarrow> \<psi>r \<and> \<psi>r \<psi>\<Rrightarrow> \<psi>l"
+
+lemma hml_srbb_eq_conjunct_iff: "\<psi>l \<Lleftarrow>\<psi>\<Rrightarrow> \<psi>r = (\<forall>p. hml_srbb_conjunct_models \<psi>l p  \<longleftrightarrow> hml_srbb_conjunct_models \<psi>r p)"
+  using hml_srbb_eq_conjunct_def hml_srbb_impl_conjunct_def by blast
+
+lemma srbb_eq_conjunct_hml_conjunct_eq:
+  shows "\<psi>l \<Lleftarrow>\<psi>\<Rrightarrow> \<psi>r = (hml_srbb_conjunct_to_hml_conjunct \<psi>l \<Lleftarrow>\<and>\<Rrightarrow> hml_srbb_conjunct_to_hml_conjunct \<psi>r)"
+  using hml_conjunct_eq_def hml_conjunct_impl_def hml_srbb_eq_conjunct_iff by auto
+
+lemma hml_srbb_eq_conjunct_equiv: "equivp (\<Lleftarrow>\<psi>\<Rrightarrow>)"
+  using equivp_def hml_srbb_eq_conjunct_iff by fastforce
 
 
 subsection \<open> Substitution \<close>
