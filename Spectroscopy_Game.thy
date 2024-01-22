@@ -401,10 +401,10 @@ where
         \<and> strategy_formula_inner (Attacker_Delayed q P') ((min1_7 (e - (E 0 0 0 0 0 0 0 1)))) \<chi>" |
   
   stable:
-  "strategy_formula (Attacker_Delayed p Q) e \<chi>" 
+  "strategy_formula_inner (Attacker_Delayed p Q) e \<chi>" 
     if "spectroscopy_moves (Attacker_Delayed p Q) (Defender_Stable_Conj p Q) 
       = (Some id) \<and> in_wina e (Defender_Stable_Conj p Q) 
-        \<and> strategy_formula (Defender_Stable_Conj p Q) e \<chi>"|
+        \<and> strategy_formula_inner (Defender_Stable_Conj p Q) e \<chi>"|
 
   stable_conj:
     "strategy_formula_inner (Defender_Stable_Conj p Q) e (StableConj Q \<Phi>)"
@@ -413,10 +413,10 @@ where
           \<and> strategy_formula_conjunct (Attacker_Clause p q) (e - (E 0 0 0 1 0 0 0 0)) (\<Phi> q)"|
   
   branch:
-  "strategy_formula (Attacker_Delayed p Q) e \<chi>" 
+  "strategy_formula_inner (Attacker_Delayed p Q) e \<chi>" 
     if "\<exists>p' Q' \<alpha> Q\<alpha>. spectroscopy_moves (Attacker_Delayed p Q) (Defender_Branch p' \<alpha> p'' Q' Q\<alpha>) 
       = (Some id) \<and> in_wina e (Defender_Branch p' \<alpha> p'' Q' Q\<alpha>) 
-        \<and> strategy_formula (Defender_Branch p' \<alpha> p'' Q' Q\<alpha>) e \<chi>"|
+        \<and> strategy_formula_inner (Defender_Branch p' \<alpha> p'' Q' Q\<alpha>) e \<chi>"|
 
   branch_conj:
   "strategy_formula_inner (Defender_Branch p \<alpha> p' Q Qa) e (BranchConj \<alpha> \<psi> Q \<Phi>)"
