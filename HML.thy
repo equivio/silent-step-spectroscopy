@@ -318,6 +318,30 @@ lemma neg_subst:
   using assms
   by (meson LTS_Tau.neg_pre_subst hml_conjunct_eq_def hml_conjunct_impl_def hml_eq_def)
 
+end (* LTS_Tau *)
+
+context Inhabited_Tau_LTS
+begin
+
+lemma and_subst_right:
+  assumes "\<psi>l \<Lleftarrow>\<and>\<Rrightarrow> \<psi>r"
+      and "\<phi> \<Lleftarrow>\<Rrightarrow> (\<psi> \<and>hml \<psi>l)"
+  shows "\<phi> \<Lleftarrow>\<Rrightarrow> (\<psi> \<and>hml \<psi>r)"
+  using assms
+  using hml_conjunct_eq_def hml_conjunct_impl_def hml_eq_equality by auto
+
+lemma and_subst_left:
+  assumes "\<psi>l \<Lleftarrow>\<and>\<Rrightarrow> \<psi>r"
+      and "\<phi> \<Lleftarrow>\<Rrightarrow> (\<psi>l \<and>hml \<psi>)"
+  shows "\<phi> \<Lleftarrow>\<Rrightarrow> (\<psi>r \<and>hml \<psi>)"
+  using assms
+  using hml_conjunct_eq_def hml_conjunct_impl_def hml_eq_equality by auto
+
+end (* Inhabited_Tau_LTS *)
+
+context LTS_Tau
+begin
+
 
 subsubsection \<open> Congruence \<close>
 
@@ -491,6 +515,28 @@ lemma neg_cong:
   shows "(Neg \<phi>l) \<Lleftarrow>\<and>\<Rrightarrow> (Neg \<phi>r)"
   using assms
   by (meson hml_conjunct_eq_def hml_conjunct_impl_def hml_conjunct_models.simps(2) hml_eq_def hml_impl_def)
+
+end (* LTS_Tau *)
+
+context Inhabited_Tau_LTS
+begin
+
+lemma and_cong_right:
+  assumes "\<psi>l \<Lleftarrow>\<and>\<Rrightarrow> \<psi>r"
+  shows "(\<psi> \<and>hml \<psi>l) \<Lleftarrow>\<Rrightarrow> (\<psi> \<and>hml \<psi>r)"
+  using assms
+  using hml_conjunct_eq_def hml_conjunct_impl_def hml_eq_equality by auto
+
+lemma and_cong_left:
+  assumes "\<psi>l \<Lleftarrow>\<and>\<Rrightarrow> \<psi>r"
+  shows "(\<psi>l \<and>hml \<psi>) \<Lleftarrow>\<Rrightarrow> (\<psi>r \<and>hml \<psi>)"
+  using assms
+  using hml_conjunct_eq_def hml_conjunct_impl_def hml_eq_equality by auto
+
+end (* Inhabited_Tau_LTS *)
+
+context LTS_Tau
+begin
 
 
 subsubsection \<open> Know Equivalence Elements\<close>
