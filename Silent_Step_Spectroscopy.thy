@@ -187,9 +187,45 @@ lemma winning_budget_implies_strategy_formula:
     from this obtain \<Phi> where "\<forall>q \<in> Q. spectroscopy_moves (Defender_Conj p Q) (Attacker_Clause p q) 
           = (subtract 0 0 1 0 0 0 0 0) \<and> (in_wina (e - (E 0 0 1 0 0 0 0 0)) (Attacker_Clause p q)) 
             \<and> strategy_formula_conjunct (Attacker_Clause p q) (e - (E 0 0 1 0 0 0 0 0)) (\<Phi> q)" by auto
-     hence "strategy_formula_inner (Defender_Conj p Q) e (Conj Q \<Phi>)"
-       using conj by blast
-     show ?case sorry
+     hence Strat: "strategy_formula_inner (Defender_Conj p Q) e (Conj {} \<Phi>)"
+       using \<open>Q = {}\<close> conj by blast
+     then have  "modal_depth_srbb_inner (Conj Q \<Phi>) = Sup ((modal_depth_srbb_conjunct \<circ> \<Phi>) ` Q)"
+                "branch_conj_depth_inner (Conj Q \<Phi>) = Sup ((branch_conj_depth_conjunct \<circ> \<Phi>) ` Q)"
+                "inst_conj_depth_inner (Conj Q \<Phi>) = 1 + Sup ((inst_conj_depth_conjunct \<circ> \<Phi>) ` Q)"
+                "st_conj_depth_inner (Conj Q \<Phi>) = Sup ((st_conj_depth_conjunct \<circ> \<Phi>) ` Q)"
+                "imm_conj_depth_inner (Conj Q \<Phi>) = Sup ((imm_conj_depth_conjunct \<circ> \<Phi>) ` Q)"
+                "max_pos_conj_depth_inner (Conj Q \<Phi>) = Sup ((max_pos_conj_depth_conjunct \<circ> \<Phi>) ` Q)"
+                "max_neg_conj_depth_inner (Conj Q \<Phi>) = Sup ((max_neg_conj_depth_conjunct \<circ> \<Phi>) ` Q)"
+                "neg_depth_inner (Conj Q \<Phi>) = Sup ((neg_depth_conjunct \<circ> \<Phi>) ` Q)"
+     using modal_depth_srbb_inner.simps(3) branch_conj_depth_inner.simps st_conj_depth_inner.simps
+      inst_conj_depth_inner.simps imm_conj_depth_inner.simps max_pos_conj_depth_inner.simps
+      max_neg_conj_depth_inner.simps neg_depth_inner.simps 
+      by auto+
+      hence "modal_depth_srbb_inner (Conj Q \<Phi>) = 0"
+          "branch_conj_depth_inner (Conj Q \<Phi>) = 0"
+          "inst_conj_depth_inner (Conj Q \<Phi>) = 1"
+          "st_conj_depth_inner (Conj Q \<Phi>) = 0"
+          "imm_conj_depth_inner (Conj Q \<Phi>) = 0"
+          "max_pos_conj_depth_inner (Conj Q \<Phi>) = 0"
+          "max_neg_conj_depth_inner (Conj Q \<Phi>) = 0"
+          "neg_depth_inner (Conj Q \<Phi>) = 0"
+
+      using \<open>Q = {}\<close> image_empty comp_apply
+      by (simp add: bot_enat_def)+
+       hence "expr_pr_inner (Conj Q \<Phi>) = (E 0 0 1 0 0 0 0 0)"
+      using expr_pr_inner.simps \<open>Q = {}\<close>
+      by force
+    have Win_a: "\<forall>q \<in> Q. in_wina (e - (E 0 0 1 0 0 0 0 0)) (Attacker_Clause p q)"  by (metis A1 local.conj_answer option.discI)
+    have NotWin_a: "\<forall>q \<in> Q. \<not>(in_wina eneg (Attacker_Clause p q))"
+      by (simp add: defender_win_level_not_in_wina)
+    have B: "\<not>(in_wina eneg (Defender_Conj p Q))"
+      by (simp add: defender_win_level_not_in_wina)
+    from A B have "e \<noteq> eneg" by auto
+    have "e - (E 0 0 1 0 0 0 0 0) \<noteq> eneg" using Win_a NotWin_a sorry
+    hence price: "expr_pr_inner (Conj Q \<Phi>) \<le> e"
+      by (metis \<open>expr_pr_inner (hml_srbb_inner.Conj Q \<Phi>) = E 0 0 1 0 0 0 0 0\<close> minus_energy_def)
+     then show ?case using Strat 
+      price sorry
   next
     case 5
     then obtain p Q where "g = Defender_Stable_Conj p Q" by blast
