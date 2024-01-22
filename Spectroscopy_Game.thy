@@ -442,7 +442,7 @@ The inductive property of lemma 1 is formalized as follows
 
 \item[2.] At attacker positions, if \<open>\<chi>\<close> distinguishes \<open>p\<close> from \<open>Q \<noteq> {}\<close> and \<open>Q\<close> is closed under \<open>\<Zsurj>\<close> (i.e. \<open>Q \<Zsurj> Q\<close>),
    then \<open>expr^\<epsilon>(\<chi>) \<in> Win_a((p,Q)^\<epsilon>_a)\<close>.\\
-\<open>\<forall>p Q. distinguishes_from_inner \<chi> p Q \<longrightarrow> Q \<Zsurj>S Q
+\<open>\<forall>p Q. Q \<noteq> {} \<longrightarrow> distinguishes_from_inner \<chi> p Q \<longrightarrow> Q \<Zsurj>S Q
        \<longrightarrow> in_wina (expr_pr_inner \<chi>) (Attacker_Delayed p Q)\<close>
 
 \item [4.] At defender positions, if \<open>\<And>\<Psi>\<close> distinguishes \<open>p\<close> from \<open>Q \<noteq> {}\<close>,
@@ -475,7 +475,7 @@ The inductive property of lemma 1 is formalized as follows
         (\<forall>Q p. Q \<noteq> {} \<longrightarrow> distinguishes_from \<phi> p Q
                \<longrightarrow> in_wina (expressiveness_price \<phi>) (Attacker_Immediate p Q))
       \<and>
-        ((\<forall>p Q. distinguishes_from_inner \<chi> p Q \<longrightarrow> Q \<Zsurj>S Q
+        ((\<forall>p Q. Q \<noteq> {} \<longrightarrow> distinguishes_from_inner \<chi> p Q \<longrightarrow> Q \<Zsurj>S Q
             \<longrightarrow> in_wina (expr_pr_inner \<chi>) (Attacker_Delayed p Q))
         \<and> (\<forall>\<Psi>_I \<Psi> p Q. \<chi> = Conj \<Psi>_I \<Psi> \<longrightarrow>
             Q \<noteq> {} \<longrightarrow> distinguishes_from_inner \<chi> p Q
@@ -516,7 +516,7 @@ The inductive property of lemma 1 is formalized as follows
 
     fix \<chi>
     assume
-      "(\<forall>p Q. distinguishes_from_inner \<chi> p Q \<longrightarrow> Q \<Zsurj>S Q \<longrightarrow> in_wina (expr_pr_inner \<chi>) (Attacker_Delayed p Q))
+      "(\<forall>p Q. Q \<noteq> {} \<longrightarrow> distinguishes_from_inner \<chi> p Q \<longrightarrow> Q \<Zsurj>S Q \<longrightarrow> in_wina (expr_pr_inner \<chi>) (Attacker_Delayed p Q))
      \<and> (\<forall>\<Psi>_I \<Psi> p Q. \<chi> = hml_srbb_inner.Conj \<Psi>_I \<Psi> \<longrightarrow>
            Q \<noteq> {} \<longrightarrow> distinguishes_from_inner \<chi> p Q
            \<longrightarrow> in_wina (expr_pr_inner \<chi>) (Defender_Conj p Q))
@@ -529,7 +529,7 @@ The inductive property of lemma 1 is formalized as follows
            Q_\<alpha> \<subseteq> Q - model_set_inner (hml_srbb_inner.Obs \<alpha> \<phi>)
            \<longrightarrow> in_wina (expr_pr_inner \<chi>) (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>))"
     hence IH1:
-      "\<forall>p Q. distinguishes_from_inner \<chi> p Q \<longrightarrow> Q \<Zsurj>S Q \<longrightarrow> in_wina (expr_pr_inner \<chi>) (Attacker_Delayed p Q)"
+      "\<forall>p Q. Q \<noteq> {} \<longrightarrow> distinguishes_from_inner \<chi> p Q \<longrightarrow> Q \<Zsurj>S Q \<longrightarrow> in_wina (expr_pr_inner \<chi>) (Attacker_Delayed p Q)"
       and IH2:
       "(\<forall>\<Psi>_I \<Psi> p Q. \<chi> = hml_srbb_inner.Conj \<Psi>_I \<Psi> \<longrightarrow>
            Q \<noteq> {} \<longrightarrow> distinguishes_from_inner \<chi> p Q
@@ -581,12 +581,17 @@ The inductive property of lemma 1 is formalized as follows
       obtain p' where "p \<Zsurj> p'" and "p' \<Turnstile> hml_srbb_inner_to_hml \<chi>" by auto
       from this(1) have "p \<Zsurj>L p'" by(rule silent_reachable_impl_loopless)
 
+      have "Q\<tau> \<noteq> {}"
+        using silent_reachable.intros(1) sreachable_set_is_sreachable Q\<tau>_def \<open>Q \<noteq> {}\<close> 
+        by fastforce
+
       from \<open>p' \<Turnstile> hml_srbb_inner_to_hml \<chi>\<close>
        and \<open>\<forall>q' \<in> Q\<tau>. \<not>(q' \<Turnstile> hml_srbb_inner_to_hml \<chi>)\<close>
       have "distinguishes_from_inner \<chi> p' Q\<tau>" 
         by (simp add: distinguishes_from_inner_def distinguishes_inner_def)
 
-      with \<open>Q\<tau> \<Zsurj>S Q\<tau>\<close>
+      
+      with \<open>Q\<tau> \<Zsurj>S Q\<tau>\<close> \<open>Q\<tau> \<noteq> {}\<close>
        and IH1
       have "in_wina (expr_pr_inner \<chi>) (Attacker_Delayed p' Q\<tau>)" 
         by blast
@@ -675,7 +680,6 @@ The inductive property of lemma 1 is formalized as follows
 
       from in_wina_Ga[of e5, OF def_conj_wina, of "Attacker_Immediate p Q"] imm_to_conj imm_to_conj_wgt
       show "in_wina (expressiveness_price (ImmConj I \<psi>s)) (Attacker_Immediate p Q)" by simp
-      
     qed
 
   next
@@ -683,10 +687,66 @@ The inductive property of lemma 1 is formalized as follows
     fix \<alpha> \<phi>
     assume IH: "\<forall>Q p. Q \<noteq> {} \<longrightarrow> distinguishes_from \<phi> p Q
                   \<longrightarrow> in_wina (expressiveness_price \<phi>) (Attacker_Immediate p Q)"
-    have "\<forall>p Q. distinguishes_from_inner (hml_srbb_inner.Obs \<alpha> \<phi>) p Q \<longrightarrow> Q \<Zsurj>S Q
-                \<longrightarrow> in_wina (expr_pr_inner (hml_srbb_inner.Obs \<alpha> \<phi>)) (Attacker_Delayed p Q)" sorry
+    have "\<forall>p Q. Q \<noteq> {} \<longrightarrow> distinguishes_from_inner (hml_srbb_inner.Obs \<alpha> \<phi>) p Q \<longrightarrow> Q \<Zsurj>S Q
+                \<longrightarrow> in_wina (expr_pr_inner (hml_srbb_inner.Obs \<alpha> \<phi>)) (Attacker_Delayed p Q)" 
+    proof(rule allI, rule allI, rule impI, rule impI, rule impI)
+      fix p Q
+      assume "Q \<noteq> {}" "distinguishes_from_inner (hml_srbb_inner.Obs \<alpha> \<phi>) p Q" "Q \<Zsurj>S Q"
+
+      have "\<exists>p' Q'. in_wina (expressiveness_price \<phi>) (Attacker_Immediate p' Q')" 
+      proof(cases "\<alpha> = \<tau>")
+        case True
+        (*with \<open>distinguishes_from_inner (hml_srbb_inner.Obs \<alpha> \<phi>) p Q\<close> 
+        have dist_unfolded: 
+          "\<forall>q\<in>Q. ((\<exists>p'. p \<mapsto>\<tau> p' \<and> p' \<Turnstile> hml_srbb_to_hml \<phi>) \<or> p \<Turnstile> hml_srbb_to_hml \<phi>) \<and>
+           \<not> ((\<exists>p'. q \<mapsto>\<tau> p' \<and> p' \<Turnstile> hml_srbb_to_hml \<phi>) \<or> q \<Turnstile> hml_srbb_to_hml \<phi>)" 
+          unfolding distinguishes_from_inner_def distinguishes_inner_def
+            hml_srbb_inner_models.simps hml_srbb_inner_to_hml.simps
+            hml_models.simps(4) True
+          by auto
+        hence "((\<exists>p'. p \<mapsto>\<tau> p' \<and> p' \<Turnstile> hml_srbb_to_hml \<phi>) \<or> p \<Turnstile> hml_srbb_to_hml \<phi>)" 
+          using \<open>Q \<noteq> {}\<close> by blast
+        then obtain p' where "p' \<Turnstile> hml_srbb_to_hml \<phi>" "p \<mapsto>a \<alpha> p'" 
+          unfolding True 
+
+        from dist_unfolded have "\<forall>q\<in>Q. \<not> ((\<exists>p'. q \<mapsto>\<tau> p' \<and> p' \<Turnstile> hml_srbb_to_hml \<phi>) \<or> q \<Turnstile> hml_srbb_to_hml \<phi>)" 
+          by blast
+        hence "\<forall>q\<in>Q. \<not>q \<Turnstile> hml_srbb_to_hml \<phi>" using \<open>Q \<Zsurj>S Q\<close> by fastforce
+
+        hence "distinguishes_from \<phi> p' Q"
+          by (simp add: \<open>p' \<Turnstile> hml_srbb_to_hml \<phi>\<close> distinguishes_def distinguishes_from_def)
+        with IH have "in_wina (expressiveness_price \<phi>) (Attacker_Immediate p' Q)" 
+          using \<open>Q \<noteq> {}\<close> by blast
+        moreover have "p \<mapsto>a \<alpha> p'" *) 
+        with IH show ?thesis sorry
+      next
+        case False
+        with \<open>distinguishes_from_inner (hml_srbb_inner.Obs \<alpha> \<phi>) p Q\<close> 
+        obtain p'' where "(p \<mapsto>\<alpha> p'') \<and> (p'' \<Turnstile> (hml_srbb_to_hml \<phi>))" 
+          unfolding distinguishes_from_inner_def distinguishes_inner_def
+            hml_srbb_inner_models.simps hml_srbb_inner_to_hml.simps 
+          using hml_models.simps \<open>Q \<noteq> {}\<close> by auto
+
+        let ?Q' = "step_set Q \<alpha>"
+        from \<open>distinguishes_from_inner (hml_srbb_inner.Obs \<alpha> \<phi>) p Q\<close> 
+        have "\<forall>q\<in>Q. \<not> q \<Turnstile> hml.Obs \<alpha> (hml_srbb_to_hml \<phi>)" 
+          unfolding distinguishes_from_inner_def distinguishes_inner_def
+            hml_srbb_inner_models.simps hml_srbb_inner_to_hml.simps 
+          using hml_models.simps \<open>Q \<noteq> {}\<close> by (metis (full_types))
+        hence "\<forall>q\<in>?Q'. \<not> q \<Turnstile> hml_srbb_to_hml \<phi>"
+          using step_set_is_step_set by fastforce
+
+        from \<open>\<forall>q\<in>step_set Q \<alpha>. \<not> q \<Turnstile> hml_srbb_to_hml \<phi>\<close> \<open>p \<mapsto>\<alpha> p'' \<and> p'' \<Turnstile> hml_srbb_to_hml \<phi>\<close>
+        have "distinguishes_from \<phi> p'' ?Q'"
+          by (simp add: distinguishes_def distinguishes_from_def)
+
+        then show ?thesis by (metis IH distinction_implies_winning_budgets_empty_Q)
+      qed
+      
+      thus "in_wina (expr_pr_inner (hml_srbb_inner.Obs \<alpha> \<phi>)) (Attacker_Delayed p Q)" sorry
+    qed
     then show
-      "(\<forall>p Q. distinguishes_from_inner (hml_srbb_inner.Obs \<alpha> \<phi>) p Q \<longrightarrow> Q \<Zsurj>S Q
+      "(\<forall>p Q. Q \<noteq> {} \<longrightarrow> distinguishes_from_inner (hml_srbb_inner.Obs \<alpha> \<phi>) p Q \<longrightarrow> Q \<Zsurj>S Q
            \<longrightarrow> in_wina (expr_pr_inner (hml_srbb_inner.Obs \<alpha> \<phi>)) (Attacker_Delayed p Q))
      \<and> (\<forall>\<Psi>_I \<Psi> p Q. hml_srbb_inner.Obs \<alpha> \<phi> = hml_srbb_inner.Conj \<Psi>_I \<Psi> \<longrightarrow>
            Q \<noteq> {} \<longrightarrow> distinguishes_from_inner (hml_srbb_inner.Obs \<alpha> \<phi>) p Q
@@ -708,13 +768,13 @@ The inductive property of lemma 1 is formalized as follows
     assume IH: "\<And>\<psi>. \<psi> \<in> range \<psi>s \<Longrightarrow> \<forall>p q. distinguishes_conjunct \<psi> p q
                   \<longrightarrow> in_wina (expr_pr_conjunct \<psi>) (Attacker_Clause p q)"
     have
-      "(\<forall>p Q. distinguishes_from_inner (hml_srbb_inner.Conj I \<psi>s) p Q \<longrightarrow> Q \<Zsurj>S Q
+      "(\<forall>p Q. Q \<noteq> {} \<longrightarrow> distinguishes_from_inner (hml_srbb_inner.Conj I \<psi>s) p Q \<longrightarrow> Q \<Zsurj>S Q
            \<longrightarrow> in_wina (expr_pr_inner (hml_srbb_inner.Conj I \<psi>s)) (Attacker_Delayed p Q))
      \<and> (\<forall>\<Psi>_I \<Psi> p Q. hml_srbb_inner.Conj I \<psi>s = hml_srbb_inner.Conj \<Psi>_I \<Psi> \<longrightarrow>
            Q \<noteq> {} \<longrightarrow> distinguishes_from_inner (hml_srbb_inner.Conj I \<psi>s) p Q
            \<longrightarrow> in_wina (expr_pr_inner (hml_srbb_inner.Conj I \<psi>s)) (Defender_Conj p Q))" sorry
     then show
-      "(\<forall>p Q. distinguishes_from_inner (hml_srbb_inner.Conj I \<psi>s) p Q \<longrightarrow> Q \<Zsurj>S Q
+      "(\<forall>p Q. Q \<noteq> {} \<longrightarrow> distinguishes_from_inner (hml_srbb_inner.Conj I \<psi>s) p Q \<longrightarrow> Q \<Zsurj>S Q
            \<longrightarrow> in_wina (expr_pr_inner (hml_srbb_inner.Conj I \<psi>s)) (Attacker_Delayed p Q))
      \<and> (\<forall>\<Psi>_I \<Psi> p Q. hml_srbb_inner.Conj I \<psi>s = hml_srbb_inner.Conj \<Psi>_I \<Psi> \<longrightarrow>
            Q \<noteq> {} \<longrightarrow> distinguishes_from_inner (hml_srbb_inner.Conj I \<psi>s) p Q
@@ -736,13 +796,13 @@ The inductive property of lemma 1 is formalized as follows
     assume IH: "\<And>\<psi>. \<psi> \<in> range \<psi>s \<Longrightarrow> \<forall>p q. distinguishes_conjunct \<psi> p q
                   \<longrightarrow> in_wina (expr_pr_conjunct \<psi>) (Attacker_Clause p q)"
     have
-      "(\<forall>p Q. distinguishes_from_inner (StableConj I \<psi>s) p Q \<longrightarrow> Q \<Zsurj>S Q
+      "(\<forall>p Q. Q \<noteq> {} \<longrightarrow> distinguishes_from_inner (StableConj I \<psi>s) p Q \<longrightarrow> Q \<Zsurj>S Q
            \<longrightarrow> in_wina (expr_pr_inner (StableConj I \<psi>s)) (Attacker_Delayed p Q))
      \<and> (\<forall>\<Psi>_I \<Psi> p Q. StableConj I \<psi>s = StableConj \<Psi>_I \<Psi> \<longrightarrow>
            Q \<noteq> {} \<longrightarrow> distinguishes_from_inner (StableConj I \<psi>s) p Q \<longrightarrow> (\<forall>q\<in>Q. \<nexists>q'. q \<mapsto>\<tau> q')
            \<longrightarrow> in_wina (expr_pr_inner (StableConj I \<psi>s)) (Defender_Stable_Conj p Q))" sorry
     then show
-      "(\<forall>p Q. distinguishes_from_inner (StableConj I \<psi>s) p Q \<longrightarrow> Q \<Zsurj>S Q
+      "(\<forall>p Q. Q \<noteq> {} \<longrightarrow> distinguishes_from_inner (StableConj I \<psi>s) p Q \<longrightarrow> Q \<Zsurj>S Q
            \<longrightarrow> in_wina (expr_pr_inner (StableConj I \<psi>s)) (Attacker_Delayed p Q))
      \<and> (\<forall>\<Psi>_I \<Psi> p Q. StableConj I \<psi>s = hml_srbb_inner.Conj \<Psi>_I \<Psi> \<longrightarrow>
            Q \<noteq> {} \<longrightarrow> distinguishes_from_inner (StableConj I \<psi>s) p Q
@@ -770,7 +830,7 @@ The inductive property of lemma 1 is formalized as follows
           "\<And>\<psi>. \<psi> \<in> range \<psi>s \<Longrightarrow> \<forall>p q. distinguishes_conjunct \<psi> p q
             \<longrightarrow> in_wina (expr_pr_conjunct \<psi>) (Attacker_Clause p q)"
     have
-      "(\<forall>p Q. distinguishes_from_inner (BranchConj \<alpha> \<phi> I \<psi>s) p Q \<longrightarrow> Q \<Zsurj>S Q
+      "(\<forall>p Q. Q \<noteq> {} \<longrightarrow> distinguishes_from_inner (BranchConj \<alpha> \<phi> I \<psi>s) p Q \<longrightarrow> Q \<Zsurj>S Q
            \<longrightarrow> in_wina (expr_pr_inner (BranchConj \<alpha> \<phi> I \<psi>s)) (Attacker_Delayed p Q))
      \<and> (\<forall>\<Psi>_I \<Psi> \<alpha>' \<phi>' p Q p' Q_\<alpha>. BranchConj \<alpha> \<phi> I \<psi>s = BranchConj \<alpha>' \<phi>' \<Psi>_I \<Psi> \<longrightarrow>
            distinguishes_from_inner (BranchConj \<alpha> \<phi> I \<psi>s) p Q \<longrightarrow> p \<mapsto>\<alpha>' p' \<longrightarrow> p' \<Turnstile>SRBB \<phi>' \<longrightarrow>
@@ -778,7 +838,7 @@ The inductive property of lemma 1 is formalized as follows
            Q_\<alpha> \<subseteq> Q - model_set_inner (hml_srbb_inner.Obs \<alpha>' \<phi>')
            \<longrightarrow> in_wina (expr_pr_inner (BranchConj \<alpha> \<phi> I \<psi>s)) (Defender_Branch p \<alpha>' p' (Q - Q_\<alpha>) Q_\<alpha>))" sorry
     then show
-      "(\<forall>p Q. distinguishes_from_inner (BranchConj \<alpha> \<phi> I \<psi>s) p Q \<longrightarrow> Q \<Zsurj>S Q
+      "(\<forall>p Q. Q \<noteq> {} \<longrightarrow> distinguishes_from_inner (BranchConj \<alpha> \<phi> I \<psi>s) p Q \<longrightarrow> Q \<Zsurj>S Q
            \<longrightarrow> in_wina (expr_pr_inner (BranchConj \<alpha> \<phi> I \<psi>s)) (Attacker_Delayed p Q))
      \<and> (\<forall>\<Psi>_I \<Psi> p Q. BranchConj \<alpha> \<phi> I \<psi>s = hml_srbb_inner.Conj \<Psi>_I \<Psi> \<longrightarrow>
            Q \<noteq> {} \<longrightarrow> distinguishes_from_inner (BranchConj \<alpha> \<phi> I \<psi>s) p Q
@@ -797,7 +857,7 @@ The inductive property of lemma 1 is formalized as follows
 
     fix \<chi>
     assume IH:
-      "(\<forall>p Q. distinguishes_from_inner \<chi> p Q \<longrightarrow> Q \<Zsurj>S Q
+      "(\<forall>p Q. Q \<noteq> {} \<longrightarrow> distinguishes_from_inner \<chi> p Q \<longrightarrow> Q \<Zsurj>S Q
            \<longrightarrow> in_wina (expr_pr_inner \<chi>) (Attacker_Delayed p Q))
      \<and> (\<forall>\<Psi>_I \<Psi> p Q. \<chi> = hml_srbb_inner.Conj \<Psi>_I \<Psi> \<longrightarrow>
            Q \<noteq> {} \<longrightarrow> distinguishes_from_inner \<chi> p Q
@@ -817,7 +877,7 @@ The inductive property of lemma 1 is formalized as follows
 
     fix \<chi>
     assume IH: 
-      "(\<forall>p Q. distinguishes_from_inner \<chi> p Q \<longrightarrow> Q \<Zsurj>S Q
+      "(\<forall>p Q. Q \<noteq> {} \<longrightarrow> distinguishes_from_inner \<chi> p Q \<longrightarrow> Q \<Zsurj>S Q
            \<longrightarrow> in_wina (expr_pr_inner \<chi>) (Attacker_Delayed p Q))
      \<and> (\<forall>\<Psi>_I \<Psi> p Q. \<chi> = hml_srbb_inner.Conj \<Psi>_I \<Psi> \<longrightarrow>
            Q \<noteq> {} \<longrightarrow> distinguishes_from_inner \<chi> p Q
