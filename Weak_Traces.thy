@@ -201,10 +201,31 @@ next
   then show ?case sorry
 next
   case (Conj I \<psi>s)
-  then show ?case sorry
+  assume "is_trace_formula_inner (Conj I \<psi>s)"
+     and "hml_srbb_inner_models (Conj I \<psi>s) q"
+
+  from \<open>is_trace_formula_inner (Conj I \<psi>s)\<close>
+  have "I = {}" 
+    by (simp add: is_trace_formula_inner.simps)
+
+  have "[] \<in> weak_traces q" by (rule empty_trace_allways_weak_trace)
+
+  have "(Conj {} (\<lambda>_. undefined)) \<Lleftarrow>\<chi>\<Rrightarrow> (Conj {} \<psi>s)"
+    using srbb_obs_\<tau>_is_\<chi>TT and hml_srbb_eq_inner_equiv by (simp add: equivp_def)
+  then have "(Conj {} (\<lambda>_. undefined)) \<Lleftarrow>\<chi>\<Rrightarrow> (Conj I \<psi>s)"
+    using \<open>I = {}\<close> by auto
+  then have "wtrace_to_inner [] \<Lleftarrow>\<chi>\<Rrightarrow> Conj I \<psi>s"
+    unfolding wtrace_to_inner.simps.
+
+  from \<open>[] \<in> weak_traces q\<close>
+   and \<open>wtrace_to_inner [] \<Lleftarrow>\<chi>\<Rrightarrow> Conj I \<psi>s\<close>
+  show ?case by auto
 next
   case (StableConj I \<psi>s)
-  then show ?case sorry
+  have "\<not>is_trace_formula_inner (StableConj I \<psi>s)" 
+    by (simp add: is_trace_formula_inner.simps)
+  with \<open>is_trace_formula_inner (StableConj I \<psi>s)\<close>
+  show ?case by contradiction
 next
   case (BranchConj \<alpha> \<phi> I \<psi>s)
   then show ?case sorry

@@ -114,6 +114,10 @@ lemma weak_step_sequence_trans:
 abbreviation weak_traces :: "'s \<Rightarrow> 'a list set"
   where "weak_traces p \<equiv> {tr. \<exists>p'. p \<Zsurj>\<mapsto>\<Zsurj>$ tr p'}"
 
+lemma empty_trace_allways_weak_trace:
+  shows "[] \<in> weak_traces p"
+  using silent_reachable.intros(1) weak_step_sequence.intros(1) by fastforce
+
 lemma silent_prepend_weak_traces:
   assumes "p \<Zsurj> p'"
       and "tr \<in> weak_traces p'"
