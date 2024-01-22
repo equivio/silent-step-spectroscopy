@@ -315,10 +315,45 @@ proof -
   qed
 qed
 
+lemma obs_srbb_cong:
+  assumes "\<phi>l \<Lleftarrow>srbb\<Rrightarrow> \<phi>r"
+  shows "(Obs \<alpha> \<phi>l) \<Lleftarrow>\<chi>\<Rrightarrow> (Obs \<alpha> \<phi>r)"
+  using assms 
+  apply (cases "\<alpha> \<noteq> \<tau>")
+  apply (smt (verit) hml_impl_iffI hml_models.simps(2) hml_srbb_eq_def hml_srbb_eq_inner_def hml_srbb_impl_inner_def hml_srbb_inner_models.elims(2) hml_srbb_inner_models.elims(3) hml_srbb_inner_to_hml.simps(1) srbb_impl_to_hml_impl)
+  using hml_impl_iffI hml_models.simps(4) hml_srbb_eq_def hml_srbb_eq_inner_def hml_srbb_impl_inner_def hml_srbb_inner_models.elims(2) hml_srbb_inner_models.elims(3) hml_srbb_inner_to_hml.simps(1) srbb_impl_to_hml_impl by auto
+
 subsection \<open> Known Equivalence Elements \<close>
 
 lemma srbb_obs_\<tau>_is_\<chi>TT: "Obs \<tau> TT \<Lleftarrow>\<chi>\<Rrightarrow> Conj {} \<psi>s"
   by (simp add: hml_srbb_eq_inner_def hml_srbb_impl_inner_def)
+
+lemma srbb_obs_is_empty_branch_conj: "Obs \<alpha> \<phi> \<Lleftarrow>\<chi>\<Rrightarrow> BranchConj \<alpha> \<phi> {} \<psi>s"
+  unfolding srbb_eq_inner_hml_eq and hml_srbb_inner_to_hml.simps
+proof -
+  from T_is_empty_conj
+  have "hml.Conj {} (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s) \<Lleftarrow>\<Rrightarrow> hml.TT" 
+    using hml_eq_equality by force
+  have    "(hml_conjunct.Pos (HML_soft_poss \<alpha> (hml_srbb_to_hml \<phi>))
+      \<and>hml hml_conjunct.Pos (hml.Conj {} (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s)))
+  \<Lleftarrow>\<Rrightarrow>      (hml_conjunct.Pos (HML_soft_poss \<alpha> (hml_srbb_to_hml \<phi>))
+      \<and>hml hml_conjunct.Pos (hml.Conj {} (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s)))"
+    using hml_eq_equality by blast
+  then have "(hml_conjunct.Pos (HML_soft_poss \<alpha> (hml_srbb_to_hml \<phi>))
+      \<and>hml hml_conjunct.Pos (hml.Conj {} (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s)))
+  \<Lleftarrow>\<Rrightarrow>      (hml_conjunct.Pos (HML_soft_poss \<alpha> (hml_srbb_to_hml \<phi>))
+      \<and>hml hml_conjunct.Pos hml.TT)"
+    using and_subst_right[OF pos_cong[OF \<open>hml.Conj {} (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s) \<Lleftarrow>\<Rrightarrow> hml.TT\<close>]] by auto
+  then have "(hml_conjunct.Pos (HML_soft_poss \<alpha> (hml_srbb_to_hml \<phi>))
+      \<and>hml hml_conjunct.Pos (hml.Conj {} (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s)))
+  \<Lleftarrow>\<Rrightarrow>      (HML_soft_poss \<alpha> (hml_srbb_to_hml \<phi>))"
+    using hml_and_right_tt 
+    by (simp add: LTS_Tau.hml_eq_equality)
+  then show "HML_soft_poss \<alpha> (hml_srbb_to_hml \<phi>) \<Lleftarrow>\<Rrightarrow>
+    hml_conjunct.Pos
+     (HML_soft_poss \<alpha> (hml_srbb_to_hml \<phi>)) \<and>hml hml_conjunct.Pos (hml.Conj {} (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s))"
+    by (meson LTS_Tau.hml_eq_equality)
+qed
 
 lemma srbb_TT_is_\<chi>TT: "TT \<Lleftarrow>srbb\<Rrightarrow> Internal (Conj {} \<psi>s)"
   using \<epsilon>T_is_T hml_eq_def hml_impl_iffI hml_srbb_eq_def hml_srbb_impl_def by auto
