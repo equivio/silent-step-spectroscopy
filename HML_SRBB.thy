@@ -135,6 +135,103 @@ lemma distinguishes_from_conjunct_priming:
   using assms distinguishes_conjunct_def distinguishes_from_conjunct'_def distinguishes_from_conjunct_def ex_in_conv by auto
 
 
+lemma srbb_dist_imm_conjunction_implies_dist_conjunct:
+  assumes "distinguishes (ImmConj I \<psi>s) p q"
+  shows "\<exists>i\<in>I. distinguishes_conjunct (\<psi>s i) p q"
+  using assms distinguishes_conjunct_def distinguishes_def by auto
+
+lemma srbb_dist_conjunction_implies_dist_conjunct:
+  assumes "distinguishes_inner (Conj I \<psi>s) p q"
+  shows "\<exists>i\<in>I. distinguishes_conjunct (\<psi>s i) p q"
+  using assms distinguishes_conjunct_def distinguishes_inner_def by auto
+
+lemma srbb_dist_stable_conjunction_implies_dist_conjunct_or_stable:
+  assumes "distinguishes_inner (StableConj I \<psi>s) p q"
+  shows "(\<exists>i\<in>I. distinguishes_conjunct (\<psi>s i) p q) \<or> (p <> (HML_not (hml.Obs \<tau> hml.TT)) q)"
+  using assms
+proof -
+  assume "distinguishes_inner (StableConj I \<psi>s) p q"
+  then have "hml_srbb_inner_models (StableConj I \<psi>s) p"
+        and "\<not> hml_srbb_inner_models (StableConj I \<psi>s) q"
+    unfolding distinguishes_inner_def by auto
+
+  from \<open>hml_srbb_inner_models (StableConj I \<psi>s) p\<close>
+  have "p \<Turnstile> hml_conjunct.Neg (hml.Obs \<tau> hml.TT)
+            \<and>hml hml_conjunct.Pos (hml.Conj I (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s))"
+    unfolding hml_srbb_inner_models.simps
+          and hml_srbb_inner_to_hml.simps.
+  with hml_and_and
+  have "hml_conjunct_models p (hml_conjunct.Neg (hml.Obs \<tau> hml.TT))"
+   and "hml_conjunct_models p (hml_conjunct.Pos (hml.Conj I (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s)))"
+    by blast+
+
+  from \<open>\<not> hml_srbb_inner_models (StableConj I \<psi>s) q\<close>
+  have "\<not> hml_conjunct_models q (hml_conjunct.Neg (hml.Obs \<tau> hml.TT))
+      \<or> \<not> hml_conjunct_models q (hml_conjunct.Pos (hml.Conj I (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s)))"
+    unfolding hml_srbb_inner_models.simps
+          and hml_srbb_inner_to_hml.simps
+          and hml_and_and
+          and de_Morgan_conj.
+  then show "(\<exists>i\<in>I. distinguishes_conjunct (\<psi>s i) p q) \<or> (p <> (HML_not (hml.Obs \<tau> hml.TT)) q)"
+  proof (rule disjE)
+    assume "\<not> hml_conjunct_models q (hml_conjunct.Neg (hml.Obs \<tau> hml.TT))"
+    with \<open>hml_conjunct_models p (hml_conjunct.Neg (hml.Obs \<tau> hml.TT))\<close>
+    have "p <> (HML_not (hml.Obs \<tau> hml.TT)) q" 
+      by (simp add: LTS_Tau.distinguishes_hml_def)
+    then show ?thesis by auto
+  next
+    assume "\<not> hml_conjunct_models q (hml_conjunct.Pos (hml.Conj I (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s)))"
+    hence "\<not> q \<Turnstile> (hml.Conj I (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s))" unfolding hml_conjunct_models.simps.
+    moreover from \<open>hml_conjunct_models p (hml_conjunct.Pos (hml.Conj I (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s)))\<close>
+    have "p \<Turnstile> (hml.Conj I (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s))" unfolding hml_conjunct_models.simps.
+    ultimately have "\<exists>i\<in>I. distinguishes_conjunct (\<psi>s i) p q"
+      using dist_conjunction_implies_dist_conjunct 
+      by (simp add: distinguishes_conjunct_def hml_models.simps(5))
+    then show ?thesis by auto
+  qed
+qed
+
+lemma srbb_dist_branch_conjunction_implies_dist_conjunct_or_branch:
+  assumes "distinguishes_inner (BranchConj \<alpha> \<phi> I \<psi>s) p q"
+  shows "(\<exists>i\<in>I. distinguishes_conjunct (\<psi>s i) p q) \<or> (distinguishes_inner (Obs \<alpha> \<phi>) p q)"
+  using assms
+proof -
+  assume "distinguishes_inner (BranchConj \<alpha> \<phi> I \<psi>s) p q"
+  then have
+    "p \<Turnstile> hml_conjunct.Pos (HML_soft_poss \<alpha> (hml_srbb_to_hml \<phi>))
+         \<and>hml hml_conjunct.Pos (hml.Conj I (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s))"
+    and
+    "\<not> q \<Turnstile> hml_conjunct.Pos (HML_soft_poss \<alpha> (hml_srbb_to_hml \<phi>))
+           \<and>hml hml_conjunct.Pos (hml.Conj I (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s))"
+    unfolding distinguishes_inner_def and hml_srbb_inner_models.simps and hml_srbb_inner_to_hml.simps
+    by auto
+
+  from \<open>p \<Turnstile> hml_conjunct.Pos (HML_soft_poss \<alpha> (hml_srbb_to_hml \<phi>))
+             \<and>hml hml_conjunct.Pos (hml.Conj I (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s))\<close>
+  have "p \<Turnstile> HML_soft_poss \<alpha> (hml_srbb_to_hml \<phi>)"
+    and "p \<Turnstile> hml.Conj I (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s)"
+    unfolding hml_and_and hml_conjunct_models.simps by auto
+
+  from \<open>\<not> q \<Turnstile> hml_conjunct.Pos (HML_soft_poss \<alpha> (hml_srbb_to_hml \<phi>))
+           \<and>hml hml_conjunct.Pos (hml.Conj I (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s))\<close>
+  show "(\<exists>i\<in>I. distinguishes_conjunct (\<psi>s i) p q) \<or> (distinguishes_inner (Obs \<alpha> \<phi>) p q)"
+    unfolding hml_and_and de_Morgan_conj hml_conjunct_models.simps
+  proof (rule disjE)
+    assume "\<not> q \<Turnstile> HML_soft_poss \<alpha> (hml_srbb_to_hml \<phi>)"
+    with \<open>p \<Turnstile> HML_soft_poss \<alpha> (hml_srbb_to_hml \<phi>)\<close>
+    have "distinguishes_inner (Obs \<alpha> \<phi>) p q"
+      unfolding distinguishes_inner_def hml_srbb_inner_models.simps hml_srbb_inner_to_hml.simps by auto
+    then show ?thesis by auto
+  next
+    assume "\<not> q \<Turnstile> hml.Conj I (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s)"
+    with \<open>p \<Turnstile> hml.Conj I (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s)\<close>
+    have "\<exists>i\<in>I. distinguishes_conjunct (\<psi>s i) p q"
+      by (simp add: distinguishes_conjunct_def)
+    then show ?thesis by auto
+  qed
+qed
+
+
 definition hml_preordered :: "(('a, 's) hml_srbb) set \<Rightarrow> 's \<Rightarrow> 's \<Rightarrow> bool" where
   "hml_preordered \<phi>s p q \<equiv> \<forall>\<phi> \<in> \<phi>s. p \<Turnstile>SRBB \<phi> \<longrightarrow> q \<Turnstile>SRBB \<phi>"
 
