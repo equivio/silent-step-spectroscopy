@@ -77,15 +77,31 @@ lemma "(state \<Turnstile>SRBB Internal \<chi>) = (state \<Turnstile>SRBB ImmCon
 definition distinguishes :: "('a, 's) hml_srbb \<Rightarrow> 's \<Rightarrow> 's \<Rightarrow> bool" where
   "distinguishes \<phi> p q \<equiv> p \<Turnstile>SRBB \<phi> \<and> \<not>(q \<Turnstile>SRBB \<phi>)"
 
+lemma dist_srbb_eq_dist_hml:
+  "distinguishes \<phi> p q = p <> (hml_srbb_to_hml \<phi>) q"
+  by (simp add: distinguishes_def distinguishes_hml_def)
+
 definition distinguishes_inner :: "('a, 's) hml_srbb_inner \<Rightarrow> 's \<Rightarrow> 's \<Rightarrow> bool" where
   "distinguishes_inner \<chi> p q \<equiv> hml_srbb_inner_models \<chi> p \<and> \<not>(hml_srbb_inner_models \<chi> q)"
+
+lemma dist_inner_srbb_eq_dist_hml:
+  "distinguishes_inner \<chi> p q = p <> (hml_srbb_inner_to_hml \<chi>) q"
+  by (simp add: distinguishes_inner_def distinguishes_hml_def)
 
 definition distinguishes_conjunct :: "('a, 's) hml_srbb_conjunct \<Rightarrow> 's \<Rightarrow> 's \<Rightarrow> bool" where
   "distinguishes_conjunct \<psi> p q \<equiv> hml_srbb_conjunct_models \<psi> p \<and> \<not>(hml_srbb_conjunct_models \<psi> q)"
 
+lemma dist_conjunct_srbb_eq_dist_conjunct_hml:
+  "distinguishes_conjunct \<psi> p q = distinguishes_conjunct_hml p (hml_srbb_conjunct_to_hml_conjunct \<psi>) q"
+  by (simp add: distinguishes_conjunct_def distinguishes_conjunct_hml_def)
+
 
 definition distinguishes_from :: "('a, 's) hml_srbb \<Rightarrow> 's \<Rightarrow> 's set \<Rightarrow> bool" where
   "distinguishes_from \<phi> p Q \<equiv> p \<Turnstile>SRBB \<phi> \<and> (\<forall>q \<in> Q. \<not>(q \<Turnstile>SRBB \<phi>))"
+
+lemma dist_from_srbb_eq_dist_from_hml:
+  "distinguishes_from \<phi> p Q = p <> (hml_srbb_to_hml \<phi>) Q"
+  by (simp add: distinguishes_from_def distinguishes_from_hml_def)
 
 definition distinguishes_from' :: "('a, 's) hml_srbb \<Rightarrow> 's \<Rightarrow> 's set \<Rightarrow> bool" where
   "distinguishes_from' \<phi> p Q \<equiv> \<forall>q \<in> Q. distinguishes \<phi> p q"
@@ -104,6 +120,10 @@ lemma distinguishes_from_priming:
 definition distinguishes_from_inner :: "('a, 's) hml_srbb_inner \<Rightarrow> 's \<Rightarrow> 's set \<Rightarrow> bool" where
   "distinguishes_from_inner \<chi> p Q \<equiv> hml_srbb_inner_models \<chi> p \<and> (\<forall>q \<in> Q. \<not>(hml_srbb_inner_models \<chi> q))"
 
+lemma dist_from_inner_srbb_eq_dist_from_hml:
+  "distinguishes_from_inner \<chi> p Q = p <> (hml_srbb_inner_to_hml \<chi>) Q"
+  by (simp add: distinguishes_from_inner_def distinguishes_from_hml_def)
+
 definition distinguishes_from_inner' :: "('a, 's) hml_srbb_inner \<Rightarrow> 's \<Rightarrow> 's set \<Rightarrow> bool" where
   "distinguishes_from_inner' \<chi> p Q \<equiv> \<forall>q \<in> Q. distinguishes_inner \<chi> p q"
 
@@ -120,6 +140,10 @@ lemma distinguishes_from_inner_priming:
 
 definition distinguishes_from_conjunct :: "('a, 's) hml_srbb_conjunct \<Rightarrow> 's \<Rightarrow> 's set \<Rightarrow> bool" where
   "distinguishes_from_conjunct \<psi> p Q \<equiv> hml_srbb_conjunct_models \<psi> p \<and> (\<forall>q \<in> Q. \<not>(hml_srbb_conjunct_models \<psi> q))"
+
+lemma dist_from_conjunct_srbb_eq_dist_from_hml:
+  "distinguishes_from_conjunct \<psi> p Q = distinguishes_conjunct_from_hml p (hml_srbb_conjunct_to_hml_conjunct \<psi>) Q"
+  by (simp add: distinguishes_from_conjunct_def distinguishes_conjunct_from_hml_def)
 
 definition distinguishes_from_conjunct' :: "('a, 's) hml_srbb_conjunct \<Rightarrow> 's \<Rightarrow> 's set \<Rightarrow> bool" where
   "distinguishes_from_conjunct' \<psi> p Q \<equiv> \<forall>q \<in> Q. distinguishes_conjunct \<psi> p q"
