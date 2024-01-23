@@ -229,6 +229,46 @@ proof -
   qed
 qed
 
+lemma srbb_dist_conjunct_or_stable_implies_dist_stable_conjunction:
+  assumes "\<forall>i \<in> I. hml_srbb_conjunct_models (\<psi>s i) p"
+      and "p \<Turnstile> (HML_not (hml.Obs \<tau> hml.TT))"
+      and "(i\<in>I \<and> distinguishes_conjunct (\<psi>s i) p q) \<or> (p <> (HML_not (hml.Obs \<tau> hml.TT)) q)"
+  shows "distinguishes_inner (StableConj I \<psi>s) p q"
+  using assms
+proof -
+  assume 
+    "\<forall>i \<in> I. hml_srbb_conjunct_models (\<psi>s i) p"
+    and p_stable:
+    "p \<Turnstile> (HML_not (hml.Obs \<tau> hml.TT))"
+    and
+    "(i \<in> I \<and> distinguishes_conjunct (\<psi>s i) p q) \<or> (p <> (HML_not (hml.Obs \<tau> hml.TT)) q)"
+  hence conj_dist_or_stable_dist:
+    "(i \<in> I \<and> distinguishes_conjunct_hml p ((hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s) i) q)
+      \<or> (p <> (HML_not (hml.Obs \<tau> hml.TT)) q)"
+    unfolding dist_conjunct_srbb_eq_dist_conjunct_hml o_apply by auto
+
+  from \<open>\<forall>i \<in> I. hml_srbb_conjunct_models (\<psi>s i) p\<close>
+  have p_sat_conj:
+       "\<forall>i\<in>I. hml_conjunct_models p ((hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s) i)"
+    unfolding hml_srbb_conjunct_models.simps o_apply.
+
+  show "distinguishes_inner (StableConj I \<psi>s) p q"
+    unfolding dist_inner_srbb_eq_dist_hml
+          and hml_srbb_inner_to_hml.simps
+          and hml_and_dist_disj
+  proof (rule conjI)
+    from p_stable and p_sat_conj
+    show "p \<Turnstile> hml_conjunct.Neg (hml.Obs \<tau> hml.TT)
+              \<and>hml hml_conjunct.Pos (hml.Conj I (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s))" 
+      by simp
+  next
+    from conj_dist_or_stable_dist
+    show "\<not> hml_conjunct_models q (hml_conjunct.Neg (hml.Obs \<tau> hml.TT))
+        \<or> \<not> hml_conjunct_models q (hml_conjunct.Pos (hml.Conj I (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s)))" 
+      using distinguishes_conjunct_hml_def distinguishes_hml_def by auto
+  qed
+qed
+
 lemma srbb_dist_branch_conjunction_implies_dist_conjunct_or_branch:
   assumes "distinguishes_inner (BranchConj \<alpha> \<phi> I \<psi>s) p q"
   shows "(\<exists>i\<in>I. distinguishes_conjunct (\<psi>s i) p q) \<or> (distinguishes_inner (Obs \<alpha> \<phi>) p q)"
@@ -266,6 +306,46 @@ proof -
     have "\<exists>i\<in>I. distinguishes_conjunct (\<psi>s i) p q"
       by (simp add: distinguishes_conjunct_def)
     then show ?thesis by auto
+  qed
+qed
+
+lemma srbb_dist_conjunct_or_branch_implies_dist_branch_conjunction:
+  assumes "\<forall>i \<in> I. hml_srbb_conjunct_models (\<psi>s i) p"
+      and "hml_srbb_inner_models (Obs \<alpha> \<phi>) p"
+      and "(i\<in>I \<and> distinguishes_conjunct (\<psi>s i) p q) \<or> (distinguishes_inner (Obs \<alpha> \<phi>) p q)"
+  shows "distinguishes_inner (BranchConj \<alpha> \<phi> I \<psi>s) p q"
+  using assms
+proof -
+  assume 
+    "\<forall>i \<in> I. hml_srbb_conjunct_models (\<psi>s i) p"
+    and p_branch:
+    "hml_srbb_inner_models (Obs \<alpha> \<phi>) p"
+    and
+    "(i \<in> I \<and> distinguishes_conjunct (\<psi>s i) p q) \<or> (distinguishes_inner (Obs \<alpha> \<phi>) p q)"
+  hence conj_dist_or_branch_dist:
+    "(i \<in> I \<and> distinguishes_conjunct_hml p ((hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s) i) q)
+      \<or> (p <> (HML_soft_poss \<alpha> (hml_srbb_to_hml \<phi>)) q)"
+    unfolding dist_conjunct_srbb_eq_dist_conjunct_hml o_apply dist_inner_srbb_eq_dist_hml by auto
+
+  from \<open>\<forall>i \<in> I. hml_srbb_conjunct_models (\<psi>s i) p\<close>
+  have p_sat_conj:
+       "\<forall>i\<in>I. hml_conjunct_models p ((hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s) i)"
+    unfolding hml_srbb_conjunct_models.simps o_apply.
+
+  show "distinguishes_inner (BranchConj \<alpha> \<phi> I \<psi>s) p q"
+    unfolding dist_inner_srbb_eq_dist_hml
+          and hml_srbb_inner_to_hml.simps
+          and hml_and_dist_disj
+  proof (rule conjI)
+    from p_branch and p_sat_conj
+    show "p \<Turnstile> hml_conjunct.Pos (HML_soft_poss \<alpha> (hml_srbb_to_hml \<phi>))
+              \<and>hml hml_conjunct.Pos (hml.Conj I (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s))" 
+      by simp
+  next
+    from conj_dist_or_branch_dist
+    show "\<not> hml_conjunct_models q (hml_conjunct.Pos (HML_soft_poss \<alpha> (hml_srbb_to_hml \<phi>)))
+        \<or> \<not> hml_conjunct_models q (hml_conjunct.Pos (hml.Conj I (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s)))" 
+      using distinguishes_conjunct_hml_def distinguishes_hml_def by auto
   qed
 qed
 
