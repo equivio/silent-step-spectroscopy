@@ -269,10 +269,6 @@ proof -
   qed
 qed
 
-definition distinguishes_from_conjunct :: "('a, 's) hml_srbb_conjunct \<Rightarrow> 's \<Rightarrow> 's set \<Rightarrow> bool" where
-  "distinguishes_from_conjunct \<chi> p Q \<equiv> \<forall>q \<in> Q. distinguishes_conjunct \<chi> p q"
-
-
 definition hml_preordered :: "(('a, 's) hml_srbb) set \<Rightarrow> 's \<Rightarrow> 's \<Rightarrow> bool" where
   "hml_preordered \<phi>s p q \<equiv> \<forall>\<phi> \<in> \<phi>s. p \<Turnstile>SRBB \<phi> \<longrightarrow> q \<Turnstile>SRBB \<phi>"
 
