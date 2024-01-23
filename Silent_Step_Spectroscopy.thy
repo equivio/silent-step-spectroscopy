@@ -40,7 +40,7 @@ lemma strategy_formulas_distinguish:
 
       | Defender_Conj p Q \<Rightarrow> distinguishes_from_inner \<chi> p Q
       | Defender_Stable_Conj p Q \<Rightarrow> (\<forall>q. \<not> p \<mapsto> \<tau> q) \<longrightarrow> distinguishes_from_inner \<chi> p Q
-      | Defender_Branch p \<alpha> p' Q Qa \<Rightarrow> distinguishes_from_inner \<chi> p (Q\<union>Qa)
+      | Defender_Branch p \<alpha> p' Q Qa \<Rightarrow> (p \<mapsto> \<alpha> p') \<longrightarrow> distinguishes_from_inner \<chi> p (Q\<union>Qa)
       | Attacker_Branch p Q \<Rightarrow> True))
       \<and>
       (strategy_formula_conjunct g e \<psi> \<longrightarrow>
@@ -220,33 +220,37 @@ next
               distinguishes_from (hml_srbb.Internal \<chi>) p Q
           | Defender_Conj p Q \<Rightarrow> distinguishes_from \<psi> p Q | _ \<Rightarrow> True)" by auto
   hence " distinguishes_from \<psi> p' Q'" by simp
+  hence X:"p' \<Turnstile>SRBB \<psi>"
+    by (simp add: distinguishes_from_def) 
 
-  from IH have " p \<mapsto> \<alpha> p'" sorry
-
-  from IH have "spectroscopy_moves (Defender_Branch p \<alpha> p' Q1 Q\<alpha>) (Attacker_Branch p' Q') =
+  have "(p \<mapsto> \<alpha> p') \<longrightarrow> distinguishes_from_inner (BranchConj \<alpha> \<psi> Q1 \<Phi>) p (Q1 \<union> Q\<alpha>) " proof
+    assume "p \<mapsto> \<alpha> p'"
+    from IH have "spectroscopy_moves (Defender_Branch p \<alpha> p' Q1 Q\<alpha>) (Attacker_Branch p' Q') =
          Some (min1_6 \<circ> (\<lambda>x. x - E 0 1 1 0 0 0 0 0))" by auto
-  hence "Q\<alpha> \<mapsto>aS \<alpha> Q'"
-    by (smt (verit) local.br_obsv option.distinct(1)) 
+    hence "Q\<alpha> \<mapsto>aS \<alpha> Q'"
+      by (smt (verit) local.br_obsv option.distinct(1)) 
+    hence A2: "hml_srbb_inner_models (Obs \<alpha> \<psi>) p" using X \<open>p \<mapsto> \<alpha> p'\<close>  by auto   
+    hence A3: "hml_srbb_inner_models (BranchConj \<alpha> \<psi> Q1 \<Phi>) p" sorry
 
-
-  hence A2: "hml_srbb_inner_models (Obs \<alpha> \<psi>) p" sorry
-  
-  have "\<forall>q\<in>(Q1 \<union> Q\<alpha>). distinguishes_inner (BranchConj \<alpha> \<psi> Q1 \<Phi>) p q" proof 
-    fix q
-    assume "q\<in>(Q1 \<union> Q\<alpha>)"    
-    show "distinguishes_inner (BranchConj \<alpha> \<psi> Q1 \<Phi>) p q" proof (cases "q\<in>Q1")
-      case True
-      then have "distinguishes_conjunct (\<Phi> q) p q" using branch_conj(2) by simp
-      then show ?thesis using A1 A2 srbb_dist_conjunct_or_branch_implies_dist_branch_conjunction True by blast 
-    next
-      case False
-      have "distinguishes_inner (Obs \<alpha> \<psi>) p q" sorry
-      then show ?thesis using A1 A2 srbb_dist_conjunct_or_branch_implies_dist_branch_conjunction by blast
+    have "\<forall>q \<in> (Q1 \<union> Q\<alpha>). \<not>(hml_srbb_inner_models (BranchConj \<alpha> \<psi> Q1 \<Phi>) q)" proof
+      fix q
+      assume "q\<in>(Q1 \<union> Q\<alpha>)"     
+      show "\<not>(hml_srbb_inner_models (BranchConj \<alpha> \<psi> Q1 \<Phi>) q)" proof (cases "q\<in>Q1")
+        case True
+        hence  "distinguishes_conjunct (\<Phi> q) p q" using branch_conj(2) by simp
+        hence "distinguishes_inner (BranchConj \<alpha> \<psi> Q1 \<Phi>) p q" using A1 A2 srbb_dist_conjunct_or_branch_implies_dist_branch_conjunction True by blast
+        then show ?thesis
+          by (simp add: distinguishes_inner_def) 
+      next
+        case False
+        have "distinguishes_inner (Obs \<alpha> \<psi>) p q" sorry
+        hence "distinguishes_inner (BranchConj \<alpha> \<psi> Q1 \<Phi>) p q" using A1 A2 srbb_dist_conjunct_or_branch_implies_dist_branch_conjunction by blast
+        then show ?thesis by (simp add: distinguishes_inner_def) 
+      qed
     qed
-  qed
-
-  hence "distinguishes_from_inner (BranchConj \<alpha> \<psi> Q1 \<Phi>) p (Q1 \<union> Q\<alpha>)"
-    by (metis A2 Un_empty distinguishes_from_inner'_def distinguishes_from_inner_def distinguishes_from_inner_prime hml_srbb_eq_inner_iff inf_bot_right insert_disjoint(1) srbb_obs_is_empty_branch_conj) 
+    thus  "distinguishes_from_inner (BranchConj \<alpha> \<psi> Q1 \<Phi>) p (Q1 \<union> Q\<alpha>)" using A2 A3 distinguishes_from_inner_def by simp 
+  qed 
+ 
   then show ?case by simp
 qed
 
