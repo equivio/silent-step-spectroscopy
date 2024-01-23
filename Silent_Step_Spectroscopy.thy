@@ -197,7 +197,7 @@ lemma winning_budget_implies_strategy_formula:
        using \<open>Q = {}\<close> conj by blast
      then have  "modal_depth_srbb_inner (Conj Q \<Phi>) = Sup ((modal_depth_srbb_conjunct \<circ> \<Phi>) ` Q)"
                 "branch_conj_depth_inner (Conj Q \<Phi>) = Sup ((branch_conj_depth_conjunct \<circ> \<Phi>) ` Q)"
-                "inst_conj_depth_inner (Conj Q \<Phi>) = 1 + Sup ((inst_conj_depth_conjunct \<circ> \<Phi>) ` Q)"
+                "inst_conj_depth_inner (Conj Q \<Phi>) = 0"
                 "st_conj_depth_inner (Conj Q \<Phi>) = Sup ((st_conj_depth_conjunct \<circ> \<Phi>) ` Q)"
                 "imm_conj_depth_inner (Conj Q \<Phi>) = Sup ((imm_conj_depth_conjunct \<circ> \<Phi>) ` Q)"
                 "max_pos_conj_depth_inner (Conj Q \<Phi>) = Sup ((max_pos_conj_depth_conjunct \<circ> \<Phi>) ` Q)"
@@ -205,11 +205,11 @@ lemma winning_budget_implies_strategy_formula:
                 "neg_depth_inner (Conj Q \<Phi>) = Sup ((neg_depth_conjunct \<circ> \<Phi>) ` Q)"
      using modal_depth_srbb_inner.simps(3) branch_conj_depth_inner.simps st_conj_depth_inner.simps
       inst_conj_depth_inner.simps imm_conj_depth_inner.simps max_pos_conj_depth_inner.simps
-      max_neg_conj_depth_inner.simps neg_depth_inner.simps 
-      by auto+
+      max_neg_conj_depth_inner.simps neg_depth_inner.simps \<open>Q = {}\<close>
+     by auto+
       hence "modal_depth_srbb_inner (Conj Q \<Phi>) = 0"
           "branch_conj_depth_inner (Conj Q \<Phi>) = 0"
-          "inst_conj_depth_inner (Conj Q \<Phi>) = 1"
+          "inst_conj_depth_inner (Conj Q \<Phi>) = 0"
           "st_conj_depth_inner (Conj Q \<Phi>) = 0"
           "imm_conj_depth_inner (Conj Q \<Phi>) = 0"
           "max_pos_conj_depth_inner (Conj Q \<Phi>) = 0"
@@ -218,19 +218,23 @@ lemma winning_budget_implies_strategy_formula:
 
       using \<open>Q = {}\<close> image_empty comp_apply
       by (simp add: bot_enat_def)+
-       hence "expr_pr_inner (Conj Q \<Phi>) = (E 0 0 1 0 0 0 0 0)"
+       hence "expr_pr_inner (Conj Q \<Phi>) = (E 0 0 0 0 0 0 0 0)"
       using expr_pr_inner.simps \<open>Q = {}\<close>
       by force
-    have Win_a: "\<forall>q \<in> Q. in_wina (e - (E 0 0 1 0 0 0 0 0)) (Attacker_Clause p q)"  by (metis A1 local.conj_answer option.discI)
+    have "(e - (E 0 0 0 0 0 0 0 0)) = e"
+      by (simp add: "1" leq_not_eneg minus_energy_def)
+    have Win_a: "\<forall>q \<in> Q. in_wina e (Attacker_Clause p q)"  by (metis A1 local.conj_answer option.discI)
     have NotWin_a: "\<forall>q \<in> Q. \<not>(in_wina eneg (Attacker_Clause p q))"
       by (simp add: defender_win_level_not_in_wina)
     have B: "\<not>(in_wina eneg (Defender_Conj p Q))"
       by (simp add: defender_win_level_not_in_wina)
     from A B have "e \<noteq> eneg" by auto
-    have "e - (E 0 0 1 0 0 0 0 0) \<noteq> eneg" using Win_a NotWin_a sorry
     hence price: "expr_pr_inner (Conj Q \<Phi>) \<le> e"
-      by (metis \<open>expr_pr_inner (hml_srbb_inner.Conj Q \<Phi>) = E 0 0 1 0 0 0 0 0\<close> minus_energy_def)
-     then show ?case using Strat 
+      using \<open>expr_pr_inner (hml_srbb_inner.Conj Q \<Phi>) = E 0 0 0 0 0 0 0 0\<close> minus_energy_def
+      using \<open>e - E 0 0 0 0 0 0 0 0 = e\<close> by presburger
+    with Strat price have "(\<exists>\<phi>. strategy_formula_inner g e \<phi> \<and> expr_pr_inner \<phi> \<le> e)"
+      using G \<open>Q = {}\<close> by blast
+    then show ?case using Strat 
       price sorry
   next
     case 5
@@ -239,49 +243,11 @@ lemma winning_budget_implies_strategy_formula:
       using "1" by blast
     hence "Q = {}" using local.conj_s_answer 
       by simp
-    hence "\<exists>\<Phi>. (\<forall>q \<in> Q. spectroscopy_moves (Defender_Stable_Conj p Q) (Attacker_Clause p q) 
-        = (subtract 0 0 0 1 0 0 0 0) \<and> in_wina (e - (E 0 0 0 1 0 0 0 0)) (Attacker_Clause p q)
-          \<and> strategy_formula_conjunct (Attacker_Clause p q) (e - (E 0 0 0 1 0 0 0 0)) (\<Phi> q))"
-      by blast
-    then obtain \<Phi> where strat_pre: "(\<forall>q \<in> Q. spectroscopy_moves (Defender_Stable_Conj p Q) (Attacker_Clause p q) 
-        = (subtract 0 0 0 1 0 0 0 0) \<and> in_wina (e - (E 0 0 0 1 0 0 0 0)) (Attacker_Clause p q)
-          \<and> strategy_formula_conjunct (Attacker_Clause p q) (e - (E 0 0 0 1 0 0 0 0)) (\<Phi> q))"
-      by blast
-    then have Strat: "strategy_formula_inner (Defender_Stable_Conj p Q) e (StableConj {} \<Phi>)"
-      using \<open>Q = {}\<close> stable_conj by blast
-    from strat_pre 5
-    have  "modal_depth_srbb_inner (StableConj Q \<Phi>) = Sup ((modal_depth_srbb_conjunct \<circ> \<Phi>) ` Q)"
-          "branch_conj_depth_inner (StableConj Q \<Phi>) = Sup ((branch_conj_depth_conjunct \<circ> \<Phi>) ` Q)"
-          "inst_conj_depth_inner (StableConj Q \<Phi>) = Sup ((inst_conj_depth_conjunct \<circ> \<Phi>) ` Q)"
-          "st_conj_depth_inner (StableConj Q \<Phi>) = 1 + Sup ((st_conj_depth_conjunct \<circ> \<Phi>) ` Q)"
-          "imm_conj_depth_inner (StableConj Q \<Phi>) = Sup ((imm_conj_depth_conjunct \<circ> \<Phi>) ` Q)"
-          "max_pos_conj_depth_inner (StableConj Q \<Phi>) = Sup ((max_pos_conj_depth_conjunct \<circ> \<Phi>) ` Q)"
-          "max_neg_conj_depth_inner (StableConj Q \<Phi>) = Sup ((max_neg_conj_depth_conjunct \<circ> \<Phi>) ` Q)"
-          "neg_depth_inner (StableConj Q \<Phi>) = Sup ((neg_depth_conjunct \<circ> \<Phi>) ` Q)"
-      using modal_depth_srbb_inner.simps(3) branch_conj_depth_inner.simps st_conj_depth_inner.simps
-      inst_conj_depth_inner.simps imm_conj_depth_inner.simps max_pos_conj_depth_inner.simps
-      max_neg_conj_depth_inner.simps neg_depth_inner.simps 
-      by auto+
-
-    hence "modal_depth_srbb_inner (StableConj Q \<Phi>) = 0"
-          "branch_conj_depth_inner (StableConj Q \<Phi>) = 0"
-          "inst_conj_depth_inner (StableConj Q \<Phi>) = 0"
-          "st_conj_depth_inner (StableConj Q \<Phi>) = 1"
-          "imm_conj_depth_inner (StableConj Q \<Phi>) = 0"
-          "max_pos_conj_depth_inner (StableConj Q \<Phi>) = 0"
-          "max_neg_conj_depth_inner (StableConj Q \<Phi>) = 0"
-          "neg_depth_inner (StableConj Q \<Phi>) = 0"
-
-      using \<open>Q = {}\<close> image_empty comp_apply
-      by (simp add: bot_enat_def)+
-    hence "expr_pr_inner (StableConj Q \<Phi>) = (E 0 0 0 1 0 0 0 0)"
-      using expr_pr_inner.simps \<open>Q = {}\<close>
-      by force
-    hence "expr_pr_inner (StableConj Q \<Phi>) \<le> e"
-      sorry
-    then show ?case using Strat 
-      using \<open>Q = {}\<close> 
-      using \<open>g = Defender_Stable_Conj p Q\<close> by blast
+    hence "spectroscopy_moves (Defender_Stable_Conj p Q) (Defender_Conj p Q) \<noteq> None"
+      by simp
+    hence False 
+      using "1" \<open>g = Defender_Stable_Conj p Q\<close> by blast
+    then show ?case by blast
   next
     case 6
     from 6 obtain p \<alpha> p' Q Qa  where G: "g =  Defender_Branch p \<alpha> p' Q Qa"
@@ -474,7 +440,7 @@ next
       using in_wina.cases 2 "2.IH" \<open>g = Attacker_Delayed p Q\<close>
       by metis
     hence move_cases: "(\<exists>p Q. g' = Attacker_Delayed p Q) \<or> (\<exists>p' Q'. g' = (Attacker_Immediate p' Q')) \<or> 
-(\<exists>p Q. g' = (Defender_Conj p Q)) \<or> (\<exists>p Q. g' = (Defender_Stable_Conj p Q)) \<or> (\<exists>p' \<alpha> p'' Q' Q\<alpha>. g' = (Defender_Branch p' \<alpha> p'' Q' Q\<alpha>))"
+      (\<exists>p Q. g' = (Defender_Conj p Q)) \<or> (\<exists>p Q. g' = (Defender_Stable_Conj p Q)) \<or> (\<exists>p' \<alpha> p'' Q' Q\<alpha>. g' = (Defender_Branch p' \<alpha> p'' Q' Q\<alpha>))"
       by (metis spectroscopy_defender.cases spectroscopy_moves.simps(53) spectroscopy_moves.simps(59))
 
     then consider (Att_Del) "(\<exists>p Q. g' = Attacker_Delayed p Q)" | (Att_Imm) "(\<exists>p' Q'. g' = (Attacker_Immediate p' Q'))" |
@@ -570,17 +536,100 @@ next
     next
       case Def_Conj
       assume "\<exists>p Q. g' = Defender_Conj p Q"
-      then obtain p' Q' where "g' = Defender_Conj p' Q'" and
+      then obtain p' Q' where g'_def_conj: "g' = Defender_Conj p' Q'" and
                           IH: "(\<exists>\<phi>. strategy_formula_inner g' (weight g g' e) \<phi> \<and> expr_pr_inner \<phi> \<le> weight g g' e) \<and>
                               (\<exists>\<phi>. strategy_formula g' (weight g g' e) \<phi> \<and> expressiveness_price \<phi> \<le> weight g g' e)" 
         using IH by blast
-      then show ?thesis sorry
+      have "p = p'" "Q = Q'" 
+        using \<open>g' = Defender_Conj p' Q'\<close> local.late_inst_conj move by presburger+
+      hence "(the (spectroscopy_moves (Attacker_Delayed p Q) (Defender_Conj p' Q')) e) = (id e)"
+        by fastforce
+      hence "(in_wina e (Defender_Conj p' Q'))" using id_apply
+        using \<open>g' = Defender_Conj p' Q'\<close> move by auto
+      have "(weight g g' e) = e" 
+        using \<open>g' = Defender_Conj p' Q'\<close> \<open>weight (Attacker_Delayed p Q) (Defender_Conj p' Q') e = id e\<close> g_att_del by force
+      
+      then obtain \<chi> where \<chi>_prop: "(strategy_formula_inner (Defender_Conj p' Q') e \<chi> \<and> expr_pr_inner \<chi> \<le> e)"
+        using IH g'_def_conj
+        by auto 
+
+      hence "\<exists>p' Q'. spectroscopy_moves (Attacker_Delayed p Q) (Defender_Conj p' Q') 
+       = (Some id) \<and> in_wina e (Defender_Conj p' Q')
+        \<and> strategy_formula_inner (Defender_Conj p' Q') e \<chi>"
+        by (simp add: \<open>Q = Q'\<close> \<open>in_wina e (Defender_Conj p' Q')\<close> \<open>p = p'\<close>)
+
+      then show ?thesis using \<chi>_prop 
+        using \<open>Q = Q'\<close> \<open>in_wina e (Defender_Conj p' Q')\<close> \<open>p = p'\<close> full_spec_game.late_conj full_spec_game_axioms g_att_del by fastforce
     next
       case Def_St_Conj
-      then show ?thesis sorry
+      assume "\<exists>p Q. g' = Defender_Stable_Conj p Q"
+      then obtain p' Q' where "g' = Defender_Stable_Conj p' Q'" and
+        IH: "(\<exists>\<phi>. strategy_formula_inner g' (weight g g' e) \<phi> \<and> expr_pr_inner \<phi> \<le> weight g g' e)"
+        using IH by blast
+
+      hence "(p = p' \<and> Q' = { q \<in> Q. (\<nexists>q'. q \<mapsto>\<tau> q')} \<and> (\<nexists>p''. p \<mapsto>\<tau> p''))"
+        using local.late_stbl_conj \<open>g' = Defender_Stable_Conj p' Q'\<close> g_att_del move
+        by meson
+
+      hence "(the (spectroscopy_moves (Attacker_Delayed p Q) (Defender_Stable_Conj p' Q')) e) = (id e)"
+        by auto
+
+      hence "(in_wina e (Defender_Stable_Conj p' Q'))" using id_apply
+        using \<open>g' = Defender_Stable_Conj p' Q'\<close> move by auto
+
+      have "(weight g g' e) = e" 
+        using \<open>g' = Defender_Stable_Conj p' Q'\<close> \<open>weight (Attacker_Delayed p Q) (Defender_Stable_Conj p' Q') e = id e\<close> g_att_del by force
+        
+      then obtain \<chi> where \<chi>_prop: "(strategy_formula_inner (Defender_Stable_Conj p' Q') e \<chi> \<and> expr_pr_inner \<chi> \<le> e)"
+        using IH \<open>g' = Defender_Stable_Conj p' Q'\<close>
+        by auto 
+      hence expr: "expr_pr_inner \<chi> \<le> e" by blast
+
+      from \<chi>_prop have "\<exists>p' Q'. spectroscopy_moves (Attacker_Delayed p Q) (Defender_Stable_Conj p' Q') 
+       = (Some id) \<and> in_wina e (Defender_Stable_Conj p' Q')
+        \<and> strategy_formula_inner (Defender_Stable_Conj p' Q') e \<chi>"
+        using \<open>g' = Defender_Stable_Conj p' Q'\<close> \<open>in_wina e (Defender_Stable_Conj p' Q')\<close> local.late_stbl_conj move
+        by meson
+
+      hence "strategy_formula_inner g e \<chi>"
+        using g_att_del local.stable sorry (*Problem: Q \<noteq> Q'*)
+      
+      then show ?thesis using expr g_att_del 
+        by blast
+
     next
       case Def_Branch
-      then show ?thesis sorry
+      then obtain p' \<alpha> p'' Q' Q\<alpha> where g'_def_br: "g' = Defender_Branch p' \<alpha> p'' Q' Q\<alpha>" and
+        IH: "(\<exists>\<phi>. strategy_formula_inner g' (weight g g' e) \<phi> \<and> expr_pr_inner \<phi> \<le> weight g g' e)"
+        using IH by blast
+
+      hence "(p = p' \<and> Q' = Q - Q\<alpha> \<and> p \<mapsto>\<alpha> p'' \<and> Q\<alpha> \<noteq> {} \<and> Q\<alpha> \<subseteq> Q)"
+        using local.br_conj move by metis
+      hence "(the (spectroscopy_moves (Attacker_Delayed p Q) (Defender_Branch p' \<alpha> p'' Q' Q\<alpha>)) e) = (id e)"
+        by auto
+
+      hence "(in_wina e (Defender_Branch p' \<alpha> p'' Q' Q\<alpha>))" using id_apply
+        using g'_def_br move by auto
+
+      have "(weight g g' e) = e" 
+        using g'_def_br g_att_del \<open>weight (Attacker_Delayed p Q) (Defender_Branch p' \<alpha> p'' Q' Q\<alpha>) e = id e\<close> by fastforce
+        
+      then obtain \<chi> where \<chi>_prop: "(strategy_formula_inner (Defender_Branch p' \<alpha> p'' Q' Q\<alpha>) e \<chi> \<and> expr_pr_inner \<chi> \<le> e)"
+        using IH g'_def_br
+        by auto 
+      hence expr: "expr_pr_inner \<chi> \<le> e" by blast
+
+      from \<chi>_prop have "\<exists>p' Q' \<alpha> Q\<alpha>. spectroscopy_moves (Attacker_Delayed p Q) (Defender_Branch p' \<alpha> p'' Q' Q\<alpha>) 
+       = (Some id) \<and> in_wina e (Defender_Stable_Conj p' Q')
+        \<and> strategy_formula_inner (Defender_Stable_Conj p' Q') e \<chi>"
+        using g'_def_br \<open>in_wina e (Defender_Branch p' \<alpha> p'' Q' Q\<alpha>)\<close> local.branch move
+        sorry (*in local.branch: muss es nicht "\<exists>p' p'' Q' \<alpha> Q\<alpha>. ... heißen?!*)
+
+      hence "strategy_formula_inner g e \<chi>"
+        using g_att_del local.stable sorry (*Problem: Q \<noteq> Q'*)
+      
+      then show ?thesis using expr g_att_del 
+        by blast
     qed
 
   next
@@ -811,13 +860,16 @@ next
   case (3 g e)
   {
     case 1
-    then show ?case sorry
+    then show ?case 
+      using "3" by force
   next
     case 2
-    then show ?case sorry
+    then show ?case using "3" 
+      by force
   next
     case 3
-    then show ?case sorry
+    then show ?case
+      using "3.IH" by force
   next
     case 4
     then show ?case sorry
@@ -829,7 +881,8 @@ next
     then show ?case sorry
   next
     case 7
-    then show ?case sorry
+    then show ?case
+      by blast
   }
 qed
 
