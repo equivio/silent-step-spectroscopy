@@ -140,9 +140,23 @@ lemma srbb_dist_imm_conjunction_implies_dist_conjunct:
   shows "\<exists>i\<in>I. distinguishes_conjunct (\<psi>s i) p q"
   using assms distinguishes_conjunct_def distinguishes_def by auto
 
+lemma srbb_dist_conjunct_implies_dist_imm_conjunction:
+  assumes "i\<in>I"
+      and "distinguishes_conjunct (\<psi>s i) p q"
+      and "\<forall>i\<in>I. hml_srbb_conjunct_models (\<psi>s i) p"
+    shows "distinguishes (ImmConj I \<psi>s) p q"
+  using assms distinguishes_conjunct_def distinguishes_def by auto
+
 lemma srbb_dist_conjunction_implies_dist_conjunct:
   assumes "distinguishes_inner (Conj I \<psi>s) p q"
   shows "\<exists>i\<in>I. distinguishes_conjunct (\<psi>s i) p q"
+  using assms distinguishes_conjunct_def distinguishes_inner_def by auto
+
+lemma srbb_dist_conjunct_implies_dist_conjunction:
+  assumes "i\<in>I"
+      and "distinguishes_conjunct (\<psi>s i) p q"
+      and "\<forall>i\<in>I. hml_srbb_conjunct_models (\<psi>s i) p"
+  shows "distinguishes_inner (Conj I \<psi>s) p q"
   using assms distinguishes_conjunct_def distinguishes_inner_def by auto
 
 lemma srbb_dist_stable_conjunction_implies_dist_conjunct_or_stable:
