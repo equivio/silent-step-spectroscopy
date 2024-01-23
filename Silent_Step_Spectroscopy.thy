@@ -181,6 +181,13 @@ next
   have "(\<forall>q. \<not> p \<mapsto>\<tau> q) \<longrightarrow> distinguishes_from_inner (StableConj Q \<Phi>) p Q" sorry
   then show ?case by simp
 next
+  case (branch p Q e \<chi>)
+  then show ?case sorry
+next
+  case (branch_conj p \<alpha> p' Q Q\<alpha> e e' \<psi> \<Phi> Qa)
+  then show ?case sorry
+
+(*
   case (branch p Q p'' e \<chi>)
   have " Q \<Zsurj>S Q \<longrightarrow> distinguishes_from (hml_srbb.Internal \<chi>) p Q" sorry
   then show ?case by simp
@@ -200,6 +207,7 @@ next
   hence "distinguishes_from \<psi> p' Q'" by simp
   have " Qa \<inter> Q1 = {} \<longrightarrow> distinguishes_from_inner (BranchConj \<alpha> \<psi> Q1 \<Phi>) p (Q1 \<union> Qa)" sorry
   then show ?case by simp
+*)
 qed
 
 theorem spectroscopy_game_correctness:
