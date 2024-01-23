@@ -619,14 +619,15 @@ next
         by auto 
       hence expr: "expr_pr_inner \<chi> \<le> e" by blast
 
-      from \<chi>_prop have "\<exists>p' Q' \<alpha> Q\<alpha>. spectroscopy_moves (Attacker_Delayed p Q) (Defender_Branch p' \<alpha> p'' Q' Q\<alpha>) 
-       = (Some id) \<and> in_wina e (Defender_Stable_Conj p' Q')
-        \<and> strategy_formula_inner (Defender_Stable_Conj p' Q') e \<chi>"
+      from \<chi>_prop have "\<exists>p' Q' \<alpha> Q\<alpha>. spectroscopy_moves (Attacker_Delayed p Q) (Defender_Branch p \<alpha> p' Q' Q\<alpha>) 
+       = (Some id) \<and> in_wina e (Defender_Branch p \<alpha> p' Q' Q\<alpha>)
+        \<and> strategy_formula_inner (Defender_Branch p \<alpha> p' Q' Q\<alpha>) e \<chi>"
         using g'_def_br \<open>in_wina e (Defender_Branch p' \<alpha> p'' Q' Q\<alpha>)\<close> local.branch move
-        sorry (*in local.branch: muss es nicht "\<exists>p' p'' Q' \<alpha> Q\<alpha>. ... heißen?!*)
+        by (metis local.br_conj)
 
       hence "strategy_formula_inner g e \<chi>"
-        using g_att_del local.stable sorry (*Problem: Q \<noteq> Q'*)
+        using g_att_del local.stable 
+        using branch by presburger
       
       then show ?thesis using expr g_att_del 
         by blast
