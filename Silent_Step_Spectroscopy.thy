@@ -301,7 +301,17 @@ next
       next
         case False
         hence "q\<in> Q\<alpha>" using \<open>q\<in>(Q1 \<union> Q\<alpha>)\<close> by simp
-        hence "\<not>(hml_srbb_inner_models (Obs \<alpha> \<psi>) q)"  using Y \<open>Q\<alpha> \<mapsto>aS \<alpha> Q'\<close> \<open>p \<mapsto> \<alpha> p'\<close> sorry
+        have "\<not>(hml_srbb_inner_models (Obs \<alpha> \<psi>) q)" proof
+          assume "hml_srbb_inner_models (Obs \<alpha> \<psi>) q"
+          hence "\<exists>q'. q\<mapsto>a \<alpha> q' \<and> (q' \<Turnstile>SRBB \<psi>)" sorry
+          then obtain q' where Z: "q\<mapsto>a \<alpha> q' \<and> (q' \<Turnstile>SRBB \<psi>)" by auto
+          hence "q' \<in> Q' " using \<open>q\<in> Q\<alpha>\<close> \<open>Q\<alpha> \<mapsto>aS \<alpha> Q'\<close>
+            by simp
+          from Z have "\<not>(q' \<in> Q')" using Y
+            by auto
+          thus "False"
+            by (simp add: \<open>q' \<in> Q'\<close>) 
+        qed
         hence "distinguishes_inner (Obs \<alpha> \<psi>) p q" using A2
           by (simp add: distinguishes_inner_def) 
         thus  "distinguishes_inner (BranchConj \<alpha> \<psi> Q1 \<Phi>) p q" using A1 A2 srbb_dist_conjunct_or_branch_implies_dist_branch_conjunction by blast    
