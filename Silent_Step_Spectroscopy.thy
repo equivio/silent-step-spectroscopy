@@ -19,6 +19,13 @@ thm strategy_formula.simps
 thm strategy_formula_inner.simps 
 thm strategy_formula_conjunct.simps
 
+lemma srbb_dist_conjunct_implies_dist_conjunction:
+  assumes "i\<in>I"
+      and "distinguishes_conjunct (\<psi>s i) p q"
+      and "\<forall>i\<in>I. hml_srbb_conjunct_models (\<psi>s i) p"
+  shows "distinguishes_inner (Conj I \<psi>s) p q"
+  sorry
+
 lemma strategy_formulas_distinguish:
   shows "(strategy_formula g e \<phi> \<longrightarrow>
         (case g of
@@ -125,12 +132,14 @@ next
   then show ?case by simp 
 next
   case (conj Q p e \<Phi>)
+  hence A: "\<forall>q \<in> Q. distinguishes_conjunct (\<Phi> q) p q" by auto
+  hence P: "\<forall>q \<in> Q. hml_srbb_conjunct_models (\<Phi> q) p" using distinguishes_conjunct_def by simp
   have "\<forall>q\<in>Q. distinguishes_inner (hml_srbb_inner.Conj Q \<Phi>) p q" proof 
     fix q 
-    assume "q\<in> Q"
-    from conj have "\<forall>q \<in> Q. distinguishes_conjunct (\<Phi> q) p q" by auto 
-    hence "distinguishes_conjunct (\<Phi> q) p q" using \<open>q\<in> Q\<close> by auto
-    show "distinguishes_inner (hml_srbb_inner.Conj Q \<Phi>) p q" sorry (* Der Bezug von dis_conj zu dis_inner fehlt noch ...*)
+    assume "q\<in> Q" 
+    hence "distinguishes_conjunct (\<Phi> q) p q" using A by auto
+    then show "distinguishes_inner (hml_srbb_inner.Conj Q \<Phi>) p q" using P \<open>q\<in> Q\<close> srbb_dist_conjunct_implies_dist_conjunction 
+      by simp
   qed
   hence "distinguishes_from_inner (hml_srbb_inner.Conj Q \<Phi>) p Q"
     by (simp add: distinguishes_from_inner_def)
