@@ -118,6 +118,9 @@ lemma hml_impl_preord: "reflp (\<Rrightarrow>) \<and> transp (\<Rrightarrow>)"
 definition hml_conjunct_impl :: "('a, 's) hml_conjunct \<Rightarrow> ('a, 's) hml_conjunct \<Rightarrow> bool" (infix "\<and>\<Rrightarrow>" 60)  where
   "\<psi>l \<and>\<Rrightarrow> \<psi>r \<equiv> (\<forall>p. (hml_conjunct_models p \<psi>l) \<longrightarrow> (hml_conjunct_models p \<psi>r))"
 
+lemma hml_conjunct_impl_iffI: "\<psi>l \<and>\<Rrightarrow> \<psi>r = (\<forall>p. (hml_conjunct_models p \<psi>l) \<longrightarrow> (hml_conjunct_models p \<psi>r))"
+  unfolding hml_conjunct_impl_def by auto
+
 lemma hml_conjunct_impl_preord: "reflp (\<and>\<Rrightarrow>) \<and> transp (\<and>\<Rrightarrow>)"
   by (metis hml_conjunct_impl_def reflpI transpI)
 
@@ -264,6 +267,9 @@ definition hml_conjunct_eq :: "('a, 's) hml_conjunct \<Rightarrow> ('a, 's) hml_
 lemma hml_conjunct_eq_equiv: "equivp (\<Lleftarrow>\<and>\<Rrightarrow>)"
   by (smt (verit, best) equivpI hml_conjunct_eq_def hml_conjunct_impl_def reflpI sympI transpI)
 
+lemma hml_conjunct_eq_equality: "(\<psi>l \<Lleftarrow>\<and>\<Rrightarrow> \<psi>r) = (\<forall>p.(hml_conjunct_models p \<psi>l) = (hml_conjunct_models p \<psi>r))"
+  using hml_conjunct_eq_def hml_conjunct_impl_iffI by blast
+
 
 subsubsection \<open> Substitution \<close>
 
@@ -317,6 +323,30 @@ lemma neg_subst:
   shows "(Neg \<phi>r) \<Lleftarrow>\<and>\<Rrightarrow> \<psi>"
   using assms
   by (meson LTS_Tau.neg_pre_subst hml_conjunct_eq_def hml_conjunct_impl_def hml_eq_def)
+
+end (* LTS_Tau *)
+
+context Inhabited_Tau_LTS
+begin
+
+lemma and_subst_right:
+  assumes "\<psi>l \<Lleftarrow>\<and>\<Rrightarrow> \<psi>r"
+      and "\<phi> \<Lleftarrow>\<Rrightarrow> (\<psi> \<and>hml \<psi>l)"
+  shows "\<phi> \<Lleftarrow>\<Rrightarrow> (\<psi> \<and>hml \<psi>r)"
+  using assms
+  using hml_conjunct_eq_def hml_conjunct_impl_def hml_eq_equality by auto
+
+lemma and_subst_left:
+  assumes "\<psi>l \<Lleftarrow>\<and>\<Rrightarrow> \<psi>r"
+      and "\<phi> \<Lleftarrow>\<Rrightarrow> (\<psi>l \<and>hml \<psi>)"
+  shows "\<phi> \<Lleftarrow>\<Rrightarrow> (\<psi>r \<and>hml \<psi>)"
+  using assms
+  using hml_conjunct_eq_def hml_conjunct_impl_def hml_eq_equality by auto
+
+end (* Inhabited_Tau_LTS *)
+
+context LTS_Tau
+begin
 
 
 subsubsection \<open> Congruence \<close>
@@ -492,6 +522,28 @@ lemma neg_cong:
   using assms
   by (meson hml_conjunct_eq_def hml_conjunct_impl_def hml_conjunct_models.simps(2) hml_eq_def hml_impl_def)
 
+end (* LTS_Tau *)
+
+context Inhabited_Tau_LTS
+begin
+
+lemma and_cong_right:
+  assumes "\<psi>l \<Lleftarrow>\<and>\<Rrightarrow> \<psi>r"
+  shows "(\<psi> \<and>hml \<psi>l) \<Lleftarrow>\<Rrightarrow> (\<psi> \<and>hml \<psi>r)"
+  using assms
+  using hml_conjunct_eq_def hml_conjunct_impl_def hml_eq_equality by auto
+
+lemma and_cong_left:
+  assumes "\<psi>l \<Lleftarrow>\<and>\<Rrightarrow> \<psi>r"
+  shows "(\<psi>l \<and>hml \<psi>) \<Lleftarrow>\<Rrightarrow> (\<psi>r \<and>hml \<psi>)"
+  using assms
+  using hml_conjunct_eq_def hml_conjunct_impl_def hml_eq_equality by auto
+
+end (* Inhabited_Tau_LTS *)
+
+context LTS_Tau
+begin
+
 
 subsubsection \<open> Know Equivalence Elements\<close>
 
@@ -563,6 +615,18 @@ lemma T_is_\<epsilon>_empty_conj: "TT \<Lleftarrow>\<Rrightarrow> Internal (Conj
   using \<epsilon>T_is_T
      and T_is_empty_conj
   by (meson LTS_Tau.internal_subst equivp_symp hml_eq_equiv)
+
+lemma soft_\<tau>_is_silent:
+  assumes "\<alpha> = \<tau>"
+  shows "Silent \<phi> \<Lleftarrow>\<Rrightarrow> HML_soft_poss \<alpha> \<phi>"
+  using assms by (simp add: hml_eq_equality)
+
+lemma soft_non_\<alpha>_is_obs:
+  assumes "\<alpha> \<noteq> \<tau>"
+  shows "Obs \<alpha> \<phi> \<Lleftarrow>\<Rrightarrow> HML_soft_poss \<alpha> \<phi>"
+  using assms
+    and hml_eq_equality
+  by auto
 
 end
 
