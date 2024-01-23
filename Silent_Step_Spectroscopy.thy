@@ -231,9 +231,9 @@ next
 
   hence A2: "hml_srbb_inner_models (Obs \<alpha> \<psi>) p" sorry
   
-  have A: "\<forall>q\<in>(Q1 \<union> Qa). distinguishes_inner (BranchConj \<alpha> \<psi> Q1 \<Phi>) p q" proof 
+  have "\<forall>q\<in>(Q1 \<union> Q\<alpha>). distinguishes_inner (BranchConj \<alpha> \<psi> Q1 \<Phi>) p q" proof 
     fix q
-    assume "q\<in>(Q1 \<union> Qa)"    
+    assume "q\<in>(Q1 \<union> Q\<alpha>)"    
     show "distinguishes_inner (BranchConj \<alpha> \<psi> Q1 \<Phi>) p q" proof (cases "q\<in>Q1")
       case True
       then have "distinguishes_conjunct (\<Phi> q) p q" using branch_conj(2) by simp
@@ -245,8 +245,8 @@ next
     qed
   qed
 
-  hence "distinguishes_from_inner (BranchConj \<alpha> \<psi> Q1 \<Phi>) p (Q1 \<union> Q\<alpha>)" using A sorry
-   (* by (meson distinguishes_from_inner_def distinguishes_inner_def) *)
+  hence "distinguishes_from_inner (BranchConj \<alpha> \<psi> Q1 \<Phi>) p (Q1 \<union> Q\<alpha>)"
+    by (metis A2 Un_empty distinguishes_from_inner'_def distinguishes_from_inner_def distinguishes_from_inner_prime hml_srbb_eq_inner_iff inf_bot_right insert_disjoint(1) srbb_obs_is_empty_branch_conj) 
   then show ?case by simp
 qed
 
