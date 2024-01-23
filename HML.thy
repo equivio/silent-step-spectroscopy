@@ -850,6 +850,10 @@ in the set. \<close>
 definition distinguishes_hml :: "'s \<Rightarrow> ('a, 's) hml \<Rightarrow> 's \<Rightarrow> bool" ("_ <> _ _" [70, 70, 70] 80) where
   "(p <> \<phi> q) \<equiv> (p \<Turnstile> \<phi>) \<and> \<not>(q \<Turnstile> \<phi>)"
 
+definition distinguishes_conjunct_hml ::"'s \<Rightarrow> ('a, 's) hml_conjunct \<Rightarrow> 's \<Rightarrow> bool" where
+  "distinguishes_conjunct_hml p \<psi> q \<equiv> (hml_conjunct_models p \<psi>) \<and> \<not>(hml_conjunct_models q \<psi>)"
+
+
 definition distinguishes_from_hml :: "'s \<Rightarrow> ('a, 's) hml \<Rightarrow> 's set \<Rightarrow> bool" ("_ <> _ _" [70, 70, 70] 80) where
   "(p <> \<phi> Q) \<equiv> (p \<Turnstile> \<phi>) \<and> (\<forall>q \<in> Q. \<not>(q \<Turnstile> \<phi>))"
 
@@ -860,6 +864,45 @@ lemma distinguishes_from_hml_prime:
   assumes "Q \<noteq> {}"
   shows "(p <> \<phi> Q) = distinguishes_from_hml' p \<phi> Q"
   using distinguishes_from_hml_def assms distinguishes_from_hml'_def distinguishes_hml_def by fastforce
+
+lemma distinguishes_from_hml_priming:
+  fixes Q :: "'s set"
+  assumes "p <> \<phi> Q"
+  shows "distinguishes_from_hml' p \<phi> Q"
+  using assms distinguishes_from_hml'_def distinguishes_from_hml_prime by blast
+
+
+definition distinguishes_conjunct_from_hml :: "'s \<Rightarrow> ('a, 's) hml_conjunct \<Rightarrow> 's set \<Rightarrow> bool" where
+  "(distinguishes_conjunct_from_hml p \<psi> Q) \<equiv> (hml_conjunct_models p \<psi>) \<and> (\<forall>q \<in> Q. \<not>(hml_conjunct_models q \<psi>))"
+
+definition distinguishes_conjunct_from_hml' :: "'s \<Rightarrow> ('a, 's) hml_conjunct \<Rightarrow> 's set \<Rightarrow> bool" where
+  "(distinguishes_conjunct_from_hml' p \<psi> Q) \<equiv> (\<forall>q \<in> Q. distinguishes_conjunct_hml p \<psi> q)"
+
+lemma distinguishes_conjunct_from_hml_prime:
+  assumes "Q \<noteq> {}"
+  shows "(distinguishes_conjunct_from_hml p \<phi> Q) = distinguishes_conjunct_from_hml' p \<phi> Q"
+  by (meson distinguishes_conjunct_from_hml_def distinguishes_conjunct_hml_def assms distinguishes_conjunct_from_hml'_def equals0I)
+
+lemma distinguishes_conjunct_from_hml_priming:
+  assumes "distinguishes_conjunct_from_hml p \<phi> Q"
+  shows "distinguishes_conjunct_from_hml' p \<phi> Q"
+  by (meson distinguishes_conjunct_from_hml_def distinguishes_conjunct_hml_def assms distinguishes_conjunct_from_hml'_def equals0I)
+
+
+lemma dist_conjunction_implies_dist_conjunct:
+  fixes q :: 's
+  assumes "p <> (Conj I \<psi>s) q"
+  shows "\<exists>i\<in>I. distinguishes_conjunct_hml p (\<psi>s i) q"
+  using assms distinguishes_conjunct_hml_def distinguishes_hml_def by auto
+
+lemma dist_conjunct_implies_dist_conjunction:
+  fixes q :: 's
+  assumes "i\<in>I"
+      and "distinguishes_conjunct_hml p (\<psi>s i) q" 
+      and "\<forall>i\<in>I. hml_conjunct_models p (\<psi>s i)"
+  shows "p <> (Conj I \<psi>s) q"
+  using assms distinguishes_conjunct_hml_def distinguishes_hml_def
+  by auto
 
 
 subsubsection \<open> Distinguishing Conjunction Thinning \<close>
