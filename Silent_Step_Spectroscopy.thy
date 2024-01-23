@@ -189,8 +189,15 @@ next
       | Defender_Branch p \<alpha> p' Q Qa \<Rightarrow> distinguishes_from_inner \<chi> p (Q \<union> Qa)
       | Defender_Conj p Q \<Rightarrow> distinguishes_from_inner \<chi> p Q
       | Defender_Stable_Conj p Q \<Rightarrow> (\<forall>q. \<not> p \<mapsto>\<tau> q) \<longrightarrow> distinguishes_from_inner \<chi> p Q | _ \<Rightarrow> True)" by blast
-  hence "distinguishes_from_inner \<chi> p (Q' \<union> Q\<alpha>)" by simp
-  then show ?case sorry
+  hence D: "distinguishes_from_inner \<chi> p (Q' \<union> Q\<alpha>)" by simp
+
+  from IH have "Q' = Q - Q\<alpha> \<and> p \<mapsto>\<alpha> p' \<and> Q\<alpha> \<noteq> {} \<and> Q\<alpha> \<subseteq> Q"
+    by (metis local.br_conj option.distinct(1))
+  hence "Q=(Q' \<union> Q\<alpha>)" by auto
+  hence "distinguishes_from_inner \<chi> p Q" using D by auto
+  hence " Q \<Zsurj>S Q \<longrightarrow> distinguishes_from (hml_srbb.Internal \<chi>) p Q"
+    using dist_from_inner_srbb_eq_dist_from_hml dist_from_srbb_eq_dist_from_hml distinguishes_from_hml_def hml_impl_iffI pre_\<epsilon> by auto 
+  then show ?case by simp
 next
   case (branch_conj p \<alpha> p' Q Q\<alpha> e e' \<psi> \<Phi> Qa)
   then show ?case sorry
