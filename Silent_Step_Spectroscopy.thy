@@ -198,7 +198,6 @@ next
   hence "spectroscopy_moves (Attacker_Delayed p Q) (Defender_Branch p \<alpha> p' Q' Q\<alpha>) = Some id" by simp
   hence "p \<mapsto>\<alpha> p' \<and> Q\<alpha> \<noteq> {}"
     by (metis local.br_conj option.distinct(1)) 
-  
   from IH have "p \<mapsto>\<alpha> p' \<and> Q\<alpha> \<noteq> {} \<longrightarrow> distinguishes_from_inner \<chi> p (Q' \<union> Q\<alpha>)" by simp
   hence D: "distinguishes_from_inner \<chi> p (Q' \<union> Q\<alpha>)" using \<open>p \<mapsto>\<alpha> p' \<and> Q\<alpha> \<noteq> {}\<close> by auto
 
@@ -225,11 +224,12 @@ next
               distinguishes_from (hml_srbb.Internal \<chi>) p Q
           | Defender_Conj p Q \<Rightarrow> distinguishes_from \<psi> p Q | _ \<Rightarrow> True)" by auto
   hence " distinguishes_from \<psi> p' Q'" by simp
-  hence X:"p' \<Turnstile>SRBB \<psi>"
-    by (simp add: distinguishes_from_def) 
+  hence X:"p' \<Turnstile>SRBB \<psi>" by (simp add: distinguishes_from_def) 
+  have Y: "\<forall>q \<in> Q'. \<not>(q \<Turnstile>SRBB \<psi>)" using \<open>distinguishes_from \<psi> p' Q'\<close>  by (simp add: distinguishes_from_def) 
 
   have "(p \<mapsto> \<alpha> p' \<and> Q\<alpha> \<noteq> {}) \<longrightarrow> distinguishes_from_inner (BranchConj \<alpha> \<psi> Q1 \<Phi>) p (Q1 \<union> Q\<alpha>) " proof
     assume "p \<mapsto> \<alpha> p' \<and> Q\<alpha> \<noteq> {}"
+    hence "p \<mapsto> \<alpha> p'" by simp
     from IH have "spectroscopy_moves (Defender_Branch p \<alpha> p' Q1 Q\<alpha>) (Attacker_Branch p' Q') =
          Some (min1_6 \<circ> (\<lambda>x. x - E 0 1 1 0 0 0 0 0))" by auto
     hence "Q\<alpha> \<mapsto>aS \<alpha> Q'"
@@ -245,7 +245,10 @@ next
         thus "distinguishes_inner (BranchConj \<alpha> \<psi> Q1 \<Phi>) p q" using A1 A2 srbb_dist_conjunct_or_branch_implies_dist_branch_conjunction True by blast
       next
         case False
-        have "distinguishes_inner (Obs \<alpha> \<psi>) p q" sorry
+        hence "q\<in> Q\<alpha>" using \<open>q\<in>(Q1 \<union> Q\<alpha>)\<close> by simp
+        hence "\<not>(hml_srbb_inner_models (Obs \<alpha> \<psi>) q)"  using Y \<open>Q\<alpha> \<mapsto>aS \<alpha> Q'\<close> \<open>p \<mapsto> \<alpha> p'\<close> sorry
+        hence "distinguishes_inner (Obs \<alpha> \<psi>) p q" using A2
+          by (simp add: distinguishes_inner_def) 
         thus  "distinguishes_inner (BranchConj \<alpha> \<psi> Q1 \<Phi>) p q" using A1 A2 srbb_dist_conjunct_or_branch_implies_dist_branch_conjunction by blast    
       qed
     qed
