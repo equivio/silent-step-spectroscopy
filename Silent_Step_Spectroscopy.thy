@@ -205,12 +205,10 @@ next
     using dist_from_inner_srbb_eq_dist_from_hml dist_from_srbb_eq_dist_from_hml distinguishes_from_hml_def hml_impl_iffI pre_\<epsilon> by auto 
   then show ?case by simp
 next
-  case (branch_conj p \<alpha> p' Q Q\<alpha> e e' \<psi> \<Phi> Qa)
-  then show ?case sorry
+  case (branch_conj p \<alpha> p' Q1 Q\<alpha> e e' \<psi> \<Phi>)
+  hence A1: "\<forall>q\<in>Q1. hml_srbb_conjunct_models (\<Phi> q) p" by (simp add: distinguishes_conjunct_def)
 
-(*
-  case (branch_conj p \<alpha> p' Q1 Q\<alpha> e e' \<psi> \<Phi> Qa)
-  then obtain Q' where IH_BB: "spectroscopy_moves (Defender_Branch p \<alpha> p' Q1 Q\<alpha>) (Attacker_Branch p' Q') =
+  from branch_conj obtain Q' where IH: "spectroscopy_moves (Defender_Branch p \<alpha> p' Q1 Q\<alpha>) (Attacker_Branch p' Q') =
          Some (min1_6 \<circ> (\<lambda>x. x - E 0 1 1 0 0 0 0 0)) \<and>
          spectroscopy_moves (Attacker_Branch p' Q') (Attacker_Immediate p' Q') = subtract 1 0 0 0 0 0 0 0 \<and>
          in_wina (min1_6 (e - E 0 1 1 0 0 0 0 0) - E 1 0 0 0 0 0 0 0) (Attacker_Immediate p' Q') \<and>
@@ -221,10 +219,35 @@ next
               strategy_formula_inner (Attacker_Immediate p' Q') e' \<chi> \<and> Q \<Zsurj>S Q \<longrightarrow>
               distinguishes_from (hml_srbb.Internal \<chi>) p Q
           | Defender_Conj p Q \<Rightarrow> distinguishes_from \<psi> p Q | _ \<Rightarrow> True)" by auto
-  hence "distinguishes_from \<psi> p' Q'" by simp
-  have " Qa \<inter> Q1 = {} \<longrightarrow> distinguishes_from_inner (BranchConj \<alpha> \<psi> Q1 \<Phi>) p (Q1 \<union> Qa)" sorry
+  hence " distinguishes_from \<psi> p' Q'" by simp
+
+  from IH have " p \<mapsto> \<alpha> p'" sorry
+
+  from IH have "spectroscopy_moves (Defender_Branch p \<alpha> p' Q1 Q\<alpha>) (Attacker_Branch p' Q') =
+         Some (min1_6 \<circ> (\<lambda>x. x - E 0 1 1 0 0 0 0 0))" by auto
+  hence "Q\<alpha> \<mapsto>aS \<alpha> Q'"
+    by (smt (verit) local.br_obsv option.distinct(1)) 
+
+
+  hence A2: "hml_srbb_inner_models (Obs \<alpha> \<psi>) p" sorry
+  
+  have A: "\<forall>q\<in>(Q1 \<union> Qa). distinguishes_inner (BranchConj \<alpha> \<psi> Q1 \<Phi>) p q" proof 
+    fix q
+    assume "q\<in>(Q1 \<union> Qa)"    
+    show "distinguishes_inner (BranchConj \<alpha> \<psi> Q1 \<Phi>) p q" proof (cases "q\<in>Q1")
+      case True
+      then have "distinguishes_conjunct (\<Phi> q) p q" using branch_conj(2) by simp
+      then show ?thesis using A1 A2 srbb_dist_conjunct_or_branch_implies_dist_branch_conjunction True by blast 
+    next
+      case False
+      have "distinguishes_inner (Obs \<alpha> \<psi>) p q" sorry
+      then show ?thesis using A1 A2 srbb_dist_conjunct_or_branch_implies_dist_branch_conjunction by blast
+    qed
+  qed
+
+  hence "distinguishes_from_inner (BranchConj \<alpha> \<psi> Q1 \<Phi>) p (Q1 \<union> Q\<alpha>)" using A sorry
+   (* by (meson distinguishes_from_inner_def distinguishes_inner_def) *)
   then show ?case by simp
-*)
 qed
 
 theorem spectroscopy_game_correctness:
