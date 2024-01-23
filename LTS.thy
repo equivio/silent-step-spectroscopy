@@ -66,18 +66,104 @@ definition weak_step ("_ \<Zsurj>\<mapsto>\<Zsurj> _ _" [70, 70, 70] 80) where
                     then p \<Zsurj> p'
                     else \<exists>p1 p2. p \<Zsurj> p1 \<and> p1 \<mapsto> \<alpha> p2 \<and> p2 \<Zsurj> p'"
 
+lemma silent_prepend_weak_step: "p \<Zsurj> p' \<Longrightarrow> p' \<Zsurj>\<mapsto>\<Zsurj> \<alpha> p'' \<Longrightarrow> p \<Zsurj>\<mapsto>\<Zsurj> \<alpha> p''"
+proof (cases "\<alpha> = \<tau>")
+  case True
+  assume "p \<Zsurj> p'"
+     and "p' \<Zsurj>\<mapsto>\<Zsurj> \<alpha> p''"
+     and "\<alpha> = \<tau>"
+  hence "p' \<Zsurj>\<mapsto>\<Zsurj> \<tau> p''" by auto
+  then have "p' \<Zsurj> p''" unfolding weak_step_def by auto
+  with \<open>p \<Zsurj> p'\<close>
+  have "p \<Zsurj> p''" using silent_reachable_trans 
+    by blast
+  then have "p \<Zsurj>\<mapsto>\<Zsurj> \<tau> p''" unfolding weak_step_def by auto
+  with \<open>\<alpha> = \<tau>\<close>
+  show "p \<Zsurj>\<mapsto>\<Zsurj> \<alpha> p''" by auto
+next
+  case False
+  assume "p \<Zsurj> p'"
+    and "p' \<Zsurj>\<mapsto>\<Zsurj> \<alpha> p''"
+    and "\<alpha> \<noteq> \<tau>"
+  then have "\<exists>p1 p2. p' \<Zsurj> p1 \<and> p1 \<mapsto> \<alpha> p2 \<and> p2 \<Zsurj> p''" 
+    using weak_step_def by auto
+  then obtain p1 and p2 where "p' \<Zsurj> p1" and "p1 \<mapsto> \<alpha> p2" and "p2 \<Zsurj> p''" by auto
+
+  from \<open>p \<Zsurj> p'\<close> and \<open>p' \<Zsurj> p1\<close>
+  have "p \<Zsurj> p1" by (rule silent_reachable_trans)
+
+  with \<open>p1 \<mapsto> \<alpha> p2\<close> and \<open>p2 \<Zsurj> p''\<close> and \<open>\<alpha> \<noteq> \<tau>\<close>
+  show "p \<Zsurj>\<mapsto>\<Zsurj> \<alpha> p''" 
+    using weak_step_def by auto
+qed
+
 inductive weak_step_sequence :: "'s \<Rightarrow> 'a list \<Rightarrow> 's \<Rightarrow> bool" ("_ \<Zsurj>\<mapsto>\<Zsurj>$ _ _" [70,70,70] 80) where
-  "p \<Zsurj>\<mapsto>\<Zsurj>$ [] p" |
+  "p \<Zsurj>\<mapsto>\<Zsurj>$ [] p'" if "p \<Zsurj> p'" |
   "p \<Zsurj>\<mapsto>\<Zsurj>$ (\<alpha>#rt) p''" if "p \<Zsurj>\<mapsto>\<Zsurj> \<alpha> p'" "p' \<Zsurj>\<mapsto>\<Zsurj>$ rt p''"
 
 lemma weak_step_sequence_trans:
   assumes "p \<Zsurj>\<mapsto>\<Zsurj>$ tr_1 p'" and "p' \<Zsurj>\<mapsto>\<Zsurj>$ tr_2 p''"
   shows "p \<Zsurj>\<mapsto>\<Zsurj>$ (tr_1 @ tr_2) p''"
   using assms weak_step_sequence.intros(2)
-  by(induct, force+)
+  apply induct
+  using silent_prepend_weak_step
+  apply (smt (verit) LTS_Tau.weak_step_sequence.simps append_Nil silent_reachable_trans)
+  by force
+
 
 abbreviation weak_traces :: "'s \<Rightarrow> 'a list set"
   where "weak_traces p \<equiv> {tr. \<exists>p'. p \<Zsurj>\<mapsto>\<Zsurj>$ tr p'}"
+
+lemma empty_trace_allways_weak_trace:
+  shows "[] \<in> weak_traces p"
+  using silent_reachable.intros(1) weak_step_sequence.intros(1) by fastforce
+
+lemma prepend_\<tau>_weak_trace:
+  assumes "tr \<in> weak_traces p"
+  shows "(\<tau> # tr) \<in> weak_traces p"
+  using silent_reachable.intros(1)
+    and weak_step_def
+    and assms
+    and mem_Collect_eq
+    and weak_step_sequence.intros(2)
+  by fastforce
+
+lemma silent_prepend_weak_traces:
+  assumes "p \<Zsurj> p'"
+      and "tr \<in> weak_traces p'"
+    shows "tr \<in> weak_traces p"
+  using assms
+proof-
+  assume "p \<Zsurj> p'"
+     and "tr \<in> weak_traces p'"
+  hence "\<exists>p''. p' \<Zsurj>\<mapsto>\<Zsurj>$ tr p''" by auto
+  then obtain p'' where "p' \<Zsurj>\<mapsto>\<Zsurj>$ tr p''" by auto
+  
+  from \<open>p' \<Zsurj>\<mapsto>\<Zsurj>$ tr p''\<close>
+    and \<open>p \<Zsurj> p'\<close>
+  have "p \<Zsurj>\<mapsto>\<Zsurj>$ tr p''" 
+    by (metis append_self_conv2 weak_step_sequence.intros(1) weak_step_sequence_trans)
+
+  hence "\<exists>p''. p \<Zsurj>\<mapsto>\<Zsurj>$ tr p''" by auto
+  then show "tr \<in> weak_traces p" 
+    by blast
+qed
+
+lemma step_prepend_weak_traces:
+  assumes "p \<mapsto> \<alpha> p'"
+      and "tr \<in> weak_traces p'"
+    shows "(\<alpha> # tr) \<in> weak_traces p"
+  using assms
+proof -
+  from \<open>tr \<in> weak_traces p'\<close>
+  have "\<exists>p''. p' \<Zsurj>\<mapsto>\<Zsurj>$ tr p''" by auto
+  then obtain p'' where "p' \<Zsurj>\<mapsto>\<Zsurj>$ tr p''" by auto
+  with \<open>p \<mapsto> \<alpha> p'\<close>
+  have "p \<Zsurj>\<mapsto>\<Zsurj>$ (\<alpha> # tr) p''" 
+    by (metis LTS_Tau.silent_reachable.intros(1) LTS_Tau.silent_reachable_append_\<tau> LTS_Tau.weak_step_def LTS_Tau.weak_step_sequence.intros(2))
+  then have "\<exists>p''. p \<Zsurj>\<mapsto>\<Zsurj>$ (\<alpha> # tr) p''" by auto
+  then show "(\<alpha> # tr) \<in> weak_traces p" by auto
+qed
 
 definition weakly_trace_preordered (infix "\<lesssim>WT" 60) where
   "p \<lesssim>WT q \<equiv> weak_traces p \<subseteq> weak_traces q"
