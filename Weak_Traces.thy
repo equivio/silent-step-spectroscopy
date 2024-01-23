@@ -552,35 +552,34 @@ from this(1, 2) have "p \<Zsurj>\<mapsto>\<Zsurj> a p''" unfolding weak_step_def
 qed
 qed
 
+
 lemma aux:
   fixes \<phi> :: "('a, 's) hml_srbb"
   fixes \<chi> :: "('a, 's) hml_srbb_inner"
   fixes \<psi> :: "('a, 's) hml_srbb_conjunct"
   shows "p \<lesssim>WT q \<Longrightarrow> is_trace_formula \<phi> \<Longrightarrow> p \<Turnstile>SRBB \<phi> \<Longrightarrow> q \<Turnstile>SRBB \<phi>"
-  oops
-(*proof -
+proof -
   assume \<phi>_trace: "is_trace_formula \<phi>" and p_sat_srbb: "p \<Turnstile>SRBB \<phi>" and assms: "p \<lesssim>WT q"
   show "q \<Turnstile>SRBB \<phi>"
   proof-
     from assms have p_trace_implies_q_trace: "\<forall>tr p'. (p \<Zsurj>\<mapsto>\<Zsurj>$ tr p') \<longrightarrow> (\<exists>q'. q \<Zsurj>\<mapsto>\<Zsurj>$ tr q')" 
       unfolding weakly_trace_preordered_def by auto
     from p_sat_srbb trace_formula_implies_trace obtain tr p' where 
-      "(p \<Zsurj>\<mapsto>\<Zsurj>$ tr p')" "wtrace_to_srbb tr = \<phi>"
+      "(p \<Zsurj>\<mapsto>\<Zsurj>$ tr p')" "wtrace_to_srbb tr \<Lleftarrow>srbb\<Rrightarrow> \<phi>"
       using \<phi>_trace by blast
     with p_trace_implies_q_trace obtain q' where "q \<Zsurj>\<mapsto>\<Zsurj>$ tr q'" 
       by blast
     with trace_equals_trace_to_formula show ?thesis 
-      using \<open>wtrace_to_srbb tr = \<phi>\<close> by blast
+      using \<open>wtrace_to_srbb tr \<Lleftarrow>srbb\<Rrightarrow> \<phi>\<close>  hml_srbb_eq_iff by blast
   qed
-qed *)
+qed 
 
 lemma expr_preorder_characterizes_relational_preorder_traces: "(p \<lesssim>WT q) = (p \<preceq> (E \<infinity> 0 0 0 0 0 0 0) q)"
   unfolding expr_preord_def hml_preordered_def
 proof
   assume "p \<lesssim>WT q"
   then show "\<forall>\<phi>\<in>\<O> (E \<infinity> 0 0 0 0 0 0 0). p \<Turnstile>SRBB \<phi> \<longrightarrow> q \<Turnstile>SRBB \<phi>"
-    oops
-    (* using aux expressiveness_to_trace_formula weakly_trace_preordered_def
+    using aux expressiveness_to_trace_formula weakly_trace_preordered_def
     by blast+ 
 next
   assume \<phi>_eneg: "\<forall>\<phi>\<in>\<O> (E \<infinity> 0 0 0 0 0 0 0). p \<Turnstile>SRBB \<phi> \<longrightarrow> q \<Turnstile>SRBB \<phi>"
@@ -588,13 +587,12 @@ next
     unfolding weakly_trace_preordered_def
     using \<phi>_eneg trace_equals_trace_to_formula trace_formula_to_expressiveness trace_to_srbb_is_trace_formula
     by (simp, blast+)
-qed *)
+qed
 
 lemma "(p \<simeq>WT q) = (p \<sim> (E \<infinity> 0 0 0 0 0 0 0) q)"
   unfolding weakly_trace_equivalent_def expr_equiv_def \<O>_def hml_equivalent_def hml_preordered_def
-  oops
-  (* using expr_preorder_characterizes_relational_preorder_traces
-  by (simp add: \<O>_def expr_preord_def hml_preordered_def) *)
+  using expr_preorder_characterizes_relational_preorder_traces
+  by (simp add: \<O>_def expr_preord_def hml_preordered_def)
 end
 
 end
