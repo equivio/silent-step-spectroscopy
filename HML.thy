@@ -851,7 +851,15 @@ definition distinguishes_hml :: "'s \<Rightarrow> ('a, 's) hml \<Rightarrow> 's 
   "(p <> \<phi> q) \<equiv> (p \<Turnstile> \<phi>) \<and> \<not>(q \<Turnstile> \<phi>)"
 
 definition distinguishes_from_hml :: "'s \<Rightarrow> ('a, 's) hml \<Rightarrow> 's set \<Rightarrow> bool" ("_ <> _ _" [70, 70, 70] 80) where
-  "(p <> \<phi> Q) \<equiv> (\<forall>q \<in> Q. p <> \<phi> q)"
+  "(p <> \<phi> Q) \<equiv> (p \<Turnstile> \<phi>) \<and> (\<forall>q \<in> Q. \<not>(q \<Turnstile> \<phi>))"
+
+definition distinguishes_from_hml' :: "'s \<Rightarrow> ('a, 's) hml \<Rightarrow> 's set \<Rightarrow> bool" where
+  "(distinguishes_from_hml' p \<phi> Q) \<equiv> (\<forall>q \<in> Q. p <> \<phi> q)"
+
+lemma distinguishes_from_hml_prime:
+  assumes "Q \<noteq> {}"
+  shows "(p <> \<phi> Q) = distinguishes_from_hml' p \<phi> Q"
+  using distinguishes_from_hml_def assms distinguishes_from_hml'_def distinguishes_hml_def by fastforce
 
 
 subsubsection \<open> Distinguishing Conjunction Thinning \<close>

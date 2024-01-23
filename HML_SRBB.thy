@@ -81,16 +81,43 @@ definition distinguishes_inner :: "('a, 's) hml_srbb_inner \<Rightarrow> 's \<Ri
   "distinguishes_inner \<chi> p q \<equiv> hml_srbb_inner_models \<chi> p \<and> \<not>(hml_srbb_inner_models \<chi> q)"
 
 definition distinguishes_conjunct :: "('a, 's) hml_srbb_conjunct \<Rightarrow> 's \<Rightarrow> 's \<Rightarrow> bool" where
-  "distinguishes_conjunct \<chi> p q \<equiv> hml_srbb_conjunct_models \<chi> p \<and> \<not>(hml_srbb_conjunct_models \<chi> q)"
+  "distinguishes_conjunct \<psi> p q \<equiv> hml_srbb_conjunct_models \<psi> p \<and> \<not>(hml_srbb_conjunct_models \<psi> q)"
+
 
 definition distinguishes_from :: "('a, 's) hml_srbb \<Rightarrow> 's \<Rightarrow> 's set \<Rightarrow> bool" where
-  "distinguishes_from \<phi> p Q \<equiv> \<forall>q \<in> Q. distinguishes \<phi> p q"
+  "distinguishes_from \<phi> p Q \<equiv> p \<Turnstile>SRBB \<phi> \<and> (\<forall>q \<in> Q. \<not>(q \<Turnstile>SRBB \<phi>))"
+
+definition distinguishes_from' :: "('a, 's) hml_srbb \<Rightarrow> 's \<Rightarrow> 's set \<Rightarrow> bool" where
+  "distinguishes_from' \<phi> p Q \<equiv> \<forall>q \<in> Q. distinguishes \<phi> p q"
+
+lemma distinguishes_from_prime:
+  assumes "Q \<noteq> {}"
+  shows "distinguishes_from \<phi> p Q = distinguishes_from' \<phi> p Q"
+  using assms distinguishes_def distinguishes_from'_def distinguishes_from_def ex_in_conv by auto
+
 
 definition distinguishes_from_inner :: "('a, 's) hml_srbb_inner \<Rightarrow> 's \<Rightarrow> 's set \<Rightarrow> bool" where
-  "distinguishes_from_inner \<chi> p Q \<equiv> \<forall>q \<in> Q. distinguishes_inner \<chi> p q"
+  "distinguishes_from_inner \<chi> p Q \<equiv> hml_srbb_inner_models \<chi> p \<and> (\<forall>q \<in> Q. \<not>(hml_srbb_inner_models \<chi> q))"
+
+definition distinguishes_from_inner' :: "('a, 's) hml_srbb_inner \<Rightarrow> 's \<Rightarrow> 's set \<Rightarrow> bool" where
+  "distinguishes_from_inner' \<chi> p Q \<equiv> \<forall>q \<in> Q. distinguishes_inner \<chi> p q"
+
+lemma distinguishes_from_inner_prime:
+  assumes "Q \<noteq> {}"
+  shows "distinguishes_from_inner \<phi> p Q = distinguishes_from_inner' \<phi> p Q"
+  using assms distinguishes_inner_def distinguishes_from_inner'_def distinguishes_from_inner_def ex_in_conv by auto
+
 
 definition distinguishes_from_conjunct :: "('a, 's) hml_srbb_conjunct \<Rightarrow> 's \<Rightarrow> 's set \<Rightarrow> bool" where
-  "distinguishes_from_conjunct \<chi> p Q \<equiv> \<forall>q \<in> Q. distinguishes_conjunct \<chi> p q"
+  "distinguishes_from_conjunct \<psi> p Q \<equiv> hml_srbb_conjunct_models \<psi> p \<and> (\<forall>q \<in> Q. \<not>(hml_srbb_conjunct_models \<psi> q))"
+
+definition distinguishes_from_conjunct' :: "('a, 's) hml_srbb_conjunct \<Rightarrow> 's \<Rightarrow> 's set \<Rightarrow> bool" where
+  "distinguishes_from_conjunct' \<psi> p Q \<equiv> \<forall>q \<in> Q. distinguishes_conjunct \<psi> p q"
+
+lemma distinguishes_from_conjunct_prime:
+  assumes "Q \<noteq> {}"
+  shows "distinguishes_from_conjunct \<phi> p Q = distinguishes_from_conjunct' \<phi> p Q"
+  using assms distinguishes_conjunct_def distinguishes_from_conjunct'_def distinguishes_from_conjunct_def ex_in_conv by auto
 
 
 definition hml_preordered :: "(('a, 's) hml_srbb) set \<Rightarrow> 's \<Rightarrow> 's \<Rightarrow> bool" where
