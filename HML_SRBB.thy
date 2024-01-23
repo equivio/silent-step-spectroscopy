@@ -95,6 +95,11 @@ lemma distinguishes_from_prime:
   shows "distinguishes_from \<phi> p Q = distinguishes_from' \<phi> p Q"
   using assms distinguishes_def distinguishes_from'_def distinguishes_from_def ex_in_conv by auto
 
+lemma distinguishes_from_priming:
+  assumes "distinguishes_from \<phi> p Q"
+  shows "distinguishes_from' \<phi> p Q"
+  using assms distinguishes_def distinguishes_from'_def distinguishes_from_def ex_in_conv by auto
+
 
 definition distinguishes_from_inner :: "('a, 's) hml_srbb_inner \<Rightarrow> 's \<Rightarrow> 's set \<Rightarrow> bool" where
   "distinguishes_from_inner \<chi> p Q \<equiv> hml_srbb_inner_models \<chi> p \<and> (\<forall>q \<in> Q. \<not>(hml_srbb_inner_models \<chi> q))"
@@ -107,6 +112,11 @@ lemma distinguishes_from_inner_prime:
   shows "distinguishes_from_inner \<phi> p Q = distinguishes_from_inner' \<phi> p Q"
   using assms distinguishes_inner_def distinguishes_from_inner'_def distinguishes_from_inner_def ex_in_conv by auto
 
+lemma distinguishes_from_inner_priming:
+  assumes "distinguishes_from_inner \<phi> p Q"
+  shows "distinguishes_from_inner' \<phi> p Q"
+  using assms distinguishes_inner_def distinguishes_from_inner'_def distinguishes_from_inner_def ex_in_conv by auto
+
 
 definition distinguishes_from_conjunct :: "('a, 's) hml_srbb_conjunct \<Rightarrow> 's \<Rightarrow> 's set \<Rightarrow> bool" where
   "distinguishes_from_conjunct \<psi> p Q \<equiv> hml_srbb_conjunct_models \<psi> p \<and> (\<forall>q \<in> Q. \<not>(hml_srbb_conjunct_models \<psi> q))"
@@ -117,6 +127,11 @@ definition distinguishes_from_conjunct' :: "('a, 's) hml_srbb_conjunct \<Rightar
 lemma distinguishes_from_conjunct_prime:
   assumes "Q \<noteq> {}"
   shows "distinguishes_from_conjunct \<phi> p Q = distinguishes_from_conjunct' \<phi> p Q"
+  using assms distinguishes_conjunct_def distinguishes_from_conjunct'_def distinguishes_from_conjunct_def ex_in_conv by auto
+
+lemma distinguishes_from_conjunct_priming:
+  assumes "distinguishes_from_conjunct \<phi> p Q"
+  shows "distinguishes_from_conjunct' \<phi> p Q"
   using assms distinguishes_conjunct_def distinguishes_from_conjunct'_def distinguishes_from_conjunct_def ex_in_conv by auto
 
 
