@@ -26,6 +26,13 @@ lemma srbb_dist_conjunct_implies_dist_conjunction:
   shows "distinguishes_inner (Conj I \<psi>s) p q"
   sorry
 
+lemma srbb_dist_conjunct_implies_dist_imm_conjunction:
+  assumes "i\<in>I"
+      and "distinguishes_conjunct (\<psi>s i) p q"
+      and "\<forall>i\<in>I. hml_srbb_conjunct_models (\<psi>s i) p"
+    shows "distinguishes (ImmConj I \<psi>s) p q"
+  sorry
+
 lemma strategy_formulas_distinguish:
   shows "(strategy_formula g e \<phi> \<longrightarrow>
         (case g of
@@ -146,8 +153,11 @@ next
   then show ?case by simp 
 next
   case (imm_conj Q p e \<Phi>)
-  hence "\<forall>q \<in> Q. distinguishes_conjunct (\<Phi> q) p q" by auto
-  have "distinguishes_from (ImmConj Q \<Phi>) p Q" sorry (* wie bei conj *)
+  hence D: "\<forall>q \<in> Q. distinguishes_conjunct (\<Phi> q) p q" by auto
+  hence "\<forall>q \<in> Q. hml_srbb_conjunct_models (\<Phi> q) p" using distinguishes_conjunct_def by simp
+  hence "\<forall>q\<in>Q. distinguishes (ImmConj Q \<Phi>) p q" using D srbb_dist_conjunct_implies_dist_imm_conjunction by simp
+  hence "distinguishes_from (ImmConj Q \<Phi>) p Q"
+    by (simp add: distinguishes_from_def) 
   then show ?case by simp 
 next
   case (pos p q e \<chi>)
