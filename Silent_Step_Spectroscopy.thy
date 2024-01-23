@@ -87,12 +87,7 @@ next
        | Defender_Conj p Q \<Rightarrow> distinguishes_from \<phi> p Q | _ \<Rightarrow> True)) \<and>
      p \<mapsto>\<alpha> p' \<and> Q \<mapsto>S \<alpha> Q' " by auto
   hence D: "distinguishes_from \<phi> p' Q'" by auto 
-  hence D1: "\<forall>q\<in> Q'. distinguishes \<phi> p' q" using distinguishes_from_def
-    by (simp add: distinguishes_def)  
-  have "\<exists>q. q \<in> Q'" sorry (* does this hold? *)
-  then obtain q where "q\<in> Q'" by auto
-  hence "distinguishes \<phi> p' q" using D1 by simp
-  hence "p' \<Turnstile>SRBB \<phi>" using distinguishes_def by auto 
+  hence "p' \<Turnstile>SRBB \<phi>" using distinguishes_from_def by auto
   from IH have "p \<mapsto>\<alpha> p'" and "Q \<mapsto>S \<alpha> Q'" by auto 
   hence P: "p \<Turnstile>SRBB (Internal (Obs \<alpha> \<phi>))" using \<open>p' \<Turnstile>SRBB \<phi>\<close>
     using silent_reachable.intros(1) by auto
