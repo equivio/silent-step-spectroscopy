@@ -177,8 +177,14 @@ next
     using spectroscopy_position.distinct(41) strategy_formula.cases sorry
 next
   case (stable_conj Q p e \<Phi>)
-  hence "\<forall>q\<in> Q. distinguishes_conjunct (\<Phi> q) p q" by simp
-  have "(\<forall>q. \<not> p \<mapsto>\<tau> q) \<longrightarrow> distinguishes_from_inner (StableConj Q \<Phi>) p Q" sorry
+  hence IH: "\<forall>q\<in> Q. distinguishes_conjunct (\<Phi> q) p q" by simp
+  hence Q: "\<forall>q \<in> Q. hml_srbb_conjunct_models (\<Phi> q) p"
+    by (simp add: distinguishes_conjunct_def) 
+  have "(\<forall>q. \<not> p \<mapsto>\<tau> q) \<longrightarrow> distinguishes_from_inner (StableConj Q \<Phi>) p Q" proof
+    assume "(\<forall>q. \<not> p \<mapsto>\<tau> q)"
+    thus  "distinguishes_from_inner (StableConj Q \<Phi>) p Q" using IH Q srbb_dist_conjunct_or_stable_implies_dist_stable_conjunction
+      by (smt (verit, ccfv_threshold) LTS_Tau.hml_models.simps(2) dist_from_inner_srbb_eq_dist_from_hml distinguishes_from_hml_def distinguishes_from_inner'_def distinguishes_from_inner_prime distinguishes_inner_def hml_conjunct_models.simps(1) hml_conjunct_models.simps(2) hml_models.simps(1) hml_models.simps(5) hml_srbb_inner_models.elims(3) hml_srbb_inner_to_hml.simps(3) tt_eq_empty_conj) 
+  qed
   then show ?case by simp
 next
   case (branch p Q e \<chi>)
@@ -203,10 +209,6 @@ next
   then show ?case sorry
 
 (*
-  case (branch p Q p'' e \<chi>)
-  have " Q \<Zsurj>S Q \<longrightarrow> distinguishes_from (hml_srbb.Internal \<chi>) p Q" sorry
-  then show ?case by simp
-next
   case (branch_conj p \<alpha> p' Q1 Q\<alpha> e e' \<psi> \<Phi> Qa)
   then obtain Q' where IH_BB: "spectroscopy_moves (Defender_Branch p \<alpha> p' Q1 Q\<alpha>) (Attacker_Branch p' Q') =
          Some (min1_6 \<circ> (\<lambda>x. x - E 0 1 1 0 0 0 0 0)) \<and>
