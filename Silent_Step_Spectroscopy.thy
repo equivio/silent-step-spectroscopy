@@ -88,7 +88,14 @@ next
      p \<mapsto>\<alpha> p' \<and> Q \<mapsto>S \<alpha> Q' " by auto
   hence D: "distinguishes_from \<phi> p' Q'" by auto 
   hence "p' \<Turnstile>SRBB \<phi>" using distinguishes_from_def by auto
-  from IH have "p \<mapsto>\<alpha> p'" and "Q \<mapsto>S \<alpha> Q'" by auto 
+
+
+  from IH have "spectroscopy_moves (Attacker_Delayed p Q) (Attacker_Immediate p' Q') = subtract 1 0 0 0 0 0 0 0" by simp
+  hence "(\<exists>a. p \<mapsto> a p' \<and> Q \<mapsto>S a Q' \<and> a \<noteq> \<tau>)"
+    by (smt (verit) option.discI spectroscopy_moves.simps(3)) 
+
+
+  from IH have "p \<mapsto>\<alpha> p'" and "Q \<mapsto>S \<alpha> Q'"  by auto
   hence P: "p \<Turnstile>SRBB (Internal (Obs \<alpha> \<phi>))" using \<open>p' \<Turnstile>SRBB \<phi>\<close>
     using silent_reachable.intros(1) by auto
   have "Q \<Zsurj>S Q \<longrightarrow> (\<forall>q\<in>Q. \<not>(q \<Turnstile>SRBB (Internal (Obs \<alpha> \<phi>))))" proof (rule impI)
@@ -100,10 +107,21 @@ next
         hence "\<exists>q'.  q \<Zsurj> q' \<and> hml_srbb_inner_models (Obs \<alpha> \<phi>) q'" by simp 
         then obtain q' where X: "q \<Zsurj> q' \<and> hml_srbb_inner_models (Obs \<alpha> \<phi>) q'" by auto
         hence "hml_srbb_inner_models (Obs \<alpha> \<phi>) q'" by simp
-        hence "\<exists>q''. q' \<mapsto> \<alpha> q'' \<and> q'' \<Turnstile>SRBB \<phi>" sorry
-        hence "\<exists>q' q''. q \<Zsurj> q' \<and> q' \<mapsto> \<alpha> q'' \<and> q'' \<Turnstile>SRBB \<phi>" using X by auto
-        then show "False" using \<open>Q \<Zsurj>S Q\<close>
-          by (metis D \<open>Q \<mapsto>S \<alpha> Q'\<close> \<open>q \<in> Q\<close> distinguishes_from_def) 
+        hence "q' \<Turnstile> (HML_soft_poss \<alpha> (hml_srbb_to_hml \<phi>))"
+          by simp
+        then show "False" proof(cases "\<alpha>=\<tau>")
+          case True
+          then show ?thesis sorry
+        next
+          case False
+          hence "q' \<Turnstile> (hml.Obs \<alpha> (hml_srbb_to_hml \<phi>))" using \<open>q' \<Turnstile> (HML_soft_poss \<alpha> (hml_srbb_to_hml \<phi>))\<close>
+            by simp
+          hence "\<exists>q''. q' \<mapsto> \<alpha> q'' \<and> q'' \<Turnstile> (hml_srbb_to_hml \<phi>)"
+            by simp 
+          hence "\<exists>q' q''. q \<Zsurj> q' \<and> q' \<mapsto> \<alpha> q'' \<and> q'' \<Turnstile>SRBB \<phi>" using X by auto
+          then show "False" using \<open>Q \<Zsurj>S Q\<close>
+            by (metis D \<open>Q \<mapsto>S \<alpha> Q'\<close> \<open>q \<in> Q\<close> distinguishes_from_def)
+        qed 
       qed
     qed
   qed
@@ -173,8 +191,45 @@ next
   then show ?case by simp
 next
   case (stable p Q e \<chi>)
-  then show ?case 
-    using spectroscopy_position.distinct(41) strategy_formula.cases sorry
+  then obtain Q' where IH: "spectroscopy_moves (Attacker_Delayed p Q) (Defender_Stable_Conj p Q') = Some id \<and>
+       in_wina e (Defender_Stable_Conj p Q') \<and>
+       strategy_formula_inner (Defender_Stable_Conj p Q') e \<chi> \<and>
+       (case Defender_Stable_Conj p Q' of Attacker_Delayed p Q \<Rightarrow> Q \<Zsurj>S Q \<longrightarrow> distinguishes_from (hml_srbb.Internal \<chi>) p Q
+        | Defender_Branch p \<alpha> p' Q Qa \<Rightarrow> p \<mapsto>\<alpha> p' \<and> Qa \<noteq> {} \<longrightarrow> distinguishes_from_inner \<chi> p (Q \<union> Qa)
+        | Defender_Conj p Q \<Rightarrow> distinguishes_from_inner \<chi> p Q
+        | Defender_Stable_Conj p Q \<Rightarrow> (\<forall>q. \<not> p \<mapsto>\<tau> q) \<longrightarrow> distinguishes_from_inner \<chi> p Q | _ \<Rightarrow> True)" by auto
+  hence M:"spectroscopy_moves (Attacker_Delayed p Q) (Defender_Stable_Conj p Q') = Some id" by simp
+  hence "(\<nexists>p''. p \<mapsto>\<tau> p'')"
+    by (metis local.late_stbl_conj option.distinct(1)) 
+
+  from IH have "(\<forall>q. \<not> p \<mapsto>\<tau> q) \<longrightarrow> distinguishes_from_inner \<chi> p Q'" by simp
+  hence "distinguishes_from_inner \<chi> p Q'" using \<open>\<nexists>p''. p \<mapsto>\<tau> p''\<close> by auto
+  hence "hml_srbb_inner_models \<chi> p"
+    by (simp add: distinguishes_from_inner_def)
+  hence "p \<Turnstile>SRBB (hml_srbb.Internal \<chi>)"
+    using hml_impl_iffI pre_\<epsilon> by auto
+
+  have "Q \<Zsurj>S Q \<longrightarrow> distinguishes_from (hml_srbb.Internal \<chi>) p Q" proof
+    assume "Q \<Zsurj>S Q"
+    have "(\<forall>q \<in> Q. \<not>(q \<Turnstile>SRBB (hml_srbb.Internal \<chi>)))" proof
+      fix q
+      assume "q \<in> Q"
+      show "\<not>(q \<Turnstile>SRBB (hml_srbb.Internal \<chi>))" proof
+        assume "(q \<Turnstile>SRBB (hml_srbb.Internal \<chi>))"
+        hence "\<exists>q'. q \<Zsurj> q' \<and> (\<nexists>q''. q' \<mapsto>\<tau> q'') \<and> (hml_srbb_inner_models \<chi> q')" sorry
+        then obtain q' where X: "q \<Zsurj> q' \<and> (\<nexists>q''. q' \<mapsto>\<tau> q'') \<and> (hml_srbb_inner_models \<chi> q')" by auto
+
+        from M have "Q' = { q \<in> Q. (\<nexists>q'. q \<mapsto>\<tau> q')}"
+          by (metis (full_types) local.late_stbl_conj option.distinct(1))
+        hence "q' \<in> Q'" using X \<open>Q \<Zsurj>S Q\<close> \<open>q \<in> Q\<close> by blast
+        thus "False" using X \<open>distinguishes_from_inner \<chi> p Q'\<close>
+          by (simp add: distinguishes_from_inner_def)
+      qed
+    qed
+    thus "distinguishes_from (hml_srbb.Internal \<chi>) p Q" using \<open>p \<Turnstile>SRBB (hml_srbb.Internal \<chi>)\<close>
+      by (simp add: distinguishes_from_def)
+  qed
+  then show ?case by simp
 next
   case (stable_conj Q p e \<Phi>)
   hence IH: "\<forall>q\<in> Q. distinguishes_conjunct (\<Phi> q) p q" by simp
