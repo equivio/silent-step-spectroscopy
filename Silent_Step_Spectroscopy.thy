@@ -19,19 +19,6 @@ thm strategy_formula.simps
 thm strategy_formula_inner.simps 
 thm strategy_formula_conjunct.simps
 
-lemma srbb_dist_conjunct_implies_dist_conjunction:
-  assumes "i\<in>I"
-      and "distinguishes_conjunct (\<psi>s i) p q"
-      and "\<forall>i\<in>I. hml_srbb_conjunct_models (\<psi>s i) p"
-  shows "distinguishes_inner (Conj I \<psi>s) p q"
-  sorry
-
-lemma srbb_dist_conjunct_implies_dist_imm_conjunction:
-  assumes "i\<in>I"
-      and "distinguishes_conjunct (\<psi>s i) p q"
-      and "\<forall>i\<in>I. hml_srbb_conjunct_models (\<psi>s i) p"
-    shows "distinguishes (ImmConj I \<psi>s) p q"
-  sorry
 
 lemma strategy_formulas_distinguish:
   shows "(strategy_formula g e \<phi> \<longrightarrow>
@@ -100,7 +87,8 @@ next
        | Defender_Conj p Q \<Rightarrow> distinguishes_from \<phi> p Q | _ \<Rightarrow> True)) \<and>
      p \<mapsto>\<alpha> p' \<and> Q \<mapsto>S \<alpha> Q' " by auto
   hence D: "distinguishes_from \<phi> p' Q'" by auto 
-  hence D1: "\<forall>q\<in> Q'. distinguishes \<phi> p' q" using distinguishes_from_def by auto 
+  hence D1: "\<forall>q\<in> Q'. distinguishes \<phi> p' q" using distinguishes_from_def
+    by (simp add: distinguishes_def)  
   have "\<exists>q. q \<in> Q'" sorry (* does this hold? *)
   then obtain q where "q\<in> Q'" by auto
   hence "distinguishes \<phi> p' q" using D1 by simp
@@ -141,23 +129,17 @@ next
   case (conj Q p e \<Phi>)
   hence A: "\<forall>q \<in> Q. distinguishes_conjunct (\<Phi> q) p q" by auto
   hence P: "\<forall>q \<in> Q. hml_srbb_conjunct_models (\<Phi> q) p" using distinguishes_conjunct_def by simp
-  have "\<forall>q\<in>Q. distinguishes_inner (hml_srbb_inner.Conj Q \<Phi>) p q" proof 
-    fix q 
-    assume "q\<in> Q" 
-    hence "distinguishes_conjunct (\<Phi> q) p q" using A by auto
-    then show "distinguishes_inner (hml_srbb_inner.Conj Q \<Phi>) p q" using P \<open>q\<in> Q\<close> srbb_dist_conjunct_implies_dist_conjunction 
-      by simp
-  qed
-  hence "distinguishes_from_inner (hml_srbb_inner.Conj Q \<Phi>) p Q"
-    by (simp add: distinguishes_from_inner_def)
+  hence "\<forall>q\<in>Q. distinguishes_inner (hml_srbb_inner.Conj Q \<Phi>) p q" using A srbb_dist_conjunct_implies_dist_conjunction by simp
+  hence "distinguishes_from_inner (hml_srbb_inner.Conj Q \<Phi>) p Q" using distinguishes_from_inner_def P
+    by (metis dist_from_inner_srbb_eq_dist_from_hml distinguishes_from_hml_def distinguishes_from_inner'_def distinguishes_from_inner_prime empty_iff hml_models.simps(1) hml_srbb_inner_to_hml.simps(2) tt_eq_empty_conj) 
   then show ?case by simp 
 next
   case (imm_conj Q p e \<Phi>)
   hence D: "\<forall>q \<in> Q. distinguishes_conjunct (\<Phi> q) p q" by auto
   hence "\<forall>q \<in> Q. hml_srbb_conjunct_models (\<Phi> q) p" using distinguishes_conjunct_def by simp
   hence "\<forall>q\<in>Q. distinguishes (ImmConj Q \<Phi>) p q" using D srbb_dist_conjunct_implies_dist_imm_conjunction by simp
-  hence "distinguishes_from (ImmConj Q \<Phi>) p Q"
-    by (simp add: distinguishes_from_def) 
+  hence "distinguishes_from (ImmConj Q \<Phi>) p Q" using distinguishes_from_def
+    by (metis distinguishes_from'_def distinguishes_from_prime empty_iff hml_models.simps(1) hml_srbb_models.elims(3) hml_srbb_to_hml.simps(3) tt_eq_empty_conj) 
   then show ?case by simp 
 next
   case (pos p q e \<chi>)
@@ -197,7 +179,7 @@ next
 next
   case (stable p Q e \<chi>)
   then show ?case
-    using spectroscopy_position.distinct(41) strategy_formula.cases by auto 
+    using spectroscopy_position.distinct(41) strategy_formula.cases sorry
 next
   case (stable_conj Q p e \<Phi>)
   hence "\<forall>q\<in> Q. distinguishes_conjunct (\<Phi> q) p q" by simp
@@ -205,8 +187,7 @@ next
   then show ?case by simp
 next
   case (branch p Q p'' e \<chi>)
-  then show ?case
-    by (smt (verit) full_spec_game.strategy_formula.cases full_spec_game_axioms spectroscopy_position.distinct(31) spectroscopy_position.distinct(37) spectroscopy_position.distinct(7))
+  then show ?case sorry
 next
   case (branch_conj p \<alpha> p' Q Q\<alpha> e e' \<psi> \<Phi> Qa)
   then obtain Q' where IH_BB: "spectroscopy_moves (Defender_Branch p \<alpha> p' Q Q\<alpha>) (Attacker_Branch p' Q') =
