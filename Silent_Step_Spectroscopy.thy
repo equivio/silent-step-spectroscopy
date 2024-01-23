@@ -173,7 +173,7 @@ next
   then show ?case by simp
 next
   case (stable p Q e \<chi>)
-  then show ?case
+  then show ?case 
     using spectroscopy_position.distinct(41) strategy_formula.cases sorry
 next
   case (stable_conj Q p e \<Phi>)
@@ -182,10 +182,11 @@ next
   then show ?case by simp
 next
   case (branch p Q p'' e \<chi>)
-  then show ?case sorry
+  have " Q \<Zsurj>S Q \<longrightarrow> distinguishes_from (hml_srbb.Internal \<chi>) p Q" sorry
+  then show ?case by simp
 next
-  case (branch_conj p \<alpha> p' Q Q\<alpha> e e' \<psi> \<Phi> Qa)
-  then obtain Q' where IH_BB: "spectroscopy_moves (Defender_Branch p \<alpha> p' Q Q\<alpha>) (Attacker_Branch p' Q') =
+  case (branch_conj p \<alpha> p' Q1 Q\<alpha> e e' \<psi> \<Phi> Qa)
+  then obtain Q' where IH_BB: "spectroscopy_moves (Defender_Branch p \<alpha> p' Q1 Q\<alpha>) (Attacker_Branch p' Q') =
          Some (min1_6 \<circ> (\<lambda>x. x - E 0 1 1 0 0 0 0 0)) \<and>
          spectroscopy_moves (Attacker_Branch p' Q') (Attacker_Immediate p' Q') = subtract 1 0 0 0 0 0 0 0 \<and>
          in_wina (min1_6 (e - E 0 1 1 0 0 0 0 0) - E 1 0 0 0 0 0 0 0) (Attacker_Immediate p' Q') \<and>
@@ -196,7 +197,8 @@ next
               strategy_formula_inner (Attacker_Immediate p' Q') e' \<chi> \<and> Q \<Zsurj>S Q \<longrightarrow>
               distinguishes_from (hml_srbb.Internal \<chi>) p Q
           | Defender_Conj p Q \<Rightarrow> distinguishes_from \<psi> p Q | _ \<Rightarrow> True)" by auto
-  have " Qa \<inter> Q = {} \<longrightarrow> distinguishes_from_inner (BranchConj \<alpha> \<psi> Q \<Phi>) p (Q \<union> Qa)" sorry
+  hence "distinguishes_from \<psi> p' Q'" by simp
+  have " Qa \<inter> Q1 = {} \<longrightarrow> distinguishes_from_inner (BranchConj \<alpha> \<psi> Q1 \<Phi>) p (Q1 \<union> Qa)" sorry
   then show ?case by simp
 qed
 
