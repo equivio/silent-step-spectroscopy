@@ -40,7 +40,7 @@ lemma strategy_formulas_distinguish:
 
       | Defender_Conj p Q \<Rightarrow> distinguishes_from_inner \<chi> p Q
       | Defender_Stable_Conj p Q \<Rightarrow> (\<forall>q. \<not> p \<mapsto> \<tau> q) \<longrightarrow> distinguishes_from_inner \<chi> p Q
-      | Defender_Branch p \<alpha> p' Q Qa \<Rightarrow> (p \<mapsto> \<alpha> p') \<longrightarrow> distinguishes_from_inner \<chi> p (Q\<union>Qa)
+      | Defender_Branch p \<alpha> p' Q Qa \<Rightarrow>((p \<mapsto> \<alpha> p') \<and> (Qa \<noteq> {})) \<longrightarrow> distinguishes_from_inner \<chi> p (Q\<union>Qa)
       | Attacker_Branch p Q \<Rightarrow> True))
       \<and>
       (strategy_formula_conjunct g e \<psi> \<longrightarrow>
@@ -192,10 +192,15 @@ next
      in_wina e (Defender_Branch p \<alpha> p' Q' Q\<alpha>) \<and>
      strategy_formula_inner (Defender_Branch p \<alpha> p' Q' Q\<alpha>) e \<chi> \<and>
      (case Defender_Branch p \<alpha> p' Q' Q\<alpha> of Attacker_Delayed p Q \<Rightarrow> Q \<Zsurj>S Q \<longrightarrow> distinguishes_from (hml_srbb.Internal \<chi>) p Q
-      | Defender_Branch p \<alpha> p' Q Qa \<Rightarrow> distinguishes_from_inner \<chi> p (Q \<union> Qa)
+      | Defender_Branch p \<alpha> p' Q Qa \<Rightarrow> p \<mapsto>\<alpha> p' \<and> Qa \<noteq> {} \<longrightarrow> distinguishes_from_inner \<chi> p (Q \<union> Qa)
       | Defender_Conj p Q \<Rightarrow> distinguishes_from_inner \<chi> p Q
       | Defender_Stable_Conj p Q \<Rightarrow> (\<forall>q. \<not> p \<mapsto>\<tau> q) \<longrightarrow> distinguishes_from_inner \<chi> p Q | _ \<Rightarrow> True)" by blast
-  hence D: "distinguishes_from_inner \<chi> p (Q' \<union> Q\<alpha>)" by simp
+  hence "spectroscopy_moves (Attacker_Delayed p Q) (Defender_Branch p \<alpha> p' Q' Q\<alpha>) = Some id" by simp
+  hence "p \<mapsto>\<alpha> p' \<and> Q\<alpha> \<noteq> {}"
+    by (metis local.br_conj option.distinct(1)) 
+  
+  from IH have "p \<mapsto>\<alpha> p' \<and> Q\<alpha> \<noteq> {} \<longrightarrow> distinguishes_from_inner \<chi> p (Q' \<union> Q\<alpha>)" by simp
+  hence D: "distinguishes_from_inner \<chi> p (Q' \<union> Q\<alpha>)" using \<open>p \<mapsto>\<alpha> p' \<and> Q\<alpha> \<noteq> {}\<close> by auto
 
   from IH have "Q' = Q - Q\<alpha> \<and> p \<mapsto>\<alpha> p' \<and> Q\<alpha> \<noteq> {} \<and> Q\<alpha> \<subseteq> Q"
     by (metis local.br_conj option.distinct(1))
@@ -223,32 +228,37 @@ next
   hence X:"p' \<Turnstile>SRBB \<psi>"
     by (simp add: distinguishes_from_def) 
 
-  have "(p \<mapsto> \<alpha> p') \<longrightarrow> distinguishes_from_inner (BranchConj \<alpha> \<psi> Q1 \<Phi>) p (Q1 \<union> Q\<alpha>) " proof
-    assume "p \<mapsto> \<alpha> p'"
+  have "(p \<mapsto> \<alpha> p' \<and> Q\<alpha> \<noteq> {}) \<longrightarrow> distinguishes_from_inner (BranchConj \<alpha> \<psi> Q1 \<Phi>) p (Q1 \<union> Q\<alpha>) " proof
+    assume "p \<mapsto> \<alpha> p' \<and> Q\<alpha> \<noteq> {}"
     from IH have "spectroscopy_moves (Defender_Branch p \<alpha> p' Q1 Q\<alpha>) (Attacker_Branch p' Q') =
          Some (min1_6 \<circ> (\<lambda>x. x - E 0 1 1 0 0 0 0 0))" by auto
     hence "Q\<alpha> \<mapsto>aS \<alpha> Q'"
       by (smt (verit) local.br_obsv option.distinct(1)) 
-    hence A2: "hml_srbb_inner_models (Obs \<alpha> \<psi>) p" using X \<open>p \<mapsto> \<alpha> p'\<close>  by auto   
-    hence A3: "hml_srbb_inner_models (BranchConj \<alpha> \<psi> Q1 \<Phi>) p" sorry
+    hence A2: "hml_srbb_inner_models (Obs \<alpha> \<psi>) p" using X \<open>p \<mapsto> \<alpha> p' \<and> Q\<alpha> \<noteq> {}\<close>  by auto  
 
-    have "\<forall>q \<in> (Q1 \<union> Q\<alpha>). \<not>(hml_srbb_inner_models (BranchConj \<alpha> \<psi> Q1 \<Phi>) q)" proof
+    have A3: "\<forall>q \<in> (Q1 \<union> Q\<alpha>). distinguishes_inner (BranchConj \<alpha> \<psi> Q1 \<Phi>) p q" proof
       fix q
       assume "q\<in>(Q1 \<union> Q\<alpha>)"     
-      show "\<not>(hml_srbb_inner_models (BranchConj \<alpha> \<psi> Q1 \<Phi>) q)" proof (cases "q\<in>Q1")
+      show "distinguishes_inner (BranchConj \<alpha> \<psi> Q1 \<Phi>) p q" proof (cases "q\<in>Q1")
         case True
         hence  "distinguishes_conjunct (\<Phi> q) p q" using branch_conj(2) by simp
-        hence "distinguishes_inner (BranchConj \<alpha> \<psi> Q1 \<Phi>) p q" using A1 A2 srbb_dist_conjunct_or_branch_implies_dist_branch_conjunction True by blast
-        then show ?thesis
-          by (simp add: distinguishes_inner_def) 
+        thus "distinguishes_inner (BranchConj \<alpha> \<psi> Q1 \<Phi>) p q" using A1 A2 srbb_dist_conjunct_or_branch_implies_dist_branch_conjunction True by blast
       next
         case False
         have "distinguishes_inner (Obs \<alpha> \<psi>) p q" sorry
-        hence "distinguishes_inner (BranchConj \<alpha> \<psi> Q1 \<Phi>) p q" using A1 A2 srbb_dist_conjunct_or_branch_implies_dist_branch_conjunction by blast
-        then show ?thesis by (simp add: distinguishes_inner_def) 
+        thus  "distinguishes_inner (BranchConj \<alpha> \<psi> Q1 \<Phi>) p q" using A1 A2 srbb_dist_conjunct_or_branch_implies_dist_branch_conjunction by blast    
       qed
     qed
-    thus  "distinguishes_from_inner (BranchConj \<alpha> \<psi> Q1 \<Phi>) p (Q1 \<union> Q\<alpha>)" using A2 A3 distinguishes_from_inner_def by simp 
+
+    from \<open>p \<mapsto> \<alpha> p' \<and> Q\<alpha> \<noteq> {}\<close> have "\<exists>qa. qa \<in> Q\<alpha>" by auto
+    then obtain qa where "qa \<in> Q\<alpha>" by auto
+    hence A4: "hml_srbb_inner_models (BranchConj \<alpha> \<psi> Q1 \<Phi>) p" using A3
+      by (meson Un_iff distinguishes_inner_def) 
+
+    from A3 have "\<forall>q \<in> (Q1 \<union> Q\<alpha>). \<not>(hml_srbb_inner_models (BranchConj \<alpha> \<psi> Q1 \<Phi>) q)"
+      using distinguishes_inner_def by blast 
+
+    thus "distinguishes_from_inner (BranchConj \<alpha> \<psi> Q1 \<Phi>) p (Q1 \<union> Q\<alpha>)" using A4 distinguishes_from_inner_def by simp 
   qed 
  
   then show ?case by simp
