@@ -182,6 +182,14 @@ next
   then show ?case by simp
 next
   case (branch p Q e \<chi>)
+  then obtain p' Q' \<alpha> Q\<alpha> where IH: "spectroscopy_moves (Attacker_Delayed p Q) (Defender_Branch p \<alpha> p' Q' Q\<alpha>) = Some id \<and>
+     in_wina e (Defender_Branch p \<alpha> p' Q' Q\<alpha>) \<and>
+     strategy_formula_inner (Defender_Branch p \<alpha> p' Q' Q\<alpha>) e \<chi> \<and>
+     (case Defender_Branch p \<alpha> p' Q' Q\<alpha> of Attacker_Delayed p Q \<Rightarrow> Q \<Zsurj>S Q \<longrightarrow> distinguishes_from (hml_srbb.Internal \<chi>) p Q
+      | Defender_Branch p \<alpha> p' Q Qa \<Rightarrow> Qa \<inter> Q = {} \<longrightarrow> distinguishes_from_inner \<chi> p (Q \<union> Qa)
+      | Defender_Conj p Q \<Rightarrow> distinguishes_from_inner \<chi> p Q
+      | Defender_Stable_Conj p Q \<Rightarrow> (\<forall>q. \<not> p \<mapsto>\<tau> q) \<longrightarrow> distinguishes_from_inner \<chi> p Q | _ \<Rightarrow> True)" by blast
+  hence "Q\<alpha> \<inter> Q' = {} \<longrightarrow> distinguishes_from_inner \<chi> p (Q' \<union> Q\<alpha>)" by simp
   then show ?case sorry
 next
   case (branch_conj p \<alpha> p' Q Q\<alpha> e e' \<psi> \<Phi> Qa)
