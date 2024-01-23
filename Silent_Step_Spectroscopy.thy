@@ -40,7 +40,7 @@ lemma strategy_formulas_distinguish:
 
       | Defender_Conj p Q \<Rightarrow> distinguishes_from_inner \<chi> p Q
       | Defender_Stable_Conj p Q \<Rightarrow> (\<forall>q. \<not> p \<mapsto> \<tau> q) \<longrightarrow> distinguishes_from_inner \<chi> p Q
-      | Defender_Branch p \<alpha> p' Q Qa \<Rightarrow> (Qa\<inter>Q={}) \<longrightarrow> distinguishes_from_inner \<chi> p (Q\<union>Qa)
+      | Defender_Branch p \<alpha> p' Q Qa \<Rightarrow> distinguishes_from_inner \<chi> p (Q\<union>Qa)
       | Attacker_Branch p Q \<Rightarrow> True))
       \<and>
       (strategy_formula_conjunct g e \<psi> \<longrightarrow>
@@ -63,7 +63,7 @@ next
        in_wina e (Attacker_Delayed p' Q) \<and>
        strategy_formula_inner (Attacker_Delayed p' Q) e \<chi> \<and>
        (case Attacker_Delayed p' Q of Attacker_Delayed p Q \<Rightarrow> Q \<Zsurj>S Q \<longrightarrow> distinguishes_from (hml_srbb.Internal \<chi>) p Q
-        | Defender_Branch p \<alpha> p' Q Qa \<Rightarrow> Qa \<inter> Q = {} \<longrightarrow> distinguishes_from_inner \<chi> p (Q \<union> Qa)
+        | Defender_Branch p \<alpha> p' Q Qa \<Rightarrow> distinguishes_from_inner \<chi> p (Q \<union> Qa)
         | Defender_Conj p Q \<Rightarrow> distinguishes_from_inner \<chi> p Q
         | Defender_Stable_Conj p Q \<Rightarrow> (\<forall>q. \<not> p \<mapsto>\<tau> q) \<longrightarrow> distinguishes_from_inner \<chi> p Q | _ \<Rightarrow> True)" by auto
   hence D: "Q \<Zsurj>S Q \<longrightarrow> distinguishes_from (hml_srbb.Internal \<chi>) p' Q"
@@ -142,7 +142,7 @@ next
        in_wina (min1_6 e) (Attacker_Delayed p Q') \<and>
        strategy_formula_inner (Attacker_Delayed p Q') (min1_6 e) \<chi> \<and>
        (case Attacker_Delayed p Q' of Attacker_Delayed p Q \<Rightarrow> Q \<Zsurj>S Q \<longrightarrow> distinguishes_from (hml_srbb.Internal \<chi>) p Q
-        | Defender_Branch p \<alpha> p' Q Qa \<Rightarrow> Qa \<inter> Q = {} \<longrightarrow> distinguishes_from_inner \<chi> p (Q \<union> Qa)
+        | Defender_Branch p \<alpha> p' Q Qa \<Rightarrow> distinguishes_from_inner \<chi> p (Q \<union> Qa)
         | Defender_Conj p Q \<Rightarrow> distinguishes_from_inner \<chi> p Q
         | Defender_Stable_Conj p Q \<Rightarrow> (\<forall>q. \<not> p \<mapsto>\<tau> q) \<longrightarrow> distinguishes_from_inner \<chi> p Q | _ \<Rightarrow> True)" by auto
   hence D: "Q' \<Zsurj>S Q' \<longrightarrow> distinguishes_from (hml_srbb.Internal \<chi>) p Q'" by simp
@@ -160,7 +160,7 @@ next
         in_wina (min1_7 (e - E 0 0 0 0 0 0 0 1)) (Attacker_Delayed q P')) \<and>
        strategy_formula_inner (Attacker_Delayed q P') (min1_7 (e - E 0 0 0 0 0 0 0 1)) \<chi> \<and>
        (case Attacker_Delayed q P' of Attacker_Delayed p Q \<Rightarrow> Q \<Zsurj>S Q \<longrightarrow> distinguishes_from (hml_srbb.Internal \<chi>) p Q
-        | Defender_Branch p \<alpha> p' Q Qa \<Rightarrow> Qa \<inter> Q = {} \<longrightarrow> distinguishes_from_inner \<chi> p (Q \<union> Qa)
+        | Defender_Branch p \<alpha> p' Q Qa \<Rightarrow> distinguishes_from_inner \<chi> p (Q \<union> Qa)
         | Defender_Conj p Q \<Rightarrow> distinguishes_from_inner \<chi> p Q
         | Defender_Stable_Conj p Q \<Rightarrow> (\<forall>q. \<not> p \<mapsto>\<tau> q) \<longrightarrow> distinguishes_from_inner \<chi> p Q | _ \<Rightarrow> True)" by auto
   hence D: "P' \<Zsurj>S P' \<longrightarrow> distinguishes_from (hml_srbb.Internal \<chi>) q P'" by simp
@@ -186,10 +186,10 @@ next
      in_wina e (Defender_Branch p \<alpha> p' Q' Q\<alpha>) \<and>
      strategy_formula_inner (Defender_Branch p \<alpha> p' Q' Q\<alpha>) e \<chi> \<and>
      (case Defender_Branch p \<alpha> p' Q' Q\<alpha> of Attacker_Delayed p Q \<Rightarrow> Q \<Zsurj>S Q \<longrightarrow> distinguishes_from (hml_srbb.Internal \<chi>) p Q
-      | Defender_Branch p \<alpha> p' Q Qa \<Rightarrow> Qa \<inter> Q = {} \<longrightarrow> distinguishes_from_inner \<chi> p (Q \<union> Qa)
+      | Defender_Branch p \<alpha> p' Q Qa \<Rightarrow> distinguishes_from_inner \<chi> p (Q \<union> Qa)
       | Defender_Conj p Q \<Rightarrow> distinguishes_from_inner \<chi> p Q
       | Defender_Stable_Conj p Q \<Rightarrow> (\<forall>q. \<not> p \<mapsto>\<tau> q) \<longrightarrow> distinguishes_from_inner \<chi> p Q | _ \<Rightarrow> True)" by blast
-  hence "Q\<alpha> \<inter> Q' = {} \<longrightarrow> distinguishes_from_inner \<chi> p (Q' \<union> Q\<alpha>)" by simp
+  hence "distinguishes_from_inner \<chi> p (Q' \<union> Q\<alpha>)" by simp
   then show ?case sorry
 next
   case (branch_conj p \<alpha> p' Q Q\<alpha> e e' \<psi> \<Phi> Qa)
