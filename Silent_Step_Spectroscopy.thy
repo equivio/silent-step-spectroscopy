@@ -309,12 +309,70 @@ lemma winning_budget_implies_strategy_formula:
     have "\<forall>Q'. spectroscopy_moves (Defender_Branch p \<alpha> p' Q Qa) (Attacker_Branch p' Q') = None"
       using A1 by blast
     from this obtain Q' where "spectroscopy_moves (Defender_Branch p \<alpha> p' Q Qa) (Attacker_Branch p' Q') = None" by auto
-    (*hence "\<exists>\<psi>. (\<forall>q \<in> Q. spectroscopy_moves (Defender_Branch p \<alpha> p' Q Qa) (Attacker_Branch p q) 
-        = subtract 1 0 0 0 0 0 0 0 
-            \<and> (in_wina ((min1_6 (e - E 0 1 1 0 0 0 0 0)) - (E 1 0 0 0 0 0 0 0)) (Attacker_Immediate p' Q'))
-            \<and> strategy_formula (Attacker_Immediate p' Q') e \<psi>)"
-      by blast*)
-    then show ?case sorry
+    hence strat: "\<exists>\<Phi>.\<forall>q \<in> Q. spectroscopy_moves (Defender_Branch p \<alpha> p' Q Qa) (Attacker_Clause p q) 
+          = (subtract 0 1 1 0 0 0 0 0)
+          \<and> in_wina (e - (E 0 1 1 0 0 0 0 0)) (Attacker_Clause p q)
+          \<and> strategy_formula_conjunct (Attacker_Clause p q) (e - (E 0 1 1 0 0 0 0 0)) (\<Phi> q)"
+         "\<exists>\<psi>.\<exists>Q'. spectroscopy_moves (Defender_Branch p \<alpha> p' Q Qa) (Attacker_Branch p' Q') 
+          = Some (min1_6 \<circ> (\<lambda>x. x- E 0 1 1 0 0 0 0 0)) 
+            \<and> spectroscopy_moves (Attacker_Branch p' Q') (Attacker_Immediate p' Q')
+            = subtract 1 0 0 0 0 0 0 0 
+            \<and> (in_wina ((min1_6 (e - E 0 1 1 0 0 0 0 0)) - (E 1 0 0 0 0 0 0 0)) 
+                  (Attacker_Immediate p' Q'))
+            \<and> strategy_formula (Attacker_Immediate p' Q') ((min1_6 (e - E 0 1 1 0 0 0 0 0)) - (E 1 0 0 0 0 0 0 0)) \<psi>"
+      sorry
+    from strat obtain \<Phi> where "\<forall>q \<in> Q. spectroscopy_moves (Defender_Branch p \<alpha> p' Q Qa) (Attacker_Clause p q) 
+          = (subtract 0 1 1 0 0 0 0 0)
+          \<and> in_wina (e - (E 0 1 1 0 0 0 0 0)) (Attacker_Clause p q)
+          \<and> strategy_formula_conjunct (Attacker_Clause p q) (e - (E 0 1 1 0 0 0 0 0)) (\<Phi> q)" by auto
+    from strat obtain \<psi> Q' where "spectroscopy_moves (Defender_Branch p \<alpha> p' Q Qa) (Attacker_Branch p' Q') 
+          = Some (min1_6 \<circ> (\<lambda>x. x- E 0 1 1 0 0 0 0 0)) 
+            \<and> spectroscopy_moves (Attacker_Branch p' Q') (Attacker_Immediate p' Q')
+            = subtract 1 0 0 0 0 0 0 0 
+            \<and> (in_wina ((min1_6 (e - E 0 1 1 0 0 0 0 0)) - (E 1 0 0 0 0 0 0 0)) 
+                  (Attacker_Immediate p' Q'))
+            \<and> strategy_formula (Attacker_Immediate p' Q') ((min1_6 (e - E 0 1 1 0 0 0 0 0)) - (E 1 0 0 0 0 0 0 0)) \<psi>" by auto
+    hence "strategy_formula_inner (Defender_Branch p \<alpha> p' Q Qa) e (BranchConj \<alpha> \<psi> {} \<Phi>)"
+      by (smt (verit, best) "1" G option.distinct(1))
+    then have "modal_depth_srbb_inner (BranchConj \<alpha>  \<psi> {}  \<Phi>) = Sup ({1 + modal_depth_srbb \<psi>} \<union> ((modal_depth_srbb_conjunct \<circ> \<Phi>) `{}))"
+              "branch_conj_depth_inner (BranchConj  \<alpha>  \<psi>  {} \<Phi>) =
+                (if {} = {}
+                  then branching_conjunction_depth \<psi>
+                 else 1 + Sup ({branching_conjunction_depth \<psi>} \<union> ((branch_conj_depth_conjunct \<circ> \<Phi>) `{})))"
+                "inst_conj_depth_inner (BranchConj  \<alpha>  \<psi>  {} \<Phi>) =
+                (if  {} = {}
+                  then instable_conjunction_depth \<psi>
+                 else 1 + Sup ({instable_conjunction_depth \<psi>} \<union> ((inst_conj_depth_conjunct \<circ> \<Phi>) `  {})))"
+                "st_conj_depth_inner (BranchConj  \<alpha>  \<psi>  {} \<Phi>) = Sup ({stable_conjunction_depth \<psi>} \<union> ((st_conj_depth_conjunct \<circ> \<Phi>) `  {}))"
+                "imm_conj_depth_inner (BranchConj  \<alpha>  \<psi>  {} \<Phi>) = Sup ({immediate_conjunction_depth \<psi>} \<union> ((imm_conj_depth_conjunct \<circ> \<Phi>) ` {}))"
+                "max_pos_conj_depth_inner (BranchConj  \<alpha>  \<psi>  {} \<Phi>) = Sup ({max_positive_conjunct_depth \<psi>} \<union> ((max_pos_conj_depth_conjunct \<circ> \<Phi>) ` {}))"
+                "max_neg_conj_depth_inner (BranchConj  \<alpha>  \<psi>  {} \<Phi>) = Sup ({max_negative_conjunct_depth \<psi>} \<union> ((max_neg_conj_depth_conjunct \<circ> \<Phi>) ` {}))"
+                "neg_depth_inner (BranchConj  \<alpha>  \<psi>  {} \<Phi>) = Sup ({negation_depth \<psi>} \<union> ((neg_depth_conjunct \<circ> \<Phi>) ` {}))"
+      using modal_depth_srbb_inner.simps(3) branch_conj_depth_inner.simps st_conj_depth_inner.simps
+      inst_conj_depth_inner.simps imm_conj_depth_inner.simps max_pos_conj_depth_inner.simps
+      max_neg_conj_depth_inner.simps neg_depth_inner.simps 
+      by auto+
+      hence   "modal_depth_srbb_inner (BranchConj \<alpha>  \<psi> {}  \<Phi>) = 0"
+              "branch_conj_depth_inner (BranchConj  \<alpha>  \<psi>  {} \<Phi>) = 0"
+              "inst_conj_depth_inner (BranchConj  \<alpha>  \<psi>  {} \<Phi>) = 0"
+              "st_conj_depth_inner (BranchConj  \<alpha>  \<psi>  {} \<Phi>) = 0"
+              "imm_conj_depth_inner (BranchConj  \<alpha>  \<psi>  {} \<Phi>) = 0"
+              "max_pos_conj_depth_inner (BranchConj  \<alpha>  \<psi>  {} \<Phi>) = 0"
+              "max_neg_conj_depth_inner (BranchConj  \<alpha>  \<psi>  {} \<Phi>) = 0"
+              "neg_depth_inner (BranchConj  \<alpha>  \<psi>  {} \<Phi>) = 0"
+        sorry
+       hence "expr_pr_inner (BranchConj \<alpha>  \<psi> {}  \<Phi>) = (E 0 0 0 0 0 0 0 0)"
+        using expr_pr_inner.simps
+        by force
+      have "(e - (E 0 0 0 0 0 0 0 0)) = e" 
+        by (simp add: "1" leq_not_eneg minus_energy_def)
+        (*have "e \<noteq> eneg" by a
+        hence price: "expr_pr_inner  (ImmConj Q \<Phi>) \<le> e"
+          using \<open>expressiveness_price (ImmConj Q \<Phi>) = E 0 0 0 0 0 0 0 0\<close> minus_energy_def
+          using \<open>e - E 0 0 0 0 0 0 0 0 = e\<close> by presburger
+      then show ?case
+        using G strat \<open>Q = {}\<close> \<open>\<exists>\<phi>. strategy_formula_inner g e \<phi> \<and> expr_pr_inner \<phi> \<le> e\<close> by blast*)
+      then show ?case sorry
   next
     case 7
     then show ?case 
