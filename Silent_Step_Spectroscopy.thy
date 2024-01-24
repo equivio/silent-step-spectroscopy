@@ -143,7 +143,28 @@ lemma expr_obs:
   assumes "expressiveness_price \<phi> \<le> (e - E 1 0 0 0 0 0 0 0)"
   shows "expr_pr_inner (Obs \<alpha> \<phi>) \<le> e"
 proof-
-  oops
+  have expr_pr_obs: "expr_pr_inner (Obs \<alpha> \<phi>) = 
+                  (E (modal_depth_srbb_inner (Obs \<alpha> \<phi>))
+                 (branch_conj_depth_inner (Obs \<alpha> \<phi>))
+                 (inst_conj_depth_inner (Obs \<alpha> \<phi>))
+                 (st_conj_depth_inner (Obs \<alpha> \<phi>))
+                 (imm_conj_depth_inner (Obs \<alpha> \<phi>))
+                 (max_pos_conj_depth_inner (Obs \<alpha> \<phi>))
+                 (max_neg_conj_depth_inner (Obs \<alpha> \<phi>))
+                 (neg_depth_inner (Obs \<alpha> \<phi>)))"
+    using expr_pr_inner.simps by blast
+  have obs_upds: "modal_depth_srbb_inner (Obs \<alpha> \<phi>) = 1 + modal_depth_srbb \<phi>" 
+  "branch_conj_depth_inner (Obs \<alpha> \<phi>) = branching_conjunction_depth \<phi>"
+  "inst_conj_depth_inner (Obs \<alpha> \<phi>) = instable_conjunction_depth \<phi>"
+  "st_conj_depth_inner (Obs \<alpha> \<phi>) = stable_conjunction_depth \<phi>"
+  "imm_conj_depth_inner (Obs \<alpha> \<phi>) = immediate_conjunction_depth \<phi>"
+  "max_pos_conj_depth_inner (Obs \<alpha> \<phi>) = max_positive_conjunct_depth \<phi>"
+  "max_neg_conj_depth_inner (Obs \<alpha> \<phi>) = max_negative_conjunct_depth \<phi>"
+  "neg_depth_inner (Obs \<alpha> \<phi>) = negation_depth \<phi>"
+    by simp+
+
+  with assms expr_pr_obs show ?thesis sorry 
+qed
 
 lemma winning_budget_implies_strategy_formula:
   fixes g e
@@ -729,6 +750,10 @@ next
       qed
   next
     case 4
+    hence "\<not>attacker g" 
+      by auto
+    with "2" have False by blast
+    then show ?case by blast
      (*have B: "(\<forall>g'. (\<exists>p Q. g' = Attacker_Immediate p Q)  \<longrightarrow> (\<exists>\<phi>. strategy_formula g' e \<phi> \<and> expressiveness_price \<phi> \<le> e) \<and>
           (\<exists>p Q. g' = Attacker_Delayed p Q)  \<longrightarrow> (\<exists>\<phi>. strategy_formula_inner g' e \<phi> \<and> expr_pr_inner \<phi> \<le> e) \<and>
           (\<exists>p q. g' = Attacker_Clause p q)  \<longrightarrow> (\<exists>\<phi>. strategy_formula_conjunct g' e \<phi> \<and> expr_pr_conjunct \<phi> \<le> e) \<and>
@@ -846,16 +871,22 @@ next
         qed
       qed
     qed*)
-    then show ?case sorry
   next
     case 5
-    then show ?case sorry
+    hence "\<not>attacker g" 
+      by auto
+    with "2" have False by blast
+    then show ?case by blast
   next
     case 6
-    then show ?case sorry
+    hence "\<not>attacker g" 
+      by auto
+    with "2" have False by blast
+    then show ?case by blast
   next
     case 7
-    then show ?case sorry
+    then show ?case using "2" 
+      by blast
   }
 next
   case (3 g e)
