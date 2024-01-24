@@ -39,7 +39,7 @@ locale LTS_Tau =
     fixes \<tau> :: 'a
 begin
 
-abbreviation non_tau_step ("_ \<mapsto>a _ _" [70,70,70] 80) where
+abbreviation soft_step ("_ \<mapsto>a _ _" [70,70,70] 80) where
   "p \<mapsto>a \<alpha> q \<equiv> p \<mapsto>\<alpha> q \<or> (\<alpha> = \<tau> \<and> p = q)" 
 
 inductive silent_reachable :: "'s \<Rightarrow> 's \<Rightarrow> bool"  (infix "\<Zsurj>" 80)
@@ -216,37 +216,37 @@ lemma sreachable_set_eq:
   shows "Q = silent_reachable_set P"
   using exactly_one_sreachable_set sreachable_set_is_sreachable assms by fastforce
 
-abbreviation non_tau_step_setp ("_ \<mapsto>aS _ _" [70,70,70] 80) where
+abbreviation soft_step_setp ("_ \<mapsto>aS _ _" [70,70,70] 80) where
   "P \<mapsto>aS \<alpha> Q \<equiv> (\<forall>q \<in> Q. \<exists>p \<in> P. p \<mapsto>a \<alpha> q) \<and> (\<forall>p \<in> P. \<forall>q. p \<mapsto>a \<alpha> q \<longrightarrow> q \<in> Q)"
 
-definition non_tau_step_set :: "'s set \<Rightarrow> 'a \<Rightarrow> 's set" where
-  "non_tau_step_set P \<alpha> \<equiv> { q . \<exists>p \<in> P. p \<mapsto>a \<alpha> q }"
+definition soft_step_set :: "'s set \<Rightarrow> 'a \<Rightarrow> 's set" where
+  "soft_step_set P \<alpha> \<equiv> { q . \<exists>p \<in> P. p \<mapsto>a \<alpha> q }"
 
-lemma non_tau_step_set_is_non_tau_step_set:
-  "P \<mapsto>aS \<alpha> (non_tau_step_set P \<alpha>)"
-  using non_tau_step_set_def by auto
+lemma soft_step_set_is_soft_step_set:
+  "P \<mapsto>aS \<alpha> (soft_step_set P \<alpha>)"
+  using soft_step_set_def by auto
 
-lemma exactly_one_non_tau_step_set:
+lemma exactly_one_soft_step_set:
   "\<exists>!Q. P \<mapsto>aS \<alpha> Q"
 proof -
-  from non_tau_step_set_is_non_tau_step_set
-  have "P \<mapsto>aS \<alpha> (non_tau_step_set P \<alpha>)"
-    and "\<And>Q. P \<mapsto>aS \<alpha> Q \<Longrightarrow> Q = (non_tau_step_set P \<alpha>)"
+  from soft_step_set_is_soft_step_set
+  have "P \<mapsto>aS \<alpha> (soft_step_set P \<alpha>)"
+    and "\<And>Q. P \<mapsto>aS \<alpha> Q \<Longrightarrow> Q = (soft_step_set P \<alpha>)"
     by fastforce+
   show "\<exists>!Q. P \<mapsto>aS \<alpha> Q"
   proof
-    from \<open>P \<mapsto>aS \<alpha> (non_tau_step_set P \<alpha>)\<close>
-    show "P \<mapsto>aS \<alpha> (non_tau_step_set P \<alpha>)".
+    from \<open>P \<mapsto>aS \<alpha> (soft_step_set P \<alpha>)\<close>
+    show "P \<mapsto>aS \<alpha> (soft_step_set P \<alpha>)".
   next
-    from \<open>\<And>Q. P \<mapsto>aS \<alpha> Q \<Longrightarrow> Q = (non_tau_step_set P \<alpha>)\<close>
-    show "\<And>Q. P \<mapsto>aS \<alpha> Q \<Longrightarrow> Q = (non_tau_step_set P \<alpha>)".
+    from \<open>\<And>Q. P \<mapsto>aS \<alpha> Q \<Longrightarrow> Q = (soft_step_set P \<alpha>)\<close>
+    show "\<And>Q. P \<mapsto>aS \<alpha> Q \<Longrightarrow> Q = (soft_step_set P \<alpha>)".
   qed
 qed  
 
-lemma non_tau_step_set_eq:
+lemma soft_step_set_eq:
   assumes "P \<mapsto>aS \<alpha> Q"
-  shows "Q = non_tau_step_set P \<alpha>"
-  using exactly_one_non_tau_step_set non_tau_step_set_is_non_tau_step_set assms 
+  shows "Q = soft_step_set P \<alpha>"
+  using exactly_one_soft_step_set soft_step_set_is_soft_step_set assms 
     by fastforce
 
 end (* locale LTS_Tau *)
