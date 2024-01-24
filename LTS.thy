@@ -40,7 +40,7 @@ locale LTS_Tau =
 begin
 
 abbreviation non_tau_step ("_ \<mapsto>a _ _" [70,70,70] 80) where
-  "p \<mapsto>a \<alpha> q \<equiv> (if \<alpha> = \<tau> then p = q else p \<mapsto>\<alpha> q)" 
+  "p \<mapsto>a \<alpha> q \<equiv> p \<mapsto>\<alpha> q \<or> (\<alpha> = \<tau> \<and> p = q)" 
 
 inductive silent_reachable :: "'s \<Rightarrow> 's \<Rightarrow> bool"  (infix "\<Zsurj>" 80)
   where
@@ -233,8 +233,14 @@ proof -
   have "P \<mapsto>aS \<alpha> (non_tau_step_set P \<alpha>)"
     and "\<And>Q. P \<mapsto>aS \<alpha> Q \<Longrightarrow> Q = (non_tau_step_set P \<alpha>)"
     by fastforce+
-  then show "\<exists>!Q. P \<mapsto>aS \<alpha> Q"
-    by blast
+  show "\<exists>!Q. P \<mapsto>aS \<alpha> Q"
+  proof
+    from \<open>P \<mapsto>aS \<alpha> (non_tau_step_set P \<alpha>)\<close>
+    show "P \<mapsto>aS \<alpha> (non_tau_step_set P \<alpha>)".
+  next
+    from \<open>\<And>Q. P \<mapsto>aS \<alpha> Q \<Longrightarrow> Q = (non_tau_step_set P \<alpha>)\<close>
+    show "\<And>Q. P \<mapsto>aS \<alpha> Q \<Longrightarrow> Q = (non_tau_step_set P \<alpha>)".
+  qed
 qed  
 
 lemma non_tau_step_set_eq:
