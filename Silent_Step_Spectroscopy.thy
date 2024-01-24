@@ -163,7 +163,32 @@ proof-
   "neg_depth_inner (Obs \<alpha> \<phi>) = negation_depth \<phi>"
     by simp+
 
-  with assms expr_pr_obs show ?thesis sorry 
+  obtain e1 e2 e3 e4 e5 e6 e7 e8 where "e = E e1 e2 e3 e4 e5 e6 e7 e8"
+    by (metis antysim assms eneg_leq energy.exhaust_sel gets_smaller srbb_price_never_neg)
+  hence "(e - (E 1 0 0 0 0 0 0 0)) = (E (e1-1) e2 e3 e4 e5 e6 e7 e8) \<or> 
+                  ((e - (E 1 0 0 0 0 0 0 0)) = eneg)"
+            using minus_energy_def
+            by simp
+  then show ?thesis
+  proof(rule disjE)
+  assume "e - E 1 0 0 0 0 0 0 0 = eneg"
+  hence "e = (E 0 0 0 0 0 0 0 0)"
+    using assms
+    using antysim eneg_leq min_eneg(2) by fastforce
+  then show ?thesis 
+    using \<open>e - E 1 0 0 0 0 0 0 0 = eneg\<close> assms 
+    using eneg_leq order_class.order_eq_iff by auto
+next
+  assume "e - E 1 0 0 0 0 0 0 0 = E (e1 - 1) e2 e3 e4 e5 e6 e7 e8"
+  hence "modal_depth_srbb \<phi> \<le> (e1 - 1)"
+    using assms leq_not_eneg by force
+  hence "modal_depth_srbb_inner (Obs \<alpha> \<phi>) \<le> e1"
+    using obs_upds
+    by (metis \<open>e - E 1 0 0 0 0 0 0 0 = E (e1 - 1) e2 e3 e4 e5 e6 e7 e8\<close> \<open>e = E e1 e2 e3 e4 e5 e6 e7 e8\<close> add_diff_assoc_enat add_diff_cancel_enat add_mono_thms_linordered_semiring(1) enat.simps(3) energy.distinct(1) energy.sel(1) le_numeral_extra(4) leq_not_eneg minus_energy_def one_enat_def)
+  then show ?thesis
+    using expr_pr_obs obs_upds 
+    using \<open>e - E 1 0 0 0 0 0 0 0 = E (e1 - 1) e2 e3 e4 e5 e6 e7 e8\<close> \<open>e = E e1 e2 e3 e4 e5 e6 e7 e8\<close> assms leq_not_eneg by fastforce 
+qed
 qed
 
 lemma winning_budget_implies_strategy_formula:
@@ -717,7 +742,8 @@ next
         by meson
 
       hence "strategy_formula_inner g e \<chi>"
-        using g_att_del local.stable sorry (*Problem: Q \<noteq> Q'*)
+        using g_att_del local.stable 
+        by (metis (no_types, lifting) local.late_stbl_conj option.distinct(1))
       
       then show ?thesis using expr g_att_del 
         by blast
