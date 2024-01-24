@@ -191,6 +191,66 @@ next
 qed
 qed
 
+lemma expr_st_conj: 
+  assumes "I \<noteq> {}" "\<forall>q \<in> I. expr_pr_conjunct (\<psi>s q) \<le> (e - (E 0 0 0 1 0 0 0 0))"
+  shows "expr_pr_inner (StableConj I \<psi>s) \<le> e"
+proof-
+  have obs_upds: "modal_depth_srbb_inner (StableConj I \<psi>s) = Sup ((modal_depth_srbb_conjunct \<circ> \<psi>s) ` I)"
+"branch_conj_depth_inner (StableConj I \<psi>s) = Sup ((branch_conj_depth_conjunct \<circ> \<psi>s) ` I)"
+"inst_conj_depth_inner (StableConj I \<psi>s) = Sup ((inst_conj_depth_conjunct \<circ> \<psi>s) ` I)"
+"st_conj_depth_inner (StableConj I \<psi>s) = 1 + Sup ((st_conj_depth_conjunct \<circ> \<psi>s) ` I)"
+"imm_conj_depth_inner (StableConj I \<psi>s) = Sup ((imm_conj_depth_conjunct \<circ> \<psi>s) ` I)"
+"max_pos_conj_depth_inner (StableConj I \<psi>s) = Sup ((max_pos_conj_depth_conjunct \<circ> \<psi>s) ` I)"
+"max_neg_conj_depth_inner (StableConj I \<psi>s) = Sup ((max_neg_conj_depth_conjunct \<circ> \<psi>s) ` I)"
+"neg_depth_inner (StableConj I \<psi>s) = Sup ((neg_depth_conjunct \<circ> \<psi>s) ` I)"
+    by force+
+
+  then obtain e1 e2 e3 e4 e5 e6 e7 e8 where "e = E e1 e2 e3 e4 e5 e6 e7 e8"
+    using antysim assms eneg_leq energy.exhaust_sel gets_smaller \<psi>_price_never_neg
+    by (metis ex_in_conv)
+  hence "(e - (E 0 0 0 1 0 0 0 0)) = (E e1 e2 e3 (e4-1) e5 e6 e7 e8) \<or> 
+                  ((e - (E 0 0 0 1 0 0 0 0)) = eneg)"
+            using minus_energy_def
+            by simp
+  then show ?thesis
+  proof(rule disjE)
+  assume "e - E 0 0 0 1 0 0 0 0 = eneg"
+  hence "e = (E 0 0 0 0 0 0 0 0)"
+    using assms
+    using antysim eneg_leq min_eneg(2) by fastforce
+  then show ?thesis 
+    using \<open>e - E 0 0 0 1 0 0 0 0 = eneg\<close> assms 
+    using eneg_leq order_class.order_eq_iff by auto
+next
+  assume assm: "e - E 0 0 0 1 0 0 0 0 = E e1 e2 e3 (e4-1) e5 e6 e7 e8"
+  hence "\<forall>i \<in> I. modal_depth_srbb_conjunct (\<psi>s i) \<le> e1"
+"\<forall>i \<in> I. branch_conj_depth_conjunct (\<psi>s i) \<le> e2"
+"\<forall>i \<in> I. inst_conj_depth_conjunct (\<psi>s i) \<le> e3"
+"\<forall>i \<in> I. st_conj_depth_conjunct (\<psi>s i) \<le> (e4 - 1)"
+"\<forall>i \<in> I. imm_conj_depth_conjunct (\<psi>s i) \<le> e5"
+"\<forall>i \<in> I. max_pos_conj_depth_conjunct (\<psi>s i) \<le> e6"
+"\<forall>i \<in> I. max_neg_conj_depth_conjunct (\<psi>s i) \<le> e7"
+"\<forall>i \<in> I. neg_depth_conjunct (\<psi>s i) \<le> e8"
+    using assms leq_not_eneg by force+
+  hence sups: "Sup ((modal_depth_srbb_conjunct \<circ> \<psi>s) ` I) \<le> e1"
+"Sup ((branch_conj_depth_conjunct \<circ> \<psi>s) ` I) \<le> e2"
+"Sup ((inst_conj_depth_conjunct \<circ> \<psi>s) ` I) \<le> e3"
+"Sup ((st_conj_depth_conjunct \<circ> \<psi>s) ` I) \<le> (e4 - 1)"
+"Sup ((imm_conj_depth_conjunct \<circ> \<psi>s) ` I) \<le> e5"
+"Sup ((max_pos_conj_depth_conjunct \<circ> \<psi>s) ` I) \<le> e6"
+"Sup ((max_neg_conj_depth_conjunct \<circ> \<psi>s) ` I) \<le> e7"
+"Sup ((neg_depth_conjunct \<circ> \<psi>s) ` I) \<le> e8"
+    by (simp add: Sup_le_iff)+
+  hence "st_conj_depth_inner (StableConj I \<psi>s) \<le> e4"
+    using \<open>e - E 0 0 0 1 0 0 0 0 = E e1 e2 e3 (e4 - 1) e5 e6 e7 e8\<close> \<open>e = E e1 e2 e3 e4 e5 e6 e7 e8\<close> \<open>st_conj_depth_inner (StableConj I \<psi>s) = 1 + Sup ((st_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close>
+    by (metis add_diff_cancel_enat enat_add_left_cancel_le energy.sel(4) energy.simps(3) le_iff_add leq_not_eneg minus_energy_def)
+  then show ?thesis
+    using obs_upds sups 
+    by (simp add: \<open>e = E e1 e2 e3 e4 e5 e6 e7 e8\<close> leq_not_eneg)
+qed
+qed
+
+
 lemma winning_budget_implies_strategy_formula:
   fixes g e
   assumes "in_wina e g"
@@ -427,7 +487,7 @@ lemma winning_budget_implies_strategy_formula:
 next
   case (2 g e)
   {
-    case 1
+    case 1 
     then obtain p Q where "g =  Attacker_Immediate p Q" by blast
     hence "(\<exists>g'. (((spectroscopy_moves (Attacker_Immediate p Q) g')\<noteq>None) \<and> (in_wina (the (spectroscopy_moves (Attacker_Immediate p Q) g') e) g')))"
       using energy_game.in_wina_Ga energy_game_axioms "2" 
@@ -679,7 +739,8 @@ next
         using local.observation 
         by presburger
 
-      have "expr_pr_inner (Obs \<alpha> \<phi>) \<le> e" sorry
+      have "expr_pr_inner (Obs \<alpha> \<phi>) \<le> e" using expr_obs \<phi>_prop 
+        by auto
 
       then show ?thesis using \<open>strategy_formula_inner (Attacker_Delayed p Q) e (Obs \<alpha> \<phi>)\<close>
         using g_att_del by blast
@@ -1034,10 +1095,64 @@ next
       using "3.IH" by force
   next
     case 4
+    then obtain p Q where "g = Defender_Conj p Q" by blast
     then show ?case sorry
   next
     case 5
-    then show ?case sorry
+    then obtain p Q where "g = Defender_Stable_Conj p Q" by blast
+    hence cases: "\<forall>g'. spectroscopy_moves g g' \<noteq> None \<longrightarrow> (in_wina (the (spectroscopy_moves (Defender_Stable_Conj p Q) g') e) g') \<and>((\<exists>p' q. g' = (Attacker_Clause p' q)) \<or> (\<exists>p' Q'. g' = (Defender_Conj p' Q')))"
+      using spectroscopy_defender.cases spectroscopy_moves.simps(42) spectroscopy_moves.simps(49) spectroscopy_moves.simps(55) spectroscopy_moves.simps(65) spectroscopy_moves.simps(75)
+      by (metis "3")
+    have "Q = {} \<or> (Q \<noteq> {} \<and> (\<forall>g'. spectroscopy_moves g g' \<noteq> None \<longrightarrow> (\<exists>p' q. g' = (Attacker_Clause p' q))))"
+      by (metis \<open>g = Defender_Stable_Conj p Q\<close> cases local.empty_stbl_conj_answer)
+    then show ?case proof(rule disjE)
+      assume "Q = {}"
+      then show ?thesis sorry
+    next
+      assume assm: "Q \<noteq> {} \<and> (\<forall>g'. spectroscopy_moves g g' \<noteq> None \<longrightarrow> (\<exists>p' q. g' = Attacker_Clause p' q))"
+      have fa_q: "\<forall>q \<in> Q. spectroscopy_moves (Defender_Stable_Conj p Q) (Attacker_Clause p q) 
+        = (subtract 0 0 0 1 0 0 0 0) \<and> in_wina (e - (E 0 0 0 1 0 0 0 0)) (Attacker_Clause p q)"
+        using \<open>g = Defender_Stable_Conj p Q\<close> cases by force
+      hence "\<forall>q \<in> Q. spectroscopy_moves (Defender_Stable_Conj p Q) (Attacker_Clause p q) 
+        = (subtract 0 0 0 1 0 0 0 0)" by blast
+      hence "\<forall>q \<in> Q. \<exists>g'. spectroscopy_moves (Defender_Stable_Conj p Q) g' \<noteq> None" 
+        by blast
+      hence "\<forall>q \<in> Q. \<exists>g'. in_wina (weight g g' e) g' \<and> (\<exists>\<phi>. strategy_formula_conjunct g' (weight g g' e) \<phi> \<and>
+                  expr_pr_conjunct \<phi> \<le> weight g g' e)"
+        using "3" \<open>g = Defender_Stable_Conj p Q\<close> cases
+        by (metis assm)
+      hence IH: "\<forall>q \<in> Q. in_wina (e - E 0 0 0 1 0 0 0 0) (Attacker_Clause p q) \<and> (\<exists>\<phi>. strategy_formula_conjunct (Attacker_Clause p q) (e - E 0 0 0 1 0 0 0 0) \<phi> \<and>
+                  expr_pr_conjunct \<phi> \<le> weight g (Attacker_Clause p q) e)" 
+        by (metis "3" \<open>\<forall>q\<in>Q. spectroscopy_moves (Defender_Stable_Conj p Q) (Attacker_Clause p q) = subtract 0 0 0 1 0 0 0 0 \<and> in_wina (e - E 0 0 0 1 0 0 0 0) (Attacker_Clause p q)\<close> \<open>g = Defender_Stable_Conj p Q\<close> option.distinct(1) option.sel)
+
+      hence "\<exists>\<Phi>. \<forall>q \<in> Q. in_wina (e - E 0 0 0 1 0 0 0 0) (Attacker_Clause p q) \<and> (strategy_formula_conjunct (Attacker_Clause p q) (e - E 0 0 0 1 0 0 0 0) (\<Phi> q) \<and>
+                  expr_pr_conjunct (\<Phi> q) \<le> weight g (Attacker_Clause p q) e)"
+        by meson 
+      hence "\<exists>\<Phi>. (\<forall>q \<in> Q. strategy_formula_conjunct (Attacker_Clause p q) (e - (E 0 0 0 1 0 0 0 0)) (\<Phi> q)
+              \<and> (strategy_formula_conjunct (Attacker_Clause p q) (e - E 0 0 0 1 0 0 0 0) (\<Phi> q) \<and>
+              expr_pr_conjunct (\<Phi> q) \<le> weight g (Attacker_Clause p q) e))"
+        using "3" \<open>g = Defender_Stable_Conj p Q\<close> cases  
+        by meson
+      hence "\<exists>\<Phi>. (\<forall>q \<in> Q. spectroscopy_moves (Defender_Stable_Conj p Q) (Attacker_Clause p q) 
+        = (subtract 0 0 0 1 0 0 0 0) \<and> in_wina (e - (E 0 0 0 1 0 0 0 0)) (Attacker_Clause p q)
+          \<and> strategy_formula_conjunct (Attacker_Clause p q) (e - (E 0 0 0 1 0 0 0 0)) (\<Phi> q)
+          \<and> (strategy_formula_conjunct (Attacker_Clause p q) (e - E 0 0 0 1 0 0 0 0) (\<Phi> q) \<and>
+              expr_pr_conjunct (\<Phi> q) \<le> weight g (Attacker_Clause p q) e))"
+        using fa_q by blast
+      then obtain \<Phi> where \<Phi>_prop: "(\<forall>q \<in> Q. spectroscopy_moves (Defender_Stable_Conj p Q) (Attacker_Clause p q) 
+        = (subtract 0 0 0 1 0 0 0 0) \<and> in_wina (e - (E 0 0 0 1 0 0 0 0)) (Attacker_Clause p q)
+          \<and> strategy_formula_conjunct (Attacker_Clause p q) (e - (E 0 0 0 1 0 0 0 0)) (\<Phi> q)
+          \<and> (strategy_formula_conjunct (Attacker_Clause p q) (e - E 0 0 0 1 0 0 0 0) (\<Phi> q) \<and>
+              expr_pr_conjunct (\<Phi> q) \<le> weight g (Attacker_Clause p q) e))"
+        by blast
+      hence "\<forall>q \<in> Q. expr_pr_conjunct (\<Phi> q) \<le> (e - (E 0 0 0 1 0 0 0 0))" 
+        by (simp add: \<open>g = Defender_Stable_Conj p Q\<close>)
+      hence "expr_pr_inner (StableConj Q \<Phi>) \<le> e"
+        using expr_st_conj assm 
+        by metis
+      then show ?thesis using \<Phi>_prop 
+        using \<open>g = Defender_Stable_Conj p Q\<close> stable_conj by blast
+    qed
   next
     case 6
     then show ?case sorry

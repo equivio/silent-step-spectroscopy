@@ -346,6 +346,9 @@ fun expr_pr_conjunct :: "('a, 's) hml_srbb_conjunct \<Rightarrow> energy" where
                  (max_neg_conj_depth_conjunct \<psi>)
                  (neg_depth_conjunct \<psi>)"
 
+lemma \<psi>_price_never_neg: "expr_pr_conjunct \<psi> \<noteq> eneg"
+  by simp
+
 definition \<O>_conjunct :: "energy \<Rightarrow> (('a, 's) hml_srbb_conjunct) set" where
   "\<O>_conjunct energy \<equiv> {\<chi> . expr_pr_conjunct \<chi> \<le> energy}"
 
