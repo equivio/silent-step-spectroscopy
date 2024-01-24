@@ -179,7 +179,7 @@ next
     using spectroscopy_defender.cases spectroscopy_moves.simps(28) spectroscopy_moves.simps(29) spectroscopy_moves.simps(31) spectroscopy_moves.simps(32) spectroscopy_moves.simps(63)
     by (metis spectroscopy_moves.simps(30) spectroscopy_moves.simps(33))
   then have "spectroscopy_moves g g' = (subtract 0 1 1 0 0 0 0 0) \<or> spectroscopy_moves g g' = Some (min1_6 \<circ> (\<lambda>x. x- E 0 1 1 0 0 0 0 0))"
-    using Defender_Branch assms(1) local.br_answer local.br_obsv sorry
+    using Defender_Branch assms(1) local.br_answer local.br_obsv by auto (metis option.discI option.inject)+
   then show ?thesis using assms(2) mono_subtract mono_min_1_6
     using comp_eq_dest_lhs monoD monoE mono_onI monotoneD option.sel by fastforce 
 next
@@ -287,7 +287,7 @@ next
     using spectroscopy_defender.cases spectroscopy_moves.simps(28) spectroscopy_moves.simps(29) spectroscopy_moves.simps(31) spectroscopy_moves.simps(32) spectroscopy_moves.simps(63)
     by (metis spectroscopy_moves.simps(30) spectroscopy_moves.simps(33))
   then have "spectroscopy_moves g g' = (subtract 0 1 1 0 0 0 0 0) \<or> spectroscopy_moves g g' = Some (min1_6 \<circ> (\<lambda>x. x- E 0 1 1 0 0 0 0 0))"
-    using Defender_Branch assms(1) local.br_answer local.br_obsv sorry
+    using Defender_Branch assms(1) local.br_answer local.br_obsv by auto (metis option.discI option.inject)+
   then show ?thesis using gets_smaller gets_smaller_min_1_6
     using dual_order.trans by fastforce
 next
