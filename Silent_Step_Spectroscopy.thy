@@ -14,12 +14,6 @@ lemma winning_budget_implies_strategy_formula:
   shows "\<exists>\<phi>. strategy_formula (Attacker_Immediate p Q) e \<phi> \<and> expressiveness_price \<phi> \<le> e"
   sorry
 
-thm strategy_formula_strategy_formula_inner_strategy_formula_conjunct.induct
-thm strategy_formula.simps 
-thm strategy_formula_inner.simps 
-thm strategy_formula_conjunct.simps
-
-
 lemma strategy_formulas_distinguish:
   shows "(strategy_formula g e \<phi> \<longrightarrow>
         (case g of
@@ -216,14 +210,31 @@ next
       assume "q \<in> Q"
       show "\<not>(q \<Turnstile>SRBB (hml_srbb.Internal \<chi>))" proof
         assume "(q \<Turnstile>SRBB (hml_srbb.Internal \<chi>))"
-        hence "\<exists>q'. q \<Zsurj> q' \<and> (\<nexists>q''. q' \<mapsto>\<tau> q'') \<and> (hml_srbb_inner_models \<chi> q')" sorry
-        then obtain q' where X: "q \<Zsurj> q' \<and> (\<nexists>q''. q' \<mapsto>\<tau> q'') \<and> (hml_srbb_inner_models \<chi> q')" by auto
+        hence "\<exists>q'. q \<Zsurj> q' \<and> (q' \<Turnstile> (hml_srbb_inner_to_hml \<chi>))" by auto
+        hence "\<exists>q'. q \<Zsurj> q' \<and> (hml_srbb_inner_models \<chi> q')" by simp
+        then obtain q' where X:"q \<Zsurj> q' \<and> (hml_srbb_inner_models \<chi> q')" by auto
+        hence "q' \<in> Q" using \<open>Q \<Zsurj>S Q\<close> \<open>q \<in> Q\<close> by blast
+        then show "False" proof(cases "q' \<in> Q'")
+          case True (* stable cases *)
+          thus "False" using X \<open>distinguishes_from_inner \<chi> p Q'\<close>
+            by (simp add: distinguishes_from_inner_def)
+        next
+          case False (* instable cases *)
+          from IH have "strategy_formula_inner (Defender_Stable_Conj p Q') e \<chi>" by simp
+          hence "\<exists>\<Phi>. \<chi>=(StableConj Q' \<Phi>)" using strategy_formula_inner.simps
+            by (smt (verit) spectroscopy_position.distinct(35) spectroscopy_position.distinct(39) spectroscopy_position.distinct(41) spectroscopy_position.inject(7))
+          then obtain \<Phi> where P: "\<chi>=(StableConj Q' \<Phi>)" by auto
 
-        from M have "Q' = { q \<in> Q. (\<nexists>q'. q \<mapsto>\<tau> q')}"
-          by (metis (full_types) local.late_stbl_conj option.distinct(1))
-        hence "q' \<in> Q'" using X \<open>Q \<Zsurj>S Q\<close> \<open>q \<in> Q\<close> by blast
-        thus "False" using X \<open>distinguishes_from_inner \<chi> p Q'\<close>
-          by (simp add: distinguishes_from_inner_def)
+          from M have "Q' = { q \<in> Q. (\<nexists>q'. q \<mapsto>\<tau> q')}"
+            by (metis (full_types) local.late_stbl_conj option.distinct(1))
+          hence "\<exists>q''. q' \<mapsto>\<tau> q''" using False \<open>q' \<in> Q\<close> by simp
+
+          from X have "(hml_srbb_inner_models (StableConj Q' \<Phi>) q')" using P by auto
+          hence "q' \<Turnstile> (hml_conjunct.Neg (hml.Obs \<tau> hml.TT)
+     \<and>hml hml_conjunct.Pos (hml.Conj Q' (hml_srbb_conjunct_to_hml_conjunct \<circ> \<Phi>)))" by simp
+
+          then show ?thesis using \<open>\<exists>q''. q' \<mapsto>\<tau> q''\<close> by simp
+        qed
       qed
     qed
     thus "distinguishes_from (hml_srbb.Internal \<chi>) p Q" using \<open>p \<Turnstile>SRBB (hml_srbb.Internal \<chi>)\<close>
@@ -303,6 +314,31 @@ next
         hence "q\<in> Q\<alpha>" using \<open>q\<in>(Q1 \<union> Q\<alpha>)\<close> by simp
         have "\<not>(hml_srbb_inner_models (Obs \<alpha> \<psi>) q)" proof
           assume "hml_srbb_inner_models (Obs \<alpha> \<psi>) q"
+
+          hence "q \<Turnstile> ( HML_soft_poss \<alpha> (hml_srbb_to_hml \<psi>))" by simp
+          hence "\<exists>q'. q\<mapsto>a \<alpha> q' \<and> (q' \<Turnstile>SRBB \<psi>)" proof (cases "\<alpha>=\<tau>")
+            case True
+            hence "q \<Turnstile> hml.Silent (hml_srbb_to_hml \<psi>)" using \<open>q \<Turnstile> ( HML_soft_poss \<alpha> (hml_srbb_to_hml \<psi>))\<close> by simp
+            hence "(\<exists>q'. q \<mapsto> \<tau> q' \<and> (q' \<Turnstile> (hml_srbb_to_hml \<psi>))) \<or> (q \<Turnstile> (hml_srbb_to_hml \<psi>))"
+              by (simp add: hml_models.simps(4))
+            hence "(\<exists>q'. q \<mapsto> \<tau> q' \<and> q' \<Turnstile>SRBB \<psi>) \<or> (q \<Turnstile>SRBB \<psi>)"
+              by simp 
+            then show ?thesis proof (cases "q \<Turnstile>SRBB \<psi>")
+              case True
+              then show ?thesis sorry
+            next
+              case False
+              then show ?thesis using \<open>(\<exists>q'. q \<mapsto> \<tau> q' \<and> q' \<Turnstile>SRBB \<psi>) \<or> (q \<Turnstile>SRBB \<psi>)\<close> sorry
+            qed 
+          next
+            case False
+            hence "q \<Turnstile> (hml.Obs \<alpha> (hml_srbb_to_hml \<psi>))" using \<open>q \<Turnstile> ( HML_soft_poss \<alpha> (hml_srbb_to_hml \<psi>))\<close> by simp
+            hence "\<exists>q'. q \<mapsto> \<alpha> q' \<and> q' \<Turnstile> (hml_srbb_to_hml \<psi>)" by simp
+            then show ?thesis
+              by (simp add: False) 
+          qed
+
+
           hence "\<exists>q'. q\<mapsto>a \<alpha> q' \<and> (q' \<Turnstile>SRBB \<psi>)" sorry
           then obtain q' where Z: "q\<mapsto>a \<alpha> q' \<and> (q' \<Turnstile>SRBB \<psi>)" by auto
           hence "q' \<in> Q' " using \<open>q\<in> Q\<alpha>\<close> \<open>Q\<alpha> \<mapsto>aS \<alpha> Q'\<close>
