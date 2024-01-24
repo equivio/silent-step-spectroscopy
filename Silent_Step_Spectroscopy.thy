@@ -825,123 +825,6 @@ next
       by auto
     with "2" have False by blast
     then show ?case by blast
-     (*have B: "(\<forall>g'. (\<exists>p Q. g' = Attacker_Immediate p Q)  \<longrightarrow> (\<exists>\<phi>. strategy_formula g' e \<phi> \<and> expressiveness_price \<phi> \<le> e) \<and>
-          (\<exists>p Q. g' = Attacker_Delayed p Q)  \<longrightarrow> (\<exists>\<phi>. strategy_formula_inner g' e \<phi> \<and> expr_pr_inner \<phi> \<le> e) \<and>
-          (\<exists>p q. g' = Attacker_Clause p q)  \<longrightarrow> (\<exists>\<phi>. strategy_formula_conjunct g' e \<phi> \<and> expr_pr_conjunct \<phi> \<le> e) \<and>
-          (\<exists>p Q. g' = Defender_Conj p Q)  \<longrightarrow> (\<exists>\<phi>. strategy_formula_inner g' e \<phi> \<and> expr_pr_inner \<phi> \<le> e) \<and>  (\<exists>\<phi>. strategy_formula g' e \<phi> \<and> expressiveness_price \<phi> \<le> e) \<and>
-          (\<exists>p Q. g' =  Defender_Stable_Conj p Q)  \<longrightarrow> (\<exists>\<phi>. strategy_formula_inner g' e \<phi> \<and> expr_pr_inner \<phi> \<le> e) \<and>
-          (\<exists>p \<alpha> p' Q Qa. g' = Defender_Branch p \<alpha> p' Q Qa) \<longrightarrow> (\<exists>\<phi>. strategy_formula_inner g' e \<phi> \<and> expr_pr_inner \<phi> \<le> e) \<and>
-          (\<exists>p Q. g' = Attacker_Branch p Q) \<longrightarrow>  True)"
-      by blast
-    consider "in_wina e (Defender_Conj p Q) = (spectroscopy_defender g) \<and> (\<forall>g'. \<not>spectroscopy_moves g g' \<noteq> None)" | 
-             "in_wina e (Defender_Conj p Q) = (\<not>spectroscopy_defender g) \<and> (\<exists>g'. spectroscopy_moves g g' \<noteq>  None \<and> (in_wina (the (spectroscopy_moves g g') e) g'))" |
-             "in_wina e (Defender_Conj p Q) = (spectroscopy_defender g) \<and> (\<forall>g'. spectroscopy_moves g g' \<noteq>  None \<longrightarrow>  (in_wina (the (spectroscopy_moves g g') e) g'))"
-      using "1" A by blast
-      then show ?case
-      proof (cases)
-        case 1
-        have "(\<forall>g'. \<not>spectroscopy_moves g g' \<noteq> None)"
-          using "1.hyps" by blast
-        hence "\<forall>g'. spectroscopy_moves g g' = None"
-          by blast
-          from B have "(\<forall>g'.(\<exists>p' Q'. g' = (Attacker_Delayed p' Q') 
-                 \<or> g' = (Defender_Conj p' Q')
-                 \<or> g' = (Attacker_Immediate p' Q')
-                 \<or> g' = (Defender_Stable_Conj p' Q')
-                 \<or> g' = (Attacker_Branch p' Q'))
-                 \<or> (\<exists>p' q'. g' = (Attacker_Clause p' q')) 
-                 \<or> (\<exists>p \<alpha> p' Q Qa. g' = Defender_Branch p \<alpha> p' Q Qa))"
-            by (meson spectroscopy_defender.cases)
-        then show ?thesis sorry
-      next
-        case 2
-        then show ?thesis
-          using "1" by blast
-      next
-        case 3
-        have "(\<forall>g'. spectroscopy_moves g g' \<noteq>  None \<longrightarrow>  (in_wina (the (spectroscopy_moves g g') e) g'))"
-          using "1" by blast
-        consider "\<forall>g'. spectroscopy_moves g g' \<noteq>  None"|
-                 "\<exists>g'. spectroscopy_moves g g' =  None"
-          by fastforce
-        then show ?thesis
-      proof (cases)
-        case 1
-        have "(\<forall>g'. in_wina (the (spectroscopy_moves g g') e) g')"
-          using "1" "1.hyps" by fastforce
-        then show ?thesis
-          using "1" "1.hyps" by auto 
-      next
-        case 2
-        from 2 obtain g' where "spectroscopy_moves g g' =  None" by (rule exE)
-        have A1:  "((\<exists>p' Q'. g' = (Attacker_Delayed p' Q') 
-                   \<or> g' = (Defender_Conj p' Q')
-                   \<or> g' = (Attacker_Immediate p' Q')
-                   \<or> g' = (Defender_Stable_Conj p' Q')
-                   \<or> g' = (Attacker_Branch p' Q'))
-                   \<or> (\<exists>p' q'. g' = (Attacker_Clause p' q')) 
-                   \<or> (\<exists>p \<alpha> p' Q Qa. g' = Defender_Branch p \<alpha> p' Q Qa))"
-          by (meson spectroscopy_defender.cases)
-         then show ?thesis 
-         proof (elim disjE)
-           assume A2: "\<exists>p' Q'.
-                   g' = Attacker_Delayed p' Q' \<or>
-                   g' = Defender_Conj p' Q' \<or>
-                   g' = Attacker_Immediate p' Q' \<or> 
-                   g' = Defender_Stable_Conj p' Q' \<or> 
-                   g' = Attacker_Branch p' Q'"
-           show "(\<exists>\<phi>. strategy_formula_inner g e \<phi> \<and> expr_pr_inner \<phi> \<le> e) \<and> (\<exists>\<phi>. strategy_formula g e \<phi> \<and> expressiveness_price \<phi> \<le> e)"
-           proof -
-             from A2 obtain p' Q' where 
-                  "g' = Attacker_Delayed p' Q' \<or>
-                   g' = Defender_Conj p' Q' \<or>
-                   g' = Attacker_Immediate p' Q' \<or> 
-                   g' = Defender_Stable_Conj p' Q' \<or> 
-                   g' = Attacker_Branch p' Q'" by auto
-             then show ?thesis
-             proof (elim disjE)
-               assume "g' = Attacker_Delayed p' Q'"
-               from this have "spectroscopy_moves (Defender_Conj p Q) (Attacker_Delayed p' Q') =  None" by auto
-               show ?thesis sorry
-             next
-               assume "g' = Defender_Conj p' Q'"
-               have "spectroscopy_moves (Defender_Conj p Q) (Defender_Conj p' Q') =  None" by auto
-               show ?thesis sorry
-             next
-               assume "g' = Attacker_Immediate p' Q'"
-               have "spectroscopy_moves (Defender_Conj p Q) (Attacker_Immediate p' Q') =  None" by auto
-               show ?thesis sorry
-             next
-               assume "g' = Defender_Stable_Conj p' Q'"
-               have "spectroscopy_moves (Defender_Conj p Q) (Defender_Stable_Conj p' Q') =  None" by auto
-               show ?thesis sorry
-             next 
-               assume "g' = Attacker_Branch p' Q'"
-               have "spectroscopy_moves (Defender_Conj p Q) (Attacker_Branch p' Q') =  None" by auto
-               show ?thesis sorry
-             qed
-           qed
-         next
-           assume "\<exists>p' q'. g' = Attacker_Clause p' q'"
-           from this obtain p' q' where "g' = Attacker_Clause p' q'" by auto
-           hence "spectroscopy_moves (Defender_Conj p Q) (Attacker_Clause p' q') =  None" using 2 sorry
-           hence "p \<noteq> p' \<or> q' \<notin> Q"
-             by force 
-           show ?thesis sorry
-           (*proof (rule disjE)
-             assume "p \<noteq> p'"
-             show ?thesis sorry
-           next
-             assume "q' \<notin> Q"
-             show ?thesis sorry
-           qed*)
-         next
-           assume "\<exists>p \<alpha> p' Q Qa. g' = Defender_Branch p \<alpha> p' Q Qa"
-           from this obtain p \<alpha> p' Q Qa where "g' = Defender_Branch p \<alpha> p' Q Qa" by auto
-           show ?thesis sorry
-        qed
-      qed
-    qed*)
   next
     case 5
     hence "\<not>attacker g" 
@@ -975,7 +858,25 @@ next
       using "3.IH" by force
   next
     case 4
-    then show ?case sorry
+    from 4 obtain p Q where "g = Defender_Conj p Q" by auto
+    have "(in_wina  e (Defender_Conj p Q))"
+      using "3" \<open>g = Defender_Conj p Q\<close> in_wina.intros(3) by force 
+    have "in_wina e (Defender_Conj p Q) = (spectroscopy_defender g) \<and> (\<forall>g'. spectroscopy_moves g g' \<noteq>  None \<longrightarrow>  (in_wina (the (spectroscopy_moves g g') e) g'))"
+      using "3" \<open>in_wina e (Defender_Conj p Q)\<close> by blast
+    consider "\<forall>g'. spectroscopy_moves g g' \<noteq>  None"|
+             "\<exists>g'. spectroscopy_moves g g' =  None"
+     by fastforce
+     then show ?case
+      proof (cases)
+        case 1
+        have "(\<forall>g'. in_wina (the (spectroscopy_moves g g') e) g')"
+         using "1" \<open>in_wina e (Defender_Conj p Q) = spectroscopy_defender g \<and> (\<forall>g'. spectroscopy_moves g g' \<noteq> None \<longrightarrow> in_wina (weight g g' e) g')\<close> by auto
+        then show ?thesis
+          using "1" "4" spectroscopy_moves.simps(35) by blast
+      next
+        case 2
+        then show ?thesis sorry
+      qed
   next
     case 5
     then show ?case sorry
