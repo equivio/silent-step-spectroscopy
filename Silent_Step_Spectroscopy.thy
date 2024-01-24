@@ -678,9 +678,18 @@ next
       hence "strategy_formula_inner (Attacker_Delayed p Q) e (Obs \<alpha> \<phi>)"
         using local.observation 
         by presburger
-
-      have "expr_pr_inner (Obs \<alpha> \<phi>) \<le> e" sorry
-
+      have Win_a: "in_wina (e - (E 1 0 0 0 0 0 0 0)) (Attacker_Immediate p' Q')"
+        using \<open>weight (Attacker_Delayed p Q) (Attacker_Immediate p' Q') e = e - E 1 0 0 0 0 0 0 0\<close> g'_att_imm move by presburger 
+      have NotWin_a: "\<not>(in_wina eneg (Attacker_Immediate p' Q'))"
+        by (simp add: defender_win_level_not_in_wina)
+      have B: "\<not>(in_wina eneg (Attacker_Delayed p Q))"
+        by (simp add: defender_win_level_not_in_wina)
+      have "in_wina e (Attacker_Delayed p Q)"
+        by (metis "2.IH" g_att_del in_wina.intros(2))
+      hence "e \<noteq> eneg" using B by auto
+      from Win_a NotWin_a have "e - (E 1 0 0 0 0 0 0 0) \<noteq> eneg" by auto
+      have "expr_pr_inner (Obs \<alpha> \<phi>) \<le> e"
+        using \<phi>_prop expr_obs by auto
       then show ?thesis using \<open>strategy_formula_inner (Attacker_Delayed p Q) e (Obs \<alpha> \<phi>)\<close>
         using g_att_del by blast
     next
