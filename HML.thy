@@ -118,6 +118,9 @@ lemma hml_impl_preord: "reflp (\<Rrightarrow>) \<and> transp (\<Rrightarrow>)"
 definition hml_conjunct_impl :: "('a, 's) hml_conjunct \<Rightarrow> ('a, 's) hml_conjunct \<Rightarrow> bool" (infix "\<and>\<Rrightarrow>" 60)  where
   "\<psi>l \<and>\<Rrightarrow> \<psi>r \<equiv> (\<forall>p. (hml_conjunct_models p \<psi>l) \<longrightarrow> (hml_conjunct_models p \<psi>r))"
 
+lemma hml_conjunct_impl_iffI: "\<psi>l \<and>\<Rrightarrow> \<psi>r = (\<forall>p. (hml_conjunct_models p \<psi>l) \<longrightarrow> (hml_conjunct_models p \<psi>r))"
+  unfolding hml_conjunct_impl_def by auto
+
 lemma hml_conjunct_impl_preord: "reflp (\<and>\<Rrightarrow>) \<and> transp (\<and>\<Rrightarrow>)"
   by (metis hml_conjunct_impl_def reflpI transpI)
 
@@ -264,6 +267,9 @@ definition hml_conjunct_eq :: "('a, 's) hml_conjunct \<Rightarrow> ('a, 's) hml_
 lemma hml_conjunct_eq_equiv: "equivp (\<Lleftarrow>\<and>\<Rrightarrow>)"
   by (smt (verit, best) equivpI hml_conjunct_eq_def hml_conjunct_impl_def reflpI sympI transpI)
 
+lemma hml_conjunct_eq_equality: "(\<psi>l \<Lleftarrow>\<and>\<Rrightarrow> \<psi>r) = (\<forall>p.(hml_conjunct_models p \<psi>l) = (hml_conjunct_models p \<psi>r))"
+  using hml_conjunct_eq_def hml_conjunct_impl_iffI by blast
+
 
 subsubsection \<open> Substitution \<close>
 
@@ -317,6 +323,30 @@ lemma neg_subst:
   shows "(Neg \<phi>r) \<Lleftarrow>\<and>\<Rrightarrow> \<psi>"
   using assms
   by (meson LTS_Tau.neg_pre_subst hml_conjunct_eq_def hml_conjunct_impl_def hml_eq_def)
+
+end (* LTS_Tau *)
+
+context Inhabited_Tau_LTS
+begin
+
+lemma and_subst_right:
+  assumes "\<psi>l \<Lleftarrow>\<and>\<Rrightarrow> \<psi>r"
+      and "\<phi> \<Lleftarrow>\<Rrightarrow> (\<psi> \<and>hml \<psi>l)"
+  shows "\<phi> \<Lleftarrow>\<Rrightarrow> (\<psi> \<and>hml \<psi>r)"
+  using assms
+  using hml_conjunct_eq_def hml_conjunct_impl_def hml_eq_equality by auto
+
+lemma and_subst_left:
+  assumes "\<psi>l \<Lleftarrow>\<and>\<Rrightarrow> \<psi>r"
+      and "\<phi> \<Lleftarrow>\<Rrightarrow> (\<psi>l \<and>hml \<psi>)"
+  shows "\<phi> \<Lleftarrow>\<Rrightarrow> (\<psi>r \<and>hml \<psi>)"
+  using assms
+  using hml_conjunct_eq_def hml_conjunct_impl_def hml_eq_equality by auto
+
+end (* Inhabited_Tau_LTS *)
+
+context LTS_Tau
+begin
 
 
 subsubsection \<open> Congruence \<close>
@@ -492,6 +522,28 @@ lemma neg_cong:
   using assms
   by (meson hml_conjunct_eq_def hml_conjunct_impl_def hml_conjunct_models.simps(2) hml_eq_def hml_impl_def)
 
+end (* LTS_Tau *)
+
+context Inhabited_Tau_LTS
+begin
+
+lemma and_cong_right:
+  assumes "\<psi>l \<Lleftarrow>\<and>\<Rrightarrow> \<psi>r"
+  shows "(\<psi> \<and>hml \<psi>l) \<Lleftarrow>\<Rrightarrow> (\<psi> \<and>hml \<psi>r)"
+  using assms
+  using hml_conjunct_eq_def hml_conjunct_impl_def hml_eq_equality by auto
+
+lemma and_cong_left:
+  assumes "\<psi>l \<Lleftarrow>\<and>\<Rrightarrow> \<psi>r"
+  shows "(\<psi>l \<and>hml \<psi>) \<Lleftarrow>\<Rrightarrow> (\<psi>r \<and>hml \<psi>)"
+  using assms
+  using hml_conjunct_eq_def hml_conjunct_impl_def hml_eq_equality by auto
+
+end (* Inhabited_Tau_LTS *)
+
+context LTS_Tau
+begin
+
 
 subsubsection \<open> Know Equivalence Elements\<close>
 
@@ -563,6 +615,18 @@ lemma T_is_\<epsilon>_empty_conj: "TT \<Lleftarrow>\<Rrightarrow> Internal (Conj
   using \<epsilon>T_is_T
      and T_is_empty_conj
   by (meson LTS_Tau.internal_subst equivp_symp hml_eq_equiv)
+
+lemma soft_\<tau>_is_silent:
+  assumes "\<alpha> = \<tau>"
+  shows "Silent \<phi> \<Lleftarrow>\<Rrightarrow> HML_soft_poss \<alpha> \<phi>"
+  using assms by (simp add: hml_eq_equality)
+
+lemma soft_non_\<alpha>_is_obs:
+  assumes "\<alpha> \<noteq> \<tau>"
+  shows "Obs \<alpha> \<phi> \<Lleftarrow>\<Rrightarrow> HML_soft_poss \<alpha> \<phi>"
+  using assms
+    and hml_eq_equality
+  by auto
 
 end
 
@@ -850,8 +914,59 @@ in the set. \<close>
 definition distinguishes_hml :: "'s \<Rightarrow> ('a, 's) hml \<Rightarrow> 's \<Rightarrow> bool" ("_ <> _ _" [70, 70, 70] 80) where
   "(p <> \<phi> q) \<equiv> (p \<Turnstile> \<phi>) \<and> \<not>(q \<Turnstile> \<phi>)"
 
+definition distinguishes_conjunct_hml ::"'s \<Rightarrow> ('a, 's) hml_conjunct \<Rightarrow> 's \<Rightarrow> bool" where
+  "distinguishes_conjunct_hml p \<psi> q \<equiv> (hml_conjunct_models p \<psi>) \<and> \<not>(hml_conjunct_models q \<psi>)"
+
+
 definition distinguishes_from_hml :: "'s \<Rightarrow> ('a, 's) hml \<Rightarrow> 's set \<Rightarrow> bool" ("_ <> _ _" [70, 70, 70] 80) where
-  "(p <> \<phi> Q) \<equiv> (\<forall>q \<in> Q. p <> \<phi> q)"
+  "(p <> \<phi> Q) \<equiv> (p \<Turnstile> \<phi>) \<and> (\<forall>q \<in> Q. \<not>(q \<Turnstile> \<phi>))"
+
+definition distinguishes_from_hml' :: "'s \<Rightarrow> ('a, 's) hml \<Rightarrow> 's set \<Rightarrow> bool" where
+  "(distinguishes_from_hml' p \<phi> Q) \<equiv> (\<forall>q \<in> Q. p <> \<phi> q)"
+
+lemma distinguishes_from_hml_prime:
+  assumes "Q \<noteq> {}"
+  shows "(p <> \<phi> Q) = distinguishes_from_hml' p \<phi> Q"
+  using distinguishes_from_hml_def assms distinguishes_from_hml'_def distinguishes_hml_def by fastforce
+
+lemma distinguishes_from_hml_priming:
+  fixes Q :: "'s set"
+  assumes "p <> \<phi> Q"
+  shows "distinguishes_from_hml' p \<phi> Q"
+  using assms distinguishes_from_hml'_def distinguishes_from_hml_prime by blast
+
+
+definition distinguishes_conjunct_from_hml :: "'s \<Rightarrow> ('a, 's) hml_conjunct \<Rightarrow> 's set \<Rightarrow> bool" where
+  "(distinguishes_conjunct_from_hml p \<psi> Q) \<equiv> (hml_conjunct_models p \<psi>) \<and> (\<forall>q \<in> Q. \<not>(hml_conjunct_models q \<psi>))"
+
+definition distinguishes_conjunct_from_hml' :: "'s \<Rightarrow> ('a, 's) hml_conjunct \<Rightarrow> 's set \<Rightarrow> bool" where
+  "(distinguishes_conjunct_from_hml' p \<psi> Q) \<equiv> (\<forall>q \<in> Q. distinguishes_conjunct_hml p \<psi> q)"
+
+lemma distinguishes_conjunct_from_hml_prime:
+  assumes "Q \<noteq> {}"
+  shows "(distinguishes_conjunct_from_hml p \<phi> Q) = distinguishes_conjunct_from_hml' p \<phi> Q"
+  by (meson distinguishes_conjunct_from_hml_def distinguishes_conjunct_hml_def assms distinguishes_conjunct_from_hml'_def equals0I)
+
+lemma distinguishes_conjunct_from_hml_priming:
+  assumes "distinguishes_conjunct_from_hml p \<phi> Q"
+  shows "distinguishes_conjunct_from_hml' p \<phi> Q"
+  by (meson distinguishes_conjunct_from_hml_def distinguishes_conjunct_hml_def assms distinguishes_conjunct_from_hml'_def equals0I)
+
+
+lemma dist_conjunction_implies_dist_conjunct:
+  fixes q :: 's
+  assumes "p <> (Conj I \<psi>s) q"
+  shows "\<exists>i\<in>I. distinguishes_conjunct_hml p (\<psi>s i) q"
+  using assms distinguishes_conjunct_hml_def distinguishes_hml_def by auto
+
+lemma dist_conjunct_implies_dist_conjunction:
+  fixes q :: 's
+  assumes "i\<in>I"
+      and "distinguishes_conjunct_hml p (\<psi>s i) q" 
+      and "\<forall>i\<in>I. hml_conjunct_models p (\<psi>s i)"
+  shows "p <> (Conj I \<psi>s) q"
+  using assms distinguishes_conjunct_hml_def distinguishes_hml_def
+  by auto
 
 
 subsubsection \<open> Distinguishing Conjunction Thinning \<close>
@@ -889,16 +1004,16 @@ lemma
   using assms
   unfolding distinguishes_from_hml_def and distinguishes_hml_def
 proof -
-  assume "\<forall>q\<in>Q. (p \<Turnstile> Conj I \<psi>s \<and> \<not> q \<Turnstile> Conj I \<psi>s)"
+  assume "p \<Turnstile> Conj I \<psi>s \<and> (\<forall>q\<in>Q. \<not> q \<Turnstile> Conj I \<psi>s)"
 
   define \<psi>s' :: "'s \<Rightarrow> ('a, 's) hml_conjunct" where
     "\<psi>s' \<equiv> (\<lambda>_. Pos (Conj I \<psi>s))"
 
-  from \<open>\<forall>q\<in>Q. (p \<Turnstile> Conj I \<psi>s \<and> \<not> q \<Turnstile> Conj I \<psi>s)\<close>
-  have "\<forall>q\<in>Q. (p \<Turnstile> Conj Q \<psi>s' \<and> \<not> q \<Turnstile> Conj Q \<psi>s')"
+  from \<open>p \<Turnstile> Conj I \<psi>s \<and> (\<forall>q\<in>Q. \<not> q \<Turnstile> Conj I \<psi>s)\<close>
+  have "p \<Turnstile> Conj Q \<psi>s' \<and> (\<forall>q\<in>Q. \<not> q \<Turnstile> Conj Q \<psi>s')"
     by (simp add: \<psi>s'_def)
 
-  then show "\<exists>\<psi>s'. \<forall>q\<in>Q. p \<Turnstile> Conj Q \<psi>s' \<and> \<not> q \<Turnstile> Conj Q \<psi>s'" by auto
+  then show "\<exists>\<psi>s'. p \<Turnstile> Conj Q \<psi>s' \<and> (\<forall>q\<in>Q. \<not> q \<Turnstile> Conj Q \<psi>s')" by auto
 qed
 
 text \<open> This is the main proof and implements the proof sketch given above. \<close>
@@ -909,19 +1024,17 @@ lemma dist_conj_thinning:
   using assms
 proof -
   assume "p <> Conj I \<psi>s Q"
-  hence conj_dist_from_Q: "\<forall>q\<in>Q. p \<Turnstile> Conj I \<psi>s \<and> \<not> q \<Turnstile> Conj I \<psi>s"
+  hence conj_dist_from_Q: "p \<Turnstile> Conj I \<psi>s \<and> (\<forall>q\<in>Q. \<not> q \<Turnstile> Conj I \<psi>s)"
     unfolding distinguishes_from_hml_def and distinguishes_hml_def.
 
   show "p <> (Conj Q (\<lambda>q. \<psi>s (SOME i. i \<in> I \<and> \<not>(hml_conjunct_models q (\<psi>s i))))) Q"
     unfolding distinguishes_from_hml_def and distinguishes_hml_def
-  proof (rule ballI, rule conjI)
-    fix q
-    assume "q \<in> Q"
-    with conj_dist_from_Q
-    have "p \<Turnstile> Conj I \<psi>s" and "\<not> q \<Turnstile> Conj I \<psi>s" by auto
+  proof (rule conjI)
+    from conj_dist_from_Q
+    have "p \<Turnstile> Conj I \<psi>s" and "\<forall>q\<in>Q. \<not> q \<Turnstile> Conj I \<psi>s" by auto
 
-    from \<open>\<not> q \<Turnstile> Conj I \<psi>s\<close>
-    have "\<exists>i. i \<in> I \<and> \<not> hml_conjunct_models q (\<psi>s i)"
+    from \<open>\<forall>q\<in>Q. \<not> q \<Turnstile> Conj I \<psi>s\<close>
+    have "\<forall>q\<in>Q. \<exists>i. i \<in> I \<and> \<not> hml_conjunct_models q (\<psi>s i)"
       using hml_models.simps(5) by blast
 
     from \<open>p \<Turnstile> Conj I \<psi>s\<close>
@@ -933,30 +1046,28 @@ proof -
       fix q'
       assume "q' \<in> Q"
       with \<open>\<forall>i\<in>I. hml_conjunct_models p (\<psi>s i)\<close>
-       and \<open>\<exists>i. i \<in> I \<and> \<not> hml_conjunct_models q (\<psi>s i)\<close>
+       and \<open>\<forall>q\<in>Q. \<exists>i. i \<in> I \<and> \<not> hml_conjunct_models q (\<psi>s i)\<close>
       show "hml_conjunct_models p (\<psi>s (SOME i. i \<in> I \<and> \<not> hml_conjunct_models q' (\<psi>s i)))" 
-        by (metis (no_types, lifting) LTS_Tau.hml_models.simps(5) conj_dist_from_Q tfl_some)
+        by (metis (no_types, lifting) tfl_some)
     qed
 
     then show "p \<Turnstile> Conj Q (\<lambda>q. \<psi>s (SOME i. i \<in> I \<and> \<not> hml_conjunct_models q (\<psi>s i)))"
       unfolding hml_models.simps.
   next
-    fix q
-    assume "q \<in> Q"
-    with conj_dist_from_Q
-    have "p \<Turnstile> Conj I \<psi>s" and "\<not> q \<Turnstile> Conj I \<psi>s" by auto
+    from conj_dist_from_Q
+    have "p \<Turnstile> Conj I \<psi>s" and "\<forall>q\<in>Q. \<not> q \<Turnstile> Conj I \<psi>s" by auto
 
-    from \<open>\<not> q \<Turnstile> Conj I \<psi>s\<close>
-    have "\<exists>i. i \<in> I \<and> \<not> hml_conjunct_models q (\<psi>s i)"
+    from \<open>\<forall>q\<in>Q. \<not> q \<Turnstile> Conj I \<psi>s\<close>
+    have "\<forall>q\<in>Q. \<exists>i. i \<in> I \<and> \<not> hml_conjunct_models q (\<psi>s i)"
       using hml_models.simps(5) by blast
 
-    then have "\<not>(hml_conjunct_models q (\<psi>s (SOME i. i \<in> I \<and> \<not> hml_conjunct_models q (\<psi>s i))))"
+    then have "\<forall>q\<in>Q. \<not>(hml_conjunct_models q (\<psi>s (SOME i. i \<in> I \<and> \<not> hml_conjunct_models q (\<psi>s i))))"
       by (metis (no_types, lifting) tfl_some)
 
-    then have "\<exists>q'\<in>Q. \<not>(hml_conjunct_models q (\<psi>s (SOME i. i \<in> I \<and> \<not> hml_conjunct_models q' (\<psi>s i))))"
-      using \<open>q \<in> Q\<close> by auto
+    then have "\<forall>q\<in>Q. \<exists>q'\<in>Q. \<not>(hml_conjunct_models q (\<psi>s (SOME i. i \<in> I \<and> \<not> hml_conjunct_models q' (\<psi>s i))))"
+      by auto
 
-    then show "\<not> q \<Turnstile> Conj Q (\<lambda>q. \<psi>s (SOME i. i \<in> I \<and> \<not> hml_conjunct_models q (\<psi>s i)))"
+    then show "\<forall>q\<in>Q. \<not> q \<Turnstile> Conj Q (\<lambda>q. \<psi>s (SOME i. i \<in> I \<and> \<not> hml_conjunct_models q (\<psi>s i)))"
       unfolding hml_models.simps by auto
   qed
 qed
