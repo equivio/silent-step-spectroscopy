@@ -299,7 +299,8 @@ next
     from IH have "spectroscopy_moves (Defender_Branch p \<alpha> p' Q1 Q\<alpha>) (Attacker_Branch p' Q') =
          Some (min1_6 \<circ> (\<lambda>x. x - E 0 1 1 0 0 0 0 0))" by auto
     hence "Q\<alpha> \<mapsto>aS \<alpha> Q'"
-      by (smt (verit) local.br_obsv option.distinct(1)) 
+      by (metis local.br_obsv option.distinct(1))
+
     hence A2: "hml_srbb_inner_models (Obs \<alpha> \<psi>) p" using X \<open>p \<mapsto> \<alpha> p' \<and> Q\<alpha> \<noteq> {}\<close>  by auto  
 
     have A3: "\<forall>q \<in> (Q1 \<union> Q\<alpha>). distinguishes_inner (BranchConj \<alpha> \<psi> Q1 \<Phi>) p q" proof
@@ -342,7 +343,7 @@ next
           hence "\<exists>q'. q\<mapsto>a \<alpha> q' \<and> (q' \<Turnstile>SRBB \<psi>)" sorry
           then obtain q' where Z: "q\<mapsto>a \<alpha> q' \<and> (q' \<Turnstile>SRBB \<psi>)" by auto
           hence "q' \<in> Q' " using \<open>q\<in> Q\<alpha>\<close> \<open>Q\<alpha> \<mapsto>aS \<alpha> Q'\<close>
-            by simp
+            by blast
           from Z have "\<not>(q' \<in> Q')" using Y
             by auto
           thus "False"
