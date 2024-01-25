@@ -83,10 +83,14 @@ next
   hence D: "distinguishes_from \<phi> p' Q'" by auto 
   hence "p' \<Turnstile>SRBB \<phi>" using distinguishes_from_def by auto
 
-  from IH have "spectroscopy_moves (Attacker_Delayed p Q) (Attacker_Immediate p' Q') = subtract 1 0 0 0 0 0 0 0" by simp
-  hence "(\<exists>a. p \<mapsto> a p' \<and> Q \<mapsto>S a Q' \<and> a \<noteq> \<tau>)"
-    by (smt (verit) option.discI spectroscopy_moves.simps(3)) 
-
+  have observation: "spectroscopy_moves (Attacker_Delayed p Q) (Attacker_Immediate p' Q') 
+      = (if (\<exists>a. p \<mapsto>a a p' \<and> Q \<mapsto>aS a Q') then (subtract 1 0 0 0 0 0 0 0) else None)"
+    for p p' Q Q' by simp
+  from IH have "spectroscopy_moves (Attacker_Delayed p Q) (Attacker_Immediate p' Q') 
+    = subtract 1 0 0 0 0 0 0 0" by simp
+  also have "... \<noteq> None" by blast
+  finally have "(\<exists>a. p \<mapsto>a a p' \<and> Q \<mapsto>aS a Q')" unfolding observation by metis
+  
   from IH have "p \<mapsto>a \<alpha> p'" and "Q \<mapsto>aS \<alpha> Q'"  by auto
   hence P: "p \<Turnstile>SRBB (Internal (Obs \<alpha> \<phi>))" using \<open>p' \<Turnstile>SRBB \<phi>\<close>
     using silent_reachable.intros(1) by auto
