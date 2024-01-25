@@ -309,6 +309,11 @@ next
           assume "hml_srbb_inner_models (Obs \<alpha> \<psi>) q"
 
           hence "q \<Turnstile> ( HML_soft_poss \<alpha> (hml_srbb_to_hml \<psi>))" by simp
+
+          hence "\<exists>q'. q\<mapsto>a \<alpha> q' \<and> (q' \<Turnstile>SRBB \<psi>)"
+            by (smt (verit) hml_models.simps(2) hml_models.simps(4) hml_srbb_models.elims(3)) 
+
+(*
           hence "\<exists>q'. q\<mapsto>a \<alpha> q' \<and> (q' \<Turnstile>SRBB \<psi>)" proof (cases "\<alpha>=\<tau>")
             case True
             hence "q \<Turnstile> hml.Silent (hml_srbb_to_hml \<psi>)" using \<open>q \<Turnstile> ( HML_soft_poss \<alpha> (hml_srbb_to_hml \<psi>))\<close> by simp
@@ -332,7 +337,7 @@ next
           qed
 
 
-          hence "\<exists>q'. q\<mapsto>a \<alpha> q' \<and> (q' \<Turnstile>SRBB \<psi>)" sorry
+          hence "\<exists>q'. q\<mapsto>a \<alpha> q' \<and> (q' \<Turnstile>SRBB \<psi>)" sorry *)
           then obtain q' where Z: "q\<mapsto>a \<alpha> q' \<and> (q' \<Turnstile>SRBB \<psi>)" by auto
           hence "q' \<in> Q' " using \<open>q\<in> Q\<alpha>\<close> \<open>Q\<alpha> \<mapsto>aS \<alpha> Q'\<close>
             by blast
