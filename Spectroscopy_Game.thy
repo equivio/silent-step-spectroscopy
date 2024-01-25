@@ -357,7 +357,7 @@ where
       if "\<exists>p' Q'. spectroscopy_moves (Attacker_Delayed p Q) (Attacker_Immediate p' Q') 
          = (subtract 1 0 0 0 0 0 0 0) \<and> in_wina (e - (E 1 0 0 0 0 0 0 0)) (Attacker_Immediate p' Q')
           \<and> strategy_formula (Attacker_Immediate p' Q') (e - (E 1 0 0 0 0 0 0 0)) \<phi>
-          \<and> p \<mapsto>\<alpha> p' \<and> Q \<mapsto>S \<alpha> Q'" |
+          \<and> p \<mapsto>a \<alpha> p' \<and> Q \<mapsto>aS \<alpha> Q'" |
   
   early_conj:
     "strategy_formula (Attacker_Immediate p Q) e \<phi>" 
