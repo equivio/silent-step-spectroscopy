@@ -307,37 +307,9 @@ next
         hence "q\<in> Q\<alpha>" using \<open>q\<in>(Q1 \<union> Q\<alpha>)\<close> by simp
         have "\<not>(hml_srbb_inner_models (Obs \<alpha> \<psi>) q)" proof
           assume "hml_srbb_inner_models (Obs \<alpha> \<psi>) q"
-
           hence "q \<Turnstile> ( HML_soft_poss \<alpha> (hml_srbb_to_hml \<psi>))" by simp
-
           hence "\<exists>q'. q\<mapsto>a \<alpha> q' \<and> (q' \<Turnstile>SRBB \<psi>)"
             by (smt (verit) hml_models.simps(2) hml_models.simps(4) hml_srbb_models.elims(3)) 
-
-(*
-          hence "\<exists>q'. q\<mapsto>a \<alpha> q' \<and> (q' \<Turnstile>SRBB \<psi>)" proof (cases "\<alpha>=\<tau>")
-            case True
-            hence "q \<Turnstile> hml.Silent (hml_srbb_to_hml \<psi>)" using \<open>q \<Turnstile> ( HML_soft_poss \<alpha> (hml_srbb_to_hml \<psi>))\<close> by simp
-            hence "(\<exists>q'. q \<mapsto> \<tau> q' \<and> (q' \<Turnstile> (hml_srbb_to_hml \<psi>))) \<or> (q \<Turnstile> (hml_srbb_to_hml \<psi>))"
-              by (simp add: hml_models.simps(4))
-            hence "(\<exists>q'. q \<mapsto> \<tau> q' \<and> q' \<Turnstile>SRBB \<psi>) \<or> (q \<Turnstile>SRBB \<psi>)"
-              by simp 
-            then show ?thesis proof (cases "q \<Turnstile>SRBB \<psi>")
-              case True
-              then show ?thesis sorry
-            next
-              case False
-              then show ?thesis using \<open>(\<exists>q'. q \<mapsto> \<tau> q' \<and> q' \<Turnstile>SRBB \<psi>) \<or> (q \<Turnstile>SRBB \<psi>)\<close> sorry
-            qed 
-          next
-            case False
-            hence "q \<Turnstile> (hml.Obs \<alpha> (hml_srbb_to_hml \<psi>))" using \<open>q \<Turnstile> ( HML_soft_poss \<alpha> (hml_srbb_to_hml \<psi>))\<close> by simp
-            hence "\<exists>q'. q \<mapsto> \<alpha> q' \<and> q' \<Turnstile> (hml_srbb_to_hml \<psi>)" by simp
-            then show ?thesis
-              by (simp add: False) 
-          qed
-
-
-          hence "\<exists>q'. q\<mapsto>a \<alpha> q' \<and> (q' \<Turnstile>SRBB \<psi>)" sorry *)
           then obtain q' where Z: "q\<mapsto>a \<alpha> q' \<and> (q' \<Turnstile>SRBB \<psi>)" by auto
           hence "q' \<in> Q' " using \<open>q\<in> Q\<alpha>\<close> \<open>Q\<alpha> \<mapsto>aS \<alpha> Q'\<close>
             by blast
