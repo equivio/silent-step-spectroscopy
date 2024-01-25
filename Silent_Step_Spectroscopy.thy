@@ -79,7 +79,7 @@ next
            strategy_formula_inner (Attacker_Immediate p' Q') (e - E 1 0 0 0 0 0 0 0) \<chi> \<and> Q \<Zsurj>S Q \<longrightarrow>
            distinguishes_from (hml_srbb.Internal \<chi>) p Q
        | Defender_Conj p Q \<Rightarrow> distinguishes_from \<phi> p Q | _ \<Rightarrow> True)) \<and>
-     p \<mapsto>a \<alpha> p' \<and> Q \<mapsto>aS \<alpha> Q' " by auto
+     p \<mapsto>\<alpha> p' \<and> Q \<mapsto>S \<alpha> Q' " by auto
   hence D: "distinguishes_from \<phi> p' Q'" by auto 
   hence "p' \<Turnstile>SRBB \<phi>" using distinguishes_from_def by auto
 
@@ -87,7 +87,7 @@ next
   hence "(\<exists>a. p \<mapsto> a p' \<and> Q \<mapsto>S a Q' \<and> a \<noteq> \<tau>)"
     by (smt (verit) option.discI spectroscopy_moves.simps(3)) 
 
-  from IH have "p \<mapsto>a \<alpha> p'" and "Q \<mapsto>aS \<alpha> Q'"  by auto
+  from IH have "p \<mapsto>a \<alpha> p'" and "Q \<mapsto>aS \<alpha> Q'"  sorry
   hence P: "p \<Turnstile>SRBB (Internal (Obs \<alpha> \<phi>))" using \<open>p' \<Turnstile>SRBB \<phi>\<close>
     using silent_reachable.intros(1) by auto
   have "Q \<Zsurj>S Q \<longrightarrow> (\<forall>q\<in>Q. \<not>(q \<Turnstile>SRBB (Internal (Obs \<alpha> \<phi>))))" proof (rule impI)
