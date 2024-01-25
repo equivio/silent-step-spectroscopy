@@ -35,7 +35,7 @@ fun spectroscopy_moves :: "('s, 'a) spectroscopy_position \<Rightarrow> ('s, 'a)
 
   observation: 
     "spectroscopy_moves (Attacker_Delayed p Q) (Attacker_Immediate p' Q') 
-      = (if (\<exists>a. p \<mapsto> a p' \<and> Q \<mapsto>S a Q' \<and> a \<noteq> \<tau>) then (subtract 1 0 0 0 0 0 0 0) else None)" |
+      = (if (\<exists>a. p \<mapsto>a a p' \<and> Q \<mapsto>aS a Q') then (subtract 1 0 0 0 0 0 0 0) else None)" |
 
   finishing_or_early_conj: 
     "spectroscopy_moves (Attacker_Immediate p Q) (Defender_Conj p' Q') 
@@ -265,8 +265,12 @@ next
       by (metis Attacker_Delayed Orderings.order_eq_iff id_apply local.procrastination option.sel)
   next
     case A_Immediate (* observation *)
-    then have "spectroscopy_moves g g' = (subtract 1 0 0 0 0 0 0 0)"
-      by (smt (verit) Attacker_Delayed assms local.observation) 
+    then obtain p' Q' where " g' = Attacker_Immediate p' Q' " by auto
+    hence "spectroscopy_moves (Attacker_Delayed x41 x42) (Attacker_Immediate p' Q') \<noteq> None"  using assms(1) Attacker_Delayed by auto
+    hence "spectroscopy_moves (Attacker_Delayed x41 x42) (Attacker_Immediate p' Q')  = (subtract 1 0 0 0 0 0 0 0)" using option.discI observation
+      by (metis (no_types, lifting)) 
+
+    hence "spectroscopy_moves g g' = (subtract 1 0 0 0 0 0 0 0)" using Attacker_Delayed \<open>g' = Attacker_Immediate p' Q'\<close> by simp
     then show ?thesis using gets_smaller by simp
   next
     case D_Conj (* late_inst_conj *)
