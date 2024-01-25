@@ -79,17 +79,15 @@ next
            strategy_formula_inner (Attacker_Immediate p' Q') (e - E 1 0 0 0 0 0 0 0) \<chi> \<and> Q \<Zsurj>S Q \<longrightarrow>
            distinguishes_from (hml_srbb.Internal \<chi>) p Q
        | Defender_Conj p Q \<Rightarrow> distinguishes_from \<phi> p Q | _ \<Rightarrow> True)) \<and>
-     p \<mapsto>\<alpha> p' \<and> Q \<mapsto>S \<alpha> Q' " by auto
+     p \<mapsto>a \<alpha> p' \<and> Q \<mapsto>aS \<alpha> Q' " by auto
   hence D: "distinguishes_from \<phi> p' Q'" by auto 
   hence "p' \<Turnstile>SRBB \<phi>" using distinguishes_from_def by auto
-
 
   from IH have "spectroscopy_moves (Attacker_Delayed p Q) (Attacker_Immediate p' Q') = subtract 1 0 0 0 0 0 0 0" by simp
   hence "(\<exists>a. p \<mapsto> a p' \<and> Q \<mapsto>S a Q' \<and> a \<noteq> \<tau>)"
     by (smt (verit) option.discI spectroscopy_moves.simps(3)) 
 
-
-  from IH have "p \<mapsto>\<alpha> p'" and "Q \<mapsto>S \<alpha> Q'"  by auto
+  from IH have "p \<mapsto>a \<alpha> p'" and "Q \<mapsto>aS \<alpha> Q'"  by auto
   hence P: "p \<Turnstile>SRBB (Internal (Obs \<alpha> \<phi>))" using \<open>p' \<Turnstile>SRBB \<phi>\<close>
     using silent_reachable.intros(1) by auto
   have "Q \<Zsurj>S Q \<longrightarrow> (\<forall>q\<in>Q. \<not>(q \<Turnstile>SRBB (Internal (Obs \<alpha> \<phi>))))" proof (rule impI)
@@ -103,19 +101,13 @@ next
         hence "hml_srbb_inner_models (Obs \<alpha> \<phi>) q'" by simp
         hence "q' \<Turnstile> (HML_soft_poss \<alpha> (hml_srbb_to_hml \<phi>))"
           by simp
-        then show "False" proof(cases "\<alpha>=\<tau>")
-          case True
-          then show ?thesis sorry
-        next
-          case False
-          hence "q' \<Turnstile> (hml.Obs \<alpha> (hml_srbb_to_hml \<phi>))" using \<open>q' \<Turnstile> (HML_soft_poss \<alpha> (hml_srbb_to_hml \<phi>))\<close>
-            by simp
-          hence "\<exists>q''. q' \<mapsto> \<alpha> q'' \<and> q'' \<Turnstile> (hml_srbb_to_hml \<phi>)"
-            by simp 
-          hence "\<exists>q' q''. q \<Zsurj> q' \<and> q' \<mapsto> \<alpha> q'' \<and> q'' \<Turnstile>SRBB \<phi>" using X by auto
-          then show "False" using \<open>Q \<Zsurj>S Q\<close>
-            by (metis D \<open>Q \<mapsto>S \<alpha> Q'\<close> \<open>q \<in> Q\<close> distinguishes_from_def)
-        qed 
+
+        from X have "q'\<in>Q" using \<open>Q \<Zsurj>S Q\<close> \<open>q \<in> Q\<close> by blast
+        hence "\<exists>q''\<in>Q'. q' \<mapsto>a \<alpha> q'' \<and> q'' \<Turnstile>SRBB \<phi>" using \<open>Q \<mapsto>aS \<alpha> Q'\<close> \<open>q' \<Turnstile> (HML_soft_poss \<alpha> (hml_srbb_to_hml \<phi>))\<close>
+          by (smt (verit, del_insts) D dist_from_srbb_eq_dist_from_hml distinguishes_from_hml_def hml_models.simps(2) hml_models.simps(4))
+        then obtain q'' where "q''\<in>Q'\<and> q' \<mapsto>a \<alpha> q'' \<and> q'' \<Turnstile>SRBB \<phi>" by auto
+        thus "False" using D
+          using distinguishes_from_def by auto
       qed
     qed
   qed
