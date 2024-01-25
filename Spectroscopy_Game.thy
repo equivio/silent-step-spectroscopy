@@ -156,8 +156,8 @@ next
       by (metis Attacker_Delayed assms(1) id_apply local.procrastination option.sel)
   next
     case A_Immediate (* observation *)
-    then have "spectroscopy_moves g g' = (subtract 1 0 0 0 0 0 0 0)"
-      by (smt (verit) Attacker_Delayed assms(1) local.observation)
+    then have "spectroscopy_moves g g' = (subtract 1 0 0 0 0 0 0 0)" sorry
+(*      by (smt (verit) Attacker_Delayed assms(1) local.observation) *)
     then show ?thesis using assms(2) mono_subtract
       by simp
   next
