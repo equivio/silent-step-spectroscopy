@@ -268,7 +268,7 @@ lemma soft_step_set_eq:
   assumes "P \<mapsto>aS \<alpha> Q"
   shows "Q = soft_step_set P \<alpha>"
   using exactly_one_soft_step_set soft_step_set_is_soft_step_set assms 
-    by fastforce
+  by fastforce
 
 end (* locale LTS_Tau *)
 

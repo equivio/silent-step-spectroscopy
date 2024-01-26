@@ -475,6 +475,62 @@ lemma "expressiveness_price (Internal (Conj {} \<psi>s)) = E 0 0 0 0 0 0 0 0"
 lemma "expressiveness_price (Internal (BranchConj \<alpha> TT {} \<psi>s)) = E 1 0 0 0 0 0 0 0"
   by (simp add: Sup_enat_def)
 
+lemma expr_obs:
+  assumes "expressiveness_price \<phi> \<le> (e - E 1 0 0 0 0 0 0 0)"
+  shows "expr_pr_inner (Obs \<alpha> \<phi>) \<le> e"
+proof-
+  have expr_pr_obs: "expr_pr_inner (Obs \<alpha> \<phi>) = 
+                  (E (modal_depth_srbb_inner (Obs \<alpha> \<phi>))
+                 (branch_conj_depth_inner (Obs \<alpha> \<phi>))
+                 (inst_conj_depth_inner (Obs \<alpha> \<phi>))
+                 (st_conj_depth_inner (Obs \<alpha> \<phi>))
+                 (imm_conj_depth_inner (Obs \<alpha> \<phi>))
+                 (max_pos_conj_depth_inner (Obs \<alpha> \<phi>))
+                 (max_neg_conj_depth_inner (Obs \<alpha> \<phi>))
+                 (neg_depth_inner (Obs \<alpha> \<phi>)))"
+    using expr_pr_inner.simps by blast
+  have obs_upds: "modal_depth_srbb_inner (Obs \<alpha> \<phi>) = 1 + modal_depth_srbb \<phi>" 
+  "branch_conj_depth_inner (Obs \<alpha> \<phi>) = branching_conjunction_depth \<phi>"
+  "inst_conj_depth_inner (Obs \<alpha> \<phi>) = instable_conjunction_depth \<phi>"
+  "st_conj_depth_inner (Obs \<alpha> \<phi>) = stable_conjunction_depth \<phi>"
+  "imm_conj_depth_inner (Obs \<alpha> \<phi>) = immediate_conjunction_depth \<phi>"
+  "max_pos_conj_depth_inner (Obs \<alpha> \<phi>) = max_positive_conjunct_depth \<phi>"
+  "max_neg_conj_depth_inner (Obs \<alpha> \<phi>) = max_negative_conjunct_depth \<phi>"
+  "neg_depth_inner (Obs \<alpha> \<phi>) = negation_depth \<phi>"
+    by simp+
+
+  obtain e1 e2 e3 e4 e5 e6 e7 e8 where "e = E e1 e2 e3 e4 e5 e6 e7 e8"
+    by (metis antisym assms eneg_leq energy.exhaust_sel gets_smaller srbb_price_never_neg)
+  hence "(e - (E 1 0 0 0 0 0 0 0)) = (E (e1-1) e2 e3 e4 e5 e6 e7 e8) \<or> 
+                  ((e - (E 1 0 0 0 0 0 0 0)) = eneg)"
+            using minus_energy_def
+            by simp
+  then show ?thesis
+  proof(rule disjE)
+  assume "e - E 1 0 0 0 0 0 0 0 = eneg"
+  hence "e = (E 0 0 0 0 0 0 0 0)"
+    using assms
+    using antisym eneg_leq min_eneg(2) by fastforce
+  then show ?thesis 
+    using \<open>e - E 1 0 0 0 0 0 0 0 = eneg\<close> assms 
+    using eneg_leq order_class.order_eq_iff by auto
+next
+  assume "e - E 1 0 0 0 0 0 0 0 = E (e1 - 1) e2 e3 e4 e5 e6 e7 e8"
+  hence "modal_depth_srbb \<phi> \<le> (e1 - 1)"
+    using assms leq_not_eneg by force
+  hence "modal_depth_srbb_inner (Obs \<alpha> \<phi>) \<le> e1"
+    using obs_upds
+    by (metis \<open>e - E 1 0 0 0 0 0 0 0 = E (e1 - 1) e2 e3 e4 e5 e6 e7 e8\<close> \<open>e = E e1 e2 e3 e4 e5 e6 e7 e8\<close> add_diff_assoc_enat add_diff_cancel_enat add_mono_thms_linordered_semiring(1) enat.simps(3) energy.distinct(1) energy.sel(1) le_numeral_extra(4) leq_not_eneg minus_energy_def one_enat_def)
+  then show ?thesis
+    using expr_pr_obs obs_upds 
+    using \<open>e - E 1 0 0 0 0 0 0 0 = E (e1 - 1) e2 e3 e4 e5 e6 e7 e8\<close> \<open>e = E e1 e2 e3 e4 e5 e6 e7 e8\<close> assms leq_not_eneg by fastforce 
+qed
+qed
+
+lemma expr_obs_phi:
+  shows "e1 (expr_pr_inner (Obs \<alpha> \<phi>)) = expressiveness_price \<phi>"
+  by (simp add: direct_minus_eq energy_leq_cases le_iff_add)
+
 end
 
 end

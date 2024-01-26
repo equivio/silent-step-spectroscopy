@@ -35,7 +35,7 @@ fun spectroscopy_moves :: "('s, 'a) spectroscopy_position \<Rightarrow> ('s, 'a)
 
   observation: 
     "spectroscopy_moves (Attacker_Delayed p Q) (Attacker_Immediate p' Q') 
-      = (if (\<exists>a. p \<mapsto> a p' \<and> Q \<mapsto>S a Q' \<and> a \<noteq> \<tau>) then (subtract 1 0 0 0 0 0 0 0) else None)" |
+      = (if (\<exists>a. p \<mapsto>a a p' \<and> Q \<mapsto>aS a Q') then (subtract 1 0 0 0 0 0 0 0) else None)" |
 
   finishing_or_early_conj: 
     "spectroscopy_moves (Attacker_Immediate p Q) (Defender_Conj p' Q') 
@@ -145,7 +145,7 @@ next
   then show ?thesis using assms(2) mono_min_1_6 mono_min_1_7 mono_subtract
     by (metis (no_types, lifting) comp_apply monoE option.sel) 
 next
-  case (Attacker_Delayed x41 x42)
+  case (Attacker_Delayed p Q)
   then have "(\<exists>p' Q'. g'=(Attacker_Delayed p' Q')) \<or> (\<exists>p' Q'. g'=(Attacker_Immediate p' Q')) \<or> (\<exists>p' Q'. g'=(Defender_Conj p' Q')) \<or> (\<exists>p' Q'. g'=(Defender_Stable_Conj p' Q')) \<or> (\<exists>p' p'' Q' \<alpha> Q\<alpha> . g'= (Defender_Branch p' \<alpha> p'' Q' Q\<alpha>))"
     using assms spectroscopy_defender.cases spectroscopy_moves.simps(26) spectroscopy_moves.simps(27)
     by (metis spectroscopy_moves.simps(59))
@@ -157,9 +157,12 @@ next
     then show ?thesis using assms(2)
       by (metis Attacker_Delayed assms(1) id_apply local.procrastination option.sel)
   next
-    case A_Immediate (* observation *)
-    then have "spectroscopy_moves g g' = (subtract 1 0 0 0 0 0 0 0)"
-      by (smt (verit) Attacker_Delayed assms(1) local.observation)
+case A_Immediate (* observation *)
+    then obtain p' Q' where g': "g' = Attacker_Immediate p' Q'" by blast
+    have "(if (\<exists>a. p \<mapsto>a a p' \<and> Q \<mapsto>aS a Q') then (subtract 1 0 0 0 0 0 0 0) else None) =
+          spectroscopy_moves g g'" 
+      unfolding g' Attacker_Delayed by auto
+    with assms(1) have "... = subtract 1 0 0 0 0 0 0 0" unfolding g' Attacker_Delayed by metis
     then show ?thesis using assms(2) mono_subtract
       by simp
   next
@@ -254,7 +257,7 @@ next
   then show ?thesis using gets_smaller
     using dual_order.trans gets_smaller_min_1_6 gets_smaller_min_1_7 option.sel by fastforce 
 next
-  case (Attacker_Delayed x41 x42)
+  case (Attacker_Delayed p Q)
   then have "(\<exists>p' Q'. g'=(Attacker_Delayed p' Q')) \<or> (\<exists>p' Q'. g'=(Attacker_Immediate p' Q')) \<or> (\<exists>p' Q'. g'=(Defender_Conj p' Q')) \<or> (\<exists>p' Q'. g'=(Defender_Stable_Conj p' Q')) \<or> (\<exists>p' p'' Q' \<alpha> Q\<alpha> . g'= (Defender_Branch p' \<alpha> p'' Q' Q\<alpha>))"
     using assms spectroscopy_defender.cases spectroscopy_moves.simps(26) spectroscopy_moves.simps(27)
     by (metis spectroscopy_moves.simps(28))
@@ -267,8 +270,13 @@ next
       by (metis Attacker_Delayed Orderings.order_eq_iff id_apply local.procrastination option.sel)
   next
     case A_Immediate (* observation *)
-    then have "spectroscopy_moves g g' = (subtract 1 0 0 0 0 0 0 0)"
-      by (smt (verit) Attacker_Delayed assms local.observation) 
+    then obtain p' Q' where " g' = Attacker_Immediate p' Q' " by auto
+    hence "spectroscopy_moves (Attacker_Delayed p Q) (Attacker_Immediate p' Q') \<noteq> None" 
+      using assms(1) Attacker_Delayed by auto
+    hence "spectroscopy_moves (Attacker_Delayed p Q) (Attacker_Immediate p' Q') = (subtract 1 0 0 0 0 0 0 0)" 
+      unfolding observation by argo 
+
+    hence "spectroscopy_moves g g' = (subtract 1 0 0 0 0 0 0 0)" using Attacker_Delayed \<open>g' = Attacker_Immediate p' Q'\<close> by simp
     then show ?thesis using gets_smaller by simp
   next
     case D_Conj (* late_inst_conj *)
@@ -686,7 +694,7 @@ The inductive property of lemma 1 is formalized as follows
       have def_conj: "spectroscopy_defender (Defender_Conj p Q)" by simp
       have  "spectroscopy_moves (Defender_Conj p Q) N \<noteq> None 
             \<Longrightarrow> N = Attacker_Clause (attacker_state N) (defender_state N)" for N
-        by (metis spectroscopy_moves.simps(35,36,38,48,54,69) spectroscopy_position.exhaust_sel)
+        by (metis spectroscopy_moves.simps(34,35,36,38,64,74) spectroscopy_position.exhaust_sel)
       hence  move_kind: "spectroscopy_moves (Defender_Conj p Q) N \<noteq> None \<Longrightarrow> \<exists>q\<in>Q. N = Attacker_Clause p q" for N
         using conj_answer by metis   
 
@@ -720,33 +728,33 @@ The inductive property of lemma 1 is formalized as follows
     proof(rule allI, rule allI, rule impI, rule impI, rule impI)
       fix p Q
       assume "Q \<noteq> {}" "distinguishes_from_inner (hml_srbb_inner.Obs \<alpha> \<phi>) p Q" "Q \<Zsurj>S Q"
-
-      have "\<exists>p' Q'. in_wina (expressiveness_price \<phi>) (Attacker_Immediate p' Q')" 
+      have "\<exists>p' Q'. p \<mapsto>a \<alpha> p' \<and> Q \<mapsto>aS \<alpha> Q' \<and> in_wina (expressiveness_price \<phi>) (Attacker_Immediate p' Q')" 
       proof(cases "\<alpha> = \<tau>")
         case True
-        (*with \<open>distinguishes_from_inner (hml_srbb_inner.Obs \<alpha> \<phi>) p Q\<close> 
-        have dist_unfolded: 
-          "\<forall>q\<in>Q. ((\<exists>p'. p \<mapsto>\<tau> p' \<and> p' \<Turnstile> hml_srbb_to_hml \<phi>) \<or> p \<Turnstile> hml_srbb_to_hml \<phi>) \<and>
-           \<not> ((\<exists>p'. q \<mapsto>\<tau> p' \<and> p' \<Turnstile> hml_srbb_to_hml \<phi>) \<or> q \<Turnstile> hml_srbb_to_hml \<phi>)" 
-          unfolding distinguishes_from_inner_def distinguishes_inner_def
-            hml_srbb_inner_models.simps hml_srbb_inner_to_hml.simps
-            hml_models.simps(4) True
-          by auto
-        hence "((\<exists>p'. p \<mapsto>\<tau> p' \<and> p' \<Turnstile> hml_srbb_to_hml \<phi>) \<or> p \<Turnstile> hml_srbb_to_hml \<phi>)" 
-          using \<open>Q \<noteq> {}\<close> by blast
+        with \<open>distinguishes_from_inner (hml_srbb_inner.Obs \<alpha> \<phi>) p Q\<close> have dist_unfold:
+             "p \<Turnstile> Silent (hml_srbb_to_hml \<phi>) \<and> (\<forall>q\<in>Q. \<not> q \<Turnstile> Silent (hml_srbb_to_hml \<phi>))"
+          unfolding True distinguishes_from_inner_def distinguishes_inner_def
+          hml_srbb_inner_models.simps hml_srbb_inner_to_hml.simps hml_models.simps(4)
+          by simp
+        hence "((\<exists>p'. p \<mapsto>\<tau> p' \<and> p' \<Turnstile> hml_srbb_to_hml \<phi>) \<or> p \<Turnstile> hml_srbb_to_hml \<phi>)"
+          unfolding True distinguishes_from_inner_def distinguishes_inner_def
+          hml_srbb_inner_models.simps hml_srbb_inner_to_hml.simps hml_models.simps(4)
+          by simp
         then obtain p' where "p' \<Turnstile> hml_srbb_to_hml \<phi>" "p \<mapsto>a \<alpha> p'" 
-          unfolding True 
+          unfolding True by blast
 
-        from dist_unfolded have "\<forall>q\<in>Q. \<not> ((\<exists>p'. q \<mapsto>\<tau> p' \<and> p' \<Turnstile> hml_srbb_to_hml \<phi>) \<or> q \<Turnstile> hml_srbb_to_hml \<phi>)" 
-          by blast
+        from dist_unfold have
+          "\<forall>q\<in>Q. (\<not> q \<Turnstile> hml_srbb_to_hml \<phi>) \<and> (\<nexists>q'. q \<mapsto>\<tau> q' \<and> q' \<Turnstile> hml_srbb_to_hml \<phi>)"
+          by simp
         hence "\<forall>q\<in>Q. \<not>q \<Turnstile> hml_srbb_to_hml \<phi>" using \<open>Q \<Zsurj>S Q\<close> by fastforce
+        
 
         hence "distinguishes_from \<phi> p' Q"
           by (simp add: \<open>p' \<Turnstile> hml_srbb_to_hml \<phi>\<close> distinguishes_def distinguishes_from_def)
         with IH have "in_wina (expressiveness_price \<phi>) (Attacker_Immediate p' Q)" 
           using \<open>Q \<noteq> {}\<close> by blast
-        moreover have "p \<mapsto>a \<alpha> p'" *) 
-        with IH show ?thesis sorry
+        moreover have "Q \<mapsto>aS \<alpha> Q" unfolding True using \<open>Q \<Zsurj>S Q\<close> using silent_reachable_append_\<tau> by blast
+        ultimately show ?thesis using \<open>p \<mapsto>a \<alpha> p'\<close> by blast
       next
         case False
         with \<open>distinguishes_from_inner (hml_srbb_inner.Obs \<alpha> \<phi>) p Q\<close> 
@@ -767,11 +775,27 @@ The inductive property of lemma 1 is formalized as follows
         from \<open>\<forall>q\<in>step_set Q \<alpha>. \<not> q \<Turnstile> hml_srbb_to_hml \<phi>\<close> \<open>p \<mapsto>\<alpha> p'' \<and> p'' \<Turnstile> hml_srbb_to_hml \<phi>\<close>
         have "distinguishes_from \<phi> p'' ?Q'"
           by (simp add: distinguishes_def distinguishes_from_def)
-
-        then show ?thesis by (metis IH distinction_implies_winning_budgets_empty_Q)
+        hence "in_wina (expressiveness_price \<phi>) (Attacker_Immediate p'' ?Q')"
+          by (metis IH distinction_implies_winning_budgets_empty_Q)
+        moreover have "p \<mapsto>\<alpha> p''" using \<open>p \<mapsto>\<alpha> p'' \<and> p'' \<Turnstile> hml_srbb_to_hml \<phi>\<close> by simp
+        moreover have "Q \<mapsto>aS \<alpha> ?Q'" by (simp add: False LTS.step_set_is_step_set)
+        ultimately show ?thesis by blast
       qed
-      
-      thus "in_wina (expr_pr_inner (hml_srbb_inner.Obs \<alpha> \<phi>)) (Attacker_Delayed p Q)" sorry
+      then obtain p' Q' where p'_Q': "p \<mapsto>a \<alpha> p'" "Q \<mapsto>aS \<alpha> Q'" and
+        wina: "in_wina (expressiveness_price \<phi>) (Attacker_Immediate p' Q')" by blast
+
+      have attacker: "attacker (Attacker_Delayed p Q)" by simp
+
+      have "spectroscopy_moves (Attacker_Delayed p Q) (Attacker_Immediate p' Q') =
+            (if (\<exists>a. p \<mapsto>a a p' \<and> Q \<mapsto>aS a Q') then Some e1 else None)"
+        for p Q p' Q' by simp
+      from this[of p Q p' Q'] have 
+        "spectroscopy_moves (Attacker_Delayed p Q) (Attacker_Immediate p' Q') = 
+             Some e1" using p'_Q' by auto
+     
+      with expr_obs_phi[of \<alpha> \<phi>] wina attacker show
+        "in_wina (expr_pr_inner (hml_srbb_inner.Obs \<alpha> \<phi>)) (Attacker_Delayed p Q)"
+        using in_wina_Ga by (metis option.discI option.sel)
     qed
     then show
       "(\<forall>p Q. Q \<noteq> {} \<longrightarrow> distinguishes_from_inner (hml_srbb_inner.Obs \<alpha> \<phi>) p Q \<longrightarrow> Q \<Zsurj>S Q
