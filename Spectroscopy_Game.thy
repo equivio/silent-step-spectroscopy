@@ -532,7 +532,7 @@ The inductive property of lemma 1 is formalized as follows
       from \<open>distinguishes_from TT p Q\<close>
        and \<open>q \<in> Q\<close>
       have "distinguishes TT p q" 
-        using distinguishes_from_def by blast
+        using distinguishes_from_def by auto
 
       with verum_never_distinguishes
       show "in_wina (expressiveness_price TT) (Attacker_Immediate p Q)" 
@@ -663,24 +663,25 @@ The inductive property of lemma 1 is formalized as follows
       fix Q p
       assume "Q \<noteq> {}" and "distinguishes_from (ImmConj I \<psi>s) p Q"
       from this(2) have "\<forall>q\<in>Q. p \<Turnstile>SRBB ImmConj I \<psi>s \<and> \<not> q \<Turnstile>SRBB ImmConj I \<psi>s" 
-        unfolding distinguishes_from_def distinguishes_def .
+        unfolding distinguishes_from_def distinguishes_def by blast
       hence "\<forall>q\<in>Q. \<exists>i\<in>I. hml_srbb_conjunct_models (\<psi>s i) p \<and> \<not>hml_srbb_conjunct_models (\<psi>s i) q"
         by simp
       hence "\<forall>q\<in>Q. \<exists>i\<in>I. distinguishes_conjunct (\<psi>s i) p q"
-        using distinguishes_conjunct_def by blast
+        using distinguishes_conjunct_def by simp
       hence "\<forall>q\<in>Q. \<exists>i\<in>I. ((\<psi>s i) \<in> range \<psi>s) \<and> distinguishes_conjunct (\<psi>s i) p q" by blast
       hence "\<forall>q\<in>Q. \<exists>i\<in>I. in_wina (expr_pr_conjunct (\<psi>s i)) (Attacker_Clause p q)" using IH by blast
       hence a_clause_wina: "\<forall>q\<in>Q. \<exists>i\<in>I. in_wina (e3 (e5 (expressiveness_price (ImmConj I \<psi>s)))) 
         (Attacker_Clause p q)"
-        using expressiveness_price_ImmConj_geq_parts'
-        by (metis win_a_upwards_closure)
+        using expressiveness_price_ImmConj_geq_parts' win_a_upwards_closure by fast
 
       from this \<open>Q \<noteq> {}\<close> have "I \<noteq> {}" by blast
       with expressiveness_price_ImmConj_geq_parts \<psi>_price_never_neg have
           "e5 (e3 (expressiveness_price (ImmConj I \<psi>s))) \<noteq> eneg"
         by (simp add: direct_minus_eq energy_leq_cases)
       hence "e5 (expressiveness_price (ImmConj I \<psi>s)) \<noteq> eneg"
-        using leq_not_eneg minus_energy_def by auto
+        using leq_not_eneg minus_energy_def 
+        by (metis \<open>Q \<noteq> {}\<close> a_clause_wina defender_win_level_not_in_wina
+            energy.discI equals0I gets_smaller win_a_upwards_closure)
 
       have def_conj: "spectroscopy_defender (Defender_Conj p Q)" by simp
       have  "spectroscopy_moves (Defender_Conj p Q) N \<noteq> None 
