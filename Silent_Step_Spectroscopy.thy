@@ -432,9 +432,9 @@ lemma winning_budget_implies_strategy_formula:
     case 6
     from 6 obtain p \<alpha> p' Q Qa  where G: "g =  Defender_Branch p \<alpha> p' Q Qa"
       by auto
-    have "p'=p' \<and> Qa \<mapsto>aS \<alpha>(non_tau_step_set Qa \<alpha>)"
-      by (simp add: non_tau_step_set_is_non_tau_step_set)
-    hence A: "spectroscopy_moves (Defender_Branch p \<alpha> p' Q Qa) (Attacker_Branch p' (non_tau_step_set Qa \<alpha>)) = Some (min1_6 \<circ> (\<lambda>x. x- E 0 1 1 0 0 0 0 0))"
+    have "p'=p' \<and> Qa \<mapsto>aS \<alpha>(soft_step_set Qa \<alpha>)"
+      by (simp add: soft_step_set_is_soft_step_set)
+    hence A: "spectroscopy_moves (Defender_Branch p \<alpha> p' Q Qa) (Attacker_Branch p' (soft_step_set Qa \<alpha>)) = Some (min1_6 \<circ> (\<lambda>x. x- E 0 1 1 0 0 0 0 0))"
       by simp
     from 1 have "(\<forall>g'. \<not> spectroscopy_moves g g' \<noteq> None)" by simp
     hence "False" using A using G by blast 
