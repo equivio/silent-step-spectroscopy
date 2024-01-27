@@ -662,6 +662,8 @@ next
       qed
     next
       case Att_Imm
+(* Needs to be updated according to the changed definition of observation *)
+(*
       assume "\<exists>p' Q'. g' = Attacker_Immediate p' Q'"
       then obtain p' Q' where g'_att_imm: "g' = Attacker_Immediate p' Q'" and
                           IH: "(\<exists>\<phi>. strategy_formula g' (weight g g' e) \<phi> \<and>
@@ -702,6 +704,8 @@ next
         by auto
       then show ?thesis using \<open>strategy_formula_inner (Attacker_Delayed p Q) e (Obs \<alpha> \<phi>)\<close>
         using g_att_del by blast
+*)
+      then show ?thesis sorry
     next
       case Def_Conj
       assume "\<exists>p Q. g' = Defender_Conj p Q"
@@ -1538,6 +1542,9 @@ next
   qed
   then show ?case by simp
 next
+  case (stable_conj_answer p Q e \<Phi>)
+  then show ?case sorry
+next
   case (branch p Q e \<chi>)
   then obtain p' Q' \<alpha> Q\<alpha> where IH: "spectroscopy_moves (Attacker_Delayed p Q) (Defender_Branch p \<alpha> p' Q' Q\<alpha>) = Some id \<and>
      in_wina e (Defender_Branch p \<alpha> p' Q' Q\<alpha>) \<and>
@@ -1560,14 +1567,14 @@ next
     using dist_from_inner_srbb_eq_dist_from_hml dist_from_srbb_eq_dist_from_hml distinguishes_from_hml_def hml_impl_iffI pre_\<epsilon> by auto 
   then show ?case by simp
 next
-  case (branch_conj p \<alpha> p' Q1 Q\<alpha> e e' \<psi> \<Phi>)
+  case (branch_conj p \<alpha> p' Q1 Q\<alpha> e \<psi> \<Phi>)
   hence A1: "\<forall>q\<in>Q1. hml_srbb_conjunct_models (\<Phi> q) p" by (simp add: distinguishes_conjunct_def)
 
   from branch_conj obtain Q' where IH: "spectroscopy_moves (Defender_Branch p \<alpha> p' Q1 Q\<alpha>) (Attacker_Branch p' Q') =
          Some (min1_6 \<circ> (\<lambda>x. x - E 0 1 1 0 0 0 0 0)) \<and>
          spectroscopy_moves (Attacker_Branch p' Q') (Attacker_Immediate p' Q') = subtract 1 0 0 0 0 0 0 0 \<and>
          in_wina (min1_6 (e - E 0 1 1 0 0 0 0 0) - E 1 0 0 0 0 0 0 0) (Attacker_Immediate p' Q') \<and>
-         strategy_formula (Attacker_Immediate p' Q') e' \<psi> \<and>
+         strategy_formula (Attacker_Immediate p' Q') (min1_6 (e - E 0 1 1 0 0 0 0 0) - E 1 0 0 0 0 0 0 0) \<psi> \<and>
          (case Attacker_Immediate p' Q' of Attacker_Immediate p Q \<Rightarrow> distinguishes_from \<psi> p Q
           | Defender_Conj p Q \<Rightarrow> distinguishes_from \<psi> p Q | _ \<Rightarrow> True)" by auto
   hence " distinguishes_from \<psi> p' Q'" by simp
@@ -1623,7 +1630,6 @@ next
 
     thus "distinguishes_from_inner (BranchConj \<alpha> \<psi> Q1 \<Phi>) p (Q1 \<union> Q\<alpha>)" using A4 distinguishes_from_inner_def by simp 
   qed 
- 
   then show ?case by simp
 qed
 
