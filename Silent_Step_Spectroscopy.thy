@@ -663,18 +663,19 @@ next
     next
       case Att_Imm
 (* Needs to be updated according to the changed definition of observation *)
-(*
+
       assume "\<exists>p' Q'. g' = Attacker_Immediate p' Q'"
       then obtain p' Q' where g'_att_imm: "g' = Attacker_Immediate p' Q'" and
                           IH: "(\<exists>\<phi>. strategy_formula g' (weight g g' e) \<phi> \<and>
                           expressiveness_price \<phi> \<le> weight g g' e)" using IH by blast 
-      hence "(\<exists>a. p \<mapsto> a p' \<and> Q \<mapsto>S a Q' \<and> a \<noteq> \<tau>)" using local.observation move g_att_del 
-        by (smt (verit, best) Inhabited_Tau_LTS_axioms Spectroscopy_Game.Inhabited_Tau_LTS.observation)
-      then obtain \<alpha> where \<alpha>_prop: "p \<mapsto> \<alpha> p'" "Q \<mapsto>S \<alpha> Q'" "\<alpha> \<noteq> \<tau>" by blast
+      have "spectroscopy_moves (Attacker_Delayed p Q) (Attacker_Immediate p' Q') \<noteq> None" using move \<open>g' = Attacker_Immediate p' Q'\<close>
+        by simp
+      hence "(\<exists>a. p \<mapsto>a a p' \<and> Q \<mapsto>aS a Q')" using spectroscopy_moves.simps(3) by metis 
+      then obtain \<alpha> where \<alpha>_prop: "p \<mapsto>a \<alpha> p'" "Q \<mapsto>aS \<alpha> Q'" by blast
       hence "(the (spectroscopy_moves (Attacker_Delayed p Q) (Attacker_Immediate p' Q')) e) = (e - (E 1 0 0 0 0 0 0 0))"
         by fastforce
       hence "(in_wina (e - (E 1 0 0 0 0 0 0 0)) (Attacker_Immediate p' Q'))"
-        using g'_att_imm \<open>p \<mapsto> \<alpha> p'\<close> \<open>Q \<mapsto>S \<alpha> Q'\<close> \<open>\<alpha> \<noteq> \<tau>\<close> "2.IH" \<open>g = Attacker_Delayed p Q\<close> id_apply in_wina.intros(2) move
+        using g'_att_imm \<open>p \<mapsto>a \<alpha> p'\<close> \<open>Q \<mapsto>aS \<alpha> Q'\<close> "2.IH" \<open>g = Attacker_Delayed p Q\<close> id_apply in_wina.intros(2) move
         by presburger
 
       have "(weight g g' e) = (e - (E 1 0 0 0 0 0 0 0))"
@@ -684,19 +685,16 @@ next
       then obtain \<phi> where \<phi>_prop: "(strategy_formula (Attacker_Immediate p' Q') (e - (E 1 0 0 0 0 0 0 0)) \<phi> \<and> expressiveness_price \<phi> \<le> (e - (E 1 0 0 0 0 0 0 0)))"
         using IH g'_att_imm
         by auto 
-
-      have "\<exists>p' Q'. spectroscopy_moves (Attacker_Delayed p Q) (Attacker_Immediate p' Q') 
+      hence "spectroscopy_moves (Attacker_Delayed p Q) (Attacker_Immediate p' Q') 
        = (subtract 1 0 0 0 0 0 0 0) \<and> in_wina (e - (E 1 0 0 0 0 0 0 0)) (Attacker_Immediate p' Q')"
-        by (smt (verit, best) Inhabited_Tau_LTS_axioms Spectroscopy_Game.Inhabited_Tau_LTS.observation \<open>in_wina (e - E 1 0 0 0 0 0 0 0) (Attacker_Immediate p' Q')\<close> g'_att_imm move)
-
+        using \<open>\<exists>a. p \<mapsto>a a p' \<and> Q \<mapsto>aS a Q'\<close> \<open>in_wina (e - E 1 0 0 0 0 0 0 0) (Attacker_Immediate p' Q')\<close> by auto 
       hence "\<exists>p' Q'. spectroscopy_moves (Attacker_Delayed p Q) (Attacker_Immediate p' Q') 
-       = (subtract 1 0 0 0 0 0 0 0) \<and> in_wina (e - (E 1 0 0 0 0 0 0 0)) (Attacker_Immediate p' Q')
-        \<and> strategy_formula (Attacker_Immediate p' Q') (e - (E 1 0 0 0 0 0 0 0)) \<phi>
-        \<and> p \<mapsto>\<alpha> p' \<and> Q \<mapsto>S \<alpha> Q'"
-        using strategy_formula_strategy_formula_inner_strategy_formula_conjunct.delay observation
-          \<alpha>_prop \<phi>_prop \<open>in_wina (e - E 1 0 0 0 0 0 0 0) (Attacker_Immediate p' Q')\<close> local.observation
-        by auto
-
+       = (subtract 1 0 0 0 0 0 0 0) \<and> in_wina (e - (E 1 0 0 0 0 0 0 0)) (Attacker_Immediate p' Q')" by blast
+      hence "\<exists>p' Q'. spectroscopy_moves (Attacker_Delayed p Q) (Attacker_Immediate p' Q') 
+         = (subtract 1 0 0 0 0 0 0 0) \<and> in_wina (e - (E 1 0 0 0 0 0 0 0)) (Attacker_Immediate p' Q')
+          \<and> strategy_formula (Attacker_Immediate p' Q') (e - (E 1 0 0 0 0 0 0 0)) \<phi>
+          \<and> p \<mapsto>a\<alpha> p' \<and> Q \<mapsto>aS \<alpha> Q'"
+        using \<alpha>_prop(1) \<alpha>_prop(2) \<open>spectroscopy_moves (Attacker_Delayed p Q) (Attacker_Immediate p' Q') = subtract 1 0 0 0 0 0 0 0 \<and> in_wina (e - E 1 0 0 0 0 0 0 0) (Attacker_Immediate p' Q')\<close> \<phi>_prop by blast
       hence "strategy_formula_inner (Attacker_Delayed p Q) e (Obs \<alpha> \<phi>)"
         using local.observation 
         by presburger
@@ -704,8 +702,6 @@ next
         by auto
       then show ?thesis using \<open>strategy_formula_inner (Attacker_Delayed p Q) e (Obs \<alpha> \<phi>)\<close>
         using g_att_del by blast
-*)
-      then show ?thesis sorry
     next
       case Def_Conj
       assume "\<exists>p Q. g' = Defender_Conj p Q"
