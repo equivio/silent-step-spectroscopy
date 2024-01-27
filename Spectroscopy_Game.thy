@@ -35,7 +35,7 @@ fun spectroscopy_moves :: "('s, 'a) spectroscopy_position \<Rightarrow> ('s, 'a)
 
   observation: 
     "spectroscopy_moves (Attacker_Delayed p Q) (Attacker_Immediate p' Q') 
-      = (if (\<exists>a. p \<mapsto> a p' \<and> Q \<mapsto>S a Q' \<and> a \<noteq> \<tau>) then (subtract 1 0 0 0 0 0 0 0) else None)" |
+      = (if (\<exists>a. p \<mapsto>a a p' \<and> Q \<mapsto>aS a Q') then (subtract 1 0 0 0 0 0 0 0) else None)" |
 
   finishing_or_early_conj: 
     "spectroscopy_moves (Attacker_Immediate p Q) (Defender_Conj p' Q') 
@@ -143,7 +143,7 @@ next
   then show ?thesis using assms(2) mono_min_1_6 mono_min_1_7 mono_subtract
     by (metis (no_types, lifting) comp_apply monoE option.sel) 
 next
-  case (Attacker_Delayed x41 x42)
+  case (Attacker_Delayed p Q)
   then have "(\<exists>p' Q'. g'=(Attacker_Delayed p' Q')) \<or> (\<exists>p' Q'. g'=(Attacker_Immediate p' Q')) \<or> (\<exists>p' Q'. g'=(Defender_Conj p' Q')) \<or> (\<exists>p' Q'. g'=(Defender_Stable_Conj p' Q')) \<or> (\<exists>p' p'' Q' \<alpha> Q\<alpha> . g'= (Defender_Branch p' \<alpha> p'' Q' Q\<alpha>))"
     using assms spectroscopy_defender.cases spectroscopy_moves.simps(26) spectroscopy_moves.simps(27)
     by (metis spectroscopy_moves.simps(59))
@@ -156,8 +156,11 @@ next
       by (metis Attacker_Delayed assms(1) id_apply local.procrastination option.sel)
   next
     case A_Immediate (* observation *)
-    then have "spectroscopy_moves g g' = (subtract 1 0 0 0 0 0 0 0)"
-      by (smt (verit) Attacker_Delayed assms(1) local.observation)
+    then obtain p' Q' where g': "g' = Attacker_Immediate p' Q'" by blast
+    have "(if (\<exists>a. p \<mapsto>a a p' \<and> Q \<mapsto>aS a Q') then (subtract 1 0 0 0 0 0 0 0) else None) =
+          spectroscopy_moves g g'" 
+      unfolding g' Attacker_Delayed by auto
+    with assms(1) have "... = subtract 1 0 0 0 0 0 0 0" unfolding g' Attacker_Delayed by metis
     then show ?thesis using assms(2) mono_subtract
       by simp
   next
@@ -252,7 +255,7 @@ next
   then show ?thesis using gets_smaller
     using dual_order.trans gets_smaller_min_1_6 gets_smaller_min_1_7 option.sel by fastforce 
 next
-  case (Attacker_Delayed x41 x42)
+  case (Attacker_Delayed p Q)
   then have "(\<exists>p' Q'. g'=(Attacker_Delayed p' Q')) \<or> (\<exists>p' Q'. g'=(Attacker_Immediate p' Q')) \<or> (\<exists>p' Q'. g'=(Defender_Conj p' Q')) \<or> (\<exists>p' Q'. g'=(Defender_Stable_Conj p' Q')) \<or> (\<exists>p' p'' Q' \<alpha> Q\<alpha> . g'= (Defender_Branch p' \<alpha> p'' Q' Q\<alpha>))"
     using assms spectroscopy_defender.cases spectroscopy_moves.simps(26) spectroscopy_moves.simps(27)
     by (metis spectroscopy_moves.simps(28))
@@ -265,8 +268,13 @@ next
       by (metis Attacker_Delayed Orderings.order_eq_iff id_apply local.procrastination option.sel)
   next
     case A_Immediate (* observation *)
-    then have "spectroscopy_moves g g' = (subtract 1 0 0 0 0 0 0 0)"
-      by (smt (verit) Attacker_Delayed assms local.observation) 
+    then obtain p' Q' where " g' = Attacker_Immediate p' Q' " by auto
+    hence "spectroscopy_moves (Attacker_Delayed p Q) (Attacker_Immediate p' Q') \<noteq> None" 
+      using assms(1) Attacker_Delayed by auto
+    hence "spectroscopy_moves (Attacker_Delayed p Q) (Attacker_Immediate p' Q') = (subtract 1 0 0 0 0 0 0 0)" 
+      unfolding observation by argo 
+
+    hence "spectroscopy_moves g g' = (subtract 1 0 0 0 0 0 0 0)" using Attacker_Delayed \<open>g' = Attacker_Immediate p' Q'\<close> by simp
     then show ?thesis using gets_smaller by simp
   next
     case D_Conj (* late_inst_conj *)
@@ -357,7 +365,7 @@ where
       if "\<exists>p' Q'. spectroscopy_moves (Attacker_Delayed p Q) (Attacker_Immediate p' Q') 
          = (subtract 1 0 0 0 0 0 0 0) \<and> in_wina (e - (E 1 0 0 0 0 0 0 0)) (Attacker_Immediate p' Q')
           \<and> strategy_formula (Attacker_Immediate p' Q') (e - (E 1 0 0 0 0 0 0 0)) \<phi>
-          \<and> p \<mapsto>\<alpha> p' \<and> Q \<mapsto>S \<alpha> Q'" |
+          \<and> p \<mapsto>a\<alpha> p' \<and> Q \<mapsto>aS \<alpha> Q'" |
   
   early_conj:
     "strategy_formula (Attacker_Immediate p Q) e \<phi>" 
