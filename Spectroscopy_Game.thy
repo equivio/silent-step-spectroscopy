@@ -432,7 +432,7 @@ where
             = subtract 1 0 0 0 0 0 0 0 
             \<and> (in_wina ((min1_6 (e - E 0 1 1 0 0 0 0 0)) - (E 1 0 0 0 0 0 0 0)) 
                   (Attacker_Immediate p' Q'))
-            \<and> strategy_formula (Attacker_Immediate p' Q') e' \<psi>"
+            \<and> strategy_formula (Attacker_Immediate p' Q') ((min1_6 (e - E 0 1 1 0 0 0 0 0)) - (E 1 0 0 0 0 0 0 0))  \<psi>"
         
         "\<forall>q \<in> Q. spectroscopy_moves (Defender_Branch p \<alpha> p' Q Q\<alpha>) (Attacker_Clause p q) 
           = (subtract 0 1 1 0 0 0 0 0)
