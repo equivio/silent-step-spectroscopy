@@ -278,8 +278,6 @@ proof-
     by force+
   oops
 
-lemma "expr_pr_inner (StableConj {} \<Phi>) = E 0 0 0 1 0 0 0 0"
-  using expr_pr_inner.simps sorry
 
 lemma winning_budget_implies_strategy_formula:
   fixes g e
