@@ -18,35 +18,21 @@ lemma strategy_formulas_distinguish:
   shows "(strategy_formula g e \<phi> \<longrightarrow>
         (case g of
         Attacker_Immediate p Q \<Rightarrow>  distinguishes_from \<phi> p Q
-      | Attacker_Delayed p Q \<Rightarrow> (Q \<Zsurj>S Q)\<longrightarrow>((strategy_formula_inner g e \<chi> \<and> Q \<Zsurj>S Q) \<longrightarrow> distinguishes_from (Internal \<chi>) p Q)
-      | Attacker_Clause p q \<Rightarrow> True
-
       | Defender_Conj p Q \<Rightarrow> distinguishes_from \<phi> p Q
-      | Defender_Stable_Conj p Q \<Rightarrow> True
-      | Defender_Branch p \<alpha> p' Q Qa \<Rightarrow> True
-      | Attacker_Branch p Q \<Rightarrow> True))
+      | _ \<Rightarrow> True))
       \<and> 
       (strategy_formula_inner g e \<chi> \<longrightarrow>
         (case g of
-        Attacker_Immediate p Q \<Rightarrow>  True
-      | Attacker_Delayed p Q \<Rightarrow> (Q \<Zsurj>S Q) \<longrightarrow> distinguishes_from (Internal \<chi>) p Q
-      | Attacker_Clause p q \<Rightarrow> True
-
+       Attacker_Delayed p Q \<Rightarrow> (Q \<Zsurj>S Q) \<longrightarrow> distinguishes_from (Internal \<chi>) p Q
       | Defender_Conj p Q \<Rightarrow> distinguishes_from_inner \<chi> p Q
       | Defender_Stable_Conj p Q \<Rightarrow> (\<forall>q. \<not> p \<mapsto> \<tau> q) \<longrightarrow> distinguishes_from_inner \<chi> p Q
       | Defender_Branch p \<alpha> p' Q Qa \<Rightarrow>((p \<mapsto> \<alpha> p') \<and> (Qa \<noteq> {})) \<longrightarrow> distinguishes_from_inner \<chi> p (Q\<union>Qa)
-      | Attacker_Branch p Q \<Rightarrow> True))
+      | _ \<Rightarrow> True))
       \<and>
       (strategy_formula_conjunct g e \<psi> \<longrightarrow>
         (case g of
-        Attacker_Immediate p Q \<Rightarrow>  True
-      | Attacker_Delayed p Q \<Rightarrow> True
-      | Attacker_Clause p q \<Rightarrow> distinguishes_conjunct \<psi> p q
-
-      | Defender_Conj p Q \<Rightarrow> True
-      | Defender_Stable_Conj p Q \<Rightarrow> True
-      | Defender_Branch p \<alpha> p' Q Qa \<Rightarrow> True
-      | Attacker_Branch p Q \<Rightarrow> True))"
+        Attacker_Clause p q \<Rightarrow> distinguishes_conjunct \<psi> p q
+      | _ \<Rightarrow> True))"
 proof(induction rule: strategy_formula_strategy_formula_inner_strategy_formula_conjunct.induct)
   case (delay p Q e \<chi>)
   then show ?case
@@ -57,7 +43,7 @@ next
        in_wina e (Attacker_Delayed p' Q) \<and>
        strategy_formula_inner (Attacker_Delayed p' Q) e \<chi> \<and>
        (case Attacker_Delayed p' Q of Attacker_Delayed p Q \<Rightarrow> Q \<Zsurj>S Q \<longrightarrow> distinguishes_from (hml_srbb.Internal \<chi>) p Q
-        | Defender_Branch p \<alpha> p' Q Qa \<Rightarrow> distinguishes_from_inner \<chi> p (Q \<union> Qa)
+        | Defender_Branch p \<alpha> p' Q Qa \<Rightarrow> p \<mapsto>\<alpha> p' \<and> Qa \<noteq> {} \<longrightarrow> distinguishes_from_inner \<chi> p (Q \<union> Qa)
         | Defender_Conj p Q \<Rightarrow> distinguishes_from_inner \<chi> p Q
         | Defender_Stable_Conj p Q \<Rightarrow> (\<forall>q. \<not> p \<mapsto>\<tau> q) \<longrightarrow> distinguishes_from_inner \<chi> p Q | _ \<Rightarrow> True)" by auto
   hence D: "Q \<Zsurj>S Q \<longrightarrow> distinguishes_from (hml_srbb.Internal \<chi>) p' Q"
@@ -74,12 +60,8 @@ next
      in_wina (e - E 1 0 0 0 0 0 0 0) (Attacker_Immediate p' Q') \<and>
      (strategy_formula (Attacker_Immediate p' Q') (e - E 1 0 0 0 0 0 0 0) \<phi> \<and>
       (case Attacker_Immediate p' Q' of Attacker_Immediate p Q \<Rightarrow> distinguishes_from \<phi> p Q
-       | Attacker_Delayed p Q \<Rightarrow>
-           Q \<Zsurj>S Q \<longrightarrow>
-           strategy_formula_inner (Attacker_Immediate p' Q') (e - E 1 0 0 0 0 0 0 0) \<chi> \<and> Q \<Zsurj>S Q \<longrightarrow>
-           distinguishes_from (hml_srbb.Internal \<chi>) p Q
        | Defender_Conj p Q \<Rightarrow> distinguishes_from \<phi> p Q | _ \<Rightarrow> True)) \<and>
-     p \<mapsto>a\<alpha> p' \<and> Q \<mapsto>aS \<alpha> Q' " by auto
+     p \<mapsto>a \<alpha> p' \<and> Q \<mapsto>aS \<alpha> Q'" by auto
   hence D: "distinguishes_from \<phi> p' Q'" by auto 
   hence "p' \<Turnstile>SRBB \<phi>" using distinguishes_from_def by auto
 
@@ -150,7 +132,7 @@ next
        in_wina (min1_6 e) (Attacker_Delayed p Q') \<and>
        strategy_formula_inner (Attacker_Delayed p Q') (min1_6 e) \<chi> \<and>
        (case Attacker_Delayed p Q' of Attacker_Delayed p Q \<Rightarrow> Q \<Zsurj>S Q \<longrightarrow> distinguishes_from (hml_srbb.Internal \<chi>) p Q
-        | Defender_Branch p \<alpha> p' Q Qa \<Rightarrow> distinguishes_from_inner \<chi> p (Q \<union> Qa)
+        | Defender_Branch p \<alpha> p' Q Qa \<Rightarrow> p \<mapsto>\<alpha> p' \<and> Qa \<noteq> {} \<longrightarrow> distinguishes_from_inner \<chi> p (Q \<union> Qa)
         | Defender_Conj p Q \<Rightarrow> distinguishes_from_inner \<chi> p Q
         | Defender_Stable_Conj p Q \<Rightarrow> (\<forall>q. \<not> p \<mapsto>\<tau> q) \<longrightarrow> distinguishes_from_inner \<chi> p Q | _ \<Rightarrow> True)" by auto
   hence D: "Q' \<Zsurj>S Q' \<longrightarrow> distinguishes_from (hml_srbb.Internal \<chi>) p Q'" by simp
@@ -168,7 +150,7 @@ next
         in_wina (min1_7 (e - E 0 0 0 0 0 0 0 1)) (Attacker_Delayed q P')) \<and>
        strategy_formula_inner (Attacker_Delayed q P') (min1_7 (e - E 0 0 0 0 0 0 0 1)) \<chi> \<and>
        (case Attacker_Delayed q P' of Attacker_Delayed p Q \<Rightarrow> Q \<Zsurj>S Q \<longrightarrow> distinguishes_from (hml_srbb.Internal \<chi>) p Q
-        | Defender_Branch p \<alpha> p' Q Qa \<Rightarrow> distinguishes_from_inner \<chi> p (Q \<union> Qa)
+        | Defender_Branch p \<alpha> p' Q Qa \<Rightarrow> p \<mapsto>\<alpha> p' \<and> Qa \<noteq> {} \<longrightarrow> distinguishes_from_inner \<chi> p (Q \<union> Qa)
         | Defender_Conj p Q \<Rightarrow> distinguishes_from_inner \<chi> p Q
         | Defender_Stable_Conj p Q \<Rightarrow> (\<forall>q. \<not> p \<mapsto>\<tau> q) \<longrightarrow> distinguishes_from_inner \<chi> p Q | _ \<Rightarrow> True)" by auto
   hence D: "P' \<Zsurj>S P' \<longrightarrow> distinguishes_from (hml_srbb.Internal \<chi>) q P'" by simp
@@ -280,10 +262,6 @@ next
          in_wina (min1_6 (e - E 0 1 1 0 0 0 0 0) - E 1 0 0 0 0 0 0 0) (Attacker_Immediate p' Q') \<and>
          strategy_formula (Attacker_Immediate p' Q') e' \<psi> \<and>
          (case Attacker_Immediate p' Q' of Attacker_Immediate p Q \<Rightarrow> distinguishes_from \<psi> p Q
-          | Attacker_Delayed p Q \<Rightarrow>
-              Q \<Zsurj>S Q \<longrightarrow>
-              strategy_formula_inner (Attacker_Immediate p' Q') e' \<chi> \<and> Q \<Zsurj>S Q \<longrightarrow>
-              distinguishes_from (hml_srbb.Internal \<chi>) p Q
           | Defender_Conj p Q \<Rightarrow> distinguishes_from \<psi> p Q | _ \<Rightarrow> True)" by auto
   hence " distinguishes_from \<psi> p' Q'" by simp
   hence X:"p' \<Turnstile>SRBB \<psi>" by (simp add: distinguishes_from_def) 
