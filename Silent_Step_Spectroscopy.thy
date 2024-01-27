@@ -940,9 +940,8 @@ next
                       expressiveness_price \<phi> \<le> weight g g' e - E 1 0 0 0 0 0 0 0)))" by auto
     hence N: "spectroscopy_moves (Attacker_Branch p Q) g' \<noteq> None " using \<open>g=Attacker_Branch p Q \<close> by simp
 
-    hence "g'=(Attacker_Immediate p Q)" using br_acct sorry
-(*      by (smt (verit) spectroscopy_moves.elims spectroscopy_moves.simps(17) spectroscopy_moves.simps(51) spectroscopy_moves.simps(57) spectroscopy_moves.simps(66) spectroscopy_position.distinct(15))
-     i dont get, why this does not work anymore...*)
+    hence "g'=(Attacker_Immediate p Q)" using br_acct using br_acct
+      by (metis (no_types, lifting) spectroscopy_defender.elims(2) spectroscopy_defender.elims(3) spectroscopy_moves.simps(17) spectroscopy_moves.simps(51) spectroscopy_moves.simps(57) spectroscopy_moves.simps(61) spectroscopy_moves.simps(66) spectroscopy_moves.simps(71)) 
      hence "spectroscopy_moves g g' = subtract 1 0 0 0 0 0 0 0" using \<open>g=Attacker_Branch p Q\<close> by simp
 
      from N have " \<exists>\<phi>. strategy_formula g' (weight g g' e) \<phi> \<and> expressiveness_price \<phi> \<le> weight g g' e" using \<open>g=Attacker_Branch p Q \<close> IH \<open>g' = Attacker_Immediate p Q\<close> by auto
@@ -1265,7 +1264,8 @@ next
       using in_wina.simps
       by (meson spectroscopy_defender.simps(2)) 
     then obtain g'' where X: "((spectroscopy_moves (Attacker_Branch p' (soft_step_set Qa \<alpha>)) g'' \<noteq> None) \<and> (in_wina ((weight (Attacker_Branch p' (soft_step_set Qa \<alpha>)) g'') (min1_6 (e - E 0 1 1 0 0 0 0 0))) g''))" by auto
-    hence "g''= (Attacker_Immediate p' (soft_step_set Qa \<alpha>))" sorry (* should not be this hard...*) 
+    hence "g''= (Attacker_Immediate p' (soft_step_set Qa \<alpha>))" using br_acct
+      by (metis (no_types, lifting) spectroscopy_defender.elims(2) spectroscopy_defender.elims(3) spectroscopy_moves.simps(17) spectroscopy_moves.simps(51) spectroscopy_moves.simps(57) spectroscopy_moves.simps(61) spectroscopy_moves.simps(66) spectroscopy_moves.simps(71)) 
     hence "(in_wina ((min1_6 (e - E 0 1 1 0 0 0 0 0)) - (E 1 0 0 0 0 0 0 0))
                   (Attacker_Immediate p' (soft_step_set Qa \<alpha>)))" using X A1
       by (simp add: A2 option.sel)
@@ -1284,7 +1284,8 @@ next
             = subtract 1 0 0 0 0 0 0 0 
             \<and> (in_wina ((min1_6 (e - E 0 1 1 0 0 0 0 0)) - (E 1 0 0 0 0 0 0 0)) 
                   (Attacker_Immediate p' Q'))
-            \<and> strategy_formula (Attacker_Immediate p' Q') ((min1_6 (e - E 0 1 1 0 0 0 0 0)) - (E 1 0 0 0 0 0 0 0)) \<phi>" sorry
+            \<and> strategy_formula (Attacker_Immediate p' Q') ((min1_6 (e - E 0 1 1 0 0 0 0 0)) - (E 1 0 0 0 0 0 0 0)) \<phi>"
+      by blast 
     
     hence S: "strategy_formula_inner g e (BranchConj \<alpha> \<phi> Q \<Phi>)" using A E branch_conj
       by (simp add: \<open>g = Defender_Branch p \<alpha> p' Q Qa\<close>) 
