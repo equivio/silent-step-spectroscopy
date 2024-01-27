@@ -278,7 +278,6 @@ proof-
     by force+
   oops
 
-
 lemma winning_budget_implies_strategy_formula:
   fixes g e
   assumes "in_wina e g"
@@ -289,8 +288,9 @@ lemma winning_budget_implies_strategy_formula:
     "(\<exists>p Q. g = Defender_Conj p Q) \<Longrightarrow> (\<exists>\<phi>. strategy_formula_inner g e \<phi> \<and> expr_pr_inner \<phi> \<le> e) \<and>  (\<exists>\<phi>. strategy_formula g e \<phi> \<and> expressiveness_price \<phi> \<le> e)"
     "(\<exists>p Q. g =  Defender_Stable_Conj p Q) \<Longrightarrow> (\<exists>\<phi>. strategy_formula_inner g e \<phi> \<and> expr_pr_inner \<phi> \<le> e)"
     "(\<exists>p \<alpha> p' Q Qa. g = Defender_Branch p \<alpha> p' Q Qa) \<Longrightarrow> (\<exists>\<phi>. strategy_formula_inner g e \<phi> \<and> expr_pr_inner \<phi> \<le> e)"
-    "(\<exists>p Q. g = Attacker_Branch p Q) \<Longrightarrow> True"
-  using assms proof(induction rule: in_wina.induct)
+    "(\<exists>p Q. g = Attacker_Branch p Q) \<Longrightarrow> \<exists>p Q. (g = Attacker_Branch p Q \<and> (\<exists>\<phi>. strategy_formula (Attacker_Immediate p Q) (e- E 1 0 0 0 0 0 0 0) \<phi> \<and> expressiveness_price \<phi> \<le> (e- E 1 0 0 0 0 0 0 0)))"
+
+using assms proof(induction rule: in_wina.induct)
   case (1 g e)
   {
     case 1
@@ -917,8 +917,40 @@ next
     then show ?case by blast
   next
     case 7
-    then show ?case using "2" 
-      by blast
+    then obtain p Q where "g=Attacker_Branch p Q " by auto
+
+    from 2 obtain g' where IH: "spectroscopy_moves g g' \<noteq> None \<and>
+        in_wina (weight g g' e) g' \<and>
+        (((\<exists>p Q. g' = Attacker_Immediate p Q) \<longrightarrow>
+          (\<exists>\<phi>. strategy_formula g' (weight g g' e) \<phi> \<and> expressiveness_price \<phi> \<le> weight g g' e)) \<and>
+         ((\<exists>p Q. g' = Attacker_Delayed p Q) \<longrightarrow>
+          (\<exists>\<phi>. strategy_formula_inner g' (weight g g' e) \<phi> \<and> expr_pr_inner \<phi> \<le> weight g g' e)) \<and>
+         ((\<exists>p q. g' = Attacker_Clause p q) \<longrightarrow>
+          (\<exists>\<phi>. strategy_formula_conjunct g' (weight g g' e) \<phi> \<and> expr_pr_conjunct \<phi> \<le> weight g g' e))) \<and>
+        (((\<exists>p Q. g' = Defender_Conj p Q) \<longrightarrow>
+          (\<exists>\<phi>. strategy_formula_inner g' (weight g g' e) \<phi> \<and> expr_pr_inner \<phi> \<le> weight g g' e) \<and>
+          (\<exists>\<phi>. strategy_formula g' (weight g g' e) \<phi> \<and> expressiveness_price \<phi> \<le> weight g g' e)) \<and>
+         ((\<exists>p Q. g' = Defender_Stable_Conj p Q) \<longrightarrow>
+          (\<exists>\<phi>. strategy_formula_inner g' (weight g g' e) \<phi> \<and> expr_pr_inner \<phi> \<le> weight g g' e))) \<and>
+        ((\<exists>p \<alpha> p' Q Qa. g' = Defender_Branch p \<alpha> p' Q Qa) \<longrightarrow>
+         (\<exists>\<phi>. strategy_formula_inner g' (weight g g' e) \<phi> \<and> expr_pr_inner \<phi> \<le> weight g g' e)) \<and>
+        ((\<exists>p Q. g' = Attacker_Branch p Q) \<longrightarrow>
+         (\<exists>p Q. g' = Attacker_Branch p Q \<and>
+                (\<exists>\<phi>. strategy_formula (Attacker_Immediate p Q) (weight g g' e - E 1 0 0 0 0 0 0 0) \<phi> \<and>
+                      expressiveness_price \<phi> \<le> weight g g' e - E 1 0 0 0 0 0 0 0)))" by auto
+    hence N: "spectroscopy_moves (Attacker_Branch p Q) g' \<noteq> None " using \<open>g=Attacker_Branch p Q \<close> by simp
+
+    hence "g'=(Attacker_Immediate p Q)" using br_acct sorry
+(*      by (smt (verit) spectroscopy_moves.elims spectroscopy_moves.simps(17) spectroscopy_moves.simps(51) spectroscopy_moves.simps(57) spectroscopy_moves.simps(66) spectroscopy_position.distinct(15))
+     i dont get, why this does not work anymore...*)
+     hence "spectroscopy_moves g g' = subtract 1 0 0 0 0 0 0 0" using \<open>g=Attacker_Branch p Q\<close> by simp
+
+     from N have " \<exists>\<phi>. strategy_formula g' (weight g g' e) \<phi> \<and> expressiveness_price \<phi> \<le> weight g g' e" using \<open>g=Attacker_Branch p Q \<close> IH \<open>g' = Attacker_Immediate p Q\<close> by auto
+     then obtain \<phi> where "strategy_formula g' (weight g g' e) \<phi> \<and> expressiveness_price \<phi> \<le> weight g g' e" by auto
+     hence "(strategy_formula (Attacker_Immediate p Q) (e- E 1 0 0 0 0 0 0 0) \<phi> ) \<and> (expressiveness_price \<phi> \<le> (e- E 1 0 0 0 0 0 0 0))" 
+       using \<open>spectroscopy_moves g g' = subtract 1 0 0 0 0 0 0 0\<close> \<open>g'=(Attacker_Immediate p Q)\<close> by simp
+     hence "(g=Attacker_Branch p Q) \<and> (strategy_formula (Attacker_Immediate p Q) (e- E 1 0 0 0 0 0 0 0) \<phi> ) \<and> (expressiveness_price \<phi> \<le> (e- E 1 0 0 0 0 0 0 0))" using \<open>g=Attacker_Branch p Q\<close> by simp
+     thus ?case by auto
   }
 next
   case (3 g e)
@@ -1190,7 +1222,9 @@ next
     then show ?case sorry
   next
     case 7
-    then show ?case
+    hence "attacker g"
+      by auto
+    then show ?case using 3
       by blast
   }
 qed
