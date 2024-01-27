@@ -1219,7 +1219,99 @@ next
     qed
   next
     case 6
-    then show ?case sorry
+    then obtain p \<alpha> p' Q Qa where "g = Defender_Branch p \<alpha> p' Q Qa " by auto
+    hence M: "\<forall>q\<in> Q. spectroscopy_moves (Defender_Branch p \<alpha> p' Q Qa) (Attacker_Clause p q) = (subtract 0 1 1 0 0 0 0 0)"
+      by simp 
+    hence "\<forall>q\<in>Q. (\<exists>\<phi>. strategy_formula_conjunct (Attacker_Clause p q)  (weight g (Attacker_Clause p q)  e) \<phi> \<and> expr_pr_conjunct \<phi> \<le> weight g (Attacker_Clause p q)  e)"
+      using "3" \<open>g = Defender_Branch p \<alpha> p' Q Qa\<close> by (metis option.distinct(1)) 
+    (* take those formulas somehow...HML Magic? *)
+
+    from M have "\<forall>q \<in> Q. in_wina (e - (E 0 1 1 0 0 0 0 0)) (Attacker_Clause p q)" using assms
+      by (metis "3" \<open>g = Defender_Branch p \<alpha> p' Q Qa\<close> option.distinct(1) option.sel) 
+    hence A: "\<forall>q \<in> Q. spectroscopy_moves (Defender_Branch p \<alpha> p' Q Qa) (Attacker_Clause p q) 
+          = (subtract 0 1 1 0 0 0 0 0)
+          \<and> in_wina (e - (E 0 1 1 0 0 0 0 0)) (Attacker_Clause p q)
+          \<and> strategy_formula_conjunct (Attacker_Clause p q) (e - (E 0 1 1 0 0 0 0 0)) (\<Phi> q)" using M  sorry (* using HML magic *)
+    
+
+
+
+    have E: "\<exists>p Q. Attacker_Branch p' (soft_step_set Qa \<alpha>) = Attacker_Branch p Q" by auto
+
+    have M: "spectroscopy_moves (Defender_Branch p \<alpha> p' Q Qa) (Attacker_Branch p' (soft_step_set Qa \<alpha>)) =Some (min1_6 \<circ> (\<lambda>x. x- E 0 1 1 0 0 0 0 0))"
+      by (simp add: soft_step_set_is_soft_step_set) 
+    hence "spectroscopy_moves (Defender_Branch p \<alpha> p' Q Qa) (Attacker_Branch p' (soft_step_set Qa \<alpha>)) \<noteq> None"
+      by (simp add: option.discI) 
+    hence "(\<exists>p Q. (Attacker_Branch p' (soft_step_set Qa \<alpha>)) = Attacker_Branch p Q \<and>
+                  (\<exists>\<phi>. strategy_formula (Attacker_Immediate p Q) (weight g (Attacker_Branch p' (soft_step_set Qa \<alpha>)) e - E 1 0 0 0 0 0 0 0) \<phi> \<and>
+                        expressiveness_price \<phi> \<le> weight g (Attacker_Branch p' (soft_step_set Qa \<alpha>)) e - E 1 0 0 0 0 0 0 0))" using E 3 \<open>g = Defender_Branch p \<alpha> p' Q Qa\<close>
+      by (metis (no_types, lifting) spectroscopy_position.inject(2))
+    then obtain p'' Q'' where IH2: "(Attacker_Branch p' (soft_step_set Qa \<alpha>)) = Attacker_Branch p'' Q'' \<and>
+                  (\<exists>\<phi>. strategy_formula (Attacker_Immediate p'' Q'') (weight g (Attacker_Branch p' (soft_step_set Qa \<alpha>)) e - E 1 0 0 0 0 0 0 0) \<phi> \<and>
+                        expressiveness_price \<phi> \<le> weight g (Attacker_Branch p' (soft_step_set Qa \<alpha>)) e - E 1 0 0 0 0 0 0 0)" by auto
+    hence "p''=p'" and "Q'' = (soft_step_set Qa \<alpha>)" by auto
+    then obtain \<phi> where "strategy_formula (Attacker_Immediate p' (soft_step_set Qa \<alpha>)) (weight g (Attacker_Branch p' (soft_step_set Qa \<alpha>)) e - E 1 0 0 0 0 0 0 0) \<phi> \<and>
+                        expressiveness_price \<phi> \<le> weight g (Attacker_Branch p' (soft_step_set Qa \<alpha>)) e - E 1 0 0 0 0 0 0 0" using IH2 by auto
+    hence "strategy_formula (Attacker_Immediate p' (soft_step_set Qa \<alpha>)) ((min1_6 (e - E 0 1 1 0 0 0 0 0)) - (E 1 0 0 0 0 0 0 0))  \<phi> \<and>
+                        expressiveness_price \<phi> \<le> ((min1_6 (e - E 0 1 1 0 0 0 0 0)) - (E 1 0 0 0 0 0 0 0)) " using M
+      by (simp add: \<open>g = Defender_Branch p \<alpha> p' Q Qa\<close> comp_apply option.sel) 
+    hence A1: "strategy_formula (Attacker_Immediate p' (soft_step_set Qa \<alpha>)) ((min1_6 (e - E 0 1 1 0 0 0 0 0)) - (E 1 0 0 0 0 0 0 0))  \<phi>" by simp
+
+    have A2: "spectroscopy_moves (Attacker_Branch p' (soft_step_set Qa \<alpha>)) (Attacker_Immediate p' (soft_step_set Qa \<alpha>)) = (subtract 1 0 0 0 0 0 0 0)" by simp
+
+    from M have "in_wina ((min1_6 (e - E 0 1 1 0 0 0 0 0))) (Attacker_Branch p' (soft_step_set Qa \<alpha>))" using assms
+      by (metis "3" E \<open>g = Defender_Branch p \<alpha> p' Q Qa\<close> bot_enat_def comp_apply option.distinct(1) option.sel)
+    hence "\<exists>g''. ((spectroscopy_moves (Attacker_Branch p' (soft_step_set Qa \<alpha>)) g'' \<noteq> None) \<and> (in_wina ((weight (Attacker_Branch p' (soft_step_set Qa \<alpha>)) g'') (min1_6 (e - E 0 1 1 0 0 0 0 0))) g''))" 
+      using in_wina.simps
+      by (meson spectroscopy_defender.simps(2)) 
+    then obtain g'' where X: "((spectroscopy_moves (Attacker_Branch p' (soft_step_set Qa \<alpha>)) g'' \<noteq> None) \<and> (in_wina ((weight (Attacker_Branch p' (soft_step_set Qa \<alpha>)) g'') (min1_6 (e - E 0 1 1 0 0 0 0 0))) g''))" by auto
+    hence "g''= (Attacker_Immediate p' (soft_step_set Qa \<alpha>))" sorry (* should not be this hard...*) 
+    hence "(in_wina ((min1_6 (e - E 0 1 1 0 0 0 0 0)) - (E 1 0 0 0 0 0 0 0))
+                  (Attacker_Immediate p' (soft_step_set Qa \<alpha>)))" using X A1
+      by (simp add: A2 option.sel)
+
+    hence "spectroscopy_moves (Defender_Branch p \<alpha> p' Q Qa) (Attacker_Branch p' (soft_step_set Qa \<alpha>)) 
+          = Some (min1_6 \<circ> (\<lambda>x. x- E 0 1 1 0 0 0 0 0)) 
+            \<and> spectroscopy_moves (Attacker_Branch p' (soft_step_set Qa \<alpha>)) (Attacker_Immediate p' (soft_step_set Qa \<alpha>))
+            = subtract 1 0 0 0 0 0 0 0 
+            \<and> (in_wina ((min1_6 (e - E 0 1 1 0 0 0 0 0)) - (E 1 0 0 0 0 0 0 0)) 
+                  (Attacker_Immediate p' (soft_step_set Qa \<alpha>)))
+            \<and> strategy_formula (Attacker_Immediate p' (soft_step_set Qa \<alpha>)) ((min1_6 (e - E 0 1 1 0 0 0 0 0)) - (E 1 0 0 0 0 0 0 0)) \<phi>" using M A2 A1 by auto
+
+    hence E: "\<exists>Q'. spectroscopy_moves (Defender_Branch p \<alpha> p' Q Qa) (Attacker_Branch p' Q') 
+          = Some (min1_6 \<circ> (\<lambda>x. x- E 0 1 1 0 0 0 0 0)) 
+            \<and> spectroscopy_moves (Attacker_Branch p' Q') (Attacker_Immediate p' Q')
+            = subtract 1 0 0 0 0 0 0 0 
+            \<and> (in_wina ((min1_6 (e - E 0 1 1 0 0 0 0 0)) - (E 1 0 0 0 0 0 0 0)) 
+                  (Attacker_Immediate p' Q'))
+            \<and> strategy_formula (Attacker_Immediate p' Q') ((min1_6 (e - E 0 1 1 0 0 0 0 0)) - (E 1 0 0 0 0 0 0 0)) \<phi>" sorry
+    
+    hence S: "strategy_formula_inner g e (BranchConj \<alpha> \<phi> Q \<Phi>)" using A E branch_conj
+      by (simp add: \<open>g = Defender_Branch p \<alpha> p' Q Qa\<close>) 
+
+    have "expr_pr_inner (BranchConj \<alpha> \<phi> Q \<Phi>) =  E (modal_depth_srbb_inner (BranchConj \<alpha> \<phi> Q \<Phi>))
+                 (branch_conj_depth_inner (BranchConj \<alpha> \<phi> Q \<Phi>))
+                 (inst_conj_depth_inner (BranchConj \<alpha> \<phi> Q \<Phi>))
+                 (st_conj_depth_inner (BranchConj \<alpha> \<phi> Q \<Phi>))
+                 (imm_conj_depth_inner (BranchConj \<alpha> \<phi> Q \<Phi>))
+                 (max_pos_conj_depth_inner (BranchConj \<alpha> \<phi> Q \<Phi>))
+                 (max_neg_conj_depth_inner (BranchConj \<alpha> \<phi> Q \<Phi>))
+                 (neg_depth_inner (BranchConj \<alpha> \<phi> Q \<Phi>))" by simp
+    hence "expr_pr_inner (BranchConj \<alpha> \<phi> Q \<Phi>) =  E ( Sup ({1 + modal_depth_srbb \<phi>} \<union> ((modal_depth_srbb_conjunct \<circ> \<Phi>) ` Q)))
+                 ((if Q = {}
+                  then branching_conjunction_depth \<phi>
+                  else 1 + Sup ({branching_conjunction_depth \<phi>} \<union> ((branch_conj_depth_conjunct \<circ> \<Phi>) ` Q))))
+                 ( Sup ((inst_conj_depth_conjunct \<circ> \<Phi>) ` Q))
+                 ( 1 + Sup ((st_conj_depth_conjunct \<circ> \<Phi>) ` Q))
+                 (Sup ((imm_conj_depth_conjunct \<circ> \<Phi>) ` Q))
+                 (Sup ((max_pos_conj_depth_conjunct \<circ> \<Phi>) ` Q))
+                 (Sup ((max_neg_conj_depth_conjunct \<circ> \<Phi>) ` Q))
+                 ( Sup ((neg_depth_conjunct \<circ> \<Phi>) ` Q))" sorry
+
+
+    have "expr_pr_inner (BranchConj \<alpha> \<phi> Q \<Phi>) \<le> e" sorry
+
+    then show ?case using S by blast
   next
     case 7
     hence "attacker g"
