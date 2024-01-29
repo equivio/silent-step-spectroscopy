@@ -329,7 +329,7 @@ lemma winning_budget_implies_strategy_formula:
     "(\<exists>p Q. g = Attacker_Immediate p Q) \<Longrightarrow> (\<exists>\<phi>. strategy_formula g e \<phi> \<and> expressiveness_price \<phi> \<le> e)"
     "(\<exists>p Q. g = Attacker_Delayed p Q) \<Longrightarrow> (\<exists>\<phi>. strategy_formula_inner g e \<phi> \<and> expr_pr_inner \<phi> \<le> e)"
     "(\<exists>p q. g = Attacker_Clause p q) \<Longrightarrow> (\<exists>\<phi>. strategy_formula_conjunct g e \<phi> \<and> expr_pr_conjunct \<phi> \<le> e)"
-    "(\<exists>p Q. g = Defender_Conj p Q) \<Longrightarrow> (\<exists>\<phi>. strategy_formula_inner g e \<phi> \<and> expr_pr_inner \<phi> \<le> e) \<and>  (\<exists>\<phi>. strategy_formula g e \<phi> \<and> expressiveness_price \<phi> \<le> e)"
+    "(\<exists>p Q. g = Defender_Conj p Q) \<Longrightarrow> (\<exists>\<phi>. strategy_formula_inner g e \<phi> \<and> expr_pr_inner \<phi> \<le> e)"
     "(\<exists>p Q. g =  Defender_Stable_Conj p Q) \<Longrightarrow> (\<exists>\<phi>. strategy_formula_inner g e \<phi> \<and> expr_pr_inner \<phi> \<le> e)"
     "(\<exists>p \<alpha> p' Q Qa. g = Defender_Branch p \<alpha> p' Q Qa) \<Longrightarrow> (\<exists>\<phi>. strategy_formula_inner g e \<phi> \<and> expr_pr_inner \<phi> \<le> e)"
     "(\<exists>p Q. g = Attacker_Branch p Q) \<Longrightarrow> \<exists>p Q. (g = Attacker_Branch p Q \<and> (\<exists>\<phi>. strategy_formula (Attacker_Immediate p Q) (e- E 1 0 0 0 0 0 0 0) \<phi> \<and> expressiveness_price \<phi> \<le> (e- E 1 0 0 0 0 0 0 0)))"
@@ -498,8 +498,7 @@ next
       by blast
     then obtain g' where move: "((spectroscopy_moves (Attacker_Immediate p Q) g')\<noteq>None) \<and> (in_wina (the (spectroscopy_moves (Attacker_Immediate p Q) g') e) g') \<and>
     ((\<exists>p Q. g' = Defender_Conj p Q) \<longrightarrow>
-      (\<exists>\<phi>. strategy_formula_inner g' (weight g g' e) \<phi> \<and> expr_pr_inner \<phi> \<le> weight g g' e) \<and> 
-      (\<exists>\<phi>. strategy_formula g' (weight g g' e) \<phi> \<and> expressiveness_price \<phi> \<le> weight g g' e)) \<and> 
+      (\<exists>\<phi>. strategy_formula_inner g' (weight g g' e) \<phi> \<and> expr_pr_inner \<phi> \<le> weight g g' e)) \<and> 
     ((\<exists>p Q. g' = Attacker_Delayed p Q) \<longrightarrow>
       (\<exists>\<phi>. strategy_formula_inner g' (weight g g' e) \<phi> \<and> expr_pr_inner \<phi> \<le> weight g g' e))" 
       using in_wina.cases 1 "2" 
@@ -509,9 +508,7 @@ next
         by (smt (verit) spectroscopy_defender.elims(1))
       have IH: "((\<exists>p' Q'. g' = Defender_Conj p Q) \<longrightarrow> 
                   ((\<exists>\<phi>. strategy_formula_inner g' (weight (Attacker_Immediate p Q) g' e) \<phi> \<and>
-                        expr_pr_inner \<phi> \<le> weight (Attacker_Immediate p Q) g' e) \<and>
-                  (\<exists>\<phi>. strategy_formula g' (weight (Attacker_Immediate p Q) g' e) \<phi> \<and>
-                        expressiveness_price \<phi> \<le> weight (Attacker_Immediate p Q) g' e)))"
+                        expr_pr_inner \<phi> \<le> weight (Attacker_Immediate p Q) g' e)))"
         using \<open>g = Attacker_Immediate p Q\<close> move
         by force
 
@@ -566,15 +563,16 @@ next
           have "(in_wina e (Defender_Conj p Q))"
             using True \<open>g' = Defender_Conj p' Q'\<close> \<open>p = p'\<close> move by auto
           with IH g'_def_conj have IH_case: "(\<exists>\<phi>. strategy_formula_inner g' (weight (Attacker_Immediate p Q) g' e) \<phi> \<and>
-            expr_pr_inner \<phi> \<le> weight (Attacker_Immediate p Q) g' e) \<and>
-            (\<exists>\<phi>. strategy_formula g' (weight (Attacker_Immediate p Q) g' e) \<phi> \<and>
-            expressiveness_price \<phi> \<le> weight (Attacker_Immediate p Q) g' e)"
+            expr_pr_inner \<phi> \<le> weight (Attacker_Immediate p Q) g' e)"
             using \<open>g' = Defender_Conj p' Q'\<close>
             using \<open>g = Attacker_Immediate p Q\<close> move by force
         have "(in_wina e (Defender_Conj p Q'))"
           using \<open>g' = Defender_Conj p' Q'\<close> \<open>p = p'\<close> move update_gets_smaller win_a_upwards_closure 
           by blast
-          
+
+      (* here Q=Q'={} holds and (Defender_Conj p Q') is a leaf *)
+
+(*
         hence "(\<exists>\<phi>. strategy_formula (Defender_Conj p Q') e \<phi> \<and> expressiveness_price \<phi> \<le> e)"
           using \<open>in_wina e (Defender_Conj p Q')\<close> IH_case 
           using \<open>p = p'\<close> \<open>weight (Attacker_Immediate p Q) (Defender_Conj p' Q') e = id e\<close> g'_def_conj by auto
@@ -589,11 +587,9 @@ next
           then show ?thesis
             using \<open>strategy_formula (Attacker_Immediate p Q) e \<phi>\<close> 
             using \<open>g = Attacker_Immediate p Q\<close> by blast
+*)      
+          thus ?thesis sorry
         next
-
-
-(* this is the interesting case *)
-
           case False
           hence "p = p'" "Q = Q'"
             using \<open>g' = Defender_Conj p' Q'\<close> move spectroscopy_moves.simps
@@ -608,26 +604,16 @@ next
             using \<open>g' = Defender_Conj p' Q'\<close> \<open>p = p'\<close> move update_gets_smaller win_a_upwards_closure 
             using \<open>weight (Attacker_Immediate p Q) (Defender_Conj p' Q') e = e - E 0 0 0 0 1 0 0 0\<close> by force
 
-
-
-(* change used IH  and use inner instead of immediate *)
           with IH g'_def_conj have IH_case: "(\<exists>\<phi>. strategy_formula_inner g' (weight (Attacker_Immediate p Q) g' e) \<phi> \<and>
-            expr_pr_inner \<phi> \<le> weight (Attacker_Immediate p Q) g' e) \<and>
-            (\<exists>\<phi>. strategy_formula g' (weight (Attacker_Immediate p Q) g' e) \<phi> \<and>
-            expressiveness_price \<phi> \<le> weight (Attacker_Immediate p Q) g' e)"
+            expr_pr_inner \<phi> \<le> weight (Attacker_Immediate p Q) g' e)"
             using \<open>g = Attacker_Immediate p Q\<close> move by auto
-
-
           hence "(\<exists>\<phi>. strategy_formula_inner (Defender_Conj p Q) (e - (E 0 0 0 0 1 0 0 0)) \<phi> \<and> expr_pr_inner \<phi> \<le> (e - (E 0 0 0 0 1 0 0 0)))"
             using \<open>in_wina (e - (E 0 0 0 0 1 0 0 0)) (Defender_Conj p Q')\<close> IH_case 
             using \<open>Q = Q'\<close> \<open>p = p'\<close> \<open>weight (Attacker_Immediate p Q) (Defender_Conj p' Q') e = e - E 0 0 0 0 1 0 0 0\<close> g'_def_conj by auto
-
           then obtain \<phi> where S: "(strategy_formula_inner (Defender_Conj p Q) (e - (E 0 0 0 0 1 0 0 0)) \<phi> \<and> expr_pr_inner \<phi> \<le> (e - (E 0 0 0 0 1 0 0 0)))"
             by blast
-
           hence "\<exists>\<psi>. \<phi>= Conj Q \<psi>" using strategy_formula_strategy_formula_inner_strategy_formula_conjunct.conj
             by (smt (verit) \<open>Q = Q'\<close> \<open>p = p'\<close> g'_def_conj move spectroscopy_defender.simps(4) spectroscopy_defender.simps(6) spectroscopy_moves.simps(60) spectroscopy_moves.simps(70) spectroscopy_position.inject(6) strategy_formula_inner.simps)
-
           then obtain \<psi> where "\<phi>= Conj Q \<psi>" by auto
           hence "strategy_formula (Defender_Conj p Q) (e - (E 0 0 0 0 1 0 0 0)) (ImmConj Q \<psi>)" using S strategy_formula_strategy_formula_inner_strategy_formula_conjunct.conj strategy_formula_strategy_formula_inner_strategy_formula_conjunct.imm_conj
             by (smt (verit) \<open>Q = Q'\<close> \<open>p = p'\<close> g'_def_conj hml_srbb_inner.inject(2) move spectroscopy_defender.simps(4) spectroscopy_defender.simps(6) spectroscopy_moves.simps(60) spectroscopy_moves.simps(70) strategy_formula_inner.cases) 
@@ -658,9 +644,7 @@ next
                                expressiveness_price \<phi> \<le> weight g g' e)"
       "(\<exists>p Q. g' = (Defender_Conj p Q)) \<longrightarrow>
       (\<exists>\<phi>. strategy_formula_inner g' (weight g g' e) \<phi> \<and>
-                               expr_pr_inner \<phi> \<le> weight g g' e) \<and>
-                         (\<exists>\<phi>. strategy_formula g' (weight g g' e) \<phi> \<and>
-                               expressiveness_price \<phi> \<le> weight g g' e)"
+                               expr_pr_inner \<phi> \<le> weight g g' e)"
       "(\<exists>p Q. g' = (Defender_Stable_Conj p Q)) \<longrightarrow>
       (\<exists>\<phi>. strategy_formula_inner g' (weight g g' e) \<phi> \<and>
                                expr_pr_inner \<phi> \<le> weight g g' e)"
@@ -766,8 +750,7 @@ next
       case Def_Conj
       assume "\<exists>p Q. g' = Defender_Conj p Q"
       then obtain p' Q' where g'_def_conj: "g' = Defender_Conj p' Q'" and
-                          IH: "(\<exists>\<phi>. strategy_formula_inner g' (weight g g' e) \<phi> \<and> expr_pr_inner \<phi> \<le> weight g g' e) \<and>
-                              (\<exists>\<phi>. strategy_formula g' (weight g g' e) \<phi> \<and> expressiveness_price \<phi> \<le> weight g g' e)" 
+                          IH: "(\<exists>\<phi>. strategy_formula_inner g' (weight g g' e) \<phi> \<and> expr_pr_inner \<phi> \<le> weight g g' e)" 
         using IH by blast
       have "p = p'" "Q = Q'" 
         using \<open>g' = Defender_Conj p' Q'\<close> local.late_inst_conj move by presburger+
@@ -988,8 +971,7 @@ next
          ((\<exists>p q. g' = Attacker_Clause p q) \<longrightarrow>
           (\<exists>\<phi>. strategy_formula_conjunct g' (weight g g' e) \<phi> \<and> expr_pr_conjunct \<phi> \<le> weight g g' e))) \<and>
         (((\<exists>p Q. g' = Defender_Conj p Q) \<longrightarrow>
-          (\<exists>\<phi>. strategy_formula_inner g' (weight g g' e) \<phi> \<and> expr_pr_inner \<phi> \<le> weight g g' e) \<and>
-          (\<exists>\<phi>. strategy_formula g' (weight g g' e) \<phi> \<and> expressiveness_price \<phi> \<le> weight g g' e)) \<and>
+          (\<exists>\<phi>. strategy_formula_inner g' (weight g g' e) \<phi> \<and> expr_pr_inner \<phi> \<le> weight g g' e)) \<and>
          ((\<exists>p Q. g' = Defender_Stable_Conj p Q) \<longrightarrow>
           (\<exists>\<phi>. strategy_formula_inner g' (weight g g' e) \<phi> \<and> expr_pr_inner \<phi> \<le> weight g g' e))) \<and>
         ((\<exists>p \<alpha> p' Q Qa. g' = Defender_Branch p \<alpha> p' Q Qa) \<longrightarrow>
@@ -1169,18 +1151,13 @@ next
         by blast
       hence Strat: "strategy_formula_inner g e (Conj Q \<Phi>)" 
         by (metis (mono_tags, lifting) \<open>g = Defender_Conj p Q\<close> conj)
-      from \<Phi>_prop have Strat_2: "strategy_formula g e (ImmConj Q \<Phi>)"
-        using \<open>g = Defender_Conj p Q\<close> imm_conj
-        by (metis (no_types, lifting))
       from \<Phi>_prop have "\<forall>q \<in> Q. expr_pr_conjunct (\<Phi> q) \<le> (e - E 0 0 1 0 0 0 0 0)"
         using \<open>g = Defender_Conj p Q\<close> 
         by fastforce
-      hence "expr_pr_inner (Conj Q \<Phi>) \<le> e" "expressiveness_price (ImmConj Q \<Phi>) \<le> e"
-        using expr_st_conj assm sorry
-      hence "(\<exists>\<phi>. strategy_formula_inner g e \<phi> \<and> expr_pr_inner \<phi> \<le> e)"
-        "(\<exists>\<phi>. strategy_formula g e \<phi> \<and> expressiveness_price \<phi> \<le> e)" using Strat Strat_2
+      hence "expr_pr_inner (Conj Q \<Phi>) \<le> e" 
+        using expr_st_conj assm sorry                                                   
+      thus  "(\<exists>\<phi>. strategy_formula_inner g e \<phi> \<and> expr_pr_inner \<phi> \<le> e)"  using Strat
         by blast+
-      then show ?thesis..
     qed
   next
     case 5
