@@ -157,7 +157,7 @@ next
     then show ?thesis using assms(2)
       by (metis Attacker_Delayed assms(1) id_apply local.procrastination option.sel)
   next
-case A_Immediate (* observation *)
+    case A_Immediate (* observation *)
     then obtain p' Q' where g': "g' = Attacker_Immediate p' Q'" by blast
     have "(if (\<exists>a. p \<mapsto>a a p' \<and> Q \<mapsto>aS a Q') then (subtract 1 0 0 0 0 0 0 0) else None) =
           spectroscopy_moves g g'" 
@@ -367,7 +367,7 @@ where
       if "\<exists>p' Q'. spectroscopy_moves (Attacker_Delayed p Q) (Attacker_Immediate p' Q') 
          = (subtract 1 0 0 0 0 0 0 0) \<and> in_wina (e - (E 1 0 0 0 0 0 0 0)) (Attacker_Immediate p' Q')
           \<and> strategy_formula (Attacker_Immediate p' Q') (e - (E 1 0 0 0 0 0 0 0)) \<phi>
-          \<and> p \<mapsto>\<alpha> p' \<and> Q \<mapsto>S \<alpha> Q'" |
+          \<and> p \<mapsto>a\<alpha> p' \<and> Q \<mapsto>aS \<alpha> Q'" |
   
   early_conj:
     "strategy_formula (Attacker_Immediate p Q) e \<phi>" 
