@@ -368,7 +368,10 @@ proof-
     using eneg_leq order_class.order_eq_iff by auto
 next
   assume assm: "e - E 0 0 1 0 0 0 0 0 = E e1 e2 (e3-1) e4 e5 e6 e7 e8"
-  hence "\<forall>i \<in> I. modal_depth_srbb_conjunct (\<psi>s i) \<le> e1"
+  hence "e3>0" using \<open>e = E e1 e2 e3 e4 e5 e6 e7 e8\<close>
+    using leq_not_eneg minus_energy_def by auto
+
+  from assm have "\<forall>i \<in> I. modal_depth_srbb_conjunct (\<psi>s i) \<le> e1"
 "\<forall>i \<in> I. branch_conj_depth_conjunct (\<psi>s i) \<le> e2"
 "\<forall>i \<in> I. inst_conj_depth_conjunct (\<psi>s i) \<le> (e3-1)"
 "\<forall>i \<in> I. st_conj_depth_conjunct (\<psi>s i) \<le> e4"
@@ -387,8 +390,10 @@ next
 "Sup ((neg_depth_conjunct \<circ> \<psi>s) ` I) \<le> e8"
     by (simp add: Sup_le_iff)+
   hence "inst_conj_depth_inner (Conj I \<psi>s) \<le> e3" 
-    using \<open>e - E 0 0 1 0 0 0 0 0 = E e1 e2 (e3-1) e4 e5 e6 e7 e8\<close> \<open>e = E e1 e2 e3 e4 e5 e6 e7 e8\<close> \<open>inst_conj_depth_inner (Conj I \<psi>s) = 1 + Sup ((inst_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close>
-    sorry
+    using \<open>e3>0\<close> \<open>e - E 0 0 1 0 0 0 0 0 = E e1 e2 (e3-1) e4 e5 e6 e7 e8\<close> \<open>e = E e1 e2 e3 e4 e5 e6 e7 e8\<close> \<open>inst_conj_depth_inner (Conj I \<psi>s) = 1 + Sup ((inst_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close>
+    unfolding
+      \<open>inst_conj_depth_inner (Conj I \<psi>s) = 1 + Sup ((inst_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close>
+    by (metis add.right_neutral add_diff_cancel_enat enat_add_left_cancel_le ileI1 le_iff_add plus_1_eSuc(1))
 
   then show ?thesis
     using conj_upds sups 
@@ -645,6 +650,7 @@ next
           by blast
 
       (* here Q=Q'={} holds and (Defender_Conj p Q') is a leaf *)
+
 
 
 
