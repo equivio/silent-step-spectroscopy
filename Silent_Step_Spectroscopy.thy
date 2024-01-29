@@ -266,13 +266,13 @@ proof-
     by force+
 
   have imm_conj_upds:  "modal_depth_srbb (ImmConj I \<psi>s) = Sup ((modal_depth_srbb_conjunct \<circ> \<psi>s) ` I)"
-"branching_conjunction_depth (ImmConj I \<psi>s) = Sup ((branch_conj_depth_conjunct \<circ> \<psi>s) ` I)"
-"instable_conjunction_depth (ImmConj I \<psi>s) = 1 + Sup ((inst_conj_depth_conjunct \<circ> \<psi>s) ` I)"
-"stable_conjunction_depth (ImmConj I \<psi>s) = Sup ((st_conj_depth_conjunct \<circ> \<psi>s) ` I)"
-"immediate_conjunction_depth (ImmConj I \<psi>s) = 1 + Sup ((imm_conj_depth_conjunct \<circ> \<psi>s) ` I)"
-"max_positive_conjunct_depth (ImmConj I \<psi>s) = Sup ((max_pos_conj_depth_conjunct \<circ> \<psi>s) ` I)"
-"max_negative_conjunct_depth (ImmConj I \<psi>s) = Sup ((max_neg_conj_depth_conjunct \<circ> \<psi>s) ` I)"
-"negation_depth (ImmConj I \<psi>s) = Sup ((neg_depth_conjunct \<circ> \<psi>s) ` I)"
+    "branching_conjunction_depth (ImmConj I \<psi>s) = Sup ((branch_conj_depth_conjunct \<circ> \<psi>s) ` I)"
+    "instable_conjunction_depth (ImmConj I \<psi>s) = 1 + Sup ((inst_conj_depth_conjunct \<circ> \<psi>s) ` I)"
+    "stable_conjunction_depth (ImmConj I \<psi>s) = Sup ((st_conj_depth_conjunct \<circ> \<psi>s) ` I)"
+    "immediate_conjunction_depth (ImmConj I \<psi>s) = 1 + Sup ((imm_conj_depth_conjunct \<circ> \<psi>s) ` I)"
+    "max_positive_conjunct_depth (ImmConj I \<psi>s) = Sup ((max_pos_conj_depth_conjunct \<circ> \<psi>s) ` I)"
+    "max_negative_conjunct_depth (ImmConj I \<psi>s) = Sup ((max_neg_conj_depth_conjunct \<circ> \<psi>s) ` I)"
+    "negation_depth (ImmConj I \<psi>s) = Sup ((neg_depth_conjunct \<circ> \<psi>s) ` I)"
     using assms
     by force+
 
@@ -794,8 +794,6 @@ next
       qed
     next
       case Att_Imm
-(* Needs to be updated according to the changed definition of observation *)
-
       assume "\<exists>p' Q'. g' = Attacker_Immediate p' Q'"
       then obtain p' Q' where g'_att_imm: "g' = Attacker_Immediate p' Q'" and
                           IH: "(\<exists>\<phi>. strategy_formula g' (weight g g' e) \<phi> \<and>
@@ -1335,9 +1333,8 @@ next
       by simp 
     hence F: "\<forall>q\<in>Q. (\<exists>\<phi>. strategy_formula_conjunct (Attacker_Clause p q)  (weight g (Attacker_Clause p q)  e) \<phi> \<and> expr_pr_conjunct \<phi> \<le> weight g (Attacker_Clause p q)  e)"
       using "3" \<open>g = Defender_Branch p \<alpha> p' Q Qa\<close> by (metis option.distinct(1)) 
-    (* take those formulas somehow...HML Magic? *)
 
-    have "\<forall> q\<in> Q. \<exists>\<phi>. spectroscopy_moves (Defender_Branch p \<alpha> p' Q Qa) (Attacker_Clause p q) 
+    have A: "\<forall> q\<in> Q. \<exists>\<phi>. spectroscopy_moves (Defender_Branch p \<alpha> p' Q Qa) (Attacker_Clause p q) 
           = (subtract 0 1 1 0 0 0 0 0)
           \<and> in_wina (e - (E 0 1 1 0 0 0 0 0)) (Attacker_Clause p q)
           \<and> strategy_formula_conjunct (Attacker_Clause p q) (e - (E 0 1 1 0 0 0 0 0)) \<phi>" proof
@@ -1361,27 +1358,21 @@ next
           \<and> strategy_formula_conjunct (Attacker_Clause p q) (e - (E 0 1 1 0 0 0 0 0)) \<phi>" by auto
     qed
 
+    define \<Phi> where "\<Phi>=(\<lambda>q. if q\<in> Q then (SOME \<phi>.(spectroscopy_moves (Defender_Branch p \<alpha> p' Q Qa) (Attacker_Clause p q) 
+          = (subtract 0 1 1 0 0 0 0 0)
+          \<and> in_wina (e - (E 0 1 1 0 0 0 0 0)) (Attacker_Clause p q)
+          \<and> strategy_formula_conjunct (Attacker_Clause p q) (e - (E 0 1 1 0 0 0 0 0)) \<phi>)) else undefined)"
+
     hence "\<exists>\<Phi>.\<forall>q \<in> Q. spectroscopy_moves (Defender_Branch p \<alpha> p' Q Qa) (Attacker_Clause p q) 
           = (subtract 0 1 1 0 0 0 0 0)
           \<and> in_wina (e - (E 0 1 1 0 0 0 0 0)) (Attacker_Clause p q)
-          \<and> strategy_formula_conjunct (Attacker_Clause p q) (e - (E 0 1 1 0 0 0 0 0)) (\<Phi> q)" sorry
-
+          \<and> strategy_formula_conjunct (Attacker_Clause p q) (e - (E 0 1 1 0 0 0 0 0)) (\<Phi> q)" using A M
+      by meson 
+   
     then obtain \<Phi> where A: "\<forall>q \<in> Q. spectroscopy_moves (Defender_Branch p \<alpha> p' Q Qa) (Attacker_Clause p q) 
           = (subtract 0 1 1 0 0 0 0 0)
           \<and> in_wina (e - (E 0 1 1 0 0 0 0 0)) (Attacker_Clause p q)
           \<and> strategy_formula_conjunct (Attacker_Clause p q) (e - (E 0 1 1 0 0 0 0 0)) (\<Phi> q)" by auto
-
-(*
-    from M have "\<forall>q \<in> Q. in_wina (e - (E 0 1 1 0 0 0 0 0)) (Attacker_Clause p q)" using assms
-      by (metis "3" \<open>g = Defender_Branch p \<alpha> p' Q Qa\<close> option.distinct(1) option.sel) 
-    hence A: "\<forall>q \<in> Q. spectroscopy_moves (Defender_Branch p \<alpha> p' Q Qa) (Attacker_Clause p q) 
-          = (subtract 0 1 1 0 0 0 0 0)
-          \<and> in_wina (e - (E 0 1 1 0 0 0 0 0)) (Attacker_Clause p q)
-          \<and> strategy_formula_conjunct (Attacker_Clause p q) (e - (E 0 1 1 0 0 0 0 0)) (\<Phi> q)"     
-      using M sorry (* using HML magic *)
-    
-*)
-
 
     have E: "\<exists>p Q. Attacker_Branch p' (soft_step_set Qa \<alpha>) = Attacker_Branch p Q" by auto
 
