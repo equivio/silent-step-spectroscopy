@@ -250,6 +250,7 @@ next
 qed
 qed
 
+(*
 lemma expr_conj: 
   assumes "I \<noteq> {}" "\<forall>q \<in> I. expr_pr_conjunct (\<psi>s q) \<le> (e - E 0 0 1 0 0 0 0 0)"
   shows "expr_pr_inner (Conj I \<psi>) \<le> e" 
@@ -277,6 +278,49 @@ proof-
     using assms
     by force+
   oops
+*)
+
+lemma expr_conj: 
+  assumes "I \<noteq> {}" "expr_pr_inner (Conj I \<psi>) \<le> (e - E 0 0 0 0 1 0 0 0)"
+  shows "expressiveness_price (ImmConj I \<psi>s) \<le> e"
+proof-
+  have conj_upds: "modal_depth_srbb_inner (Conj I \<psi>s) = Sup ((modal_depth_srbb_conjunct \<circ> \<psi>s) ` I)"
+  "branch_conj_depth_inner (Conj I \<psi>s) = Sup ((branch_conj_depth_conjunct \<circ> \<psi>s) ` I)"
+  "inst_conj_depth_inner (Conj I \<psi>s) = 1 + Sup ((inst_conj_depth_conjunct \<circ> \<psi>s) ` I)"
+  "st_conj_depth_inner (Conj I \<psi>s) = Sup ((st_conj_depth_conjunct \<circ> \<psi>s) ` I)"
+  "imm_conj_depth_inner (Conj I \<psi>s) = Sup ((imm_conj_depth_conjunct \<circ> \<psi>s) ` I)"
+  "max_pos_conj_depth_inner (Conj I \<psi>s) = Sup ((max_pos_conj_depth_conjunct \<circ> \<psi>s) ` I)"
+  "max_neg_conj_depth_inner (Conj I \<psi>s) = Sup ((max_neg_conj_depth_conjunct \<circ> \<psi>s) ` I)"
+  "neg_depth_inner (Conj I \<psi>s) = Sup ((neg_depth_conjunct \<circ> \<psi>s) ` I)"
+    using assms  
+    by force+
+
+  have imm_conj_upds:  "modal_depth_srbb (ImmConj I \<psi>s) = Sup ((modal_depth_srbb_conjunct \<circ> \<psi>s) ` I)"
+"branching_conjunction_depth (ImmConj I \<psi>s) = Sup ((branch_conj_depth_conjunct \<circ> \<psi>s) ` I)"
+"instable_conjunction_depth (ImmConj I \<psi>s) = 1 + Sup ((inst_conj_depth_conjunct \<circ> \<psi>s) ` I)"
+"stable_conjunction_depth (ImmConj I \<psi>s) = Sup ((st_conj_depth_conjunct \<circ> \<psi>s) ` I)"
+"immediate_conjunction_depth (ImmConj I \<psi>s) = 1 + Sup ((imm_conj_depth_conjunct \<circ> \<psi>s) ` I)"
+"max_positive_conjunct_depth (ImmConj I \<psi>s) = Sup ((max_pos_conj_depth_conjunct \<circ> \<psi>s) ` I)"
+"max_negative_conjunct_depth (ImmConj I \<psi>s) = Sup ((max_neg_conj_depth_conjunct \<circ> \<psi>s) ` I)"
+"negation_depth (ImmConj I \<psi>s) = Sup ((neg_depth_conjunct \<circ> \<psi>s) ` I)"
+    using assms
+    by force+
+
+  obtain e1 e2 e3 e4 e5 e6 e7 e8 where "e = E e1 e2 e3 e4 e5 e6 e7 e8" 
+    using antysim assms eneg_leq energy.exhaust_sel gets_smaller \<psi>_price_never_neg
+    by (metis \<chi>_price_never_neg)
+
+  hence "Sup ((modal_depth_srbb_conjunct \<circ> \<psi>s) ` I) \<le> e1"
+  "Sup ((branch_conj_depth_conjunct \<circ> \<psi>s) ` I) \<le> e2"
+  "1 + Sup ((inst_conj_depth_conjunct \<circ> \<psi>s) ` I) \<le> e3"
+  "Sup ((st_conj_depth_conjunct \<circ> \<psi>s) ` I) \<le> e4"
+  "Sup ((imm_conj_depth_conjunct \<circ> \<psi>s) ` I) \<le> (e5-1)"
+  "Sup ((max_pos_conj_depth_conjunct \<circ> \<psi>s) ` I) \<le> e6"
+  "Sup ((max_neg_conj_depth_conjunct \<circ> \<psi>s) ` I) \<le> e7"
+  "Sup ((neg_depth_conjunct \<circ> \<psi>s) ` I) \<le> e8" using assms conj_upds sorry
+
+  thus "expressiveness_price (ImmConj I \<psi>s) \<le> e" using imm_conj_upds sorry
+qed
 
 lemma winning_budget_implies_strategy_formula:
   fixes g e
@@ -546,6 +590,10 @@ next
             using \<open>strategy_formula (Attacker_Immediate p Q) e \<phi>\<close> 
             using \<open>g = Attacker_Immediate p Q\<close> by blast
         next
+
+
+(* this is the interesting case *)
+
           case False
           hence "p = p'" "Q = Q'"
             using \<open>g' = Defender_Conj p' Q'\<close> move spectroscopy_moves.simps
@@ -560,27 +608,39 @@ next
             using \<open>g' = Defender_Conj p' Q'\<close> \<open>p = p'\<close> move update_gets_smaller win_a_upwards_closure 
             using \<open>weight (Attacker_Immediate p Q) (Defender_Conj p' Q') e = e - E 0 0 0 0 1 0 0 0\<close> by force
 
+
+
+(* change used IH  and use inner instead of immediate *)
           with IH g'_def_conj have IH_case: "(\<exists>\<phi>. strategy_formula_inner g' (weight (Attacker_Immediate p Q) g' e) \<phi> \<and>
             expr_pr_inner \<phi> \<le> weight (Attacker_Immediate p Q) g' e) \<and>
             (\<exists>\<phi>. strategy_formula g' (weight (Attacker_Immediate p Q) g' e) \<phi> \<and>
             expressiveness_price \<phi> \<le> weight (Attacker_Immediate p Q) g' e)"
             using \<open>g = Attacker_Immediate p Q\<close> move by auto
 
-          hence "(\<exists>\<phi>. strategy_formula (Defender_Conj p Q) (e - (E 0 0 0 0 1 0 0 0)) \<phi> \<and> expressiveness_price \<phi> \<le> (e - (E 0 0 0 0 1 0 0 0)))"
+
+          hence "(\<exists>\<phi>. strategy_formula_inner (Defender_Conj p Q) (e - (E 0 0 0 0 1 0 0 0)) \<phi> \<and> expr_pr_inner \<phi> \<le> (e - (E 0 0 0 0 1 0 0 0)))"
             using \<open>in_wina (e - (E 0 0 0 0 1 0 0 0)) (Defender_Conj p Q')\<close> IH_case 
             using \<open>Q = Q'\<close> \<open>p = p'\<close> \<open>weight (Attacker_Immediate p Q) (Defender_Conj p' Q') e = e - E 0 0 0 0 1 0 0 0\<close> g'_def_conj by auto
 
-          then obtain \<phi> where "(strategy_formula (Defender_Conj p Q) (e - (E 0 0 0 0 1 0 0 0)) \<phi> \<and> expressiveness_price \<phi> \<le> (e - (E 0 0 0 0 1 0 0 0)))"
+          then obtain \<phi> where S: "(strategy_formula_inner (Defender_Conj p Q) (e - (E 0 0 0 0 1 0 0 0)) \<phi> \<and> expr_pr_inner \<phi> \<le> (e - (E 0 0 0 0 1 0 0 0)))"
             by blast
-          hence "strategy_formula (Attacker_Immediate p Q) e \<phi>"
+
+          hence "\<exists>\<psi>. \<phi>= Conj Q \<psi>" using strategy_formula_strategy_formula_inner_strategy_formula_conjunct.conj
+            by (smt (verit) \<open>Q = Q'\<close> \<open>p = p'\<close> g'_def_conj move spectroscopy_defender.simps(4) spectroscopy_defender.simps(6) spectroscopy_moves.simps(60) spectroscopy_moves.simps(70) spectroscopy_position.inject(6) strategy_formula_inner.simps)
+
+          then obtain \<psi> where "\<phi>= Conj Q \<psi>" by auto
+          hence "strategy_formula (Defender_Conj p Q) (e - (E 0 0 0 0 1 0 0 0)) (ImmConj Q \<psi>)" using S strategy_formula_strategy_formula_inner_strategy_formula_conjunct.conj strategy_formula_strategy_formula_inner_strategy_formula_conjunct.imm_conj
+            by (smt (verit) \<open>Q = Q'\<close> \<open>p = p'\<close> g'_def_conj hml_srbb_inner.inject(2) move spectroscopy_defender.simps(4) spectroscopy_defender.simps(6) spectroscopy_moves.simps(60) spectroscopy_moves.simps(70) strategy_formula_inner.cases) 
+          hence SI: "strategy_formula (Attacker_Immediate p Q) e (ImmConj Q \<psi>)"
             using strategy_formula_strategy_formula_inner_strategy_formula_conjunct.delay early_conj False \<open>Q = Q'\<close>
             by (metis (no_types, lifting) \<open>in_wina (e - E 0 0 0 0 1 0 0 0) (Defender_Conj p Q')\<close> local.finishing_or_early_conj)
-          have "expressiveness_price \<phi> \<le> (e - (E 0 0 0 0 1 0 0 0))"
-            using \<open>strategy_formula (Defender_Conj p Q) (e - (E 0 0 0 0 1 0 0 0)) \<phi> \<and> expressiveness_price \<phi> \<le> (e - (E 0 0 0 0 1 0 0 0))\<close>
-            by blast
-          then show ?thesis
-            using \<open>strategy_formula (Attacker_Immediate p Q) e \<phi>\<close> 
-            using gets_smaller transitivity 
+
+          have "expr_pr_inner (Conj Q \<psi>) \<le> (e - (E 0 0 0 0 1 0 0 0))" using S \<open>\<phi> = Conj Q \<psi>\<close> by simp
+          
+          hence "expressiveness_price (ImmConj Q \<psi>) \<le> e" using expr_conj False \<open>Q = Q'\<close>
+            by metis
+
+          thus ?thesis using SI
             using \<open>g = Attacker_Immediate p Q\<close> by blast
         qed
       qed
