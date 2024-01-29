@@ -1333,18 +1333,54 @@ next
     then obtain p \<alpha> p' Q Qa where "g = Defender_Branch p \<alpha> p' Q Qa " by auto
     hence M: "\<forall>q\<in> Q. spectroscopy_moves (Defender_Branch p \<alpha> p' Q Qa) (Attacker_Clause p q) = (subtract 0 1 1 0 0 0 0 0)"
       by simp 
-    hence "\<forall>q\<in>Q. (\<exists>\<phi>. strategy_formula_conjunct (Attacker_Clause p q)  (weight g (Attacker_Clause p q)  e) \<phi> \<and> expr_pr_conjunct \<phi> \<le> weight g (Attacker_Clause p q)  e)"
+    hence F: "\<forall>q\<in>Q. (\<exists>\<phi>. strategy_formula_conjunct (Attacker_Clause p q)  (weight g (Attacker_Clause p q)  e) \<phi> \<and> expr_pr_conjunct \<phi> \<le> weight g (Attacker_Clause p q)  e)"
       using "3" \<open>g = Defender_Branch p \<alpha> p' Q Qa\<close> by (metis option.distinct(1)) 
     (* take those formulas somehow...HML Magic? *)
 
+    have "\<forall> q\<in> Q. \<exists>\<phi>. spectroscopy_moves (Defender_Branch p \<alpha> p' Q Qa) (Attacker_Clause p q) 
+          = (subtract 0 1 1 0 0 0 0 0)
+          \<and> in_wina (e - (E 0 1 1 0 0 0 0 0)) (Attacker_Clause p q)
+          \<and> strategy_formula_conjunct (Attacker_Clause p q) (e - (E 0 1 1 0 0 0 0 0)) \<phi>" proof
+      fix q
+      assume "q\<in> Q"
+      hence  "(\<exists>\<phi>. strategy_formula_conjunct (Attacker_Clause p q)  (weight g (Attacker_Clause p q)  e) \<phi> \<and> expr_pr_conjunct \<phi> \<le> weight g (Attacker_Clause p q)  e)" using F by simp
+      then obtain \<phi> where " strategy_formula_conjunct (Attacker_Clause p q)  (weight g (Attacker_Clause p q)  e) \<phi> \<and> expr_pr_conjunct \<phi> \<le> weight g (Attacker_Clause p q)  e" by auto
+      hence F: "strategy_formula_conjunct (Attacker_Clause p q) (e - (E 0 1 1 0 0 0 0 0)) \<phi> \<and> expr_pr_conjunct \<phi> \<le> (e - (E 0 1 1 0 0 0 0 0))" using M \<open>q\<in> Q\<close>
+        using \<open>g = Defender_Branch p \<alpha> p' Q Qa\<close> option.sel by auto
+
+
+      from M have "in_wina (e - (E 0 1 1 0 0 0 0 0)) (Attacker_Clause p q)" using assms \<open>q\<in> Q\<close>
+        by (metis "3" \<open>g = Defender_Branch p \<alpha> p' Q Qa\<close> option.distinct(1) option.sel) 
+      hence  "spectroscopy_moves (Defender_Branch p \<alpha> p' Q Qa) (Attacker_Clause p q) 
+          = (subtract 0 1 1 0 0 0 0 0)
+          \<and> in_wina (e - (E 0 1 1 0 0 0 0 0)) (Attacker_Clause p q)
+          \<and> strategy_formula_conjunct (Attacker_Clause p q) (e - (E 0 1 1 0 0 0 0 0)) \<phi>" using F \<open>q\<in> Q\<close> M by simp
+      thus "\<exists>\<phi>. spectroscopy_moves (Defender_Branch p \<alpha> p' Q Qa) (Attacker_Clause p q) 
+          = (subtract 0 1 1 0 0 0 0 0)
+          \<and> in_wina (e - (E 0 1 1 0 0 0 0 0)) (Attacker_Clause p q)
+          \<and> strategy_formula_conjunct (Attacker_Clause p q) (e - (E 0 1 1 0 0 0 0 0)) \<phi>" by auto
+    qed
+
+    hence "\<exists>\<Phi>.\<forall>q \<in> Q. spectroscopy_moves (Defender_Branch p \<alpha> p' Q Qa) (Attacker_Clause p q) 
+          = (subtract 0 1 1 0 0 0 0 0)
+          \<and> in_wina (e - (E 0 1 1 0 0 0 0 0)) (Attacker_Clause p q)
+          \<and> strategy_formula_conjunct (Attacker_Clause p q) (e - (E 0 1 1 0 0 0 0 0)) (\<Phi> q)" sorry
+
+    then obtain \<Phi> where A: "\<forall>q \<in> Q. spectroscopy_moves (Defender_Branch p \<alpha> p' Q Qa) (Attacker_Clause p q) 
+          = (subtract 0 1 1 0 0 0 0 0)
+          \<and> in_wina (e - (E 0 1 1 0 0 0 0 0)) (Attacker_Clause p q)
+          \<and> strategy_formula_conjunct (Attacker_Clause p q) (e - (E 0 1 1 0 0 0 0 0)) (\<Phi> q)" by auto
+
+(*
     from M have "\<forall>q \<in> Q. in_wina (e - (E 0 1 1 0 0 0 0 0)) (Attacker_Clause p q)" using assms
       by (metis "3" \<open>g = Defender_Branch p \<alpha> p' Q Qa\<close> option.distinct(1) option.sel) 
     hence A: "\<forall>q \<in> Q. spectroscopy_moves (Defender_Branch p \<alpha> p' Q Qa) (Attacker_Clause p q) 
           = (subtract 0 1 1 0 0 0 0 0)
           \<and> in_wina (e - (E 0 1 1 0 0 0 0 0)) (Attacker_Clause p q)
-          \<and> strategy_formula_conjunct (Attacker_Clause p q) (e - (E 0 1 1 0 0 0 0 0)) (\<Phi> q)" using M  sorry (* using HML magic *)
+          \<and> strategy_formula_conjunct (Attacker_Clause p q) (e - (E 0 1 1 0 0 0 0 0)) (\<Phi> q)"     
+      using M sorry (* using HML magic *)
     
-
+*)
 
 
     have E: "\<exists>p Q. Attacker_Branch p' (soft_step_set Qa \<alpha>) = Attacker_Branch p Q" by auto
