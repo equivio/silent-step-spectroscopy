@@ -329,8 +329,10 @@ next
   "Sup ((neg_depth_conjunct \<circ> \<psi>s) ` I) \<le> e8" 
     using assms(1) conj_upds by force+
 
-  hence "(1 + Sup ((imm_conj_depth_conjunct \<circ> \<psi>s) ` I)) \<le> e5" using \<open>e5>0\<close> \<open>(e - (E 0 0 0 0 1 0 0 0)) = (E e1 e2 e3 e4 (e5-1) e6 e7 e8)\<close> \<open>e = E e1 e2 e3 e4 e5 e6 e7 e8\<close> 
-   sorry
+  from \<open>Sup ((imm_conj_depth_conjunct \<circ> \<psi>s) ` I) \<le> (e5-1)\<close> have "(1 + Sup ((imm_conj_depth_conjunct \<circ> \<psi>s) ` I)) \<le> e5" 
+    using assms(1) \<open>e5>0\<close> \<open>(e - (E 0 0 0 0 1 0 0 0)) = (E e1 e2 e3 e4 (e5-1) e6 e7 e8)\<close> \<open>e = E e1 e2 e3 e4 e5 e6 e7 e8\<close> 
+          add.right_neutral add_diff_cancel_enat enat_add_left_cancel_le ileI1 le_iff_add plus_1_eSuc(1)
+    by metis
 
   thus "expressiveness_price (ImmConj I \<psi>s) \<le> e" using imm_conj_upds E
     by (metis \<open>e = E e1 e2 e3 e4 e5 e6 e7 e8\<close> energy.discI energy.sel(1) energy.sel(2) energy.sel(3) energy.sel(4) energy.sel(5) energy.sel(6) energy.sel(7) energy.sel(8) expressiveness_price.elims leD somwhere_larger_eq) 
@@ -392,7 +394,7 @@ next
 "Sup ((neg_depth_conjunct \<circ> \<psi>s) ` I) \<le> e8"
     by (simp add: Sup_le_iff)+
   hence "inst_conj_depth_inner (Conj I \<psi>s) \<le> e3" 
-    using \<open>e3>0\<close> \<open>e - E 0 0 1 0 0 0 0 0 = E e1 e2 (e3-1) e4 e5 e6 e7 e8\<close> \<open>e = E e1 e2 e3 e4 e5 e6 e7 e8\<close> \<open>inst_conj_depth_inner (Conj I \<psi>s) = 1 + Sup ((inst_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close>
+    using \<open>e3>0\<close> \<open>e - E 0 0 1 0 0 0 0 0 = E e1 e2 (e3-1) e4 e5 e6 e7 e8\<close> \<open>e = E e1 e2 e3 e4 e5 e6 e7 e8\<close> 
     unfolding
       \<open>inst_conj_depth_inner (Conj I \<psi>s) = 1 + Sup ((inst_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close>
     by (metis add.right_neutral add_diff_cancel_enat enat_add_left_cancel_le ileI1 le_iff_add plus_1_eSuc(1))
