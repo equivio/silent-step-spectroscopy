@@ -295,9 +295,11 @@ proof-
     using \<open>e - E 0 0 0 0 1 0 0 0 = eneg\<close> assms 
     using eneg_leq order_class.order_eq_iff by auto
 next
-  assume "(e - (E 0 0 0 0 1 0 0 0)) = (E e1 e2 e3 e4 (e5-1) e6 e7 e8)"
+  assume assm: "(e - (E 0 0 0 0 1 0 0 0)) = (E e1 e2 e3 e4 (e5-1) e6 e7 e8)"
+  hence "e5>0" using \<open>e = E e1 e2 e3 e4 e5 e6 e7 e8\<close>
+    using energy.distinct(1) energy.sel(5) gr_zeroI leq_not_eneg minus_energy_def not_one_le_zero by fastforce
 
-  hence " E (modal_depth_srbb_inner (Conj I \<psi>))
+  from assm have " E (modal_depth_srbb_inner (Conj I \<psi>))
                  (branch_conj_depth_inner (Conj I \<psi>))
                  (inst_conj_depth_inner (Conj I \<psi>))
                  (st_conj_depth_inner (Conj I \<psi>))
@@ -311,23 +313,23 @@ next
        " (branch_conj_depth_inner (Conj I \<psi>)) \<le> e2"
                  "(inst_conj_depth_inner (Conj I \<psi>)) \<le> e3"
                  "(st_conj_depth_inner (Conj I \<psi>))\<le> e4"
-                 "(imm_conj_depth_inner (Conj I \<psi>))\<le> e5-1"
+                 "(imm_conj_depth_inner (Conj I \<psi>))\<le> (e5-1)"
                  "(max_pos_conj_depth_inner (Conj I \<psi>)) \<le> e6"
                  "(max_neg_conj_depth_inner (Conj I \<psi>)) \<le> e7"
                  "(neg_depth_inner (Conj I \<psi>))\<le> e8"
     using leq_not_eneg by force+
 
-  hence E: "Sup ((modal_depth_srbb_conjunct \<circ> \<psi>s) ` I) \<le> e1"
-  "Sup ((branch_conj_depth_conjunct \<circ> \<psi>s) ` I) \<le> e2"
-  "1 + Sup ((inst_conj_depth_conjunct \<circ> \<psi>s) ` I) \<le> e3"
-  "Sup ((st_conj_depth_conjunct \<circ> \<psi>s) ` I) \<le> e4"
-  "Sup ((imm_conj_depth_conjunct \<circ> \<psi>s) ` I) \<le> (e5-1)"
-  "Sup ((max_pos_conj_depth_conjunct \<circ> \<psi>s) ` I) \<le> e6"
-  "Sup ((max_neg_conj_depth_conjunct \<circ> \<psi>s) ` I) \<le> e7"
-  "Sup ((neg_depth_conjunct \<circ> \<psi>s) ` I) \<le> e8" 
-    using assms(1) conj_upds sorry
+  hence E: "Sup ((modal_depth_srbb_conjunct \<circ> \<psi>) ` I) \<le> e1"
+  "Sup ((branch_conj_depth_conjunct \<circ> \<psi>) ` I) \<le> e2"
+  "1 + Sup ((inst_conj_depth_conjunct \<circ> \<psi>) ` I) \<le> e3"
+  "Sup ((st_conj_depth_conjunct \<circ> \<psi>) ` I) \<le> e4"
+  "Sup ((imm_conj_depth_conjunct \<circ> \<psi>) ` I) \<le> (e5-1)"
+  "Sup ((max_pos_conj_depth_conjunct \<circ> \<psi>) ` I) \<le> e6"
+  "Sup ((max_neg_conj_depth_conjunct \<circ> \<psi>) ` I) \<le> e7"
+  "Sup ((neg_depth_conjunct \<circ> \<psi>) ` I) \<le> e8" 
+    using assms(1) conj_upds by force+
 
-  hence "1 + Sup ((imm_conj_depth_conjunct \<circ> \<psi>s) ` I) \<le> e5" using \<open>(e - (E 0 0 0 0 1 0 0 0)) = (E e1 e2 e3 e4 (e5-1) e6 e7 e8)\<close> \<open>e = E e1 e2 e3 e4 e5 e6 e7 e8\<close> 
+  hence "1 + Sup ((imm_conj_depth_conjunct \<circ> \<psi>) ` I) \<le> e5" using \<open>e5>0\<close> \<open>(e - (E 0 0 0 0 1 0 0 0)) = (E e1 e2 e3 e4 (e5-1) e6 e7 e8)\<close> \<open>e = E e1 e2 e3 e4 e5 e6 e7 e8\<close> 
     sorry
 
   thus "expressiveness_price (ImmConj I \<psi>s) \<le> e" using imm_conj_upds E
