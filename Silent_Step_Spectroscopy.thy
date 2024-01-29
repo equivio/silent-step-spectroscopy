@@ -295,7 +295,63 @@ qed
 lemma expr_conj: 
   assumes "I \<noteq> {}" "\<forall>q \<in> I. expr_pr_conjunct (\<psi>s q) \<le> (e - E 0 0 1 0 0 0 0 0)"
   shows "expr_pr_inner (Conj I \<psi>s) \<le> e"
-  sorry
+proof-
+  have conj_upds: "modal_depth_srbb_inner (Conj I \<psi>s) = Sup ((modal_depth_srbb_conjunct \<circ> \<psi>s) ` I)"
+  "branch_conj_depth_inner (Conj I \<psi>s) = Sup ((branch_conj_depth_conjunct \<circ> \<psi>s) ` I)"
+  "inst_conj_depth_inner (Conj I \<psi>s) = 1 + Sup ((inst_conj_depth_conjunct \<circ> \<psi>s) ` I)"
+  "st_conj_depth_inner (Conj I \<psi>s) = Sup ((st_conj_depth_conjunct \<circ> \<psi>s) ` I)"
+  "imm_conj_depth_inner (Conj I \<psi>s) = Sup ((imm_conj_depth_conjunct \<circ> \<psi>s) ` I)"
+  "max_pos_conj_depth_inner (Conj I \<psi>s) = Sup ((max_pos_conj_depth_conjunct \<circ> \<psi>s) ` I)"
+  "max_neg_conj_depth_inner (Conj I \<psi>s) = Sup ((max_neg_conj_depth_conjunct \<circ> \<psi>s) ` I)"
+  "neg_depth_inner (Conj I \<psi>s) = Sup ((neg_depth_conjunct \<circ> \<psi>s) ` I)"
+    using assms  
+    by force+
+
+  obtain e1 e2 e3 e4 e5 e6 e7 e8 where "e = E e1 e2 e3 e4 e5 e6 e7 e8"
+    using antysim assms eneg_leq energy.exhaust_sel gets_smaller \<psi>_price_never_neg
+    by (metis ex_in_conv)
+  hence "(e - (E 0 0 1 0 0 0 0 0)) = (E e1 e2 (e3-1) e4 e5 e6 e7 e8) \<or> 
+                  ((e - (E 0 0 1 0 0 0 0 0)) = eneg)"
+            using minus_energy_def
+            by simp
+  then show ?thesis
+  proof(rule disjE)
+  assume "e - E 0 0 1 0 0 0 0 0 = eneg"
+  hence "e = (E 0 0 0 0 0 0 0 0)"
+    using assms
+    using antysim eneg_leq min_eneg(2) by fastforce
+  then show ?thesis 
+    using \<open>e - E 0 0 1 0 0 0 0 0 = eneg\<close> assms 
+    using eneg_leq order_class.order_eq_iff by auto
+next
+  assume assm: "e - E 0 0 1 0 0 0 0 0 = E e1 e2 (e3-1) e4 e5 e6 e7 e8"
+  hence "\<forall>i \<in> I. modal_depth_srbb_conjunct (\<psi>s i) \<le> e1"
+"\<forall>i \<in> I. branch_conj_depth_conjunct (\<psi>s i) \<le> e2"
+"\<forall>i \<in> I. inst_conj_depth_conjunct (\<psi>s i) \<le> (e3-1)"
+"\<forall>i \<in> I. st_conj_depth_conjunct (\<psi>s i) \<le> e4"
+"\<forall>i \<in> I. imm_conj_depth_conjunct (\<psi>s i) \<le> e5"
+"\<forall>i \<in> I. max_pos_conj_depth_conjunct (\<psi>s i) \<le> e6"
+"\<forall>i \<in> I. max_neg_conj_depth_conjunct (\<psi>s i) \<le> e7"
+"\<forall>i \<in> I. neg_depth_conjunct (\<psi>s i) \<le> e8"
+    using assms leq_not_eneg by force+
+  hence sups: "Sup ((modal_depth_srbb_conjunct \<circ> \<psi>s) ` I) \<le> e1"
+"Sup ((branch_conj_depth_conjunct \<circ> \<psi>s) ` I) \<le> e2"
+"Sup ((inst_conj_depth_conjunct \<circ> \<psi>s) ` I) \<le> (e3-1)"
+"Sup ((st_conj_depth_conjunct \<circ> \<psi>s) ` I) \<le> e4"
+"Sup ((imm_conj_depth_conjunct \<circ> \<psi>s) ` I) \<le> e5"
+"Sup ((max_pos_conj_depth_conjunct \<circ> \<psi>s) ` I) \<le> e6"
+"Sup ((max_neg_conj_depth_conjunct \<circ> \<psi>s) ` I) \<le> e7"
+"Sup ((neg_depth_conjunct \<circ> \<psi>s) ` I) \<le> e8"
+    by (simp add: Sup_le_iff)+
+  hence "inst_conj_depth_inner (Conj I \<psi>s) \<le> e3" 
+    using \<open>e - E 0 0 1 0 0 0 0 0 = E e1 e2 (e3-1) e4 e5 e6 e7 e8\<close> \<open>e = E e1 e2 e3 e4 e5 e6 e7 e8\<close> \<open>inst_conj_depth_inner (Conj I \<psi>s) = 1 + Sup ((inst_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close>
+    sorry
+
+  then show ?thesis
+    using conj_upds sups 
+    by (simp add: \<open>e = E e1 e2 e3 e4 e5 e6 e7 e8\<close> leq_not_eneg)
+qed
+qed
 
 lemma winning_budget_implies_strategy_formula:
   fixes g e
