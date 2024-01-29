@@ -333,6 +333,7 @@ next
   thus "expressiveness_price (ImmConj I \<psi>s) \<le> e" using imm_conj_upds E
     by (metis \<open>e = E e1 e2 e3 e4 e5 e6 e7 e8\<close> energy.discI energy.sel(1) energy.sel(2) energy.sel(3) energy.sel(4) energy.sel(5) energy.sel(6) energy.sel(7) energy.sel(8) expressiveness_price.elims leD somwhere_larger_eq) 
 qed
+qed
 
 lemma expr_conj: 
   assumes "I \<noteq> {}" "\<forall>q \<in> I. expr_pr_conjunct (\<psi>s q) \<le> (e - E 0 0 1 0 0 0 0 0)"
@@ -644,6 +645,8 @@ next
           by blast
 
       (* here Q=Q'={} holds and (Defender_Conj p Q') is a leaf *)
+
+
 
 
 
