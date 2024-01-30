@@ -405,6 +405,58 @@ next
 qed
 qed
 
+lemma expr_br_conj:
+  assumes "expressiveness_price \<phi> \<le> ((min1_6 (e - E 0 1 1 0 0 0 0 0)) - (E 1 0 0 0 0 0 0 0))" and
+     "\<forall>q \<in> Q. expr_pr_conjunct (\<Phi> q) \<le> (e - (E 0 1 1 0 0 0 0 0))"
+   shows "expr_pr_inner (BranchConj \<alpha> \<phi> Q \<Phi>) \<le> e"
+proof-
+    have "E (modal_depth_srbb            \<phi>)
+                              (branching_conjunction_depth \<phi>)
+                              (instable_conjunction_depth  \<phi>)
+                              (stable_conjunction_depth    \<phi>)
+                              (immediate_conjunction_depth \<phi>)
+                              (max_positive_conjunct_depth \<phi>)
+                              (max_negative_conjunct_depth \<phi>)
+                              (negation_depth              \<phi>) 
+          \<le> ((min1_6 (e - E 0 1 1 0 0 0 0 0)) - (E 1 0 0 0 0 0 0 0))" using assms(1) by simp
+
+
+    have " \<forall>q\<in>Q. E (modal_depth_srbb_conjunct (\<Phi> q))
+                 (branch_conj_depth_conjunct  (\<Phi> q))
+                 (inst_conj_depth_conjunct  (\<Phi> q))
+                 (st_conj_depth_conjunct  (\<Phi> q))
+                 (imm_conj_depth_conjunct  (\<Phi> q))
+                 (max_pos_conj_depth_conjunct  (\<Phi> q))
+                 (max_neg_conj_depth_conjunct  (\<Phi> q))
+                 (neg_depth_conjunct  (\<Phi> q)) \<le> (e - (E 0 1 1 0 0 0 0 0))" using assms(2) by simp
+    
+
+    have "expr_pr_inner (BranchConj \<alpha> \<phi> Q \<Phi>) =  E (modal_depth_srbb_inner (BranchConj \<alpha> \<phi> Q \<Phi>))
+                 (branch_conj_depth_inner (BranchConj \<alpha> \<phi> Q \<Phi>))
+                 (inst_conj_depth_inner (BranchConj \<alpha> \<phi> Q \<Phi>))
+                 (st_conj_depth_inner (BranchConj \<alpha> \<phi> Q \<Phi>))
+                 (imm_conj_depth_inner (BranchConj \<alpha> \<phi> Q \<Phi>))
+                 (max_pos_conj_depth_inner (BranchConj \<alpha> \<phi> Q \<Phi>))
+                 (max_neg_conj_depth_inner (BranchConj \<alpha> \<phi> Q \<Phi>))
+                 (neg_depth_inner (BranchConj \<alpha> \<phi> Q \<Phi>))" by simp
+
+    hence "expr_pr_inner (BranchConj \<alpha> \<phi> Q \<Phi>) =  E (Sup ({1 + modal_depth_srbb \<phi>} \<union> ((modal_depth_srbb_conjunct \<circ> \<Phi>) ` Q)))
+                 ((if Q = {}
+                  then branching_conjunction_depth \<phi>
+                  else 1 + Sup ({branching_conjunction_depth \<phi>} \<union> ((branch_conj_depth_conjunct \<circ> \<Phi>) ` Q))))
+                 (if Q = {}
+                  then instable_conjunction_depth \<phi>
+                  else 1 + Sup ({instable_conjunction_depth \<phi>} \<union> ((inst_conj_depth_conjunct \<circ> \<Phi>) ` Q)))
+                 (Sup ({stable_conjunction_depth \<phi>} \<union> ((st_conj_depth_conjunct \<circ> \<Phi>) ` Q)))
+                 (Sup ({immediate_conjunction_depth \<phi>} \<union> ((imm_conj_depth_conjunct \<circ> \<Phi>) ` Q)))
+                 (Sup ({max_positive_conjunct_depth \<phi>} \<union> ((max_pos_conj_depth_conjunct \<circ> \<Phi>) ` Q)))
+                 (Sup ({max_negative_conjunct_depth \<phi>} \<union> ((max_neg_conj_depth_conjunct \<circ> \<Phi>) ` Q)))
+                 (Sup ({negation_depth \<phi>} \<union> ((neg_depth_conjunct \<circ> \<Phi>) ` Q)))" by simp
+
+    thus "expr_pr_inner (BranchConj \<alpha> \<phi> Q \<Phi>) \<le> e" sorry
+  qed
+
+
 lemma winning_budget_implies_strategy_formula:
   fixes g e
   assumes "in_wina e g"
@@ -1254,7 +1306,7 @@ next
       \<and> strategy_formula_inner (Defender_Conj p Q) (e - (E 0 0 0 1 0 0 0 0)) (Conj Q \<Phi>))"
         by blast
       hence "strategy_formula_inner g e (StableConj Q \<Phi>)" 
-        using \<open>g = Defender_Stable_Conj p Q\<close> stable_conj_answer by blast
+        using \<open>g = Defender_Stable_Conj p Q\<close> by (simp add: \<open>Q = {}\<close> \<open>g = Defender_Stable_Conj p Q\<close> stable_conj)
       have "\<nexists>p' q. p = p' \<and> q \<in> Q" using \<open>Q = {}\<close> 
         by blast
       hence "\<forall>g'. spectroscopy_moves (Defender_Conj p Q) g' = None"
@@ -1337,7 +1389,7 @@ next
     have A: "\<forall> q\<in> Q. \<exists>\<phi>. spectroscopy_moves (Defender_Branch p \<alpha> p' Q Qa) (Attacker_Clause p q) 
           = (subtract 0 1 1 0 0 0 0 0)
           \<and> in_wina (e - (E 0 1 1 0 0 0 0 0)) (Attacker_Clause p q)
-          \<and> strategy_formula_conjunct (Attacker_Clause p q) (e - (E 0 1 1 0 0 0 0 0)) \<phi>" proof
+          \<and> strategy_formula_conjunct (Attacker_Clause p q) (e - (E 0 1 1 0 0 0 0 0)) \<phi> \<and> expr_pr_conjunct \<phi> \<le> (e - (E 0 1 1 0 0 0 0 0))" proof
       fix q
       assume "q\<in> Q"
       hence  "(\<exists>\<phi>. strategy_formula_conjunct (Attacker_Clause p q)  (weight g (Attacker_Clause p q)  e) \<phi> \<and> expr_pr_conjunct \<phi> \<le> weight g (Attacker_Clause p q)  e)" using F by simp
@@ -1351,28 +1403,25 @@ next
       hence  "spectroscopy_moves (Defender_Branch p \<alpha> p' Q Qa) (Attacker_Clause p q) 
           = (subtract 0 1 1 0 0 0 0 0)
           \<and> in_wina (e - (E 0 1 1 0 0 0 0 0)) (Attacker_Clause p q)
-          \<and> strategy_formula_conjunct (Attacker_Clause p q) (e - (E 0 1 1 0 0 0 0 0)) \<phi>" using F \<open>q\<in> Q\<close> M by simp
+          \<and> strategy_formula_conjunct (Attacker_Clause p q) (e - (E 0 1 1 0 0 0 0 0)) \<phi> \<and> expr_pr_conjunct \<phi> \<le> (e - (E 0 1 1 0 0 0 0 0))" using F \<open>q\<in> Q\<close> M by simp
       thus "\<exists>\<phi>. spectroscopy_moves (Defender_Branch p \<alpha> p' Q Qa) (Attacker_Clause p q) 
           = (subtract 0 1 1 0 0 0 0 0)
           \<and> in_wina (e - (E 0 1 1 0 0 0 0 0)) (Attacker_Clause p q)
-          \<and> strategy_formula_conjunct (Attacker_Clause p q) (e - (E 0 1 1 0 0 0 0 0)) \<phi>" by auto
+          \<and> strategy_formula_conjunct (Attacker_Clause p q) (e - (E 0 1 1 0 0 0 0 0)) \<phi> \<and> expr_pr_conjunct \<phi> \<le> (e - (E 0 1 1 0 0 0 0 0))" by auto
     qed
-
     define \<Phi> where "\<Phi>=(\<lambda>q. if q\<in> Q then (SOME \<phi>.(spectroscopy_moves (Defender_Branch p \<alpha> p' Q Qa) (Attacker_Clause p q) 
           = (subtract 0 1 1 0 0 0 0 0)
           \<and> in_wina (e - (E 0 1 1 0 0 0 0 0)) (Attacker_Clause p q)
-          \<and> strategy_formula_conjunct (Attacker_Clause p q) (e - (E 0 1 1 0 0 0 0 0)) \<phi>)) else undefined)"
-
+          \<and> strategy_formula_conjunct (Attacker_Clause p q) (e - (E 0 1 1 0 0 0 0 0)) \<phi>) \<and> expr_pr_conjunct \<phi> \<le> (e - (E 0 1 1 0 0 0 0 0))) else undefined)"
     hence "\<exists>\<Phi>.\<forall>q \<in> Q. spectroscopy_moves (Defender_Branch p \<alpha> p' Q Qa) (Attacker_Clause p q) 
           = (subtract 0 1 1 0 0 0 0 0)
           \<and> in_wina (e - (E 0 1 1 0 0 0 0 0)) (Attacker_Clause p q)
-          \<and> strategy_formula_conjunct (Attacker_Clause p q) (e - (E 0 1 1 0 0 0 0 0)) (\<Phi> q)" using A M
-      by meson 
-   
+          \<and> strategy_formula_conjunct (Attacker_Clause p q) (e - (E 0 1 1 0 0 0 0 0)) (\<Phi> q) \<and> expr_pr_conjunct (\<Phi> q) \<le> (e - (E 0 1 1 0 0 0 0 0))" using A M
+      by meson
     then obtain \<Phi> where A: "\<forall>q \<in> Q. spectroscopy_moves (Defender_Branch p \<alpha> p' Q Qa) (Attacker_Clause p q) 
           = (subtract 0 1 1 0 0 0 0 0)
           \<and> in_wina (e - (E 0 1 1 0 0 0 0 0)) (Attacker_Clause p q)
-          \<and> strategy_formula_conjunct (Attacker_Clause p q) (e - (E 0 1 1 0 0 0 0 0)) (\<Phi> q)" by auto
+          \<and> strategy_formula_conjunct (Attacker_Clause p q) (e - (E 0 1 1 0 0 0 0 0)) (\<Phi> q) \<and> expr_pr_conjunct (\<Phi> q) \<le> (e - (E 0 1 1 0 0 0 0 0))" by auto
 
     have E: "\<exists>p Q. Attacker_Branch p' (soft_step_set Qa \<alpha>) = Attacker_Branch p Q" by auto
 
@@ -1390,7 +1439,7 @@ next
     hence "p''=p'" and "Q'' = (soft_step_set Qa \<alpha>)" by auto
     then obtain \<phi> where "strategy_formula (Attacker_Immediate p' (soft_step_set Qa \<alpha>)) (weight g (Attacker_Branch p' (soft_step_set Qa \<alpha>)) e - E 1 0 0 0 0 0 0 0) \<phi> \<and>
                         expressiveness_price \<phi> \<le> weight g (Attacker_Branch p' (soft_step_set Qa \<alpha>)) e - E 1 0 0 0 0 0 0 0" using IH2 by auto
-    hence "strategy_formula (Attacker_Immediate p' (soft_step_set Qa \<alpha>)) ((min1_6 (e - E 0 1 1 0 0 0 0 0)) - (E 1 0 0 0 0 0 0 0))  \<phi> \<and>
+    hence A0: "strategy_formula (Attacker_Immediate p' (soft_step_set Qa \<alpha>)) ((min1_6 (e - E 0 1 1 0 0 0 0 0)) - (E 1 0 0 0 0 0 0 0))  \<phi> \<and>
                         expressiveness_price \<phi> \<le> ((min1_6 (e - E 0 1 1 0 0 0 0 0)) - (E 1 0 0 0 0 0 0 0)) " using M
       by (simp add: \<open>g = Defender_Branch p \<alpha> p' Q Qa\<close> comp_apply option.sel) 
     hence A1: "strategy_formula (Attacker_Immediate p' (soft_step_set Qa \<alpha>)) ((min1_6 (e - E 0 1 1 0 0 0 0 0)) - (E 1 0 0 0 0 0 0 0))  \<phi>" by simp
@@ -1416,7 +1465,6 @@ next
             \<and> (in_wina ((min1_6 (e - E 0 1 1 0 0 0 0 0)) - (E 1 0 0 0 0 0 0 0)) 
                   (Attacker_Immediate p' (soft_step_set Qa \<alpha>)))
             \<and> strategy_formula (Attacker_Immediate p' (soft_step_set Qa \<alpha>)) ((min1_6 (e - E 0 1 1 0 0 0 0 0)) - (E 1 0 0 0 0 0 0 0)) \<phi>" using M A2 A1 by auto
-
     hence E: "\<exists>Q'. spectroscopy_moves (Defender_Branch p \<alpha> p' Q Qa) (Attacker_Branch p' Q') 
           = Some (min1_6 \<circ> (\<lambda>x. x- E 0 1 1 0 0 0 0 0)) 
             \<and> spectroscopy_moves (Attacker_Branch p' Q') (Attacker_Immediate p' Q')
@@ -1429,27 +1477,11 @@ next
     hence S: "strategy_formula_inner g e (BranchConj \<alpha> \<phi> Q \<Phi>)" using A E branch_conj
       by (simp add: \<open>g = Defender_Branch p \<alpha> p' Q Qa\<close>) 
 
-    have "expr_pr_inner (BranchConj \<alpha> \<phi> Q \<Phi>) =  E (modal_depth_srbb_inner (BranchConj \<alpha> \<phi> Q \<Phi>))
-                 (branch_conj_depth_inner (BranchConj \<alpha> \<phi> Q \<Phi>))
-                 (inst_conj_depth_inner (BranchConj \<alpha> \<phi> Q \<Phi>))
-                 (st_conj_depth_inner (BranchConj \<alpha> \<phi> Q \<Phi>))
-                 (imm_conj_depth_inner (BranchConj \<alpha> \<phi> Q \<Phi>))
-                 (max_pos_conj_depth_inner (BranchConj \<alpha> \<phi> Q \<Phi>))
-                 (max_neg_conj_depth_inner (BranchConj \<alpha> \<phi> Q \<Phi>))
-                 (neg_depth_inner (BranchConj \<alpha> \<phi> Q \<Phi>))" by simp
-    hence "expr_pr_inner (BranchConj \<alpha> \<phi> Q \<Phi>) =  E ( Sup ({1 + modal_depth_srbb \<phi>} \<union> ((modal_depth_srbb_conjunct \<circ> \<Phi>) ` Q)))
-                 ((if Q = {}
-                  then branching_conjunction_depth \<phi>
-                  else 1 + Sup ({branching_conjunction_depth \<phi>} \<union> ((branch_conj_depth_conjunct \<circ> \<Phi>) ` Q))))
-                 ( Sup ((inst_conj_depth_conjunct \<circ> \<Phi>) ` Q))
-                 ( 1 + Sup ((st_conj_depth_conjunct \<circ> \<Phi>) ` Q))
-                 (Sup ((imm_conj_depth_conjunct \<circ> \<Phi>) ` Q))
-                 (Sup ((max_pos_conj_depth_conjunct \<circ> \<Phi>) ` Q))
-                 (Sup ((max_neg_conj_depth_conjunct \<circ> \<Phi>) ` Q))
-                 ( Sup ((neg_depth_conjunct \<circ> \<Phi>) ` Q))" sorry
+    from A have "\<forall>q \<in> Q. expr_pr_conjunct (\<Phi> q) \<le> (e - (E 0 1 1 0 0 0 0 0))" by auto
+    from A0 have "expressiveness_price \<phi> \<le> ((min1_6 (e - E 0 1 1 0 0 0 0 0)) - (E 1 0 0 0 0 0 0 0))" by simp
 
-
-    have "expr_pr_inner (BranchConj \<alpha> \<phi> Q \<Phi>) \<le> e" sorry
+    hence "expr_pr_inner (BranchConj \<alpha> \<phi> Q \<Phi>) \<le> e" using expr_br_conj \<open>\<forall>q \<in> Q. expr_pr_conjunct (\<Phi> q) \<le> (e - (E 0 1 1 0 0 0 0 0))\<close>
+      by metis
 
     then show ?case using S by blast
   next
