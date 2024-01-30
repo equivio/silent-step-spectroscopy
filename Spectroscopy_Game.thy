@@ -343,7 +343,7 @@ locale full_spec_game =
 begin
 
 subsection \<open>Strategy Formulas\<close>
-text \<open>For the proof of lemma 2 we define strategy formulas. 
+text \<open>For the proof of the lemma winning_budget_implies_strategy_formula  we define strategy formulas. 
 These formulas create a bridge between HML formulas, the spectroscopy game and our definition of winning budgets.
 Like in the paper we distinguish several cases. It is worth noting that one rule is new.
 Since in our HML we distinguish between a conjunction and an immediate conjunction, we added a new strategy formula for this case.\<close>
