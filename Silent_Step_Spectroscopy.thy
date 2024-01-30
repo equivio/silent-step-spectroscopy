@@ -435,7 +435,9 @@ proof-
         by (metis (no_types, lifting) antysim eneg_leq energy.discI energy.sel(2) gr_zeroI min_eneg(1) not_one_le_zero)
       from assm have "e - (E 0 1 1 0 0 0 0 0) = E e1 (e2-1) (e3-1) e4 e5 e6 e7 e8" using \<open>e = E e1 e2 e3 e4 e5 e6 e7 e8\<close>
         by (smt (verit) antysim eneg_leq energy.distinct(1) energy.sel(1) energy.sel(2) energy.sel(3) energy.sel(4) energy.sel(5) energy.sel(6) energy.sel(7) energy.sel(8) idiff_0_right min_eneg(1) minus_energy_def)
-
+      have "e6>0" using \<open>e = E e1 e2 e3 e4 e5 e6 e7 e8\<close>
+         using leq_not_eneg minus_energy_def 
+         by (metis \<open>e - E 0 1 1 0 0 0 0 0 = E e1 (e2 - 1) (e3 - 1) e4 e5 e6 e7 e8\<close> antysim assm eneg_leq energy.distinct(1) energy.sel(1) energy.sel(6) gr_zeroI min_1_6_simps(1) min_enat_simps(2) not_one_le_zero)
       have conj: "E (modal_depth_srbb            \<phi>)
                               (branching_conjunction_depth \<phi>)
                               (instable_conjunction_depth  \<phi>)
@@ -446,6 +448,25 @@ proof-
                               (negation_depth              \<phi>) 
           \<le> ((E ((min e1 e6)-1) (e2-1) (e3-1) e4 e5 e6 e7 e8))" using assms(1) assm by simp
 
+      hence conj_single: "modal_depth_srbb \<phi> \<le> ((min e1 e6)-1)"
+      "branching_conjunction_depth \<phi> \<le> e2 -1"
+      "(instable_conjunction_depth  \<phi>) \<le> e3-1"
+      "(stable_conjunction_depth    \<phi>) \<le> e4"
+      "(immediate_conjunction_depth \<phi>) \<le> e5"
+      "(max_positive_conjunct_depth \<phi>) \<le> e6"
+      "(max_negative_conjunct_depth \<phi>) \<le> e7"
+      "(negation_depth              \<phi>) \<le> e8"
+        by (simp add: leq_not_eneg)+
+      have "0 < (min e1 e6)" using \<open>0 < e1\<close> \<open>e6>0\<close> 
+        using min_less_iff_conj by blast
+      hence "1 + modal_depth_srbb \<phi> \<le> (min e1 e6)" using conj_single add.commute add_diff_assoc_enat add_diff_cancel_enat add_right_mono conj_single(2) i1_ne_infinity ileI1 one_eSuc
+        by (metis (no_types, lifting))
+      hence "1 + modal_depth_srbb \<phi> \<le> e1" 
+        using min.bounded_iff by blast
+      from conj have "1 + branching_conjunction_depth \<phi> \<le> e2" 
+        by (metis \<open>0 < e2\<close> add.commute add_diff_assoc_enat add_diff_cancel_enat add_right_mono conj_single(2) i1_ne_infinity ileI1 one_eSuc)
+      from conj_single have "1 + instable_conjunction_depth \<phi> \<le> e3" using \<open>e3>0\<close> add.commute add_diff_assoc_enat add_diff_cancel_enat add_right_mono conj_single(2) i1_ne_infinity ileI1 one_eSuc
+        by (metis (no_types, lifting))
 
       have branch: "\<forall>q\<in>Q. E (modal_depth_srbb_conjunct (\<Phi> q))
                  (branch_conj_depth_conjunct  (\<Phi> q))
@@ -455,6 +476,22 @@ proof-
                  (max_pos_conj_depth_conjunct  (\<Phi> q))
                  (max_neg_conj_depth_conjunct  (\<Phi> q))
                  (neg_depth_conjunct  (\<Phi> q)) \<le> (E e1 (e2-1) (e3-1) e4 e5 e6 e7 e8)" using assms(2) \<open>e - (E 0 1 1 0 0 0 0 0) = E e1 (e2-1) (e3-1) e4 e5 e6 e7 e8\<close> by simp
+
+      hence branch_single: "\<forall>q\<in>Q. (modal_depth_srbb_conjunct (\<Phi> q)) \<le> e1"
+      "\<forall>q\<in>Q. (branch_conj_depth_conjunct  (\<Phi> q)) \<le> (e2-1)"
+      "\<forall>q\<in>Q. (inst_conj_depth_conjunct  (\<Phi> q)) \<le> (e3-1)"
+      "\<forall>q\<in>Q. (st_conj_depth_conjunct  (\<Phi> q)) \<le> e4"
+      "\<forall>q\<in>Q. (imm_conj_depth_conjunct  (\<Phi> q)) \<le> e5"
+      "\<forall>q\<in>Q. (max_pos_conj_depth_conjunct  (\<Phi> q)) \<le> e6"
+      "\<forall>q\<in>Q. (max_neg_conj_depth_conjunct  (\<Phi> q)) \<le> e7"
+      "\<forall>q\<in>Q. (neg_depth_conjunct  (\<Phi> q)) \<le> e8"
+        by (simp add: leq_not_eneg)+
+
+      hence "\<forall>q\<in>Q. (1 + branch_conj_depth_conjunct  (\<Phi> q)) \<le> e2"
+        by (metis \<open>0 < e2\<close> add.commute add_diff_assoc_enat add_diff_cancel_enat add_right_mono i1_ne_infinity ileI1 one_eSuc)
+      from branch_single have "\<forall>q\<in>Q. (1 + inst_conj_depth_conjunct  (\<Phi> q)) \<le> e3"
+        using \<open>e3>0\<close>
+        by (metis add.commute add_diff_assoc_enat add_diff_cancel_enat add_right_mono i1_ne_infinity ileI1 one_eSuc)
 
 
       have "expr_pr_inner (BranchConj \<alpha> \<phi> Q \<Phi>) =  E (modal_depth_srbb_inner (BranchConj \<alpha> \<phi> Q \<Phi>))
@@ -466,7 +503,7 @@ proof-
                  (max_neg_conj_depth_inner (BranchConj \<alpha> \<phi> Q \<Phi>))
                  (neg_depth_inner (BranchConj \<alpha> \<phi> Q \<Phi>))" by simp
 
-      hence "expr_pr_inner (BranchConj \<alpha> \<phi> Q \<Phi>) =  E (Sup ({1 + modal_depth_srbb \<phi>} \<union> ((modal_depth_srbb_conjunct \<circ> \<Phi>) ` Q)))
+      hence expr: "expr_pr_inner (BranchConj \<alpha> \<phi> Q \<Phi>) =  E (Sup ({1 + modal_depth_srbb \<phi>} \<union> ((modal_depth_srbb_conjunct \<circ> \<Phi>) ` Q)))
                  ((if Q = {}
                   then branching_conjunction_depth \<phi>
                   else 1 + Sup ({branching_conjunction_depth \<phi>} \<union> ((branch_conj_depth_conjunct \<circ> \<Phi>) ` Q))))
@@ -479,8 +516,40 @@ proof-
                  (Sup ({max_negative_conjunct_depth \<phi>} \<union> ((max_neg_conj_depth_conjunct \<circ> \<Phi>) ` Q)))
                  (Sup ({negation_depth \<phi>} \<union> ((neg_depth_conjunct \<circ> \<Phi>) ` Q)))" by simp
 
-      thus "expr_pr_inner (BranchConj \<alpha> \<phi> Q \<Phi>) \<le> e" sorry
-    qed
+      from branch_single \<open>1 + modal_depth_srbb \<phi> \<le> e1\<close> 
+      have "\<forall>x \<in> ({1 + modal_depth_srbb \<phi>} \<union> ((modal_depth_srbb_conjunct \<circ> \<Phi>) ` Q)). x \<le> e1"
+        by fastforce
+      hence e1_le: "(Sup ({1 + modal_depth_srbb \<phi>} \<union> ((modal_depth_srbb_conjunct \<circ> \<Phi>) ` Q))) \<le> e1"
+        using Sup_least by blast
+      have "\<forall>x \<in> {branching_conjunction_depth \<phi>} \<union> ((branch_conj_depth_conjunct \<circ> \<Phi>) ` Q). x \<le> e2 -1"
+        using branch_single conj_single 
+        using comp_apply image_iff insertE by auto
+      hence e2_le: "1 + Sup ({branching_conjunction_depth \<phi>} \<union> ((branch_conj_depth_conjunct \<circ> \<Phi>) ` Q)) \<le> e2"
+      using Sup_least 
+      by (metis Un_insert_left \<open>0 < e2\<close> add.commute eSuc_minus_1 enat_add_left_cancel_le ileI1 le_iff_add one_eSuc plus_1_eSuc(2) sup_bot_left)
+    have "\<forall>x \<in> ({instable_conjunction_depth \<phi>} \<union> ((inst_conj_depth_conjunct \<circ> \<Phi>) ` Q)). x \<le> e3-1"
+      using conj_single branch_single
+      using comp_apply image_iff insertE by auto
+    hence e3_le: "1 + Sup ({instable_conjunction_depth \<phi>} \<union> ((inst_conj_depth_conjunct \<circ> \<Phi>) ` Q)) \<le> e3"
+      using Un_insert_left \<open>0<e3\<close>  add.commute eSuc_minus_1 enat_add_left_cancel_le ileI1 le_iff_add one_eSuc plus_1_eSuc(2) sup_bot_left
+      by (metis Sup_least)
+    have fa: "\<forall>x \<in> ({stable_conjunction_depth \<phi>} \<union> ((st_conj_depth_conjunct \<circ> \<Phi>) ` Q)). x \<le> e4"
+    "\<forall>x \<in> ({immediate_conjunction_depth \<phi>} \<union> ((imm_conj_depth_conjunct \<circ> \<Phi>) ` Q)). x \<le> e5"
+    "\<forall>x \<in> ({max_positive_conjunct_depth \<phi>} \<union> ((max_pos_conj_depth_conjunct \<circ> \<Phi>) ` Q)). x \<le> e6"
+    "\<forall>x \<in> ({max_negative_conjunct_depth \<phi>} \<union> ((max_neg_conj_depth_conjunct \<circ> \<Phi>) ` Q)). x \<le> e7"
+    "\<forall>x \<in> ({negation_depth \<phi>} \<union> ((neg_depth_conjunct \<circ> \<Phi>) ` Q)). x \<le> e8"
+      using conj_single branch_single 
+      by fastforce+
+    hence "(Sup ({stable_conjunction_depth \<phi>} \<union> ((st_conj_depth_conjunct \<circ> \<Phi>) ` Q))) \<le> e4"
+    "(Sup ({immediate_conjunction_depth \<phi>} \<union> ((imm_conj_depth_conjunct \<circ> \<Phi>) ` Q))) \<le> e5"
+    "(Sup ({max_positive_conjunct_depth \<phi>} \<union> ((max_pos_conj_depth_conjunct \<circ> \<Phi>) ` Q))) \<le> e6"
+    "(Sup ({max_negative_conjunct_depth \<phi>} \<union> ((max_neg_conj_depth_conjunct \<circ> \<Phi>) ` Q))) \<le> e7"
+    "(Sup ({negation_depth \<phi>} \<union> ((neg_depth_conjunct \<circ> \<Phi>) ` Q))) \<le> e8"
+      using Sup_least 
+      by metis+
+        thus "expr_pr_inner (BranchConj \<alpha> \<phi> Q \<Phi>) \<le> e" using expr e3_le e2_le e1_le 
+          by (smt (verit, del_insts) Sup_insert Sup_union_distrib \<open>e = E e1 e2 e3 e4 e5 e6 e7 e8\<close> ccpo_Sup_singleton dual_order.trans energy.distinct(1) energy.sel(1) energy.sel(2) energy.sel(3) energy.sel(4) energy.sel(5) energy.sel(6) energy.sel(7) energy.sel(8) ile_eSuc image_empty linorder_not_less plus_1_eSuc(1) somwhere_larger_eq)
+      qed
   qed
 
 
