@@ -178,12 +178,13 @@ next
   with 2 show ?case using pred_eq L energy_level_def2 energy_level_def3 energy_level_def4 comp_apply energy_level.simps snoc_eq_iff_butlast by auto
 qed
 
-subsection \<open>The Winner of a Finite Play\<close>
+subsection \<open>Winning\<close>
 
 text\<open>Energy games can be won. An infinite game is won by the defender. A finite play is won if it's 
 stuck (i.e. there are no more possible moves) and it is the other players turn. Since we for now
 only consider finite plays we will need to define stuckness.\<close>
 
+subsubsection \<open>The Winner of a Finite Play\<close>
 abbreviation "play_stuck g0 p \<equiv> (finite_play g0 p) \<and> (\<nexists>gn. finite_play g0 (p @ [gn]))"
 
 lemma play_stuck_def:
