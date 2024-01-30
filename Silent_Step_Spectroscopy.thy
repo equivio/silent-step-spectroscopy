@@ -802,30 +802,62 @@ next
           using \<open>g' = Defender_Conj p' Q'\<close> \<open>p = p'\<close> move update_gets_smaller win_a_upwards_closure 
           by blast
 
-      (* here Q=Q'={} holds and (Defender_Conj p Q') is a leaf *)
-
-
-
-
-
-
-(*
-        hence "(\<exists>\<phi>. strategy_formula (Defender_Conj p Q') e \<phi> \<and> expressiveness_price \<phi> \<le> e)"
-          using \<open>in_wina e (Defender_Conj p Q')\<close> IH_case 
-          using \<open>p = p'\<close> \<open>weight (Attacker_Immediate p Q) (Defender_Conj p' Q') e = id e\<close> g'_def_conj by auto
-         then obtain \<phi> where "(strategy_formula (Defender_Conj p Q') e \<phi> \<and> expressiveness_price \<phi> \<le> e)"
+        with IH g'_def_conj have IH_case: "(\<exists>\<phi>. strategy_formula_inner g' (weight (Attacker_Immediate p Q) g' e) \<phi> \<and>
+            expr_pr_inner \<phi> \<le> weight (Attacker_Immediate p Q) g' e)"
+            using \<open>g = Attacker_Immediate p Q\<close> move by auto
+          hence "(\<exists>\<phi>. strategy_formula_inner (Defender_Conj p Q) e \<phi> \<and> expr_pr_inner \<phi> \<le> e)"
+            using \<open>in_wina e (Defender_Conj p Q')\<close> IH_case 
+            using True \<open>p = p'\<close> 
+            by (simp add: g'_def_conj)
+          then obtain \<phi> where S: "(strategy_formula_inner (Defender_Conj p Q) e \<phi> \<and> expr_pr_inner \<phi> \<le> e)"
             by blast
+          hence "\<exists>\<psi>. \<phi>= Conj Q \<psi>" using strategy_formula_strategy_formula_inner_strategy_formula_conjunct.conj
+            by (smt (verit) True \<open>p = p'\<close> g'_def_conj move spectroscopy_defender.simps(4) spectroscopy_defender.simps(6) spectroscopy_moves.simps(60) spectroscopy_moves.simps(70) spectroscopy_position.inject(6) strategy_formula_inner.simps)
+          then obtain \<psi> where "\<phi>= Conj Q \<psi>" by auto
+          hence "strategy_formula (Defender_Conj p Q) e (ImmConj Q \<psi>)" using S strategy_formula_strategy_formula_inner_strategy_formula_conjunct.conj strategy_formula_strategy_formula_inner_strategy_formula_conjunct.imm_conj
+            by (smt (verit) True \<open>p = p'\<close> g'_def_conj hml_srbb_inner.inject(2) move spectroscopy_defender.simps(4) spectroscopy_defender.simps(6) spectroscopy_moves.simps(60) spectroscopy_moves.simps(70) strategy_formula_inner.cases) 
+          hence SI: "strategy_formula (Attacker_Immediate p Q) e (ImmConj Q \<psi>)"
+            using strategy_formula_strategy_formula_inner_strategy_formula_conjunct.delay early_conj True local.finishing_or_early_conj
+            by (metis (no_types, lifting) \<open>in_wina e (Defender_Conj p Q')\<close> local.finishing_or_early_conj)
+
+          have "expr_pr_inner (Conj Q \<psi>) \<le> e" using S \<open>\<phi> = Conj Q \<psi>\<close> by simp
+
+
+          have "modal_depth_srbb (ImmConj  {}  \<psi>) = Sup ((modal_depth_srbb_conjunct \<circ>  \<psi>) ` {})"
+               "branching_conjunction_depth (ImmConj {}  \<psi>) = Sup ((branch_conj_depth_conjunct \<circ>  \<psi>) ` {})" 
+               "instable_conjunction_depth (ImmConj {}  \<psi>) =
+                  (if {} = {}
+                    then 0
+                   else 1 + Sup ((inst_conj_depth_conjunct \<circ>  \<psi>) ` {}))"
+                "stable_conjunction_depth (ImmConj {} \<psi>) = Sup ((st_conj_depth_conjunct \<circ> \<psi>) ` {})"
+                "immediate_conjunction_depth (ImmConj {}  \<psi>) =
+                  (if {} = {}
+                    then 0
+                   else 1 + Sup ((imm_conj_depth_conjunct \<circ>  \<psi>) ` {}))"
+                "max_positive_conjunct_depth (ImmConj {} \<psi>) = Sup ((max_pos_conj_depth_conjunct \<circ> \<psi>) ` {})"
+                "max_negative_conjunct_depth (ImmConj {} \<psi>) = Sup ((max_neg_conj_depth_conjunct \<circ> \<psi>) ` {})"
+                "negation_depth (ImmConj {}  \<psi>) = Sup ((neg_depth_conjunct \<circ>  \<psi>) ` {})"
+       using modal_depth_srbb_inner.simps(3) branch_conj_depth_inner.simps st_conj_depth_inner.simps
+        inst_conj_depth_inner.simps imm_conj_depth_inner.simps max_pos_conj_depth_inner.simps
+        max_neg_conj_depth_inner.simps neg_depth_inner.simps True
+       by auto+
+        hence   "modal_depth_srbb (ImmConj  {}  \<psi>) = 0"
+                 "branching_conjunction_depth (ImmConj {}  \<psi>) = 0" 
+                 "instable_conjunction_depth (ImmConj {}  \<psi>) = 0"
+                  "stable_conjunction_depth (ImmConj {} \<psi>) = 0"
+                  "immediate_conjunction_depth (ImmConj {}  \<psi>) = 0"
+                  "max_positive_conjunct_depth (ImmConj {} \<psi>) = 0"
+                  "max_negative_conjunct_depth (ImmConj {} \<psi>) = 0"
+                  "negation_depth (ImmConj {}  \<psi>) = 0"
+        using True image_empty comp_apply
+        by (simp add: bot_enat_def)+
+      hence "expressiveness_price (ImmConj Q \<psi>) = (E 0 0 0 0 0 0 0 0)"
+        using True by force
   
-          hence "strategy_formula (Attacker_Immediate p Q) e \<phi>"
-            using strategy_formula_strategy_formula_inner_strategy_formula_conjunct.delay early_conj True
-            by (metis \<open>in_wina e (Defender_Conj p Q')\<close> local.finishing_or_early_conj)
-          have "expressiveness_price \<phi> \<le> e"
-            using \<open>strategy_formula (Defender_Conj p Q') e \<phi> \<and> expressiveness_price \<phi> \<le> e\<close> by blast
-          then show ?thesis
-            using \<open>strategy_formula (Attacker_Immediate p Q) e \<phi>\<close> 
-            using \<open>g = Attacker_Immediate p Q\<close> by blast
-*)      
-          thus ?thesis sorry
+      hence "expressiveness_price (ImmConj Q \<psi>) \<le> e" using True "2.IH" leq_not_eneg srbb_price_never_neg
+        by simp     
+          thus ?thesis
+            using SI \<open>g = Attacker_Immediate p Q\<close> by blast
         next
           case False
           hence "p = p'" "Q = Q'"
