@@ -1,5 +1,5 @@
 theory Expressiveness_Price
-  imports Main HML_SRBB "HOL-Library.Extended_Nat" Energy Energy_Games
+  imports Main HML_SRBB "HOL-Library.Extended_Nat" Energy Spectroscopy_Game
 begin
 
 section \<open>The expressiveness price function\<close>
@@ -353,6 +353,8 @@ definition \<O>_conjunct :: "energy \<Rightarrow> (('a, 's) hml_srbb_conjunct) s
   "\<O>_conjunct energy \<equiv> {\<chi> . expr_pr_conjunct \<chi> \<le> energy}"
 
 subsection \<open>Lemmas on expressiveness of different formulas\<close>
+
+context full_spec_game begin
 
 lemma expr_internal_eq:
   shows "expressiveness_price (Internal \<chi>) = expr_pr_inner \<chi>"
@@ -897,6 +899,7 @@ proof-
       qed
   qed
 
+end
 
 
 
