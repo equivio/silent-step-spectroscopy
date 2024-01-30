@@ -1,14 +1,12 @@
-section "Energy Games"
-
 theory Energy_Games
   imports Main Misc
 begin
 
+section \<open>Energy Games\<close>
 text \<open>In this theory energy games are introduced and basic definitions such as (winning) plays are 
 given. This creates the foundation for the later introduced full spectroscopy game, which is an 
 energy game itself, characterizing equivalence problems.\<close>
 
-section \<open>Energy Games\<close>
 
 text\<open>Later on we will consider 8-dimensional energy games. For now energies will not be typed.\<close>
 
@@ -180,7 +178,7 @@ next
   with 2 show ?case using pred_eq L energy_level_def2 energy_level_def3 energy_level_def4 comp_apply energy_level.simps snoc_eq_iff_butlast by auto
 qed
 
-subsection \<open>Winning\<close>
+subsection \<open>The Winner of a Finite Play\<close>
 
 text\<open>Energy games can be won. An infinite game is won by the defender. A finite play is won if it's 
 stuck (i.e. there are no more possible moves) and it is the other players turn. Since we for now
