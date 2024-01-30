@@ -1247,32 +1247,6 @@ next
   qed
   then show ?case by simp
 next
-  case (stable_conj_answer p Q e \<Phi>)
-  hence  "distinguishes_from_inner (hml_srbb_inner.Conj Q \<Phi>) p Q" by simp
-  hence IH: "hml_srbb_inner_models (hml_srbb_inner.Conj Q \<Phi>) p \<and> (\<forall>q \<in> Q. \<not>(hml_srbb_inner_models (hml_srbb_inner.Conj Q \<Phi>) q))"
-    by (simp add: distinguishes_from_inner_def)
-  hence "hml_srbb_inner_models (hml_srbb_inner.Conj Q \<Phi>) p " by simp
-  hence "p \<Turnstile>  hml.Conj Q (hml_srbb_conjunct_to_hml_conjunct \<circ> \<Phi>)" by simp
-  hence "\<forall>i \<in> Q. hml_conjunct_models p ((hml_srbb_conjunct_to_hml_conjunct \<circ> \<Phi>) i)" by simp
-  hence IH1: "hml_conjunct_models p (hml_conjunct.Pos (hml.Conj Q (hml_srbb_conjunct_to_hml_conjunct \<circ> \<Phi>)))" by simp
-
-  have "(\<forall>q. \<not> p \<mapsto>\<tau> q) \<longrightarrow> distinguishes_from_inner (StableConj Q \<Phi>) p Q" proof
-    assume "(\<forall>q. \<not> p \<mapsto>\<tau> q)"
-    hence "hml_conjunct_models p (hml_conjunct.Neg (hml.Obs \<tau> hml.TT))" by simp
-    hence "hml_srbb_inner_models (StableConj Q \<Phi>) p" using IH1 by simp
-    have "(\<forall>q \<in> Q. \<not>(hml_srbb_inner_models (StableConj Q \<Phi>) q))" proof
-      fix q 
-      assume "q\<in> Q"
-      hence "\<not>(hml_srbb_inner_models (hml_srbb_inner.Conj Q \<Phi>) q)" using IH by simp
-      hence "\<not> (hml_conjunct_models q (hml_conjunct.Pos (hml.Conj Q (hml_srbb_conjunct_to_hml_conjunct \<circ> \<Phi>))))" by simp
-      thus "\<not>(hml_srbb_inner_models (StableConj Q \<Phi>) q)"
-        using hml_and_and hml_srbb_inner_models.simps hml_srbb_inner_to_hml.simps(3) by presburger 
-    qed
-    thus "distinguishes_from_inner (StableConj Q \<Phi>) p Q" using \<open>hml_srbb_inner_models (StableConj Q \<Phi>) p\<close>
-      using distinguishes_from_inner_def by blast 
-  qed
-  then show ?case by simp
-next
   case (branch p Q e \<chi>)
   then obtain p' Q' \<alpha> Q\<alpha> where IH: "spectroscopy_moves (Attacker_Delayed p Q) (Defender_Branch p \<alpha> p' Q' Q\<alpha>) = Some id \<and>
      in_wina e (Defender_Branch p \<alpha> p' Q' Q\<alpha>) \<and>
