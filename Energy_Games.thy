@@ -1,14 +1,12 @@
-section "Energy Games"
-
 theory Energy_Games
   imports Main Misc
 begin
 
+section \<open>Energy Games\<close>
 text \<open>In this theory energy games are introduced and basic definitions such as (winning) plays are 
 given. This creates the foundation for the later introduced full spectroscopy game, which is an 
 energy game itself, characterizing equivalence problems.\<close>
 
-section \<open>Energy Games\<close>
 
 text\<open>Later on we will consider 8-dimensional energy games. For now energies will not be typed.\<close>
 
@@ -186,6 +184,7 @@ text\<open>Energy games can be won. An infinite game is won by the defender. A f
 stuck (i.e. there are no more possible moves) and it is the other players turn. Since we for now
 only consider finite plays we will need to define stuckness.\<close>
 
+subsubsection \<open>The Winner of a Finite Play\<close>
 abbreviation "play_stuck g0 p \<equiv> (finite_play g0 p) \<and> (\<nexists>gn. finite_play g0 (p @ [gn]))"
 
 lemma play_stuck_def:

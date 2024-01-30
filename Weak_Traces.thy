@@ -2,6 +2,8 @@ theory Weak_Traces
   imports Main HML_SRBB Expressiveness_Price
 begin
 
+section \<open>Weak Traces\<close>
+
 inductive
       is_trace_formula :: "('act, 'i) hml_srbb \<Rightarrow> bool"
   and is_trace_formula_inner :: "('act, 'i) hml_srbb_inner \<Rightarrow> bool" where

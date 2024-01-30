@@ -1,6 +1,8 @@
 theory Example_Instantiation_
   imports Energy_Games "HOL-Library.Extended_Nat"
 begin
+
+section \<open>Instantiation of an Energy Game\<close>
 text \<open>In this theory we create an instantiation of energy game to test our definitions.\<close>
 text \<open>Based on our definition of energy  with eight dimensions, we first define energy..\<close>
 datatype energy = E (one: "enat") (two: "enat") | eneg

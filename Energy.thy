@@ -2,6 +2,7 @@ theory Energy
   imports Main "HOL-Library.Extended_Nat" "HOL-Lattice.Orders"
 begin
 
+section \<open>Energies\<close>
 datatype energy = E (one: "enat") (two: "enat") (three: "enat") (four: "enat")
                     (five: "enat") (six: "enat") (seven: "enat") (eight: "enat") |
                   eneg      

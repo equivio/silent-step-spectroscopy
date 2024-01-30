@@ -2,6 +2,7 @@ theory LTS
   imports Main
 begin
 
+section \<open>LTS\<close>
 locale LTS =
   fixes step :: "'s \<Rightarrow> 'a \<Rightarrow> 's \<Rightarrow> bool" ("_ \<mapsto> _ _" [70,70,70] 80)
 begin
