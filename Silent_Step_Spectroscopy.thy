@@ -4,6 +4,8 @@ begin
 
 context full_spec_game begin
 
+section \<open>Silent Step Spectroscopy\<close>
+
 lemma distinction_implies_winning_budgets:
   assumes "distinguishes_from \<phi> p Q"
   shows "in_wina (expressiveness_price \<phi>) (Attacker_Immediate p Q)"
