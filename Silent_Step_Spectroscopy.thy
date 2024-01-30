@@ -410,7 +410,33 @@ lemma expr_br_conj:
      "\<forall>q \<in> Q. expr_pr_conjunct (\<Phi> q) \<le> (e - (E 0 1 1 0 0 0 0 0))"
    shows "expr_pr_inner (BranchConj \<alpha> \<phi> Q \<Phi>) \<le> e"
 proof-
-    have "E (modal_depth_srbb            \<phi>)
+    obtain e1 e2 e3 e4 e5 e6 e7 e8 where "e = E e1 e2 e3 e4 e5 e6 e7 e8"
+      by (smt (z3) \<psi>_price_never_neg assms(1) dual_order.trans eneg_leq energy.exhaust expr_obs expr_pos gets_smaller order_antisym_conv)
+      hence "(min1_6 (e - E 0 1 1 0 0 0 0 0)) - (E 1 0 0 0 0 0 0 0) = (E ((min e1 e6)-1) (e2-1) (e3-1) e4 e5 e6 e7 e8) \<or> 
+             (min1_6 (e - E 0 1 1 0 0 0 0 0)) - (E 1 0 0 0 0 0 0 0) = eneg"
+            using minus_energy_def
+            by (smt (verit) antysim eneg_leq energy.distinct(1) energy.sel(1) energy.sel(2) energy.sel(3) energy.sel(4) energy.sel(5) energy.sel(6) energy.sel(7) energy.sel(8) idiff_0_right min_1_6_simps(1) min_1_6_simps(2) min_1_6_simps(3) min_1_6_simps(4) min_1_6_simps(5) min_1_6_simps(6) min_1_6_simps(7) min_1_6_simps(8) min_eneg(1))
+            
+  then show ?thesis proof(rule disjE)
+    assume "(min1_6 (e - E 0 1 1 0 0 0 0 0)) - (E 1 0 0 0 0 0 0 0) = eneg"
+    hence "e = (E 0 0 0 0 0 0 0 0)"
+      using assms antysim eneg_leq min_eneg(2) by fastforce
+    then show ?thesis 
+      using \<open>(min1_6 (e - E 0 1 1 0 0 0 0 0)) - (E 1 0 0 0 0 0 0 0) = eneg\<close> assms 
+      using eneg_leq order_class.order_eq_iff by auto
+    next
+      assume assm: "(min1_6 (e - E 0 1 1 0 0 0 0 0)) - (E 1 0 0 0 0 0 0 0) = (E ((min e1 e6)-1) (e2-1) (e3-1) e4 e5 e6 e7 e8)"
+      hence "e1>0" using \<open>e = E e1 e2 e3 e4 e5 e6 e7 e8\<close>
+         using leq_not_eneg minus_energy_def
+         by (smt (verit) antysim eneg_leq energy.discI energy.sel(1) gr_zeroI idiff_0_right min_1_6_simps(1) min_enat_simps(3) min_eneg(1) not_one_le_zero)
+      have "e3>0" using assm \<open>e = E e1 e2 e3 e4 e5 e6 e7 e8\<close> leq_not_eneg minus_energy_def
+        by (smt (verit) antysim eneg_leq energy.discI energy.sel(3) gr_zeroI min_eneg(1) not_one_le_zero)
+      have "e2>0" using assm \<open>e = E e1 e2 e3 e4 e5 e6 e7 e8\<close> leq_not_eneg minus_energy_def
+        by (metis (no_types, lifting) antysim eneg_leq energy.discI energy.sel(2) gr_zeroI min_eneg(1) not_one_le_zero)
+      from assm have "e - (E 0 1 1 0 0 0 0 0) = E e1 (e2-1) (e3-1) e4 e5 e6 e7 e8" using \<open>e = E e1 e2 e3 e4 e5 e6 e7 e8\<close>
+        by (smt (verit) antysim eneg_leq energy.distinct(1) energy.sel(1) energy.sel(2) energy.sel(3) energy.sel(4) energy.sel(5) energy.sel(6) energy.sel(7) energy.sel(8) idiff_0_right min_eneg(1) minus_energy_def)
+
+      have conj: "E (modal_depth_srbb            \<phi>)
                               (branching_conjunction_depth \<phi>)
                               (instable_conjunction_depth  \<phi>)
                               (stable_conjunction_depth    \<phi>)
@@ -418,20 +444,20 @@ proof-
                               (max_positive_conjunct_depth \<phi>)
                               (max_negative_conjunct_depth \<phi>)
                               (negation_depth              \<phi>) 
-          \<le> ((min1_6 (e - E 0 1 1 0 0 0 0 0)) - (E 1 0 0 0 0 0 0 0))" using assms(1) by simp
+          \<le> ((E ((min e1 e6)-1) (e2-1) (e3-1) e4 e5 e6 e7 e8))" using assms(1) assm by simp
 
 
-    have " \<forall>q\<in>Q. E (modal_depth_srbb_conjunct (\<Phi> q))
+      have branch: "\<forall>q\<in>Q. E (modal_depth_srbb_conjunct (\<Phi> q))
                  (branch_conj_depth_conjunct  (\<Phi> q))
                  (inst_conj_depth_conjunct  (\<Phi> q))
                  (st_conj_depth_conjunct  (\<Phi> q))
                  (imm_conj_depth_conjunct  (\<Phi> q))
                  (max_pos_conj_depth_conjunct  (\<Phi> q))
                  (max_neg_conj_depth_conjunct  (\<Phi> q))
-                 (neg_depth_conjunct  (\<Phi> q)) \<le> (e - (E 0 1 1 0 0 0 0 0))" using assms(2) by simp
-    
+                 (neg_depth_conjunct  (\<Phi> q)) \<le> (E e1 (e2-1) (e3-1) e4 e5 e6 e7 e8)" using assms(2) \<open>e - (E 0 1 1 0 0 0 0 0) = E e1 (e2-1) (e3-1) e4 e5 e6 e7 e8\<close> by simp
 
-    have "expr_pr_inner (BranchConj \<alpha> \<phi> Q \<Phi>) =  E (modal_depth_srbb_inner (BranchConj \<alpha> \<phi> Q \<Phi>))
+
+      have "expr_pr_inner (BranchConj \<alpha> \<phi> Q \<Phi>) =  E (modal_depth_srbb_inner (BranchConj \<alpha> \<phi> Q \<Phi>))
                  (branch_conj_depth_inner (BranchConj \<alpha> \<phi> Q \<Phi>))
                  (inst_conj_depth_inner (BranchConj \<alpha> \<phi> Q \<Phi>))
                  (st_conj_depth_inner (BranchConj \<alpha> \<phi> Q \<Phi>))
@@ -440,7 +466,7 @@ proof-
                  (max_neg_conj_depth_inner (BranchConj \<alpha> \<phi> Q \<Phi>))
                  (neg_depth_inner (BranchConj \<alpha> \<phi> Q \<Phi>))" by simp
 
-    hence "expr_pr_inner (BranchConj \<alpha> \<phi> Q \<Phi>) =  E (Sup ({1 + modal_depth_srbb \<phi>} \<union> ((modal_depth_srbb_conjunct \<circ> \<Phi>) ` Q)))
+      hence "expr_pr_inner (BranchConj \<alpha> \<phi> Q \<Phi>) =  E (Sup ({1 + modal_depth_srbb \<phi>} \<union> ((modal_depth_srbb_conjunct \<circ> \<Phi>) ` Q)))
                  ((if Q = {}
                   then branching_conjunction_depth \<phi>
                   else 1 + Sup ({branching_conjunction_depth \<phi>} \<union> ((branch_conj_depth_conjunct \<circ> \<Phi>) ` Q))))
@@ -453,8 +479,10 @@ proof-
                  (Sup ({max_negative_conjunct_depth \<phi>} \<union> ((max_neg_conj_depth_conjunct \<circ> \<Phi>) ` Q)))
                  (Sup ({negation_depth \<phi>} \<union> ((neg_depth_conjunct \<circ> \<Phi>) ` Q)))" by simp
 
-    thus "expr_pr_inner (BranchConj \<alpha> \<phi> Q \<Phi>) \<le> e" sorry
+      thus "expr_pr_inner (BranchConj \<alpha> \<phi> Q \<Phi>) \<le> e" sorry
+    qed
   qed
+
 
 
 lemma winning_budget_implies_strategy_formula:
