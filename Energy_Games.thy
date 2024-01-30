@@ -30,7 +30,7 @@ locale energy_game =
         ord::"'energy \<Rightarrow> 'energy \<Rightarrow> bool"
   assumes transitivity: "\<And>e e' e''. (ord e e') \<Longrightarrow> (ord e' e'') \<Longrightarrow> (ord e e'')" and
           reflexivity: "\<And>e. (ord e e)" and
-          antysim: "\<And>e e'. (ord e e') \<Longrightarrow> (ord e' e) \<Longrightarrow> e=e'" and
+          antisim: "\<And>e e'. (ord e e') \<Longrightarrow> (ord e' e) \<Longrightarrow> e=e'" and
           dwl_min: "\<And>e. ord defender_win_level e" and 
           monotonicity:"\<And>g g' e e'. (weight_opt g g') \<noteq> None \<Longrightarrow> (ord e e')  \<Longrightarrow> (ord (the (weight_opt g g')e) (the (weight_opt g g')e'))" and
           update_gets_smaller: "\<And>g g' e. ((weight_opt g g') \<noteq> None) \<Longrightarrow> (ord (the (weight_opt g g')e) e)"
@@ -273,16 +273,16 @@ lemma win_a_upwards_closure:
     "in_wina e' g"
 using assms proof (induct arbitrary: e' rule: in_wina.induct)
   case (1 g e)
-  then show ?case using antysim dwl_min local.reflexivity local.transitivity update_gets_smaller
+  then show ?case using antisim dwl_min local.reflexivity local.transitivity update_gets_smaller
     by (metis in_wina.intros(1))
 next
   case (2 g e)
   then show ?case
-    using antysim dwl_min in_wina.intros(2) monotonicity by blast 
+    using antisim dwl_min in_wina.intros(2) monotonicity by blast 
 next
   case (3 g e)
   then show ?case
-    using antysim dwl_min in_wina.intros(3) monotonicity by blast 
+    using antisim dwl_min in_wina.intros(3) monotonicity by blast 
 qed
 
 end (*End of context energy_game*)
