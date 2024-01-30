@@ -341,6 +341,10 @@ locale full_spec_game =
       \<tau> :: 'a
 begin
 
+text \<open>For the proof of lemma 2 we define strategy formulas. 
+These formulas create a bridge between HML formulas, the spectroscopy game and our definition of winning budgets.
+Like in the paper we distinguish several cases. It is worth noting that one rule is new.
+Since in our HML we distinguish between a conjunction and an immediate conjunction, we added a new strategy formula for this case.\<close>
 inductive 
 strategy_formula :: "('s, 'a) spectroscopy_position \<Rightarrow> energy \<Rightarrow> ('a, 's)hml_srbb \<Rightarrow> bool"
 and strategy_formula_inner 
