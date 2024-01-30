@@ -2,6 +2,7 @@ theory Spectroscopy_Game
   imports Energy_Games Energy LTS HML_SRBB
 begin
 
+section \<open>Spectroscopy Games\<close>
 text \<open>In this theory the full spectroscopy game is defined (as a locale). 
 The definition corresponds to definition 16 in the paper. (Definition 16 is an extension of 
 definition 14, which extends definition 12, which is a energy game depending on a LTS. We omit these 
@@ -341,6 +342,7 @@ locale full_spec_game =
       \<tau> :: 'a
 begin
 
+subsection \<open>Strategy Formulas\<close>
 text \<open>For the proof of lemma 2 we define strategy formulas. 
 These formulas create a bridge between HML formulas, the spectroscopy game and our definition of winning budgets.
 Like in the paper we distinguish several cases. It is worth noting that one rule is new.
