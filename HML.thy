@@ -1205,51 +1205,51 @@ definition dist_c_from :: "'s \<Rightarrow> ('a, 'i) hml_conjunct \<Rightarrow> 
 
 
 
-primrec dist_map      :: "'s \<Rightarrow> 's set \<Rightarrow> ('a, 'i) hml \<Rightarrow> ('a, 's) hml"
-    and dist_conj_map :: "'s \<Rightarrow> 's set \<Rightarrow> ('a, 'i) hml_conjunct \<Rightarrow> ('a, 's) hml_conjunct" where
-  "dist_map p Q TT = TT" |
-  "dist_map p Q (Obs \<alpha> \<phi>) = (if Q = {} then TT else
+primrec dist_map      :: "'s set \<Rightarrow> ('a, 'i) hml \<Rightarrow> ('a, 's) hml"
+    and dist_conj_map :: "'s \<Rightarrow> ('a, 'i) hml_conjunct \<Rightarrow> ('a, 's) hml_conjunct" where
+  "dist_map Q TT = TT" |
+  "dist_map Q (Obs \<alpha> \<phi>) = (if Q = {} then TT else
     (Obs \<alpha> (if step_set Q \<alpha> = {}
             then TT
-            else (dist_map (SOME p'. p \<mapsto> \<alpha> p' \<and> p' \<Turnstile> \<phi>) (step_set Q \<alpha>) \<phi>))))" |
-  "dist_map p Q (Internal \<phi>) =
+            else (dist_map (step_set Q \<alpha>) \<phi>))))" |
+  "dist_map Q (Internal \<phi>) =
     (if silent_reachable_set Q = {}
      then TT
-     else (Internal (dist_map (SOME p'. p \<Zsurj> p' \<and> p' \<Turnstile> \<phi>) (silent_reachable_set Q) \<phi>)))" |
-  "dist_map p Q (Silent \<phi>) =
+     else (Internal (dist_map (silent_reachable_set Q) \<phi>)))" |
+  "dist_map Q (Silent \<phi>) =
     (if Q \<union> (step_set Q \<tau>) = {}
      then TT
-     else (Silent (dist_map (SOME p'. (p' = p \<and> p' \<Turnstile> \<phi>) \<or> (p \<mapsto> \<tau> p' \<and> p' \<Turnstile> \<phi>)) (Q \<union> (step_set Q \<tau>)) \<phi>)))" |
-  "dist_map p Q (Conj I \<psi>s) =
+     else (Silent (dist_map (Q \<union> (step_set Q \<tau>)) \<phi>)))" |
+  "dist_map Q (Conj I \<psi>s) =
     (if Q = {} \<or> I = {}
      then TT
-     else (Conj Q (\<lambda>q. dist_conj_map p {q} (\<psi>s (SOME i. i \<in> I \<and> \<not>(hml_conjunct_models q (\<psi>s i)))))))" |
+     else (Conj Q (\<lambda>q. dist_conj_map q (\<psi>s (SOME i. i \<in> I \<and> \<not>(hml_conjunct_models q (\<psi>s i)))))))" |
 
-  "dist_conj_map p Q (Pos \<phi>) = (Pos (dist_map p Q \<phi>))" |
-  "dist_conj_map p Q (Neg \<phi>) = (Neg (dist_map p Q \<phi>))"
+  "dist_conj_map q (Pos \<phi>) = (Pos (dist_map {q} \<phi>))" |
+  "dist_conj_map q (Neg \<phi>) = (Neg (dist_map {q} \<phi>))"
 
 
 lemma 
   fixes \<phi> :: "('a, 'i) hml"
     and \<psi> :: "('a, 'i) hml_conjunct"
-  shows "(\<forall>p Q. dist_from p \<phi> Q \<longrightarrow> p <> (dist_map p Q \<phi>) Q)
-     \<and> (\<forall>p Q. dist_c_from p \<psi> Q \<longrightarrow> distinguishes_conjunct_from_hml p (dist_conj_map p Q \<psi>) Q)"
+  shows "(\<forall>p Q. dist_from p \<phi> Q \<longrightarrow> p <> (dist_map Q \<phi>) Q)
+     \<and> (\<forall>p q. dist_c p \<psi> q \<longrightarrow> distinguishes_conjunct_hml p (dist_conj_map q \<psi>) q)"
 
-proof (induct rule: hml_hml_conjunct.induct[of "(\<lambda>\<phi>. \<forall>p Q. dist_from p \<phi> Q \<longrightarrow> p <> (dist_map p Q \<phi>) Q)"
-                                               "(\<lambda>\<psi>. \<forall>p Q. dist_c_from p \<psi> Q \<longrightarrow> distinguishes_conjunct_from_hml p (dist_conj_map p Q \<psi>) Q)"
+proof (induct rule: hml_hml_conjunct.induct[of "(\<lambda>\<phi>. \<forall>p Q. dist_from p \<phi> Q \<longrightarrow> p <> (dist_map Q \<phi>) Q)"
+                                               "(\<lambda>\<psi>. \<forall>p q. dist_c p \<psi> q \<longrightarrow> distinguishes_conjunct_hml p (dist_conj_map q \<psi>) q)"
                                                \<phi> \<psi>])
   case TT
   then show ?case 
     by (simp add: dist_from_def distinguishes_from_hml_def)
 next
   case (Obs \<alpha> \<phi>)
-  assume IH: "\<forall>p Q. dist_from p \<phi> Q \<longrightarrow> p <> dist_map p Q \<phi> Q"
-  show "\<forall>p Q. dist_from p (Obs \<alpha> \<phi>) Q \<longrightarrow> p <> dist_map p Q (Obs \<alpha> \<phi>) Q"
+  assume IH: "\<forall>p Q. dist_from p \<phi> Q \<longrightarrow> p <> dist_map Q \<phi> Q"
+  show "\<forall>p Q. dist_from p (Obs \<alpha> \<phi>) Q \<longrightarrow> p <> dist_map Q (Obs \<alpha> \<phi>) Q"
   proof (rule allI, rule allI, rule impI)
     fix p Q
     assume "dist_from p (Obs \<alpha> \<phi>) Q"
 
-    show "p <> dist_map p Q (Obs \<alpha> \<phi>) Q"
+    show "p <> dist_map Q (Obs \<alpha> \<phi>) Q"
     proof (cases "Q = {}")
       case True
       hence "Q = {}".
@@ -1260,7 +1260,7 @@ next
       hence "Q \<noteq> {}".
       have "p <> ((Obs \<alpha> (if step_set Q \<alpha> = {}
                           then TT
-                          else (dist_map (SOME p'. p \<mapsto> \<alpha> p' \<and> p' \<Turnstile> \<phi>) (step_set Q \<alpha>) \<phi>))))
+                          else (dist_map (step_set Q \<alpha>) \<phi>))))
                       Q"
       proof (cases "step_set Q \<alpha> = {}")
         case True
@@ -1285,28 +1285,28 @@ next
         have "dist_from p' \<phi> (step_set Q \<alpha>)" 
           by (simp add: LTS_Tau.dist_from_def)
         with IH
-        have "p' <> (dist_map p' (step_set Q \<alpha>) \<phi>) (step_set Q \<alpha>)" 
+        have "p' <> (dist_map (step_set Q \<alpha>) \<phi>) (step_set Q \<alpha>)" 
           by blast
         with \<open>p \<mapsto> \<alpha> p'\<close> and \<open>p' \<Turnstile> \<phi>\<close> and \<open>\<exists>p'. p \<mapsto> \<alpha> p' \<and> p' \<Turnstile> \<phi>\<close>
-        have "p <> (Obs \<alpha> (dist_map (SOME p'. p \<mapsto> \<alpha> p' \<and> p' \<Turnstile> \<phi>) (step_set Q \<alpha>) \<phi>)) Q"
+        have "p <> (Obs \<alpha> (dist_map (step_set Q \<alpha>) \<phi>)) Q"
           using step_set_def 
           by (smt (verit) LTS_Tau.distinguishes_from_hml_def Obs \<open>\<forall>q'\<in>step_set Q \<alpha>. \<not> q' \<Turnstile> \<phi>\<close> dist_from_def hml_models.simps(2) someI_ex step_set_is_step_set)
         with \<open>step_set Q \<alpha> \<noteq> {}\<close>
         show ?thesis by auto
       qed
       with \<open>Q \<noteq> {}\<close> and dist_map.simps
-      show "p <> dist_map p Q (Obs \<alpha> \<phi>) Q" 
+      show "p <> dist_map Q (Obs \<alpha> \<phi>) Q" 
         by auto
     qed
   qed
 next
   case (Internal \<phi>)
-  hence IH: "\<forall>p Q. dist_from p \<phi> Q \<longrightarrow> p <> dist_map p Q \<phi> Q".
-  show "\<forall>p Q. dist_from p (Internal \<phi>) Q \<longrightarrow> p <> dist_map p Q (Internal \<phi>) Q"
+  hence IH: "\<forall>p Q. dist_from p \<phi> Q \<longrightarrow> p <> dist_map Q \<phi> Q".
+  show "\<forall>p Q. dist_from p (Internal \<phi>) Q \<longrightarrow> p <> dist_map Q (Internal \<phi>) Q"
   proof (rule allI, rule allI, rule impI)
     fix p Q
     assume "dist_from p (Internal \<phi>) Q"
-    show "p <> dist_map p Q (Internal \<phi>) Q"
+    show "p <> dist_map Q (Internal \<phi>) Q"
     proof (cases "silent_reachable_set Q = {}")
       case True
       hence "silent_reachable_set Q = {}".
@@ -1315,7 +1315,7 @@ next
       then have "p <> TT Q" 
         by (simp add: distinguishes_from_hml_def)
       with \<open>silent_reachable_set Q = {}\<close>
-      show "p <> dist_map p Q (Internal \<phi>) Q" by auto
+      show "p <> dist_map Q (Internal \<phi>) Q" by auto
     next
       case False
       hence "silent_reachable_set Q \<noteq> {}".
@@ -1333,37 +1333,37 @@ next
       have "dist_from p' \<phi> (silent_reachable_set Q)" 
         using dist_from_def by blast
       with IH
-      have "p' <> (dist_map p' (silent_reachable_set Q) \<phi>) (silent_reachable_set Q)" by blast
+      have "p' <> (dist_map (silent_reachable_set Q) \<phi>) (silent_reachable_set Q)" by blast
       with \<open>p \<Zsurj> p'\<close> and \<open>p' \<Turnstile> \<phi>\<close> 
-      have "p \<Turnstile> (Internal (dist_map p' (silent_reachable_set Q) \<phi>))" 
+      have "p \<Turnstile> (Internal (dist_map (silent_reachable_set Q) \<phi>))" 
         using distinguishes_from_hml_def by auto
-      with \<open>p' <> (dist_map p' (silent_reachable_set Q) \<phi>) (silent_reachable_set Q)\<close>
+      with \<open>p' <> (dist_map (silent_reachable_set Q) \<phi>) (silent_reachable_set Q)\<close>
        and \<open>\<forall>q' \<in> (silent_reachable_set Q). \<not>(q' \<Turnstile> \<phi>)\<close>
-      have "\<forall>q \<in> Q. \<not>(q \<Turnstile> (Internal (dist_map p' (silent_reachable_set Q) \<phi>)))" 
+      have "\<forall>q \<in> Q. \<not>(q \<Turnstile> (Internal (dist_map (silent_reachable_set Q) \<phi>)))" 
         by (meson distinguishes_from_hml_def hml_models.simps(3) sreachable_set_is_sreachable)
-      with \<open>p \<Turnstile> (Internal (dist_map p' (silent_reachable_set Q) \<phi>))\<close>
-      have "p <> (Internal (dist_map p' (silent_reachable_set Q) \<phi>)) Q" 
+      with \<open>p \<Turnstile> (Internal (dist_map (silent_reachable_set Q) \<phi>))\<close>
+      have "p <> (Internal (dist_map (silent_reachable_set Q) \<phi>)) Q" 
         using distinguishes_from_hml_def by blast
       with \<open>p \<Zsurj> p'\<close> and \<open>p' \<Turnstile> \<phi>\<close>
-      have "p <> (Internal (dist_map p' (silent_reachable_set Q) \<phi>)) Q \<and> p \<Zsurj> p' \<and> p' \<Turnstile> \<phi>"
+      have "p <> (Internal (dist_map (silent_reachable_set Q) \<phi>)) Q \<and> p \<Zsurj> p' \<and> p' \<Turnstile> \<phi>"
         by auto
-      then have "\<exists>p'. (\<lambda>p'. p <> (Internal (dist_map p' (silent_reachable_set Q) \<phi>)) Q \<and> p \<Zsurj> p' \<and> p' \<Turnstile> \<phi>) p'" by auto
-      then have "(\<lambda>p'. p <> (Internal (dist_map p' (silent_reachable_set Q) \<phi>)) Q \<and> p \<Zsurj> p' \<and> p' \<Turnstile> \<phi>) (SOME p'. (\<lambda>p'. p <> (Internal (dist_map p' (silent_reachable_set Q) \<phi>)) Q \<and> p \<Zsurj> p' \<and> p' \<Turnstile> \<phi>) p')"
+      then have "\<exists>p'. (\<lambda>p'. p <> (Internal (dist_map (silent_reachable_set Q) \<phi>)) Q \<and> p \<Zsurj> p' \<and> p' \<Turnstile> \<phi>) p'" by auto
+      then have "(\<lambda>p'. p <> (Internal (dist_map (silent_reachable_set Q) \<phi>)) Q \<and> p \<Zsurj> p' \<and> p' \<Turnstile> \<phi>) (SOME p'. (\<lambda>p'. p <> (Internal (dist_map (silent_reachable_set Q) \<phi>)) Q \<and> p \<Zsurj> p' \<and> p' \<Turnstile> \<phi>) p')"
         using someI_ex 
         by (smt (verit))
-      then have "p <> (Internal (dist_map (SOME p'. p \<Zsurj> p' \<and> p' \<Turnstile> \<phi>) (silent_reachable_set Q) \<phi>)) Q" 
+      then have "p <> (Internal (dist_map (silent_reachable_set Q) \<phi>)) Q" 
         using silent_reachable_set_def and sreachable_set_is_sreachable 
         by (smt (verit) Eps_cong Internal LTS_Tau.distinguishes_from_hml_def \<open>\<forall>q'\<in>silent_reachable_set Q. \<not> q' \<Turnstile> \<phi>\<close> dist_from_def hml_models.simps(3))
       with \<open>silent_reachable_set Q \<noteq> {}\<close>
-      show "p <> dist_map p Q (Internal \<phi>) Q" 
+      show "p <> dist_map Q (Internal \<phi>) Q" 
         by force
     qed
     thm someI_ex
   qed
 next
   case (Silent \<phi>)
-  hence IH: "\<forall>p Q. dist_from p \<phi> Q \<longrightarrow> p <> dist_map p Q \<phi> Q".
-  show "\<forall>p Q. dist_from p (Silent \<phi>) Q \<longrightarrow> p <> dist_map p Q (Silent \<phi>) Q"
+  hence IH: "\<forall>p Q. dist_from p \<phi> Q \<longrightarrow> p <> dist_map Q \<phi> Q".
+  show "\<forall>p Q. dist_from p (Silent \<phi>) Q \<longrightarrow> p <> dist_map Q (Silent \<phi>) Q"
   proof (rule allI, rule allI, rule impI)
     fix p Q
     assume "dist_from p (Silent \<phi>) Q"
@@ -1375,7 +1375,7 @@ next
       by (metis Un_iff dist_from_def hml_models.simps(4) step_set_is_step_set)
 
 
-    show "p <> dist_map p Q (Silent \<phi>) Q"
+    show "p <> dist_map Q (Silent \<phi>) Q"
     proof (cases "Q \<union> (step_set Q \<tau>) = {}")
       case True
       then show ?thesis 
@@ -1384,46 +1384,130 @@ next
       case False
       hence "Q \<union> (step_set Q \<tau>) \<noteq> {}".
       from \<open>p \<Turnstile> \<phi> \<or> (\<exists>p'. p \<mapsto> \<tau> p' \<and> p' \<Turnstile> \<phi>)\<close>
-      have "p <> (Silent (dist_map (SOME p'. (p' = p \<and> p' \<Turnstile> \<phi>) \<or> (p \<mapsto> \<tau> p' \<and> p' \<Turnstile> \<phi>)) (Q \<union> (step_set Q \<tau>)) \<phi>)) Q"
+      have "p <> (Silent (dist_map (Q \<union> (step_set Q \<tau>)) \<phi>)) Q"
       proof (rule disjE)
         assume "p \<Turnstile> \<phi>"
         with \<open>\<forall>q' \<in> Q \<union> (step_set Q \<tau>). \<not>(q' \<Turnstile> \<phi>)\<close>
         have "dist_from p \<phi> (Q \<union> (step_set Q \<tau>))" 
           using dist_from_def by blast
         with IH
-        have "p <> (dist_map p (Q \<union> (step_set Q \<tau>)) \<phi>) (Q \<union> (step_set Q \<tau>))" 
+        have "p <> (dist_map (Q \<union> (step_set Q \<tau>)) \<phi>) (Q \<union> (step_set Q \<tau>))" 
           by blast
-        then have "p \<Turnstile> (Silent (dist_map p (Q \<union> (step_set Q \<tau>)) \<phi>))" 
+        then have "p \<Turnstile> (Silent (dist_map (Q \<union> (step_set Q \<tau>)) \<phi>))" 
           by (simp add: distinguishes_from_hml_def)
 
         from \<open>\<forall>q' \<in> Q \<union> (step_set Q \<tau>). \<not>(q' \<Turnstile> \<phi>)\<close>
-         and \<open>p <> (dist_map p (Q \<union> (step_set Q \<tau>)) \<phi>) (Q \<union> (step_set Q \<tau>))\<close>
-        have "\<forall>q' \<in> Q. \<not>(q' \<Turnstile> (Silent (dist_map p (Q \<union> (step_set Q \<tau>)) \<phi>)))" 
+         and \<open>p <> (dist_map (Q \<union> (step_set Q \<tau>)) \<phi>) (Q \<union> (step_set Q \<tau>))\<close>
+        have "\<forall>q' \<in> Q. \<not>(q' \<Turnstile> (Silent (dist_map (Q \<union> (step_set Q \<tau>)) \<phi>)))" 
           by (simp add: distinguishes_from_hml_def step_set_is_step_set)
 
-        with \<open>p \<Turnstile> (Silent (dist_map p (Q \<union> (step_set Q \<tau>)) \<phi>))\<close>
-        have "p <> (Silent (dist_map p (Q \<union> (step_set Q \<tau>)) \<phi>)) Q" 
+        with \<open>p \<Turnstile> (Silent (dist_map (Q \<union> (step_set Q \<tau>)) \<phi>))\<close>
+        show "p <> (Silent (dist_map (Q \<union> (step_set Q \<tau>)) \<phi>)) Q" 
           using distinguishes_from_hml_def by presburger
-
-        with \<open>p \<Turnstile> \<phi>\<close> and \<open>\<forall>q' \<in> Q \<union> (step_set Q \<tau>). \<not>(q' \<Turnstile> \<phi>)\<close>
-        show "p <> Silent (dist_map (SOME p'. p' = p \<and> p' \<Turnstile> \<phi> \<or> p \<mapsto> \<tau> p' \<and> p' \<Turnstile> \<phi>) (Q \<union> step_set Q \<tau>) \<phi>) Q"
-          using step_set_def someI_ex sorry
       next
         assume "\<exists>p'. p \<mapsto> \<tau> p' \<and> p' \<Turnstile> \<phi>"
-        then show "p <> Silent (dist_map (SOME p'. p' = p \<and> p' \<Turnstile> \<phi> \<or> p \<mapsto> \<tau> p' \<and> p' \<Turnstile> \<phi>) (Q \<union> step_set Q \<tau>) \<phi>) Q"
-          sorry
+        then obtain p' where "p \<mapsto> \<tau> p'" and "p' \<Turnstile> \<phi>" by auto
+        with \<open>\<forall>q' \<in> Q \<union> (step_set Q \<tau>). \<not>(q' \<Turnstile> \<phi>)\<close>
+        have "dist_from p' \<phi> (Q \<union> (step_set Q \<tau>))" 
+          using dist_from_def by blast
+        with IH
+        have "p' <> (dist_map (Q \<union> step_set Q \<tau>) \<phi>) (Q \<union> (step_set Q \<tau>))" 
+          by blast
+        with \<open>p \<mapsto> \<tau> p'\<close>
+        show "p <> Silent (dist_map (Q \<union> step_set Q \<tau>) \<phi>) Q" 
+          using UnCI distinguishes_from_hml_def hml_models.simps(4) step_set_is_step_set by auto
       qed
       with \<open>Q \<union> (step_set Q \<tau>) \<noteq> {}\<close>
-      show "p <> dist_map p Q (Silent \<phi>) Q" by auto
+      show "p <> dist_map Q (Silent \<phi>) Q" by auto
     qed
   qed
 next
   case (Conj I \<psi>s)
-  then show ?case sorry
+  hence "\<And>\<psi>. \<psi> \<in> range \<psi>s \<Longrightarrow> \<forall>p q. dist_c p \<psi> q \<longrightarrow> distinguishes_conjunct_hml p (dist_conj_map q \<psi>) q".
+  then have IH: "\<forall>\<psi> \<in> \<psi>s ` I. \<forall>p q. dist_c p \<psi> q \<longrightarrow> distinguishes_conjunct_hml p (dist_conj_map q \<psi>) q" 
+    by blast
+
+  show "\<forall>p Q. dist_from p (Conj I \<psi>s) Q \<longrightarrow> p <> dist_map Q (Conj I \<psi>s) Q"
+  proof (rule allI, rule allI, rule impI)
+    fix p Q
+    assume "dist_from p (Conj I \<psi>s) Q"
+
+    show "p <> dist_map Q (Conj I \<psi>s) Q"
+    proof (cases "Q = {} \<or> I = {}")
+      case True
+      hence "Q = {} \<or> I = {}".
+      then have "p <> TT Q"
+      proof (rule disjE)
+        assume "Q = {}"
+        then show "p <> TT Q" 
+          by (simp add: distinguishes_from_hml_def)
+      next
+        assume "I = {}"
+        with \<open>dist_from p (Conj I \<psi>s) Q\<close>
+        have "dist_from p (Conj {} \<psi>s) Q" by auto
+        then have "Q = {}" 
+          by (simp add: dist_from_def)
+        then show "p <> TT Q"
+          by (simp add: distinguishes_from_hml_def)
+      qed
+      with \<open>Q = {} \<or> I = {}\<close>
+      show "p <> dist_map Q (Conj I \<psi>s) Q" by simp
+    next
+      case False
+      hence "Q \<noteq> {}" and "I \<noteq> {}" by auto
+
+      from \<open>dist_from p (Conj I \<psi>s) Q\<close>
+      have "\<forall>\<psi> \<in> \<psi>s ` I. hml_conjunct_models p \<psi>" 
+        by (simp add: dist_from_def hml_models.simps(5) image_iff)
+
+      from \<open>dist_from p (Conj I \<psi>s) Q\<close>
+      have "\<forall>q \<in> Q. \<exists>\<psi> \<in> \<psi>s ` I. \<not>hml_conjunct_models q \<psi>" 
+        by (simp add: dist_from_def hml_models.simps(5))
+
+      from \<open>\<forall>\<psi> \<in> \<psi>s ` I. hml_conjunct_models p \<psi>\<close>
+       and \<open>\<forall>q \<in> Q. \<exists>\<psi> \<in> \<psi>s ` I. \<not>hml_conjunct_models q \<psi>\<close>
+      have "\<forall>q \<in> Q. \<exists>\<psi> \<in> \<psi>s ` I. dist_c p \<psi> q"  
+        by (meson dist_c_def)
+      with IH
+      have "\<forall>q \<in> Q. \<exists>\<psi> \<in> \<psi>s ` I. distinguishes_conjunct_hml p (dist_conj_map q \<psi>) q"
+        by meson
+
+      have "p \<Turnstile> (Conj Q (\<lambda>q. dist_conj_map q (\<psi>s (SOME i. i \<in> I \<and> \<not>(hml_conjunct_models q (\<psi>s i))))))" sorry
+
+      from \<open>\<forall>q \<in> Q. \<exists>\<psi> \<in> \<psi>s ` I. distinguishes_conjunct_hml p (dist_conj_map q \<psi>) q\<close>
+       and \<open>\<forall>q \<in> Q. \<exists>\<psi> \<in> \<psi>s ` I. \<not>hml_conjunct_models q \<psi>\<close>
+      have "\<forall>q \<in> Q. \<not>(q \<Turnstile> (Conj Q (\<lambda>q. dist_conj_map q (\<psi>s (SOME i. i \<in> I \<and> \<not>(hml_conjunct_models q (\<psi>s i)))))))"
+        sorry
+
+      from \<open>p \<Turnstile> (Conj Q (\<lambda>q. dist_conj_map q (\<psi>s (SOME i. i \<in> I \<and> \<not>(hml_conjunct_models q (\<psi>s i))))))\<close>
+       and \<open>\<forall>q \<in> Q. \<not>(q \<Turnstile> (Conj Q (\<lambda>q. dist_conj_map q (\<psi>s (SOME i. i \<in> I \<and> \<not>(hml_conjunct_models q (\<psi>s i)))))))\<close>
+      have "p <> (Conj Q (\<lambda>q. dist_conj_map q (\<psi>s (SOME i. i \<in> I \<and> \<not>(hml_conjunct_models q (\<psi>s i)))))) Q" 
+        using distinguishes_from_hml_def by blast
+      with \<open>Q \<noteq> {}\<close> and \<open>I \<noteq> {}\<close>
+      show "p <> dist_map Q (Conj I \<psi>s) Q" 
+        by auto
+    qed
+  qed
 next
   case (Pos \<phi>)
-  then show ?case 
-    by (simp add: dist_c_from_def dist_from_def distinguishes_conjunct_from_hml_def distinguishes_from_hml_def)
+  hence IH: "\<forall>p Q. dist_from p \<phi> Q \<longrightarrow> p <> dist_map Q \<phi> Q".
+  show "\<forall>p q. dist_c p (Pos \<phi>) q \<longrightarrow> distinguishes_conjunct_hml p (dist_conj_map q (Pos \<phi>)) q"
+  proof (rule allI, rule allI, rule impI)
+    fix p q
+    assume "dist_c p (Pos \<phi>) q"
+    then have "p \<Turnstile> \<phi>" 
+      by (simp add: dist_c_def)
+    moreover from \<open>dist_c p (Pos \<phi>) q\<close>
+    have "\<not>(q \<Turnstile> \<phi>)" 
+      by (simp add: dist_c_def)
+    ultimately have "dist p \<phi> q" 
+      by (simp add: dist_def)
+    with IH
+    have "p <> (dist_map {q} \<phi>) q" 
+      by (smt (verit) \<open>\<not> q \<Turnstile> \<phi>\<close> \<open>p \<Turnstile> \<phi>\<close> dist_from_def distinguishes_from_hml_def distinguishes_hml_def empty_iff insert_iff)
+    then show "distinguishes_conjunct_hml p (dist_conj_map q (Pos \<phi>)) q" 
+      using distinguishes_conjunct_hml_def distinguishes_hml_def by auto
+  qed
 next
   case (Neg \<phi>)
   then show ?case sorry
