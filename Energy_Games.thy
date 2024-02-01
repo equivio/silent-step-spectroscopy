@@ -286,4 +286,5 @@ next
 qed
 
 end (*End of context energy_game*)
+
 end

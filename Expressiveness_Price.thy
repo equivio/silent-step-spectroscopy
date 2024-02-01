@@ -1,5 +1,5 @@
 theory Expressiveness_Price
-  imports Main HML_SRBB "HOL-Library.Extended_Nat" Energy Spectroscopy_Game
+  imports HML_SRBB Energy Spectroscopy_Game
 begin
 
 section \<open>The expressiveness price function\<close>
@@ -354,7 +354,8 @@ definition \<O>_conjunct :: "energy \<Rightarrow> (('a, 's) hml_srbb_conjunct) s
 
 subsection \<open>Lemmas on expressiveness of different formulas\<close>
 
-context full_spec_game begin
+context full_spec_game
+begin
 
 lemma expr_internal_eq:
   shows "expressiveness_price (Internal \<chi>) = expr_pr_inner \<chi>"
@@ -899,7 +900,7 @@ proof-
       qed
   qed
 
-end
+end (* full_spec_game *)
 
 
 
