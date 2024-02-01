@@ -1,8 +1,8 @@
+section \<open>The expressiveness price function\<close>
+
 theory Expressiveness_Price
   imports HML_SRBB Energy Spectroscopy_Game
 begin
-
-section \<open>The expressiveness price function\<close>
 
 text \<open>
 The expressiveness price function assigns a price - an eight element tuple - to a \<open>hml_srbb\<close> formula.

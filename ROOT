@@ -29,9 +29,15 @@ session LinearTimeBranchingTimeSpectroscopyAccountingForSilentSteps = HOL +
 (* The top-level theories of the submission: *)
   theories
     Silent_Step_Spectroscopy
-
+    Weak_Traces
+    HML_Context
+    Example_Instantiation
 
 (* Dependencies on document source files: *)
   document_files
+    "change_index.tex"
+    "conclusion.tex"
+    "introduction.tex"
+    "outcomes.tex"
     "root.bib"
     "root.tex"

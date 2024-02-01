@@ -1,3 +1,4 @@
+section \<open>Distinction Implies Winning Budgets\<close>
 theory Distinction_Implies_Winning_Budgets
   imports Spectroscopy_Game Expressiveness_Price
 begin

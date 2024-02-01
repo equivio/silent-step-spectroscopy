@@ -1,4 +1,4 @@
-section "Energy Games"
+section \<open>Energy Games\<close>
 
 theory Energy_Games
   imports Main Misc

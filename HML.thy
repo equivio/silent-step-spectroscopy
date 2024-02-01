@@ -1,8 +1,7 @@
+section \<open> Hennesy-Milner-Logic (HML)\<close>
 theory HML
   imports Main LTS
 begin
-
-section \<open> Hennesy-Milner-Logic (HML) \<close>
 
 datatype 
   ('act, 'i) hml =

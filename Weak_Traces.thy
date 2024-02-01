@@ -1,3 +1,4 @@
+section \<open>Weak Traces\<close>
 theory Weak_Traces
   imports Main HML_SRBB Expressiveness_Price
 begin

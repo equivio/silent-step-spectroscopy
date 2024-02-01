@@ -1,3 +1,4 @@
+section \<open>Spectroscopy Game\<close>
 theory Spectroscopy_Game
   imports Energy_Games Energy LTS
 begin

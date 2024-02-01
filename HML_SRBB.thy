@@ -1,8 +1,8 @@
+section \<open> Stability Respecting Branching Bisimilarity - Subset of HML \<close>
+
 theory HML_SRBB
   imports Main HML
 begin
-
-section \<open> Stability Respecting Branching Bisimilarity - Subset of HML \<close>
 
 datatype 
   ('act, 'i) hml_srbb =

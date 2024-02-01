@@ -1,3 +1,5 @@
+section \<open>Correctness\<close>
+
 theory Silent_Step_Spectroscopy
   imports Strategy_Formulas Distinction_Implies_Winning_Budgets
 begin
