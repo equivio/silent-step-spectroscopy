@@ -10,16 +10,20 @@ The mutually recursive data types \<open>hml\<close> and \<open>hml_conjunct\<cl
 In particular:
   - in \<open>hml\<close>
     - \<open>TT\<close> encodes \<open>\<top>\<close>
-    - \<open>Obs \<alpha> \<phi>\<close> encodes \<open>\<langle>\<alpha>\<rangle>\<phi>\<close>
-    - \<open>Internal \<phi>\<close> encodes \<open>\<langle>\<epsilon>\<rangle>\<phi>\<close>
-    - \<open>Silent \<phi>\<close> encodes \<open>(\<tau>)\<phi>\<close>
-    - \<open>Conj I \<psi>s\<close> encodes \<open>\<And>\<Psi>\<close> where \<open>\<Psi> \<equiv> \<psi>s ` I\<close>
+    - \<open>Obs \<alpha> \<phi>\<close> encodes \<open>\<langle>\<alpha>\<rangle>\<phi>\<close> and is to be read as '\<open>\<alpha>\<close> can be observed and then \<open>\<phi>\<close> holds'.
+    - \<open>Internal \<phi>\<close> encodes \<open>\<langle>\<epsilon>\<rangle>\<phi>\<close> and is to be read as 'after arbitrarily much internal behaviour \<open>\<phi>\<close> holds'.
+    - \<open>Silent \<phi>\<close> encodes \<open>(\<tau>)\<phi>\<close> and is to be read as '\<open>\<phi>\<close> holds after possibly no or exactly one internal step'.
+    - \<open>Conj I \<psi>s\<close> encodes \<open>\<And>\<Psi>\<close> where \<open>\<Psi> \<equiv> \<psi>s ` I\<close>  and is to be read as 'all formulas in \<open>\<Psi>\<close> hold'.
   - in \<open>hml_conjunct\<close>
-    - \<open>Pos \<phi>\<close> encodes \<open>\<phi>\<close> when used as a conjunct
-    - \<open>Neg \<phi>\<close> encodes \<open>\<not>\<phi>\<close> in position of a conjunct
+    - \<open>Pos \<phi>\<close> encodes \<open>\<phi>\<close> when used as a conjunct and is to be read exactly as \<open>\<phi>\<close> is.
+    - \<open>Neg \<phi>\<close> encodes \<open>\<not>\<phi>\<close> in position of a conjunct and is to be read as '\<open>\<phi>\<close> does not hold'.
 
 When a variable is of type \<open>hml\<close> then \<open>\<phi>\<close> is used in most cases.
 In case a variable is of type \<open>hml_conjunct\<close> then \<open>\<psi>\<close> is used.
+
+Note that in canonical definitions of HML \<open>TT\<close> is not usually given, but is instead synonymous to \<open>\<And>{}\<close>.
+We include \<open>TT\<close> in the definition to enable Isabelle to infer via syntax only, that the types \<open>hml\<close>
+and \<open>hml_srbb\<close> are non-empty.  If this data constructor is omitted, Isabelle will reject the definition.
 \<close>
 
 datatype 
@@ -59,6 +63,10 @@ where
   "(hml_conjunct_models p (Neg \<phi>)) = (\<not>(p \<Turnstile> \<phi>))"
 
 
+text \<open>
+While \<open>T\<close> and \<open>\<And>\<Psi>\<close> differ syntactically, they mean exactly the same thing.
+Every process will satisfy both of these formulas.
+\<close>
 lemma tt_eq_empty_conj: "(state \<Turnstile> TT) = (state \<Turnstile> Conj {} \<psi>)"
   by simp
 
@@ -66,7 +74,9 @@ lemma opt_\<tau>_is_or: "(p \<Turnstile> (Silent \<phi>)) = ((p \<Turnstile> (Ob
   by simp
 
 
-text \<open> \<open>HML_soft_poss \<alpha> \<phi>\<close> represents \<open>(\<alpha>)\<phi>\<close> \<close>
+text \<open> \<open>HML_soft_poss \<alpha> \<phi>\<close> represents \<open>(\<alpha>)\<phi>\<close>, which is to be interpeted as \<open>\<langle>\<alpha>\<rangle>\<phi>\<close> if \<open>\<alpha> \<noteq> \<tau>\<close> and
+as \<open>(\<tau>)\<phi>\<close> otherwise.
+\<close>
 
 abbreviation HML_soft_poss :: "'a \<Rightarrow> ('a, 'i) hml \<Rightarrow> ('a, 'i) hml" where
   "HML_soft_poss \<alpha> \<phi> \<equiv> if \<alpha> = \<tau> then Silent \<phi> else Obs \<alpha> \<phi>"
@@ -939,11 +949,8 @@ subsection \<open> Distinguishing Formulas \<close>
 context LTS_Tau
 begin
 
-text \<open> A formula is said to distinguishe to processes iff one process satisfies the formula,
-while the other does not. 
-One may lift this to sets of processes, i.e. that a formula distinguishes a singular processes
-from a whole set of processes iff this formula distinguishes the processes from each processes
-in the set. \<close>
+text \<open> A formula is said to distinguishe two processes iff one process satisfies the formula,
+while the other does not. \<close>
 
 definition distinguishes_hml :: "'s \<Rightarrow> ('a, 's) hml \<Rightarrow> 's \<Rightarrow> bool" ("_ <> _ _" [70, 70, 70] 80) where
   "(p <> \<phi> q) \<equiv> (p \<Turnstile> \<phi>) \<and> \<not>(q \<Turnstile> \<phi>)"
@@ -951,6 +958,13 @@ definition distinguishes_hml :: "'s \<Rightarrow> ('a, 's) hml \<Rightarrow> 's 
 definition distinguishes_conjunct_hml ::"'s \<Rightarrow> ('a, 's) hml_conjunct \<Rightarrow> 's \<Rightarrow> bool" where
   "distinguishes_conjunct_hml p \<psi> q \<equiv> (hml_conjunct_models p \<psi>) \<and> \<not>(hml_conjunct_models q \<psi>)"
 
+text\<open>One may lift this notion to sets of processes, i.e. that a formula distinguishes a singular processes
+from a whole set of processes iff this formula distinguishes the processes from each processes
+in the set (\<open>distinguishes_from_hml'\<close>).
+For this project, we require a stronger notion of this lifted predicate, namely, that the process \<open>p\<close>
+must satisfy the distinguishing formula \<open>\<phi>\<close> while all processes in \<open>Q\<close> must not (\<open>distinguishes_from_hml\<close>).  
+This differs from the other way of lifting in that \<open>p\<close> must satisfy the formula even if the set of
+processes to distinguish from \<open>Q\<close> is empty.\<close>
 
 definition distinguishes_from_hml :: "'s \<Rightarrow> ('a, 's) hml \<Rightarrow> 's set \<Rightarrow> bool" ("_ <> _ _" [70, 70, 70] 80) where
   "(p <> \<phi> Q) \<equiv> (p \<Turnstile> \<phi>) \<and> (\<forall>q \<in> Q. \<not>(q \<Turnstile> \<phi>))"
@@ -986,12 +1000,18 @@ lemma distinguishes_conjunct_from_hml_priming:
   shows "distinguishes_conjunct_from_hml' p \<phi> Q"
   by (meson distinguishes_conjunct_from_hml_def distinguishes_conjunct_hml_def assms distinguishes_conjunct_from_hml'_def equals0I)
 
+text \<open> If a conjunction distinguishes a processes \<open>p\<close> from another process \<open>q\<close> then there must be
+at least one conjunct in this conjunction that on its own distinguishes \<open>p\<close> from \<open>q\<close>. \<close>
 
 lemma dist_conjunction_implies_dist_conjunct:
   fixes q :: 's
   assumes "p <> (Conj I \<psi>s) q"
   shows "\<exists>i\<in>I. distinguishes_conjunct_hml p (\<psi>s i) q"
   using assms distinguishes_conjunct_hml_def distinguishes_hml_def by auto
+
+text \<open> Inversely, If there is a conjunct that distinguishes \<open>p\<close> from \<open>q\<close>, then a conjunction containing
+this conjunct will itself distinguish \<open>p\<close> from \<open>q\<close>, provided that \<open>p\<close> satisfies all other conjuncts
+as well.\<close>
 
 lemma dist_conjunct_implies_dist_conjunction:
   fixes q :: 's
@@ -1026,7 +1046,7 @@ no new conjuncts are constructed there is no opportunity for p to not satisfy th
 
 text \<open>The following proof is a prove of a underspecified variant of the distinguishing conjunction thinning.
 It is underspecified in the sense that we do not know anything about the new set of conjuncts.
-For purposes of the silent step spectroscopy, this is problematic, since we might want relate the
+For purposes of the silent step spectroscopy, this is problematic, since we might want to relate the
 expressiveness price of the new distinguishing conjunction to the old distinguishing conjunction.
 The proof diverges from the proof sketch given above in that the new conjunction simply copies the
 old conjunction in each new conjunct.
