@@ -1,3 +1,4 @@
+section \<open>LTS\<close>
 theory LTS
   imports Main
 begin
