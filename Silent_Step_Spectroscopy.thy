@@ -1,13 +1,9 @@
 theory Silent_Step_Spectroscopy
-  imports Strategy_Formulas
+  imports Strategy_Formulas Distinction_Implies_Winning_Budgets
 begin
 
-context full_spec_game begin
-
-lemma distinction_implies_winning_budgets:
-  assumes "distinguishes_from \<phi> p Q"
-  shows "in_wina (expressiveness_price \<phi>) (Attacker_Immediate p Q)"
-  sorry
+context full_spec_game 
+begin
 
 theorem spectroscopy_game_correctness:
   shows "(\<exists>\<phi> \<in> \<O> e. distinguishes_from \<phi> p Q)
@@ -28,7 +24,6 @@ next
   thus "\<exists>\<phi>\<in>\<O> e. distinguishes_from \<phi> p Q"
     using strategy_formulas_distinguish by fastforce 
 qed
-
 
 end (* context full_spec_game *)
 

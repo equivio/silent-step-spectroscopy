@@ -1,5 +1,5 @@
 theory Spectroscopy_Game
-  imports Energy_Games Energy LTS HML_SRBB
+  imports Energy_Games Energy LTS
 begin
 
 text \<open>In this theory the full spectroscopy game is defined (as a locale). 
@@ -87,6 +87,7 @@ fun spectroscopy_moves :: "('s, 'a) spectroscopy_position \<Rightarrow> ('s, 'a)
 
   others: "spectroscopy_moves _ _ = None"
 
+
 text \<open>The definition of defender positions in a full spectroscopy game is implicitly given by the 
 possible positions. Now we make them explicit:\<close>
 fun spectroscopy_defender where
@@ -97,6 +98,7 @@ fun spectroscopy_defender where
   "spectroscopy_defender (Defender_Branch _ _ _ _ _) = True" |
   "spectroscopy_defender (Defender_Conj _ _) = True" |
   "spectroscopy_defender (Defender_Stable_Conj _ _) = True"
+
 
 text \<open>To check whether these definitions are compatible with our definition of energy games we proof 
 an interpretation. To do so we first provide lemmas showing monotonicity of updates and that updates 

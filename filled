@@ -1,0 +1,18 @@
+hml_srbb_hml_srbb_inner_hml_srbb_conjunct.induct[of
+      "λφ. ∀Q p. Q ≠ {} ⟶ distinguishes_from φ p Q 
+              ⟶ in_wina (expressiveness_price φ) (Attacker_Immediate p Q)"
+      
+      "λχ. (∀p Q. (distinguishes_from_inner χ p Q ⟶ Q ↠S Q
+              ⟶ in_wina (expr_pr_inner χ) (Attacker_Delayed p Q))) ∧
+           (∀Ψ_I Ψ p Q. χ = Conj Ψ_I Ψ ⟶ Q ≠ {} ⟶ distinguishes_from_inner χ p Q 
+              ⟶ in_wina (expr_pr_inner χ) (Defender_Conj p Q)) ∧
+           (∀Ψ_I Ψ p Q. χ = StableConj Ψ_I Ψ ⟶ Q ≠ {} ⟶ distinguishes_from_inner χ p Q 
+              ⟶ in_wina (expr_pr_inner χ) (Defender_Stable_Conj p Q)) ∧
+           (∀Ψ_I Ψ α φ p Q p' Q_α. χ = BranchConj α φ Ψ_I Ψ 
+              ⟶ distinguishes_from_inner χ p Q ⟶ p ↦ α p' ⟶ p' ⊨SRBB φ 
+              ⟶ Q ∩ (model_set_inner χ) ⊆ Q_α ⟶ Q_α ⊆ (Q - model_set_inner (Obs α φ)) 
+                ⟶ in_wina (expr_pr_inner χ) (Defender_Branch p α p' (Q - Q_α) Q_α
+            ))"
+      
+      "λψ. ∀p q. distinguishes_conjunct ψ p q ⟶ in_wina (expr_pr_conjunct ψ) (Attacker_Clause p q)"
+]
