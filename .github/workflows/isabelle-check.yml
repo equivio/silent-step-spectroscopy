@@ -1,11 +1,10 @@
-name: Check Isabelle for PRs
+name: Build isabelle session
 
 on:
   pull_request:
     branches: [ main ]
   workflow_dispatch:
 
-# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
 permissions:
   contents: read
 
@@ -16,20 +15,8 @@ jobs:
     steps:
       - uses: actions/checkout@v3.4.0
 
-      - name: chache output
-        id: cache-output
-        uses: actions/cache@v3
+      - name: Isabelle
+        uses: 'docker://hllm/isabelle-docker'
         with:
-          path: ./out
-          key: ${{ runner.os }}-out
-
-      - name: Isabelle-action
-        uses: TheHllm/isabelle-action@v1.10
-        with:
-          session: LinearTimeBranchingTimeSpectroscopyAccountingForSilentSteps
-      
-      - uses: actions/upload-artifact@v3
-        with:
-          name: document
-          path: ./out/AFP/LinearTimeBranchingTimeSpectroscopyAccountingForSilentSteps/document.pdf
-          retention-days: 7
+          entrypoint: /bin/bash
+          args: build.sh -c
