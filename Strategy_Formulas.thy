@@ -106,6 +106,30 @@ where
           \<and> in_wina (e - (E 0 1 1 0 0 0 0 0)) (Attacker_Clause p q)
           \<and> strategy_formula_conjunct (Attacker_Clause p q) (e - (E 0 1 1 0 0 0 0 0)) (\<Phi> q)"
 
+text \<open>To proof \<open>spectroscopy_game_correctness\<close> we need the following implication:
+If \<open>e\<close> is in the winning budget of \<open>Attacker_Immediate p Q\<close>, there is a strategy formula \<open>\<phi>\<close> 
+
+HOW DO WE PRONOUNCE \<open>\<phi> \<in> Strat((p,Q), e)\<close>?
+
+with expressiveness price \<open>\<le> e\<close>. 
+
+We prove a more detailed result for all possible game positions \<open>g\<close> by induction.
+While the paper uses an order over pairs of game positions and energies to do a well-founded 
+induction we use the induction rules given by the definition of winning budgets:
+
+We first show that the statement holds if \<open>g\<close> has no outgoing edges.(case 1) This can only be the case for 
+defender positions. If a defender position has outgoing edges and the statement holds true for all
+successors we show that the statement holds true for \<open>g\<close> as well. (case 3) If \<open>g\<close> is an attacker 
+position by \<open>e\<close> being in the winning budget of \<open>g\<close> we know there exists a successor of \<open>g\<close> that 
+the attacker can move to. If by induction the property holds true for that successor we show that it 
+then holds for \<open>g\<close> as well. (case 2)
+
+Since we only look at direct successors we added the not too interesting case of \<open>g\<close> being an 
+attacker branching position which was omitted in the paper.
+
+LINK to formalization changes
+\<close>
+
 lemma winning_budget_implies_strategy_formula:
   fixes g e
   assumes "in_wina e g"
