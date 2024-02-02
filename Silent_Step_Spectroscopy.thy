@@ -15,7 +15,7 @@ The proof utilizes three lemmas: The implication \<open>\<longrightarrow>\<close
 \<open>distinction_implies_winning_budgets\<close> combined with the upwards closure of winning budgets. 
 To show the other direction one can construct a (strategy) formula with an appropriate price using 
 the constructive proof of \<open>winning_budget_implies_strategy_formula\<close>. From lemma 
-\<open>strategy_formulas_distinguish\<close> we know that this formula actually distiguishes \<open>p\<close> from \<open>Q\<close>.
+\<open>strategy_formulas_distinguish\<close> we know that this formula actually distinguishes \<open>p\<close> from \<open>Q\<close>.
 \<close>
 
 theorem spectroscopy_game_correctness:
