@@ -8,10 +8,11 @@ context full_spec_game
 begin
 
 theorem spectroscopy_game_correctness:
-  shows "(\<exists>\<phi> \<in> \<O> e. distinguishes_from \<phi> p Q)
+  fixes e p Q
+  shows "(\<exists>\<phi>. distinguishes_from \<phi> p Q \<and> expressiveness_price \<phi> \<le> e)
        = (in_wina e (Attacker_Immediate p Q))"
 proof
-  assume "\<exists>\<phi>\<in>\<O> e. distinguishes_from \<phi> p Q"
+  assume "\<exists>\<phi>. distinguishes_from \<phi> p Q \<and> expressiveness_price \<phi> \<le> e"
   then obtain \<phi> where
     "distinguishes_from \<phi> p Q" and le: "expressiveness_price \<phi> \<le> e"
     unfolding \<O>_def by blast 
@@ -22,8 +23,8 @@ next
   assume "in_wina e (Attacker_Immediate p Q)"
   with winning_budget_implies_strategy_formula
     have "\<exists>\<phi>. strategy_formula (Attacker_Immediate p Q) e \<phi> \<and> expressiveness_price \<phi> \<le> e" by force
-  hence "\<exists>\<phi>\<in>\<O> e. strategy_formula (Attacker_Immediate p Q) e \<phi>" unfolding \<O>_def by blast
-  thus "\<exists>\<phi>\<in>\<O> e. distinguishes_from \<phi> p Q"
+  hence "\<exists>\<phi>. strategy_formula (Attacker_Immediate p Q) e \<phi> \<and> expressiveness_price \<phi> \<le> e" unfolding \<O>_def by blast
+  thus "\<exists>\<phi>. distinguishes_from \<phi> p Q \<and> expressiveness_price \<phi> \<le> e"
     using strategy_formulas_distinguish by fastforce 
 qed
 
