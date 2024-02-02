@@ -7,6 +7,17 @@ begin
 context full_spec_game 
 begin
 
+text \<open>Now we state in what sense winning energy levels and equivalences coincide: 
+There exists a formula \<open>\<phi>\<close> distinguishing a process \<open>p\<close> from a set of processes \<open>Q\<close> with 
+expressiveness price \<open>\<le>e\<close> if and only if \<open>e\<close> is in the winning budget of \<open>Attacker_Immediate p Q\<close>. 
+
+The proof utilizes three lemmas: The implication \<open>\<longrightarrow>\<close> is given by lemma 
+\<open>distinction_implies_winning_budgets\<close> combined with the upwards closure of winning budgets. 
+To show the other direction one can construct a (strategy) formula with an appropriate price using 
+the constructive proof of \<open>winning_budget_implies_strategy_formula\<close>. From lemma 
+\<open>strategy_formulas_distinguish\<close> we know that this formula actually distiguishes \<open>p\<close> from \<open>Q\<close>.
+\<close>
+
 theorem spectroscopy_game_correctness:
   fixes e p Q
   shows "(\<exists>\<phi>. distinguishes_from \<phi> p Q \<and> expressiveness_price \<phi> \<le> e)
