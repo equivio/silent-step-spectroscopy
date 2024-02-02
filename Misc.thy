@@ -1,3 +1,4 @@
+section \<open>Misc\<close>
 theory Misc
   imports Main
 begin

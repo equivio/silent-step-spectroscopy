@@ -36,6 +36,13 @@ lemma leq_not_eneg:
                      seven e1 \<le> seven e2 \<and> eight e1 \<le> eight e2)"
   using assms unfolding less_eq_energy_def by (simp add: energy.case_eq_if)
 
+lemma energy_leq_cases:
+  assumes "e2 \<noteq> eneg"
+          "one e1 \<le> one e2" "two e1 \<le> two e2" "three e1 \<le> three e2"
+          "four e1 \<le> four e2" "five e1 \<le> five e2" "six e1 \<le> six e2"
+          "seven e1 \<le> seven e2" "eight e1 \<le> eight e2"
+  shows "e1 \<le> e2" using assms  by (metis eneg_leq leq_not_eneg)
+
 end
 
 text \<open>Encode if @{term "e2"} is larger than @{term "e1"} in any component.\<close>
@@ -271,7 +278,12 @@ next
     using min_1_7_simps min_less_iff_conj somwhere_larger_eq by fastforce
 qed
 
-abbreviation "subtract a b c d e f g h \<equiv> Some (\<lambda>x. x - (E a b c d e f g h))"
+abbreviation "subtract_fn a b c d e f g h \<equiv> (\<lambda>x. x - (E a b c d e f g h))"
+abbreviation "e1 \<equiv> subtract_fn 1 0 0 0 0 0 0 0"
+abbreviation "e3 \<equiv> subtract_fn 0 0 1 0 0 0 0 0"
+abbreviation "e5 \<equiv> subtract_fn 0 0 0 0 1 0 0 0"
+
+abbreviation "subtract a b c d e f g h \<equiv> Some (subtract_fn a b c d e f g h)"
 
 lemma mono_subtract: 
   assumes "x \<le> x'"

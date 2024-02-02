@@ -1,8 +1,7 @@
+section \<open> Hennesy-Milner-Logic (HML)\<close>
 theory HML
   imports Main LTS
 begin
-
-section \<open> Hennesy-Milner-Logic (HML) \<close>
 
 datatype 
   ('act, 'i) hml =
@@ -33,7 +32,7 @@ end (* context Inhabited_LTS *)
 context LTS_Tau
 begin
 
-abbreviation HML_soft_poss :: "'a \<Rightarrow> ('a, 'i) hml \<Rightarrow> ('a, 'i) hml" where
+abbreviation (input) HML_soft_poss :: "'a \<Rightarrow> ('a, 'i) hml \<Rightarrow> ('a, 'i) hml" where
   "HML_soft_poss \<alpha> \<phi> \<equiv> if \<alpha> = \<tau> then Silent \<phi> else Obs \<alpha> \<phi>"
 
 primrec

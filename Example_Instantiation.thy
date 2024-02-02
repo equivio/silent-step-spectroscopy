@@ -1,4 +1,4 @@
-theory Example_Instantiation_
+theory Example_Instantiation
   imports Energy_Games "HOL-Library.Extended_Nat"
 begin
 text \<open>In this theory we create an instantiation of energy game to test our definitions.\<close>
@@ -276,7 +276,7 @@ using assms proof -
   hence "(\<exists>gn. finite_play a (p @ [gn]))" using assms(1) Game.finite_play.intros(2) by blast 
   thus "\<not>Game.play_stuck a p" by simp
 qed
-text \<open>Finally, we verify our definition of win_a using scenarios where we expect the attacker to have a winning strategy (or not).\<close>
+text \<open>Finally, we verify our definition of win\_a using scenarios where we expect the attacker to have a winning strategy (or not).\<close>
 
 lemma attackers_winas_defender_stuck:
   shows "Game.in_wina (E 9 8) e"
@@ -373,6 +373,5 @@ proof -
     using moves(6) by blast
   thus "\<not>Game.in_wina (E 0 0) c" using Game.in_wina.intros by (metis Game.in_wina.cases defender.simps(3))
 qed
-
 
 end
