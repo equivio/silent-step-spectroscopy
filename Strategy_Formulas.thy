@@ -1039,28 +1039,6 @@ next
   }
 qed
 
-text \<open>To proof \<open>spectroscopy_game_correctness\<close> we need the following implication:
-If \<open>\<phi>\<close> is a strategy formula for \<open>Attacker_Immediate p Q\<close> with energy \<open>e\<close>, then \<open>\<phi>\<close> distinguishes 
-\<open>p\<close> from \<open>Q\<close>. 
-
-We prove a more detailed result for all possible game positions \<open>g\<close> by induction. (Note that the 
-case of \<open>g\<close> being an attacker branching position is not explicitly needed as part of the induction
-hypothesis but is proven as a part of case \<open>branch_conj\<close>.) The induction relies on the inductive 
-structure of strategy formulas. 
-
-The two \<open>Defender_Conj\<close> cases are necessary because of our formalization on (immediate) conjunctions. 
-early conj only needs imm conj
-late conj only needs conj
-
-the strategy construction rule \<open>early_conj\<close>:
-\<open>\<phi>\<close> is a strategy formula of an \<open>Attacker_Immediate\<close> position if
-
-
-ToDo: LINK to formalization changes
-
-changes to paper:
-defender branch position: added \<open>((p \<mapsto> \<alpha> p') \<and> (Qa \<noteq> {}))\<close> to ind. hyp.; left out \<open>Q\<close> and \<open>Qa\<close> being disjunct (not impotant for the proof)
-\<close>
 
 lemma strategy_formulas_distinguish:
   shows "(strategy_formula g e \<phi> \<longrightarrow>
