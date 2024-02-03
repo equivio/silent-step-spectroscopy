@@ -40,7 +40,7 @@ fun spectroscopy_moves :: "('s, 'a) spectroscopy_position \<Rightarrow> ('s, 'a)
 
   finishing_or_early_conj: (* removed finishing *)
     "spectroscopy_moves (Attacker_Immediate p Q) (Defender_Conj p' Q') 
-      =(if (Q = Q' \<and> p = p') then (subtract 0 0 0 0 1 0 0 0) else None)" |
+      =(if (Q\<noteq>{} \<and> Q = Q' \<and> p = p') then (subtract 0 0 0 0 1 0 0 0) else None)" |
 
   late_inst_conj: 
     "spectroscopy_moves (Attacker_Delayed p Q) (Defender_Conj p' Q') 
