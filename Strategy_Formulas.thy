@@ -1135,7 +1135,7 @@ hypothesis but is proven as a part of case \<open>branch_conj\<close>.) The indu
 structure of strategy formulas. 
 
 
-Defender conj double (because of imm conj) 
+Defender conj double (because of imm conj is neeeded for early conj) 
 
 ToDo: LINK to formalization changes
 
