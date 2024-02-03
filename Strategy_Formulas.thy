@@ -284,8 +284,8 @@ next
       assume "\<exists>p' Q'. g' = Defender_Conj p' Q'"
       then obtain p' Q' where g'_def_conj: "g' = Defender_Conj p' Q'" by blast
       hence M: "spectroscopy_moves (Attacker_Immediate p Q) (Defender_Conj p' Q') = (subtract 0 0 0 0 1 0 0 0)"
-        using local.finishing_or_early_conj move by presburger
-      hence "(Q\<noteq>{} \<and> Q = Q' \<and> p = p')" by (metis g'_def_conj local.finishing_or_early_conj option.distinct(1))
+        using local.early_conj move by presburger
+      hence "(Q\<noteq>{} \<and> Q = Q' \<and> p = p')" by (metis g'_def_conj local.early_conj option.distinct(1))
 
       from M have "(the (spectroscopy_moves (Attacker_Immediate p Q) (Defender_Conj p' Q')) e) 
                 = e - (E 0 0 0 0 1 0 0 0)"
@@ -308,7 +308,7 @@ next
          by (smt (verit) \<open>(Q\<noteq>{} \<and> Q = Q' \<and> p = p')\<close> g'_def_conj hml_srbb_inner.inject(2) move spectroscopy_defender.simps(4) spectroscopy_defender.simps(6) spectroscopy_moves.simps(60) spectroscopy_moves.simps(70) strategy_formula_inner.cases) 
       hence SI: "strategy_formula (Attacker_Immediate p Q) e (ImmConj Q \<psi>)"
          using strategy_formula_strategy_formula_inner_strategy_formula_conjunct.delay early_conj \<open>(Q\<noteq>{} \<and> Q = Q' \<and> p = p')\<close>
-         by (metis (no_types, lifting) \<open>in_wina (e - E 0 0 0 0 1 0 0 0) (Defender_Conj p Q')\<close> local.finishing_or_early_conj)
+         by (metis (no_types, lifting) \<open>in_wina (e - E 0 0 0 0 1 0 0 0) (Defender_Conj p Q')\<close> local.early_conj)
 
       have "expr_pr_inner (Conj Q \<psi>) \<le> (e - (E 0 0 0 0 1 0 0 0))" using S \<open>\<phi> = Conj Q \<psi>\<close> by simp
       hence "expressiveness_price (ImmConj Q \<psi>) \<le> e" using expr_imm_conj \<open>(Q\<noteq>{} \<and> Q = Q' \<and> p = p')\<close>
@@ -1151,7 +1151,7 @@ next
 next
   case (early_conj Q p Q' e \<phi>)
   then show ?case
-    by (smt (verit, del_insts) local.finishing_or_early_conj option.distinct(1) spectroscopy_position.simps(50) spectroscopy_position.simps(55))
+    by (smt (verit, del_insts) local.early_conj option.distinct(1) spectroscopy_position.simps(50) spectroscopy_position.simps(55))
 next
   case (late_conj p Q e \<chi>)
   hence "distinguishes_from_inner \<chi> p Q" by simp
