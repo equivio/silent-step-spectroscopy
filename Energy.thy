@@ -11,7 +11,7 @@ datatype energy = E (one: "enat") (two: "enat") (three: "enat") (four: "enat")
                     (five: "enat") (six: "enat") (seven: "enat") (eight: "enat") |
                   eneg
 subsection \<open>Ordering Energies\<close>
-text \<open>Inorder to define subtraction on energies we first lift the orderings
+text \<open>In order to define subtraction on energies we first lift the orderings
       @{text "\<le>"} and @{text "<"} from @{type "enat"} to @{type "energy"}.\<close>
 instantiation energy :: order begin
 
