@@ -125,19 +125,20 @@ lemma winning_budget_implies_strategy_formula:
   fixes g e
   assumes "in_wina e g"
   shows
-    "(\<exists>p Q. g = Attacker_Immediate p Q) \<Longrightarrow> (\<exists>\<phi>. strategy_formula g e \<phi> 
-                                            \<and> expressiveness_price \<phi> \<le> e)"
-    "(\<exists>p Q. g = Attacker_Delayed p Q) \<Longrightarrow> (\<exists>\<phi>. strategy_formula_inner g e \<phi> 
-                                            \<and> expr_pr_inner \<phi> \<le> e)"
-    "(\<exists>p q. g = Attacker_Clause p q) \<Longrightarrow> (\<exists>\<phi>. strategy_formula_conjunct g e \<phi> 
-                                            \<and> expr_pr_conjunct \<phi> \<le> e)"
-    "(\<exists>p Q. g = Defender_Conj p Q) \<Longrightarrow> (\<exists>\<phi>. strategy_formula_inner g e \<phi> 
-                                          \<and> expr_pr_inner \<phi> \<le> e)"
-    "(\<exists>p Q. g =  Defender_Stable_Conj p Q) \<Longrightarrow> (\<exists>\<phi>. strategy_formula_inner g e \<phi> 
-                                                 \<and> expr_pr_inner \<phi> \<le> e)"
-    "(\<exists>p \<alpha> p' Q Qa. g = Defender_Branch p \<alpha> p' Q Qa) \<Longrightarrow> (\<exists>\<phi>. strategy_formula_inner g e \<phi> 
-                                                            \<and> expr_pr_inner \<phi> \<le> e)"
-    "(\<exists>p Q. g = Attacker_Branch p Q) \<Longrightarrow> \<exists>p Q. (g = Attacker_Branch p Q 
+    "(\<exists>p Q. g = Attacker_Immediate p Q)
+        \<Longrightarrow> (\<exists>\<phi>. strategy_formula g e \<phi> \<and> expressiveness_price \<phi> \<le> e)"
+    "(\<exists>p Q. g = Attacker_Delayed p Q) 
+        \<Longrightarrow> (\<exists>\<phi>. strategy_formula_inner g e \<phi> \<and> expr_pr_inner \<phi> \<le> e)"
+    "(\<exists>p q. g = Attacker_Clause p q)  
+        \<Longrightarrow> (\<exists>\<phi>. strategy_formula_conjunct g e \<phi> \<and> expr_pr_conjunct \<phi> \<le> e)"
+    "(\<exists>p Q. g = Defender_Conj p Q) 
+        \<Longrightarrow> (\<exists>\<phi>. strategy_formula_inner g e \<phi> \<and> expr_pr_inner \<phi> \<le> e)"
+    "(\<exists>p Q. g =  Defender_Stable_Conj p Q)
+        \<Longrightarrow> (\<exists>\<phi>. strategy_formula_inner g e \<phi>  \<and> expr_pr_inner \<phi> \<le> e)"
+    "(\<exists>p \<alpha> p' Q Qa. g = Defender_Branch p \<alpha> p' Q Qa) 
+        \<Longrightarrow> (\<exists>\<phi>. strategy_formula_inner g e \<phi> \<and> expr_pr_inner \<phi> \<le> e)"
+    "(\<exists>p Q. g = Attacker_Branch p Q) 
+        \<Longrightarrow> \<exists>p Q. (g = Attacker_Branch p Q 
               \<and> (\<exists>\<phi>. strategy_formula (Attacker_Immediate p Q) (e- E 1 0 0 0 0 0 0 0) \<phi> 
               \<and> expressiveness_price \<phi> \<le> (e- E 1 0 0 0 0 0 0 0)))"
 using assms proof(induction rule: in_wina.induct)
