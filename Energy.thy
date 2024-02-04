@@ -222,7 +222,7 @@ lemma mono_subtract:
   by (smt (verit) antisym assms dual_order.trans eneg_leq energy.distinct(1) leq_not_eneg minus_component_leq(1) minus_component_leq(2) minus_component_leq(3) minus_component_leq(4) minus_component_leq(5) minus_component_leq(6) minus_component_leq(7) minus_component_leq(8) minus_energy_def)
 
 
-text \<open>And define abbreviations for performing subtraction.\<close>
+text \<open>We also define abbreviations for performing subtraction.\<close>
 abbreviation "subtract_fn a b c d e f g h \<equiv> (\<lambda>x. x - (E a b c d e f g h))"
 abbreviation "e1 \<equiv> subtract_fn 1 0 0 0 0 0 0 0"
 abbreviation "e3 \<equiv> subtract_fn 0 0 1 0 0 0 0 0"
