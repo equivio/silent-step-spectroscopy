@@ -72,8 +72,9 @@ lemma somwhere_larger_eq:
   by (smt (z3) assms energy.case_eq_if less_eq_energy_def linorder_le_less_linear)
 
 subsection \<open>Subtracting Energies\<close>
-text \<open>@{term "somewhere_larger"} is then to define subtraction,
-  as the @{text "minus"} operator on energies.\<close>
+text \<open>Using @{term "somewhere_larger"} we define subtraction as 
+  the @{text "minus"} operator on energies.\<close>
+
 instantiation energy :: minus
 begin
 
