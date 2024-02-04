@@ -7,7 +7,7 @@ begin
 context full_spec_game 
 begin
 
-text \<open>Now we state in what sense winning energy levels and equivalences coincide: 
+text \<open>As in theorem 1 of \cite[p. 14]{bisping2023lineartimebranchingtime} we state in what sense winning energy levels and equivalences coincide as the theorem \<open>spectroscopy_game_correctness\<close>:
 There exists a formula \<open>\<phi>\<close> distinguishing a process \<open>p\<close> from a set of processes \<open>Q\<close> with 
 expressiveness price of at most \<open>e\<close> if and only if \<open>e\<close> is in the winning budget of \<open>Attacker_Immediate p Q\<close>. 
 
