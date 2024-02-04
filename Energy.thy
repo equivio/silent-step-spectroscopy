@@ -57,7 +57,7 @@ lemma energy_leq_cases:
 
 end
 
-text \<open>We then use this to define a predicate that decides if an @{term "e1 :: energy"} 
+text \<open>We then use this order to define a predicate that decides if an @{term "e1 :: energy"} 
       may be subtracted from another @{term "e2 :: energy"} without the 
       result being negative. That is to say if @{term "e1"} is \textit{larger} than 
       @{term "e2"} \textit{somewhere}.\<close>
