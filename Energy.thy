@@ -6,7 +6,7 @@ text \<open>\noindent Following \cite[p. 5]{bisping2023lineartimebranchingtime} 
       eight dimensional vectors of natural numbers extended by @{text "\<infinity>"}.
       But deviate from \cite{bisping2023lineartimebranchingtime} in also defining
       an energy @{text "eneg"} that represents negative energy. This allows us to
-      express updates to energies as total functions\label{deviation:eneg}.\<close>
+      express energy updates (cf. \cite[p. 8]{bisping2023lineartimebranchingtime}) as total functions\label{deviation:eneg}.\<close>
 datatype energy = E (one: "enat") (two: "enat") (three: "enat") (four: "enat")
                     (five: "enat") (six: "enat") (seven: "enat") (eight: "enat") |
                   eneg
