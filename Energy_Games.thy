@@ -4,25 +4,23 @@ theory Energy_Games
   imports Main Misc
 begin
 
-text \<open>In this theory energy games are introduced and basic definitions such as (winning) plays are 
-given. This creates the foundation for the later introduced full spectroscopy game, which is an 
+text \<open>In this theory we introduce energy games and give basic definitions such as (winning) plays. 
+Energy games are the foundation for the later introduced full spectroscopy game, which is an 
 energy game itself, characterizing equivalence problems.\<close>
 
-section \<open>Energy Games\<close>
-
-text\<open>Later on we will consider 8-dimensional energy games. For now energies will not be typed.\<close>
+text\<open>\noindent Currently we do not consider 8-dimensional energy games and use an abstract concept of energies.
+In order to combine this concept with our later definition of energy as a data type, energies must fulfill certain properties.\<close>
 
 type_synonym 'energy update = "'energy \<Rightarrow> 'energy"
 
-text\<open>When only finite plays are considered these can be represented as a list of states. To stay 
-aware of this limitation to finite cases a corresponding type synonym is introduced.\<close>
+text\<open>\noindent Furthermore we focus on finite plays that may be represented as a list of states.\<close>
 
 type_synonym 'gstate fplay = "'gstate list"
 
-text\<open>An energy game is played on a directed graph labeled by energy updates. We limit ourselves to 
-the case where only the attacker can run out of energy if the energy level reaches the 
-\<open>defender_win_level\<close>.\<close>
-
+text\<open>\noindent An energy game is played by two players on a directed graph labeled by energy updates. 
+These energy updates show that the performance of a certain move is associated with costs for the attacker.
+We therefore only consider the case where the attacker has no more energy when the energy level reaches the \<open>defender_win_level\<close>.
+In contrast to other games, our game does not have a starting position. This allows us to provide information about plays with any starting position.\<close>
 locale energy_game =
   fixes weight_opt :: "'gstate \<Rightarrow> 'gstate \<Rightarrow> 'energy update option" and
         defender :: "'gstate \<Rightarrow> bool" ("Gd") and 
@@ -36,7 +34,7 @@ locale energy_game =
           update_gets_smaller: "\<And>g g' e. ((weight_opt g g') \<noteq> None) \<Longrightarrow> (ord (the (weight_opt g g')e) e)"
 begin
 
-text\<open>Some natural abbreviations follow:\<close>
+text\<open>\noindent In the following we introduce some abbreviations about attacker positions and moves.\<close>
 
 abbreviation attacker :: "'gstate \<Rightarrow> bool" ("Ga") where "Ga p \<equiv> \<not> Gd p" 
 
@@ -47,14 +45,14 @@ abbreviation weighted_move :: "'gstate \<Rightarrow> 'energy update \<Rightarrow
 
 abbreviation "weight g1 g2 \<equiv> the (weight_opt g1 g2)"
 
-text\<open>Starting with some energy at some state the resulting energy level after a valid play can be 
+text\<open>\noindent Starting with some energy at some state the resulting energy level of a a valid play can be 
 calculated as follows:\<close>
 
 fun energy_level :: "'gstate \<Rightarrow> 'energy \<Rightarrow>'gstate fplay \<Rightarrow> 'energy" where
   "energy_level g0 e0 p = (
     if p = [g0] then 
       e0 
-    else ( if (length p \<ge> 2) then ( if ((weight_opt (last (butlast p))(last p)) \<noteq> None) then ((weight (last (butlast p)) (last p)) (energy_level g0 e0 (butlast p)))
+    else (if (length p \<ge> 2) then ( if ((weight_opt (last (butlast p))(last p)) \<noteq> None) then ((weight (last (butlast p)) (last p)) (energy_level g0 e0 (butlast p)))
                                     else undefined)
           else undefined))"
 
@@ -94,14 +92,15 @@ qed
 
 subsection \<open>Finite Plays\<close>
 
-text\<open>We already spoke of "valid games". By this we mean lists of states where an edge from one 
-state to the next in the list exists. In the finite case this is represented as \<open>finite_play\<close>.\<close>
+text\<open>We have already used the term \<open>valid plays\<close>, which refers to lists of states where there is a move from one state to the next in the list. 
+In the finite case, this is called a \<open>finite_play\<close>.\<close>
 
 inductive finite_play :: "'gstate \<Rightarrow> 'gstate fplay \<Rightarrow> bool" where
   "finite_play g0 [g0]" |
   "finite_play g0 (p @ [gn])" if "finite_play g0 p" and "last p \<Zinj> gn"
 
-text\<open>Some potentially helpful lemmas follow:\<close>
+text\<open>\noindent Next we prove some properties of finite plays. 
+This includes the statements that the prefix or suffix of a finite play is itself a finite play.\<close>
 
 lemma finite_play_prefix:
   assumes "finite_play g0 (a @ b)" "a \<noteq> []"
@@ -121,7 +120,7 @@ corollary finite_play_suffix:
   shows "finite_play g0 p"
   using assms finite_play_prefix by fast
 
-lemma finite_play_suffix2:
+lemma %invisible finite_play_suffix2:
   assumes "finite_play g0 ([g0] @ ([g1]@p))"
   shows "finite_play g1 ([g1]@p)"
 using assms proof (induct p rule: rev_induct)
@@ -133,7 +132,7 @@ next
     by (smt (verit) Cons_eq_appendI append_assoc append_same_eq distinct_adj_Cons distinct_adj_Cons_Cons eq_Nil_appendI finite_play.simps last.simps last_appendR)
 qed
 
-lemma finite_play_check_gen:
+lemma %invisible finite_play_check_gen:
    assumes "x \<noteq> p1" and
            "p = p1 # [pn]"
    shows "\<not>finite_play x (p @ [gn])"
@@ -152,7 +151,7 @@ proof (rule notI)
   show "False"
     using A5 A6 by auto 
 qed
-
+text\<open>\noindent We also verify that a \<open>finite_play\<close> has at least the length $1$ and that the game positions of a \<open>finite_play\<close> form a path.\<close>
 lemma finite_play_min_len: "finite_play g0 p \<Longrightarrow> length p \<ge> 1"
   using add_leE finite_play.cases not_Cons_self2 not_less_eq_eq by fastforce
 
@@ -162,7 +161,7 @@ lemma finite_play_is_path:
   shows "((p = ((a @ [g]) @ b)) \<and> a \<noteq>[]) \<longrightarrow> ((last a) \<Zinj> g)"
   by (metis assms butlast.simps(2) finite_play.simps finite_play_prefix snoc_eq_iff_butlast)
 
-lemma energy_level_fold_eq:
+lemma %invisible energy_level_fold_eq:
   assumes "finite_play g0 p"
   shows "energy_level g0 e0 p = fold (\<lambda>(g1, g2) e. (weight g1 g2) e) (pairs p) e0"
 using assms proof (induct "p" rule: finite_play.induct)
