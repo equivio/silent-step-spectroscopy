@@ -24,7 +24,7 @@ definition "e1 \<le> e2 \<equiv>
 
 definition "(x::energy) < y = (x \<le> y \<and> \<not> y \<le> x)"
 
-text \<open>And show that this yields a reflexive transitive antisymmetric order.\<close>
+text \<open>Next, we show that this yields a reflexive transitive antisymmetric order.\<close>
 
 instance proof
   fix x y z :: energy
