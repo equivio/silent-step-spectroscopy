@@ -149,7 +149,7 @@ proof-
   show "eight (x - s) \<le> eight (y - s)"  by (smt (verit, del_insts))
 qed
 
-text \<open>We further show that the subtraction of non negative of energies is decreasing.\<close>
+text \<open>We further show that the subtraction of non-negative of energies is decreasing.\<close>
 lemma mono:
   fixes s :: energy
   assumes "s \<noteq> eneg"
