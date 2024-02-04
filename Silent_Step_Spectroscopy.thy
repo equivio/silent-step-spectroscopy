@@ -10,8 +10,8 @@ begin
 text \<open>Now we state in what sense winning energy levels and equivalences coincide: 
 There exists a formula \<open>\<phi>\<close> distinguishing a process \<open>p\<close> from a set of processes \<open>Q\<close> with 
 expressiveness price of at most \<open>e\<close> if and only if \<open>e\<close> is in the winning budget of \<open>Attacker_Immediate p Q\<close>. 
-\\
-\\
+
+
 The proof utilizes three lemmas. The forward direction is given by the lemma \<open>distinction_implies_winning_budgets\<close> combined with the upwards closure of winning budgets. 
 To show the other direction one can construct a (strategy) formula with an appropriate price using 
 the constructive proof of \<open>winning_budget_implies_strategy_formula\<close>. From lemma 
