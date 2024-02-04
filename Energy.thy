@@ -59,7 +59,7 @@ end
 
 text \<open>We then use this order to define a predicate that decides if an @{term "e1 :: energy"} 
       may be subtracted from another @{term "e2 :: energy"} without the result being negative.
-      We encode this by @{term "e1"} being "somwhere_larger" than @{term "e2"}.\<close>
+      We encode this by @{term "e1"} being @{text "somwhere_larger"} than @{term "e2"}.\<close>
 
 abbreviation somwhere_larger where "somwhere_larger e1 e2 \<equiv> \<not>(e1 \<ge> e2)"
 
