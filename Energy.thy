@@ -36,7 +36,7 @@ instance proof
     by (smt (z3) energy.case_eq_if energy.expand nle_le)
 qed
 
-text \<open>We further prove, that @{term "eneg"} is a lower bound of this order.\<close>
+text \<open>We further prove that @{term "eneg"} is a lower bound.\<close>
 lemma eneg_leq:
   shows "eneg \<le> e"
   by (simp add: less_eq_energy_def)
