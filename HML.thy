@@ -172,7 +172,8 @@ implies that \<open>p\<close> must also satisfy \<open>\<phi>r\<close>, no matte
 definition hml_impl :: "('a, 's) hml \<Rightarrow> ('a, 's) hml \<Rightarrow> bool" (infix "\<Rrightarrow>" 60)  where
   "\<phi>l \<Rrightarrow> \<phi>r \<equiv> (\<forall>p. (p \<Turnstile> \<phi>l) \<longrightarrow> (p \<Turnstile> \<phi>r))"
 
-lemma hml_impl_iffI: "\<phi>l \<Rrightarrow> \<phi>r = (\<forall>p. (p \<Turnstile> \<phi>l) \<longrightarrow> (p \<Turnstile> \<phi>r))"
+lemma hml_impl_iffI:
+  "\<phi>l \<Rrightarrow> \<phi>r = (\<forall>p. (p \<Turnstile> \<phi>l) \<longrightarrow> (p \<Turnstile> \<phi>r))"
   using hml_impl_def by force
 
 text \<open> HML formula implication is a pre-order. \<close>
@@ -180,10 +181,14 @@ lemma hml_impl_preord: "reflp (\<Rrightarrow>) \<and> transp (\<Rrightarrow>)"
   by (metis hml_impl_def reflpI transpI)
 
 
-definition hml_conjunct_impl :: "('a, 's) hml_conjunct \<Rightarrow> ('a, 's) hml_conjunct \<Rightarrow> bool" (infix "\<and>\<Rrightarrow>" 60)  where
+text \<open> Duplicating these definitions and lemmata for the inner type \<open>hml_conjunction\<close>. \<close>
+
+definition hml_conjunct_impl :: "('a, 's) hml_conjunct \<Rightarrow> ('a, 's) hml_conjunct \<Rightarrow> bool"
+  (infix "\<and>\<Rrightarrow>" 60) where
   "\<psi>l \<and>\<Rrightarrow> \<psi>r \<equiv> (\<forall>p. (hml_conjunct_models p \<psi>l) \<longrightarrow> (hml_conjunct_models p \<psi>r))"
 
-lemma hml_conjunct_impl_iffI: "\<psi>l \<and>\<Rrightarrow> \<psi>r = (\<forall>p. (hml_conjunct_models p \<psi>l) \<longrightarrow> (hml_conjunct_models p \<psi>r))"
+lemma hml_conjunct_impl_iffI:
+  "\<psi>l \<and>\<Rrightarrow> \<psi>r = (\<forall>p. (hml_conjunct_models p \<psi>l) \<longrightarrow> (hml_conjunct_models p \<psi>r))"
   unfolding hml_conjunct_impl_def by auto
 
 lemma hml_conjunct_impl_preord: "reflp (\<and>\<Rrightarrow>) \<and> transp (\<and>\<Rrightarrow>)"
@@ -202,41 +207,86 @@ substitute on the left hand side of the implication.
 The lemmata differ in the choice of context, i.e. what formula is substituted into.
 \<close>
 
+text \<open> From \<open>\<phi>' \<Rrightarrow> \<phi>''\<close> and \<open>\<phi> \<Rrightarrow> \<langle>\<alpha>\<rangle>\<phi>'\<close> follows \<open>\<phi> \<Rrightarrow> \<langle>\<alpha>\<rangle>\<phi>''\<close>. \<close>
 lemma obs_pre_subst:
   assumes "\<phi>l \<Rrightarrow> \<phi>r"
       and "\<phi> \<Rrightarrow> (Obs \<alpha> \<phi>l)"
   shows "\<phi> \<Rrightarrow> (Obs \<alpha> \<phi>r)"
   using assms and hml_impl_def by force
 
+text \<open> From \<open>\<phi>' \<Rrightarrow> \<phi>''\<close> and \<open>\<phi> \<Rrightarrow> \<langle>\<epsilon>\<rangle>\<phi>'\<close> follows \<open>\<phi> \<Rrightarrow> \<langle>\<epsilon>\<rangle>\<phi>''\<close>. \<close>
 lemma internal_pre_subst:
   assumes "\<phi>l \<Rrightarrow> \<phi>r"
       and "\<phi> \<Rrightarrow> (Internal \<phi>l)"
   shows "\<phi> \<Rrightarrow> (Internal \<phi>r)"
   using assms and hml_impl_iffI by force
 
+text \<open> From \<open>\<phi>' \<Rrightarrow> \<phi>''\<close> and \<open>\<phi> \<Rrightarrow> (\<tau>)\<phi>'\<close> follows \<open>\<phi> \<Rrightarrow> (\<tau>)\<phi>''\<close>. \<close>
 lemma silent_pre_subst: 
   assumes "\<phi>l \<Rrightarrow> \<phi>r"
       and "\<phi> \<Rrightarrow> (Silent \<phi>l)"
   shows "\<phi> \<Rrightarrow> (Silent \<phi>r)"
   using assms and hml_impl_iffI by force
 
+text \<open> From \<open>\<phi>' \<Rrightarrow> \<phi>''\<close> and \<open>\<phi> \<Rrightarrow> \<And>{\<phi>', ...}\<close> follows \<open>\<phi> \<Rrightarrow> \<And>{\<phi>'', ...}\<close>,
+as long the remainder of the conjunction is unchanged. \<close>
 lemma conj_pre_subst: 
   assumes "\<phi>l \<Rrightarrow> \<phi>r"
       and "\<phi> \<Rrightarrow> (Conj (I \<union> {s}) (\<lambda>i. if i = s then Pos \<phi>l else \<psi>s i))"
   shows "\<phi> \<Rrightarrow> (Conj (I \<union> {s}) (\<lambda>i. if i = s then Pos \<phi>r else \<psi>s i))"
   using assms and hml_impl_iffI by fastforce
 
+text \<open> From \<open>\<phi>' \<Rrightarrow> \<phi>''\<close> and \<open>\<phi> \<Rrightarrow> \<phi>'\<close> follows \<open>\<phi> \<Rrightarrow> \<phi>''\<close>.
+This simply lifts hml implication into the \<open>hml_conjunct\<close> data type.\<close>
 lemma pos_pre_subst:
   assumes "\<phi>l \<Rrightarrow> \<phi>r"
       and "\<psi> \<and>\<Rrightarrow> (Pos \<phi>l)" 
   shows "\<psi> \<and>\<Rrightarrow> (Pos \<phi>r)" 
   using assms by (simp add: hml_conjunct_impl_def hml_impl_iffI)
 
+text \<open> From \<open>\<phi>' \<Rrightarrow> \<phi>''\<close> and \<open>\<not>\<phi>' \<Rrightarrow> \<phi>\<close> follows \<open>\<not>\<phi>'' \<Rrightarrow> \<phi>\<close>.
+Note that here substitution occurs on the left hand side.\<close>
 lemma neg_pre_subst: 
   assumes "\<phi>l \<Rrightarrow> \<phi>r"
       and "(Neg \<phi>l) \<and>\<Rrightarrow> \<psi>" 
   shows "(Neg \<phi>r) \<and>\<Rrightarrow> \<psi>"
   using assms and hml_conjunct_impl_def hml_impl_iffI by auto
+
+text \<open> From \<open>\<phi>' \<Rrightarrow> \<phi>''\<close> and \<open>\<phi> \<Rrightarrow> (\<alpha>)\<phi>'\<close> follows \<open>\<phi> \<Rrightarrow> (\<alpha>)\<phi>''\<close>. \<close>
+lemma soft_pos_pre_subst:
+  assumes "\<phi>l \<Rrightarrow> \<phi>r"
+    and "\<phi> \<Rrightarrow> (HML_soft_poss \<alpha> \<phi>l)"
+  shows "\<phi> \<Rrightarrow> (HML_soft_poss \<alpha> \<phi>r)"
+  using assms obs_pre_subst silent_pre_subst by auto
+
+end (* LTS_Tau *)
+
+context Inhabited_Tau_LTS
+begin
+
+text \<open> From \<open>\<phi>' \<Rrightarrow> \<phi>''\<close> and \<open>\<phi> \<Rrightarrow> (\<phi>' \<and> \<phi>o)\<close> follows \<open>\<phi> \<Rrightarrow> (\<phi>'' \<and> \<phi>o)\<close>. \<close>
+lemma hml_and_left_pre_subst:
+  assumes "\<phi>l \<and>\<Rrightarrow> \<phi>r"
+    and "\<phi> \<Rrightarrow> (\<phi>l \<and>hml \<phi>o)"
+  shows "\<phi> \<Rrightarrow> (\<phi>r \<and>hml \<phi>o)"
+  using assms hml_conjunct_impl_iffI hml_impl_iffI by auto
+
+text \<open> From \<open>\<phi>' \<Rrightarrow> \<phi>''\<close> and \<open>\<phi> \<Rrightarrow> (\<phi>o \<and> \<phi>')\<close> follows \<open>\<phi> \<Rrightarrow> (\<phi>o \<and> \<phi>'')\<close>. \<close>
+lemma hml_and_right_pre_subst:
+  assumes "\<phi>l \<and>\<Rrightarrow> \<phi>r"
+    and "\<phi> \<Rrightarrow> (\<phi>o \<and>hml \<phi>l)"
+  shows "\<phi> \<Rrightarrow> (\<phi>o \<and>hml \<phi>r)"
+  using assms hml_conjunct_impl_iffI hml_impl_iffI by auto
+
+text \<open> From \<open>\<phi>' \<Rrightarrow> \<phi>''\<close> and \<open>\<not>\<phi>' \<Rrightarrow> \<phi>\<close> follows \<open>\<not>\<phi>'' \<Rrightarrow> \<phi>\<close>.
+Note that here substitution occurs on the left hand side.\<close>
+lemma not_pre_subst:
+  assumes "\<phi>l \<Rrightarrow> \<phi>r"
+    and "HML_not \<phi>l \<Rrightarrow> \<phi>"
+  shows "HML_not \<phi>r \<Rrightarrow> \<phi>"
+  using assms hml_impl_iffI by auto
+
+end (* Inhabited_Tau_LTS *)
 
 
 subsubsection \<open> Pre-Congruence \<close>
@@ -248,21 +298,31 @@ by wrapping both sides of the implication in the same HML formula context.
 The lemmata differ in the choice of context, i.e. how both sides are extended.
 \<close>
 
+context LTS_Tau
+begin
+
+text \<open> Prepending an observation (\<open>\<langle>\<alpha>\<rangle>...\<close>) preserves implication. \<close>
 lemma obs_pre_cong:
   assumes "\<phi>l \<Rrightarrow> \<phi>r"
   shows "(Obs \<alpha> \<phi>l) \<Rrightarrow> (Obs \<alpha> \<phi>r)"
   using assms and hml_impl_iffI by auto
 
+text \<open> Prepending an epsilon (\<open>\<langle>\<epsilon>\<rangle>...\<close>) preserves implication. \<close>
 lemma internal_pre_cong: 
   assumes "\<phi>l \<Rrightarrow> \<phi>r"
   shows "(Internal \<phi>l) \<Rrightarrow> (Internal \<phi>r)"
   using assms and hml_impl_iffI by auto
 
+text \<open> Prepending an silent observation (\<open>(\<tau>)...\<close>) preserves implication. \<close>
 lemma silent_pre_cong: 
   assumes "\<phi>l \<Rrightarrow> \<phi>r"
   shows "(Silent \<phi>l) \<Rrightarrow> (Silent \<phi>r)"
   using assms and hml_impl_iffI by auto
 
+text \<open>
+Wrapping both sides of an implication in the same conjunction,
+will preserve the implication.
+\<close>
 lemma conj_pre_cong: 
   assumes "\<psi>sl ` I = \<psi>sr ` I"
       and "\<psi>sl l \<and>\<Rrightarrow> \<psi>sr r" 
@@ -270,6 +330,10 @@ lemma conj_pre_cong:
   using assms
   by (smt (verit) Un_insert_right hml_conjunct_impl_def hml_impl_def hml_models.simps(5) image_iff insert_iff sup_bot.right_neutral)
 
+text \<open>
+Wrapping a set of implying conjuncts in the same conjunction,
+will preserve the implications.
+\<close>
 lemma conj_pre_congs:
   assumes "\<psi>sl ` I = \<psi>sr ` I"
       and "\<forall>i \<in> I'. \<psi>sl i \<and>\<Rrightarrow> \<psi>sr i"
@@ -277,27 +341,70 @@ lemma conj_pre_congs:
   using assms
   by (smt (verit, ccfv_threshold) LTS_Tau.hml_conjunct_impl_def UnE UnI1 hml_impl_iffI hml_models.simps(5) imageE imageI)
 
+text \<open> Simply lifting hml implication to hml conjunct implication. \<close>
 lemma pos_pre_cong:
   assumes "\<phi>l \<Rrightarrow> \<phi>r"
   shows "Pos \<phi>l \<and>\<Rrightarrow> Pos \<phi>r"
   using assms
   by (simp add: hml_conjunct_impl_def hml_impl_iffI)
 
-text \<open> Note: \<open>\<phi>l\<close> and \<open>\<phi>r\<close> switch sides in the conclusion! \<close>
+text \<open> Turning both sides of an implication into a negated conjunct will invert the implication direction.
+Note: \<open>\<phi>l\<close> and \<open>\<phi>r\<close> switch sides in the conclusion! \<close>
 lemma neg_pre_cong:
   assumes "\<phi>l \<Rrightarrow> \<phi>r"
   shows "Neg \<phi>r \<and>\<Rrightarrow> Neg \<phi>l"
   using assms and hml_conjunct_impl_def hml_impl_def by auto
 
+text \<open> Prepending an soft observation (\<open>(\<alpha>)...\<close>) preserves implication. \<close>
+lemma soft_poss_pre_cong:
+  assumes "\<phi>l \<Rrightarrow> \<phi>r"
+  shows "HML_soft_poss \<alpha> \<phi>l \<Rrightarrow> HML_soft_poss \<alpha> \<phi>r"
+  using assms and obs_pre_cong and silent_pre_cong 
+  by auto
+
+end (* LTS_Tau *)
+
+context Inhabited_Tau_LTS
+begin
+
+text \<open> Appending a conjunct (\<open>... \<and> \<psi>\<close>) preserves implication. \<close>
+lemma hml_and_left_pre_cong:
+  assumes "\<psi>l \<and>\<Rrightarrow> \<psi>r"
+  shows "\<psi>l \<and>hml \<psi> \<Rrightarrow> \<psi>r \<and>hml \<psi>"
+  using assms and conj_pre_congs 
+  by (simp add: hml_conjunct_impl_iffI hml_impl_iffI)
+
+text \<open> Prepending a conjunct (\<open>\<psi> \<and> ...\<close>) preserves implication. \<close>
+lemma hml_and_right_pre_cong:
+  assumes "\<psi>l \<and>\<Rrightarrow> \<psi>r"
+  shows "\<psi> \<and>hml \<psi>l \<Rrightarrow> \<psi> \<and>hml \<psi>r"
+  using assms and conj_pre_congs 
+  by (simp add: hml_conjunct_impl_iffI hml_impl_iffI)
+
+text \<open> Prepending a negation (\<open>\<not>...\<close>) inverts implication. \<close>
+lemma not_pre_cong:
+  assumes "\<phi>l \<Rrightarrow> \<phi>r"
+  shows "HML_not \<phi>r \<Rrightarrow> HML_not \<phi>l"
+  using assms and neg_pre_cong and conj_pre_cong 
+  by simp
+
+end (* Inhabited_Tau_LTS *)
+
 
 subsubsection \<open> Know Pre-Order Elements\<close>
 
+context LTS_Tau
+begin
+
+text \<open> If \<open>\<phi>\<close> is satisfied, then also \<open>\<langle>\<epsilon>\<rangle>\<phi>\<close> must be satisfied. \<close>
 lemma pre_\<epsilon>: "\<phi> \<Rrightarrow> (Internal \<phi>)"
   using silent_reachable.intros(1) hml_impl_def by fastforce
 
+text \<open> If \<open>\<phi>\<close> is satisfied, then also \<open>(\<tau>)\<phi>\<close> must be satisfied. \<close>
 lemma pre_\<tau>: "\<phi> \<Rrightarrow> (Silent \<phi>)"
   using hml_impl_def by fastforce
 
+text \<open> If \<open>\<langle>\<epsilon>\<rangle>\<langle>\<tau>\<rangle>\<phi>\<close> is satisfied, then also \<open>\<langle>\<epsilon>\<rangle>\<phi>\<close> must be satisfied. \<close>
 lemma \<epsilon>_eats_\<tau>: "(Internal (Obs \<tau> \<phi>)) \<Rrightarrow> (Internal \<phi>)"
   using silent_reachable_append_\<tau> hml_impl_def by fastforce
 
