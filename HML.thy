@@ -1,6 +1,8 @@
+section \<open> Hennesy-Milner-Logic (HML)\<close>
 theory HML
   imports Main LTS
 begin
+
 
 section \<open> Hennesy-Milner-Logic (HML) \<close>
 
@@ -31,6 +33,7 @@ Note that in canonical definitions of HML \<open>TT\<close> is not usually given
 We include \<open>TT\<close> in the definition to enable Isabelle to infer via syntax only, that the types \<open>hml\<close>
 and \<open>hml_srbb\<close> are non-empty.  If this data constructor is omitted, Isabelle will reject the definition.
 \<close>
+
 
 datatype 
   ('act, 'i) hml =

@@ -3,6 +3,14 @@
 \usepackage{isabelle,isabellesym}
 \usepackage{amsmath}
 \usepackage{amssymb}
+\usepackage{geometry}
+\geometry{
+  left=3cm,
+  right=3cm,
+  top=2cm,
+  bottom=4cm,
+  bindingoffset=5mm
+}
 
 % this should be the last package used
 \usepackage{pdfsetup}
@@ -21,7 +29,7 @@
 \begin{document}
 
 \title{Linear-Time--Branching-Time Spectroscopy Accounting for Silent Steps}
-\author{}
+\author{Lisa Annett Barthel \and Leonard Moritz Hübner \and Caroline Lemke \and Karl Parvis Philipp Mattes \and Lenard Mollenkopf}
 \maketitle
 
 \begin{abstract}
@@ -31,7 +39,27 @@
 \tableofcontents
 
 % include generated text of all theories
-\input{session}
+%\input{session}
+\input{introduction}
+\input{LTS}
+\input{HML}
+\input{HML_SRBB}
+\input{Energy}
+\input{Expressiveness_Price}
+\input{Energy_Games}
+\input{Spectroscopy_Game}
+\input{Silent_Step_Spectroscopy}
+\input{Distinction_Implies_Winning_Budgets}
+\input{Strategy_Formulas}
+\input{outcomes}
+\input{conclusion}
+
+\appendix
+\input{change_index}
+\input{Example_Instantiation}
+\input{HML_Context}
+\input{Weak_Traces}
+\input{Misc}
 
 \bibliographystyle{abbrv}
 \bibliography{root}

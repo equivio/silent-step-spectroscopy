@@ -1,8 +1,8 @@
+section \<open> Stability Respecting Branching Bisimilarity - Subset of HML \<close>
+
 theory HML_SRBB
   imports Main HML
 begin
-
-section \<open> Stability Respecting Branching Bisimilarity - Subset of HML \<close>
 
 datatype 
   ('act, 'i) hml_srbb =
@@ -20,7 +20,6 @@ and
   ('act, 'i) hml_srbb_conjunct =
     Pos "('act, 'i) hml_srbb_inner" |
     Neg "('act, 'i) hml_srbb_inner"
-
 
 context Inhabited_Tau_LTS
 begin
@@ -58,7 +57,6 @@ fun hml_srbb_inner_models :: "('a, 's) hml_srbb_inner \<Rightarrow> 's \<Rightar
 fun hml_srbb_conjunct_models :: "('a, 's) hml_srbb_conjunct \<Rightarrow> 's \<Rightarrow> bool" where
   "hml_srbb_conjunct_models \<psi> s = (hml_conjunct_models s (hml_srbb_conjunct_to_hml_conjunct \<psi>))"
 
-
 (*Some sanity checks*)
 
 lemma "(state \<Turnstile>SRBB TT) = (state \<Turnstile>SRBB ImmConj {} \<psi>s)"
@@ -73,13 +71,17 @@ lemma "(state \<Turnstile>SRBB TT) = (hml_srbb_inner_models (Obs \<tau> TT) stat
 lemma "(state \<Turnstile>SRBB Internal \<chi>) = (state \<Turnstile>SRBB ImmConj {left} (\<lambda>i. if i = left then Pos \<chi> else undefined))"
   by simp
 
+abbreviation model_set :: "('a, 's) hml_srbb \<Rightarrow> 's set"  where "model_set \<phi> \<equiv> {p. p \<Turnstile>SRBB \<phi>}"
+abbreviation model_set_inner :: "('a, 's) hml_srbb_inner \<Rightarrow> 's set"  where "model_set_inner \<chi> \<equiv> {p. hml_srbb_inner_models \<chi> p}"
+abbreviation model_set_conjunct :: "('a, 's) hml_srbb_conjunct \<Rightarrow> 's set"  where "model_set_conjunct \<psi> \<equiv> {p. hml_srbb_conjunct_models \<psi> p}"
+
 
 definition distinguishes :: "('a, 's) hml_srbb \<Rightarrow> 's \<Rightarrow> 's \<Rightarrow> bool" where
   "distinguishes \<phi> p q \<equiv> p \<Turnstile>SRBB \<phi> \<and> \<not>(q \<Turnstile>SRBB \<phi>)"
 
-lemma dist_srbb_eq_dist_hml:
-  "distinguishes \<phi> p q = p <> (hml_srbb_to_hml \<phi>) q"
-  by (simp add: distinguishes_def distinguishes_hml_def)
+lemma verum_never_distinguishes:
+  "\<not> distinguishes TT p q"
+  by (simp add: distinguishes_def)
 
 definition distinguishes_inner :: "('a, 's) hml_srbb_inner \<Rightarrow> 's \<Rightarrow> 's \<Rightarrow> bool" where
   "distinguishes_inner \<chi> p q \<equiv> hml_srbb_inner_models \<chi> p \<and> \<not>(hml_srbb_inner_models \<chi> q)"
@@ -348,7 +350,6 @@ proof -
       using distinguishes_conjunct_hml_def distinguishes_hml_def by auto
   qed
 qed
-
 
 definition hml_preordered :: "(('a, 's) hml_srbb) set \<Rightarrow> 's \<Rightarrow> 's \<Rightarrow> bool" where
   "hml_preordered \<phi>s p q \<equiv> \<forall>\<phi> \<in> \<phi>s. p \<Turnstile>SRBB \<phi> \<longrightarrow> q \<Turnstile>SRBB \<phi>"

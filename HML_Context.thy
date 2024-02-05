@@ -1,4 +1,5 @@
-theory HML_Context_
+section \<open>HML Contexts\<close>
+theory HML_Context
   imports Main HML
 begin
 

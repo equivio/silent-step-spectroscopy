@@ -1,8 +1,8 @@
-theory Expressiveness_Price
-  imports Main HML_SRBB "HOL-Library.Extended_Nat" Energy Spectroscopy_Game
-begin
-
 section \<open>The expressiveness price function\<close>
+
+theory Expressiveness_Price
+  imports HML_SRBB Energy Spectroscopy_Game
+begin
 
 text \<open>
 The expressiveness price function assigns a price - an eight element tuple - to a \<open>hml_srbb\<close> formula.
@@ -314,6 +314,34 @@ fun expressiveness_price :: "('a, 's) hml_srbb \<Rightarrow> energy" where
                               (max_negative_conjunct_depth \<phi>)
                               (negation_depth              \<phi>)"
 
+lemma expressiveness_price_ImmConj_def:
+  shows "expressiveness_price (ImmConj I \<psi>s) = E 
+    (Sup ((modal_depth_srbb_conjunct \<circ> \<psi>s) ` I))
+    (Sup ((branch_conj_depth_conjunct \<circ> \<psi>s) ` I))
+    (if I = {} then 0 else 1 + Sup ((inst_conj_depth_conjunct \<circ> \<psi>s) ` I))
+    (Sup ((st_conj_depth_conjunct \<circ> \<psi>s) ` I))
+    (if I = {} then 0 else 1 + Sup ((imm_conj_depth_conjunct \<circ> \<psi>s) ` I))
+    (Sup ((max_pos_conj_depth_conjunct \<circ> \<psi>s) ` I))
+    (Sup ((max_neg_conj_depth_conjunct \<circ> \<psi>s) ` I))
+    (Sup ((neg_depth_conjunct \<circ> \<psi>s) ` I))" by simp
+
+lemma expressiveness_price_ImmConj_non_empty_def:
+  assumes "I \<noteq> {}"
+  shows "expressiveness_price (ImmConj I \<psi>s) = E 
+    (Sup ((modal_depth_srbb_conjunct \<circ> \<psi>s) ` I))
+    (Sup ((branch_conj_depth_conjunct \<circ> \<psi>s) ` I))
+    (1 + Sup ((inst_conj_depth_conjunct \<circ> \<psi>s) ` I))
+    (Sup ((st_conj_depth_conjunct \<circ> \<psi>s) ` I))
+    (1 + Sup ((imm_conj_depth_conjunct \<circ> \<psi>s) ` I))
+    (Sup ((max_pos_conj_depth_conjunct \<circ> \<psi>s) ` I))
+    (Sup ((max_neg_conj_depth_conjunct \<circ> \<psi>s) ` I))
+    (Sup ((neg_depth_conjunct \<circ> \<psi>s) ` I))" using assms  by simp
+
+lemma expressiveness_price_ImmConj_empty_def:
+  assumes "I = {}"
+  shows "expressiveness_price (ImmConj I \<psi>s) = E 0 0 0 0 0 0 0 0" using assms 
+  unfolding expressiveness_price_ImmConj_def by (simp add: bot_enat_def)
+
 lemma srbb_price_never_neg : "expressiveness_price \<phi> \<noteq> eneg"
   by simp
 
@@ -354,7 +382,8 @@ definition \<O>_conjunct :: "energy \<Rightarrow> (('a, 's) hml_srbb_conjunct) s
 
 subsection \<open>Lemmas on expressiveness of different formulas\<close>
 
-context full_spec_game begin
+context full_spec_game
+begin
 
 lemma expr_internal_eq:
   shows "expressiveness_price (Internal \<chi>) = expr_pr_inner \<chi>"
@@ -897,11 +926,39 @@ proof-
         thus "expr_pr_inner (BranchConj \<alpha> \<phi> Q \<Phi>) \<le> e" using expr e3_le e2_le e1_le 
           by (smt (verit, del_insts) Sup_insert Sup_union_distrib \<open>e = E e1 e2 e3 e4 e5 e6 e7 e8\<close> ccpo_Sup_singleton dual_order.trans energy.distinct(1) energy.sel(1) energy.sel(2) energy.sel(3) energy.sel(4) energy.sel(5) energy.sel(6) energy.sel(7) energy.sel(8) ile_eSuc image_empty linorder_not_less plus_1_eSuc(1) somwhere_larger_eq)
       qed
-  qed
+    qed
 
-end
+lemma expressiveness_price_ImmConj_geq_parts:
+  assumes "i \<in> I" "I \<noteq> {}"
+  shows "expressiveness_price (ImmConj I \<psi>s) - E 0 0 1 0 1 0 0 0 \<ge> expr_pr_conjunct (\<psi>s i)"
+proof-
+  from expressiveness_price_ImmConj_non_empty_def[OF assms(2)] 
+  have "expressiveness_price (ImmConj I \<psi>s) \<ge> E 0 0 1 0 1 0 0 0"
+    using energy_leq_cases by force
+  from direct_minus_eq[OF this] have
+  "expressiveness_price (ImmConj I \<psi>s) - E 0 0 1 0 1 0 0 0 = E
+    (Sup ((modal_depth_srbb_conjunct \<circ> \<psi>s) ` I))
+    (Sup ((branch_conj_depth_conjunct \<circ> \<psi>s) ` I))
+    (Sup ((inst_conj_depth_conjunct \<circ> \<psi>s) ` I))
+    (Sup ((st_conj_depth_conjunct \<circ> \<psi>s) ` I))
+    (Sup ((imm_conj_depth_conjunct \<circ> \<psi>s) ` I))
+    (Sup ((max_pos_conj_depth_conjunct \<circ> \<psi>s) ` I))
+    (Sup ((max_neg_conj_depth_conjunct \<circ> \<psi>s) ` I))
+    (Sup ((neg_depth_conjunct \<circ> \<psi>s) ` I))" unfolding expressiveness_price_ImmConj_non_empty_def[OF assms(2)] by auto
+  also have "... \<ge> expr_pr_conjunct (\<psi>s i)" using assms using SUP_upper leq_not_eneg by fastforce
+  finally show ?thesis .
+qed
 
+lemma expressiveness_price_ImmConj_geq_parts':
+  assumes "i \<in> I" "I \<noteq> {}"
+  shows "(expressiveness_price (ImmConj I \<psi>s) - E 0 0 0 0 1 0 0 0) - E 0 0 1 0 0 0 0 0 \<ge> expr_pr_conjunct (\<psi>s i)"
+  using expressiveness_price_ImmConj_geq_parts[OF assms]
+  less_eq_energy_def minus_energy_def
+  by (smt (z3) assms(2) energy.case_eq_if energy.simps(4)
+      energy_minus expressiveness_price_ImmConj_non_empty_def
+      idiff_0_right linorder_le_less_linear not_less_zero)
 
+end (* full_spec_game *)
 
 subsection \<open>characterizing equivalence by energy coordinates\<close>
 
@@ -966,6 +1023,62 @@ lemma "expressiveness_price (Internal (Conj {} \<psi>s)) = E 0 0 0 0 0 0 0 0"
 
 lemma "expressiveness_price (Internal (BranchConj \<alpha> TT {} \<psi>s)) = E 1 0 0 0 0 0 0 0"
   by (simp add: Sup_enat_def)
+
+lemma expr_obs:
+  assumes "expressiveness_price \<phi> \<le> (e - E 1 0 0 0 0 0 0 0)"
+  shows "expr_pr_inner (Obs \<alpha> \<phi>) \<le> e"
+proof-
+  have expr_pr_obs: "expr_pr_inner (Obs \<alpha> \<phi>) = 
+                  (E (modal_depth_srbb_inner (Obs \<alpha> \<phi>))
+                 (branch_conj_depth_inner (Obs \<alpha> \<phi>))
+                 (inst_conj_depth_inner (Obs \<alpha> \<phi>))
+                 (st_conj_depth_inner (Obs \<alpha> \<phi>))
+                 (imm_conj_depth_inner (Obs \<alpha> \<phi>))
+                 (max_pos_conj_depth_inner (Obs \<alpha> \<phi>))
+                 (max_neg_conj_depth_inner (Obs \<alpha> \<phi>))
+                 (neg_depth_inner (Obs \<alpha> \<phi>)))"
+    using expr_pr_inner.simps by blast
+  have obs_upds: "modal_depth_srbb_inner (Obs \<alpha> \<phi>) = 1 + modal_depth_srbb \<phi>" 
+  "branch_conj_depth_inner (Obs \<alpha> \<phi>) = branching_conjunction_depth \<phi>"
+  "inst_conj_depth_inner (Obs \<alpha> \<phi>) = instable_conjunction_depth \<phi>"
+  "st_conj_depth_inner (Obs \<alpha> \<phi>) = stable_conjunction_depth \<phi>"
+  "imm_conj_depth_inner (Obs \<alpha> \<phi>) = immediate_conjunction_depth \<phi>"
+  "max_pos_conj_depth_inner (Obs \<alpha> \<phi>) = max_positive_conjunct_depth \<phi>"
+  "max_neg_conj_depth_inner (Obs \<alpha> \<phi>) = max_negative_conjunct_depth \<phi>"
+  "neg_depth_inner (Obs \<alpha> \<phi>) = negation_depth \<phi>"
+    by simp+
+
+  obtain e1 e2 e3 e4 e5 e6 e7 e8 where "e = E e1 e2 e3 e4 e5 e6 e7 e8"
+    by (metis antisym assms eneg_leq energy.exhaust_sel gets_smaller srbb_price_never_neg)
+  hence "(e - (E 1 0 0 0 0 0 0 0)) = (E (e1-1) e2 e3 e4 e5 e6 e7 e8) \<or> 
+                  ((e - (E 1 0 0 0 0 0 0 0)) = eneg)"
+            using minus_energy_def
+            by simp
+  then show ?thesis
+  proof(rule disjE)
+  assume "e - E 1 0 0 0 0 0 0 0 = eneg"
+  hence "e = (E 0 0 0 0 0 0 0 0)"
+    using assms
+    using antisym eneg_leq min_eneg(2) by fastforce
+  then show ?thesis 
+    using \<open>e - E 1 0 0 0 0 0 0 0 = eneg\<close> assms 
+    using eneg_leq order_class.order_eq_iff by auto
+next
+  assume "e - E 1 0 0 0 0 0 0 0 = E (e1 - 1) e2 e3 e4 e5 e6 e7 e8"
+  hence "modal_depth_srbb \<phi> \<le> (e1 - 1)"
+    using assms leq_not_eneg by force
+  hence "modal_depth_srbb_inner (Obs \<alpha> \<phi>) \<le> e1"
+    using obs_upds
+    by (metis \<open>e - E 1 0 0 0 0 0 0 0 = E (e1 - 1) e2 e3 e4 e5 e6 e7 e8\<close> \<open>e = E e1 e2 e3 e4 e5 e6 e7 e8\<close> add_diff_assoc_enat add_diff_cancel_enat add_mono_thms_linordered_semiring(1) enat.simps(3) energy.distinct(1) energy.sel(1) le_numeral_extra(4) leq_not_eneg minus_energy_def one_enat_def)
+  then show ?thesis
+    using expr_pr_obs obs_upds 
+    using \<open>e - E 1 0 0 0 0 0 0 0 = E (e1 - 1) e2 e3 e4 e5 e6 e7 e8\<close> \<open>e = E e1 e2 e3 e4 e5 e6 e7 e8\<close> assms leq_not_eneg by fastforce 
+qed
+qed
+
+lemma expr_obs_phi:
+  shows "e1 (expr_pr_inner (Obs \<alpha> \<phi>)) = expressiveness_price \<phi>"
+  by (simp add: direct_minus_eq energy_leq_cases le_iff_add)
 
 end
 
