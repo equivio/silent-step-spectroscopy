@@ -56,7 +56,7 @@ even of infinite width.
 \<close>
 
 primrec
-      hml_models          :: "'s \<Rightarrow> ('a, 's) hml          \<Rightarrow> bool" ("_ \<Turnstile> _" 60) 
+      hml_models          :: "'s \<Rightarrow> ('a, 's) hml \<Rightarrow> bool" ("_ \<Turnstile> _" 60) 
   and hml_conjunct_models :: "'s \<Rightarrow> ('a, 's) hml_conjunct \<Rightarrow> bool"
 where
   "(_ \<Turnstile> TT) = True" |
@@ -70,7 +70,7 @@ where
 
 
 text \<open>
-While \<open>T\<close> and \<open>\<And>\<Psi>\<close> differ syntactically, they mean exactly the same thing.
+While \<open>T\<close> and \<open>\<And>{}\<close> differ syntactically, they mean exactly the same thing.
 Every process will satisfy both of these formulas.
 \<close>
 lemma tt_eq_empty_conj: "(state \<Turnstile> TT) = (state \<Turnstile> Conj {} \<psi>)"
@@ -97,12 +97,17 @@ Binary conjunction (\<open>\<and>\<close>) is reduced to a conjunction over sets
 whereby the LTS needs to be inhabited so that at least two indices are available.
 \<close>
 
-abbreviation HML_and :: "('a, 's) hml_conjunct \<Rightarrow> ('a, 's) hml_conjunct \<Rightarrow> ('a, 's) hml" ("_ \<and>hml _" 70) where
-  "HML_and left_conjunct right_conjunct \<equiv> Conj {left, right} (\<lambda>i. if i = left
-                                          then left_conjunct
-                                          else if i = right
-                                               then right_conjunct
-                                               else Pos TT)"
+abbreviation
+  HML_and :: "('a, 's) hml_conjunct \<Rightarrow> ('a, 's) hml_conjunct
+              \<Rightarrow> ('a, 's) hml"
+  ("_ \<and>hml _" 70) where
+
+  "left_conjunct \<and>hml right_conjunct \<equiv> 
+   Conj {left, right} (\<lambda>i. if i = left
+                           then left_conjunct
+                           else if i = right
+                                then right_conjunct
+                                else Pos TT)"
 
 end (* context Inhabited_LTS *)
 
