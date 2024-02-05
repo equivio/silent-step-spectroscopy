@@ -114,7 +114,11 @@ end (* context Inhabited_LTS *)
 context Inhabited_Tau_LTS
 begin
 
-lemma hml_and_and: "(p \<Turnstile> (\<psi>l \<and>hml \<psi>r)) = (hml_conjunct_models p \<psi>l \<and> hml_conjunct_models p \<psi>r)"
+text \<open> \<open>hml_and_and\<close> lifts satisfaction of a hml conjunction from HML logic to HOL logic. \<close>
+
+lemma hml_and_and:
+  "(p \<Turnstile> (\<psi>l \<and>hml \<psi>r))
+ = (hml_conjunct_models p \<psi>l \<and> hml_conjunct_models p \<psi>r)"
   unfolding hml_models.simps and hml_conjunct_models.simps
 proof (rule iffI)
   assume "\<forall>i\<in>{left, right}. hml_conjunct_models p (if i = left then \<psi>l else if i = right then \<psi>r else Pos TT)"
@@ -139,13 +143,19 @@ text \<open> \<open>(HML_not \<phi>)\<close> represents \<open>\<not>\<phi>\<clo
 abbreviation HML_not :: "('a, 's) hml \<Rightarrow> ('a, 's) hml" where
   "HML_not \<phi> \<equiv> Conj {left} (\<lambda>i. if i = left then (Neg \<phi>) else (Pos TT))"
 
-lemma "(state \<Turnstile> \<phi>) = (state \<Turnstile>Conj {left}
-                            (\<lambda>i. if i = left
-                                 then (Pos \<phi>)
-                                 else (Pos TT)))"
+
+text \<open> \<open>\<not>\<not>\<phi>\<close> is satisfied iff \<open>\<phi>\<close> is satisfied. \<close>
+
+lemma hml_not_not:
+  "(state \<Turnstile> \<phi>)
+ = (state \<Turnstile> HML_not (HML_not \<phi>))"
   by simp
 
-lemma "(state \<Turnstile> \<phi>) = (state \<Turnstile> HML_not (HML_not \<phi>))"
+text \<open> \<open>\<And>{\<phi>}\<close> (i.e. the single element conjunction) is satisfied iff \<open>\<phi>\<close> is satisfied. \<close>
+
+lemma conj_\<phi>_is_\<phi>:
+  "(state \<Turnstile> \<phi>)
+ = (state \<Turnstile> Conj {left} (\<lambda>i. if i = left then (Pos \<phi>) else (Pos TT)))"
   by simp
 
 end (* context Inhabited_Tau_LTS *)
