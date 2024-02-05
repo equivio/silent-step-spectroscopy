@@ -902,6 +902,11 @@ lemma silent_is_or: "(Silent \<phi>) \<Lleftarrow>\<Rrightarrow> ((Obs \<tau> \<
         and opt_\<tau>_is_or
   by (rule allI, rule refl)
 
+text \<open> \<open>\<phi>\<close> is equivalent to \<open>\<not>\<not>\<phi>\<close> \<close>
+lemma hml_not_not_eq: "\<phi> \<Lleftarrow>\<Rrightarrow> HML_not (HML_not \<phi>)"
+  unfolding hml_eq_equality
+  using hml_not_not by auto
+
 
 subsection \<open> HML Equivalence X HML Pre-Order \<close>
 
