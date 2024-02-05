@@ -76,16 +76,30 @@ Every process will satisfy both of these formulas.
 lemma tt_eq_empty_conj: "(state \<Turnstile> TT) = (state \<Turnstile> Conj {} \<psi>)"
   by simp
 
+text \<open> \<open>\<And>{\<phi>}\<close> (i.e. the single element conjunction) is satisfied iff \<open>\<phi>\<close> is satisfied. \<close>
+lemma conj_\<phi>_is_\<phi>:
+  "(state \<Turnstile> \<phi>)
+ = (state \<Turnstile> Conj {state} (\<lambda>i. if i = state then (Pos \<phi>) else (Pos TT)))"
+  by simp
+
 lemma opt_\<tau>_is_or: "(p \<Turnstile> (Silent \<phi>)) = ((p \<Turnstile> (Obs \<tau> \<phi>)) \<or> (p \<Turnstile> \<phi>))"
   by simp
 
 
-text \<open> \<open>HML_soft_poss \<alpha> \<phi>\<close> represents \<open>(\<alpha>)\<phi>\<close>, which is to be interpeted as \<open>\<langle>\<alpha>\<rangle>\<phi>\<close> if \<open>\<alpha> \<noteq> \<tau>\<close> and
-as \<open>(\<tau>)\<phi>\<close> otherwise.
+text \<open>
+\<open>HML_soft_poss \<alpha> \<phi>\<close> represents \<open>(\<alpha>)\<phi>\<close>,
+which is to be interpeted as \<open>\<langle>\<alpha>\<rangle>\<phi>\<close> if \<open>\<alpha> \<noteq> \<tau>\<close> and as \<open>(\<tau>)\<phi>\<close> otherwise.
 \<close>
-
 abbreviation HML_soft_poss :: "'a \<Rightarrow> ('a, 'i) hml \<Rightarrow> ('a, 'i) hml" where
   "HML_soft_poss \<alpha> \<phi> \<equiv> if \<alpha> = \<tau> then Silent \<phi> else Obs \<alpha> \<phi>"
+
+text \<open>
+\<open>(\<alpha>)\<phi>\<close> is satisfied if either \<open>\<langle>\<alpha>\<rangle>\<phi>\<close> (note that here \<open>\<alpha>\<close> may be equal to \<open>\<tau>\<close>) or
+if \<open>\<alpha> = \<tau>\<close> and \<open>\<phi>\<close> is already satisfied.
+\<close>
+lemma soft_poss_to_or:
+  "p \<Turnstile> (HML_soft_poss \<alpha> \<phi>) = (p \<Turnstile> Obs \<alpha> \<phi>) \<or> (\<alpha> = \<tau> \<and> p \<Turnstile> \<phi>)"
+  by auto
 
 end (* context LTS_Tau *)
 
@@ -96,7 +110,6 @@ text \<open>
 Binary conjunction (\<open>\<and>\<close>) is reduced to a conjunction over sets,
 whereby the LTS needs to be inhabited so that at least two indices are available.
 \<close>
-
 abbreviation
   HML_and :: "('a, 's) hml_conjunct \<Rightarrow> ('a, 's) hml_conjunct
               \<Rightarrow> ('a, 's) hml"
@@ -151,12 +164,14 @@ lemma hml_not_not:
  = (state \<Turnstile> HML_not (HML_not \<phi>))"
   by simp
 
-text \<open> \<open>\<And>{\<phi>}\<close> (i.e. the single element conjunction) is satisfied iff \<open>\<phi>\<close> is satisfied. \<close>
+text \<open> \<open>(\<phi> \<or> \<phi>')\<close> represents \<open>\<phi> \<or> \<phi>'\<close> (read "or") and is realized by using binary conjunction and negation. \<close>
 
-lemma conj_\<phi>_is_\<phi>:
-  "(state \<Turnstile> \<phi>)
- = (state \<Turnstile> Conj {left} (\<lambda>i. if i = left then (Pos \<phi>) else (Pos TT)))"
-  by simp
+definition HML_or :: "('a, 's) hml \<Rightarrow> ('a, 's) hml \<Rightarrow> ('a, 's) hml" ("_ \<or> _" 70) where
+  "\<phi>l \<or> \<phi>r \<equiv> HML_not (Neg \<phi>l \<and>hml Neg \<phi>r)"
+
+lemma hml_or_or: "(p \<Turnstile> (\<phi>l \<or> \<phi>r)) = ((p \<Turnstile> \<phi>l) \<or> (p \<Turnstile> \<phi>r))"
+  unfolding HML_or_def 
+  using Inhabited_LTS_axioms Inhabited_LTS_def hml_conjunct_models.simps(2) hml_models.simps(1) hml_models.simps(5) by force
 
 end (* context Inhabited_Tau_LTS *)
 
@@ -879,6 +894,13 @@ proof -
   show "Conj (I \<union> {s}) (\<lambda>i. if i = s then Pos TT else \<psi>s i) \<Lleftarrow>\<Rrightarrow> Conj I \<psi>s"
     by (meson equivp_transp hml_eq_equiv)
 qed
+
+text \<open> \<open>(\<tau>)\<phi>\<close> is equivalent to \<open>\<langle>\<tau>\<rangle>\<phi> \<or> \<phi>\<close> \<close>
+lemma silent_is_or: "(Silent \<phi>) \<Lleftarrow>\<Rrightarrow> ((Obs \<tau> \<phi>) \<or> \<phi>)"
+  unfolding hml_eq_equality
+        and hml_or_or
+        and opt_\<tau>_is_or
+  by (rule allI, rule refl)
 
 
 subsection \<open> HML Equivalence X HML Pre-Order \<close>
