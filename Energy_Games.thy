@@ -207,7 +207,7 @@ qed
 abbreviation "is_defender_turn p \<equiv> Gd (last p)"
 abbreviation "is_attacker_turn p \<equiv> Ga (last p)"
 
-text\<open>\noindent The following definitions formalize the conditions under which the game is won by the attacker, the defender or by nobody if the game is not yet stuck.
+text\<open>\noindent The following definitions formalize the conditions under which a finite play is won by the attacker, the defender or by nobody if the play is not yet stuck.
 For this purpose we have to consider the energy level. If we reach an energy level that is equal to the defender's win level, the defender wins.\<close>
 
 definition won_by_defender:: "'gstate \<Rightarrow> 'energy \<Rightarrow> 'gstate fplay \<Rightarrow> bool" where
