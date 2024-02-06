@@ -9,7 +9,7 @@ Energy games are the foundation for the later introduced full spectroscopy game,
 energy game itself, characterizing equivalence problems.\<close>
 
 text\<open>\noindent Currently we do not consider 8-dimensional energy games and use an abstract concept of energies.
-In order to combine this concept with our later definition of energy as a data type, energies must fulfill certain properties.\<close>
+In order to combine this with our later definition of energies as a data type, energies must fulfill certain properties.\<close>
 
 type_synonym 'energy update = "'energy \<Rightarrow> 'energy"
 
