@@ -8,13 +8,13 @@ begin
 
 text \<open>\noindent In this section we prove that the if a formula distinguishes a process @{term "p"}
       from a set of process @{term "Q"} then the price of this formula is in the attackers winning
-      budget. This is the same statement as that of lemma 1 in the paper \cite[p. 20]{bisping2023lineartimebranchingtime}
+      budget. This is the same statement as that of lemma 1 in the paper \cite[p. 20]{bisping2023lineartimebranchingtime}.
       We likewise also prove it in the same manner.
 
-      We first show that the statement holds if @{term "Q = {}"}. This is the case, as the
+      First we show that the statement holds if @{term "Q = {}"}. This is the case, as the
       attacker can move, at no cost, from the starting position, @{term "Attacker_Immediate p {}"}, 
       to the defender position @{term "Defender_Conj p {}"}. In this position the defender is then
-      unable to make any further moves. Hence the defender wins the game with any budget.\<close>
+      unable to make any further moves. Hence the attacker wins the game with any budget.\<close>
 
 lemma distinction_implies_winning_budgets_empty_Q:
   assumes "distinguishes_from \<phi> p {}"
@@ -38,7 +38,7 @@ qed
 
 text \<open>Next we show the statement for the case that @{term "Q \<noteq> {}"}. Following the proof of
       \cite[p. 20]{bisping2023lineartimebranchingtime} we do this by induction on a more
-      complex property. We formalize this property as follows (with the same labels as in the paper):
+      complex property. We formalize this property as follows (keeping the labels from the paper):
       \begin{itemize}
       \item [1.] \<open>\<forall>Q p. Q \<noteq> {} \<longrightarrow> distinguishes_from \<phi> p Q\<close>\\
       \<open>\<longrightarrow> in_wina (expressiveness_price \<phi>) (Attacker_Immediate p Q)\<close>
@@ -66,7 +66,8 @@ text \<open>Next we show the statement for the case that @{term "Q \<noteq> {}"}
     The induction itself is then done via the rule \<open>indict\<close> on\\\<open>hml_srbb_hml_srbb_inner_hml_srbb_conjunct\<close>.
     The parts of this proof that are completed work as described in the paper.
     A notable exceptions to this is that we also have to prove the statement for the 
-    formula @{term "TT"}\label{deviation:lemma1TT}.
+    formula @{term "TT"}\label{deviation:lemma1TT}. This holds trivialy as @{term "TT"} does not distinguishes any @{term "p"} from any
+    non-empty @{term "Q"}. 
   \<close>
 lemma distinction_implies_winning_budgets:
   assumes "distinguishes_from \<phi> p Q"
