@@ -181,7 +181,7 @@ qed
 
 subsection \<open>Winning\<close>
 
-text\<open>Energy games can be won by the attacker or the defender. In general, we distinguish between the winner of an infinite or a finite play. 
+text\<open>Plays can be won by the attacker or the defender. In general, we distinguish between the winner of an infinite and a finite play. 
 An infinite play is won by the defender. In contrast to the infinite play, the finite play is won if one of the players whose turn it is can no longer move.
 Then the play is stuck. Since we only consider finite plays, we just need definition for \<open>stuck\<close> and for the current player.\<close>
 
