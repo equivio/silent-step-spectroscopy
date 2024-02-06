@@ -3,15 +3,9 @@ theory Spectroscopy_Game
   imports Energy_Games Energy LTS
 begin
 
-text \<open>In this theory the full spectroscopy game is defined (as a locale). 
-The definition corresponds to definition 16 in the paper. (Definition 16 is an extension of 
-definition 14, which extends definition 12, which is a energy game depending on a LTS. We omit these 
-steps and give a definition directly.) 
-
-The full spectroscopy game is an energy game that can be constructed by adding stable and branching 
-conjunctions to a delay bisimulation game, which is  depending on a LTS. In the following we 
-differentiate the positions accordingly:\<close>
-
+text \<open>In this theory, we define the spectroscopy game as a locale.
+This game is an energy game constructed by adding stable and branching connections to a delay bisimulation game that depends on an LTS.\<close>
+text \<open>\noindent We differentiate the positions accordingly and define the moves of the game.\<close>
 datatype ('s, 'a) spectroscopy_position = 
                           Attacker_Immediate (attacker_state: "'s") (defender_states: "'s set") |
                           Attacker_Branch (attacker_state: "'s") (defender_states: "'s set") |
@@ -24,7 +18,6 @@ datatype ('s, 'a) spectroscopy_position =
 
 context Inhabited_Tau_LTS begin
 
-text \<open>Now we define the moves in a full spectroscopy game depending on a LTS:\<close>
 fun spectroscopy_moves :: "('s, 'a) spectroscopy_position \<Rightarrow> ('s, 'a) spectroscopy_position \<Rightarrow> energy update option" where 
   delay: 
     "spectroscopy_moves (Attacker_Immediate p Q) (Attacker_Delayed p' Q') 
@@ -89,8 +82,7 @@ fun spectroscopy_moves :: "('s, 'a) spectroscopy_position \<Rightarrow> ('s, 'a)
   others: "spectroscopy_moves _ _ = None"
 
 
-text \<open>The definition of defender positions in a full spectroscopy game is implicitly given by the 
-possible positions. Now we make them explicit:\<close>
+text \<open>\noindent We also explicitly define which positions are defender positions.\<close>
 fun spectroscopy_defender where
   "spectroscopy_defender (Attacker_Immediate _ _) = False" |
   "spectroscopy_defender (Attacker_Branch _ _) = False" |
@@ -101,9 +93,8 @@ fun spectroscopy_defender where
   "spectroscopy_defender (Defender_Stable_Conj _ _) = True"
 
 
-text \<open>To check whether these definitions are compatible with our definition of energy games we proof 
-an interpretation. To do so we first provide lemmas showing monotonicity of updates and that updates 
-only decline.\<close>
+text \<open>\noindent In the following, we check whether our definitions are compatible with those of energy games.
+For this purpose we show the monotonicity of energy updates and that they are only decreasing.\<close>
 
 lemma update_monotonicity: 
   fixes g g' e e'
@@ -334,7 +325,7 @@ qed
 
 end
 
-text \<open>Now we can write down the full spectroscopy game depending on an arbitrary (but inhabitated) LTS:\<close>
+text \<open>Now we are able to define the spectroscopy game on an arbitrary (but inhabited) LTS:\<close>
 locale full_spec_game =
   Inhabited_Tau_LTS step left right \<tau>
   + energy_game "spectroscopy_moves" "spectroscopy_defender" "eneg" "less_eq"
