@@ -34,7 +34,7 @@ locale energy_game =
           update_gets_smaller: "\<And>g g' e. ((weight_opt g g') \<noteq> None) \<Longrightarrow> (ord (the (weight_opt g g')e) e)"
 begin
 
-text\<open>\noindent In the following we introduce some abbreviations about attacker positions and moves.\<close>
+text\<open>\noindent In the following we introduce some abbreviations for attacker positions and moves.\<close>
 
 abbreviation attacker :: "'gstate \<Rightarrow> bool" ("Ga") where "Ga p \<equiv> \<not> Gd p" 
 
