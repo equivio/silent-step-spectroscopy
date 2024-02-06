@@ -18,7 +18,7 @@ text\<open>\noindent Furthermore we focus on finite plays that may be represente
 type_synonym 'gstate fplay = "'gstate list"
 
 text\<open>\noindent An energy game is played by two players on a directed graph labeled by energy updates. 
-These energy updates show that the performance of a certain move is associated with costs for the attacker.
+These energy updates represent the costs for the attacker of choosing a certain move.
 We therefore only consider the case where the attacker has no more energy when the energy level reaches the \<open>defender_win_level\<close>.
 In contrast to other games, our game does not have a starting position. This allows us to provide information about plays with any starting position.\<close>
 locale energy_game =
