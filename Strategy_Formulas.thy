@@ -114,7 +114,9 @@ If \<open>e\<close> is in the winning budget of \<open>Attacker_Immediate p Q\<c
 We prove a more detailed result for all possible game positions \<open>g\<close> by induction over the structure of winning budgets:\label{derivation:lemma2}
 \\
 We first show that the statement holds if \<open>g\<close> has no outgoing edges. (case 1) This can only be the case for 
-defender positions. If a defender position has outgoing edges and the statement holds true for all
+defender positions. If a defender position \<open>g\<close> has outgoing edges and the statement holds true for all
+Comment
+
 successors we show that the statement holds true for \<open>g\<close> as well. (case 3) If \<open>g\<close> is an attacker 
 position, by \<open>e\<close> being in the winning budget of \<open>g\<close>, we know there exists a successor of \<open>g\<close> that 
 the attacker can move to. If by induction the property holds true for that successor we show that it 
