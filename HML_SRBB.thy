@@ -995,6 +995,16 @@ lemma srbb_TT_is_empty_conj: "TT \<Lleftarrow>srbb\<Rrightarrow> ImmConj {} \<ps
   by (simp add: hml_srbb_eq_def hml_srbb_impl_def)
 
 
+subsection \<open> Distinguishing Formulas \& Equivalence \<close>
+
+lemma dist_equal_dist:
+  assumes "\<phi>l \<Lleftarrow>srbb\<Rrightarrow> \<phi>r"
+      and "distinguishes \<phi>l p q"
+    shows "distinguishes \<phi>r p q"
+  using assms
+  by (simp add: distinguishes_def hml_srbb_eq_iff)
+
+
 subsection \<open> \<open>hml_srbb\<close> formula set derived preorder \<close>
 
 definition hml_preordered :: "(('a, 's) hml_srbb) set \<Rightarrow> 's \<Rightarrow> 's \<Rightarrow> bool" where
