@@ -244,7 +244,7 @@ definition wina_set
   where
 "wina_set g = {e. in_wina e g}"
 
-lemma defender_win_level_not_in_wina:
+lemma %invisible defender_win_level_not_in_wina:
   shows "\<forall>g. \<not>in_wina defender_win_level g" 
   by (metis in_wina.cases)
 
@@ -253,23 +253,23 @@ lemma %invisible attacker_wins_last_wina_notempty:
   shows "\<exists>e. in_wina e (last p)"
   using assms won_by_attacker_def finite_play.intros(2) in_wina.intros(1) by meson
 
-lemma in_wina_GaE:
+lemma %invisible in_wina_GaE:
   assumes "in_wina e g" and "Ga g" 
   shows "\<exists>g'. ((g \<Zinj> g') \<and> (in_wina ((weight g g') e) g'))"
   using assms(1) assms(2) in_wina.simps by blast
 
-lemma in_wina_Ga:
+lemma %invisible in_wina_Ga:
   assumes "in_wina (u e) g'" "g \<Zinj>wgt u g'" "Ga g"
   shows "in_wina e g"
   using assms in_wina.simps by (metis antisim dwl_min update_gets_smaller)
 
-lemma in_wina_Ga_with_id_step:
+lemma %invisible in_wina_Ga_with_id_step:
   assumes "in_wina e g'" "g \<Zinj>wgt id g'" "Ga g"
   shows "in_wina e g"
   using assms by (metis id_apply in_wina.simps)
 
 
-lemma in_wina_Gd:
+lemma %invisible in_wina_Gd:
   fixes update
   assumes "Gd g"
   "e \<noteq> defender_win_level"
