@@ -151,7 +151,7 @@ proof (rule notI)
   show "False"
     using A5 A6 by auto 
 qed
-text\<open>\noindent We also verify that a \<open>finite_play\<close> has at least the length $1$ and that the game positions of a \<open>finite_play\<close> form a path.\<close>
+text\<open>\noindent We also verify that a \<open>finite_play\<close> has at least the length $1$ and that the game positions of a finite play form a path.\<close>
 lemma finite_play_min_len: "finite_play g0 p \<Longrightarrow> length p \<ge> 1"
   using add_leE finite_play.cases not_Cons_self2 not_less_eq_eq by fastforce
 
@@ -181,13 +181,13 @@ qed
 
 subsection \<open>Winning\<close>
 
-text\<open>Energy games can be won. An infinite game is won by the defender. A finite play is won if it's 
-stuck (i.e. there are no more possible moves) and it is the other players turn. Since we for now
-only consider finite plays we will need to define stuckness.\<close>
+text\<open>Energy games can be won by the attacker or the defender. In general, we distinguish between the winner of an infinite or a finite play. 
+An infinite play is won by the defender. In contrast to the infinite play, the finite play is won if one of the players whose turn it is can no longer move.
+Then the play is stuck. Since we only consider finite plays, we just need definition for \<open>stuck\<close> and for the current player.\<close>
 
 abbreviation "play_stuck g0 p \<equiv> (finite_play g0 p) \<and> (\<nexists>gn. finite_play g0 (p @ [gn]))"
 
-lemma play_stuck_def:
+lemma %invisible play_stuck_def:
   shows "play_stuck g0 p \<longleftrightarrow> ((finite_play g0 p) \<and> (\<nexists>ps. ps \<noteq> [] \<and> finite_play g0 (p @ ps)))"
 proof
   assume asm: "(finite_play g0 p) \<and> (\<nexists>gn. finite_play g0 (p @ [gn]))"
@@ -207,10 +207,8 @@ qed
 abbreviation "is_defender_turn p \<equiv> Gd (last p)"
 abbreviation "is_attacker_turn p \<equiv> Ga (last p)"
 
-text\<open>Now the winning conditions for finite plays can be formalized and we can show that each finite 
-play is either won by the defender, won by the attacker or not yet stuck. We need to consider the 
-energy levels of plays. The attacker should be understood as truly not stuck only if the energy 
-level does not equal the defender win level - otherwise the defender wins.\<close>
+text\<open>\noindent The following definitions formalize the conditions under which the game is won by the attacker, the defender or by nobody because the game is not yet stuck.
+For this purpose we We need consider the energy level. If we reach an energy level that is equal to the defender's win level, the defender wins.\<close>
 
 definition won_by_defender:: "'gstate \<Rightarrow> 'energy \<Rightarrow> 'gstate fplay \<Rightarrow> bool" where
   "won_by_defender g0 e0 p \<equiv> (play_stuck g0 p \<and> is_attacker_turn p) \<or> (energy_level g0 e0 p = defender_win_level)"
@@ -221,21 +219,21 @@ definition won_by_attacker:: "'gstate \<Rightarrow> 'energy \<Rightarrow> 'gstat
 abbreviation no_winner:: "'gstate \<Rightarrow> 'energy \<Rightarrow> 'gstate fplay \<Rightarrow> bool" where
   "no_winner g0 e0 p \<equiv> \<not>play_stuck g0 p \<and> (energy_level g0 e0 p \<noteq> defender_win_level)"
 
+subsubsection \<open>Winner of a Play\<close> 
+text\<open>Now we prove that exactly one of our three cases is always true. This means, in particular, that if there is a winner, that winner is unique. \<close>
 lemma play_won_cases:
   shows "won_by_defender g0 e0 p \<or> won_by_attacker g0 e0 p \<or> no_winner g0 e0 p"
   unfolding won_by_attacker_def won_by_defender_def by blast
 
 lemma play_won_unique:
-  shows"won_by_defender g0 e0 p  \<longleftrightarrow>  \<not> (won_by_attacker g0 e0 p \<or> no_winner g0 e0 p)"
-  and  "won_by_attacker g0 e0 p  \<longleftrightarrow>  \<not> (won_by_defender g0 e0 p \<or> no_winner g0 e0 p)"
-  and  "no_winner g0 e0 p  \<longleftrightarrow>  \<not> (won_by_defender g0 e0 p \<or> won_by_attacker g0 e0 p)"
+  shows "won_by_defender g0 e0 p  \<longleftrightarrow>  \<not> (won_by_attacker g0 e0 p \<or> no_winner g0 e0 p)"
+  and   "won_by_attacker g0 e0 p  \<longleftrightarrow>  \<not> (won_by_defender g0 e0 p \<or> no_winner g0 e0 p)"
+  and   "no_winner g0 e0 p  \<longleftrightarrow>  \<not> (won_by_defender g0 e0 p \<or> won_by_attacker g0 e0 p)"
   using  won_by_attacker_def won_by_defender_def by blast+
 
 subsubsection \<open>Winning Budgets\<close>
 
-text\<open>The attacker wins a game from some starting position if they can force the defender to get 
-stuck before running out of energy themselves. How much energy is needed can be characterized by 
-winning budgets: \<close>
+text\<open>The attacker wins a game from a certain starting position if he manages to force the defender to get stuck before he runs out of energy. How much energy is required is described by the winning budgets:\<close>
 
 inductive in_wina:: "'energy \<Rightarrow> 'gstate \<Rightarrow> bool " where
  "in_wina e g" if "(Gd g) \<and> (\<forall>g'. \<not>(g \<Zinj> g')) \<and> (e \<noteq> defender_win_level)" |
@@ -250,7 +248,7 @@ lemma defender_win_level_not_in_wina:
   shows "\<forall>g. \<not>in_wina defender_win_level g" 
   by (metis in_wina.cases)
 
-lemma attacker_wins_last_wina_notempty:
+lemma %invisible attacker_wins_last_wina_notempty:
   assumes "won_by_attacker g0 e0 p"
   shows "\<exists>e. in_wina e (last p)"
   using assms won_by_attacker_def finite_play.intros(2) in_wina.intros(1) by meson
@@ -279,9 +277,7 @@ lemma in_wina_Gd:
   "\<And>g'. g \<Zinj> g' \<Longrightarrow> in_wina (update e) g'"
 shows "in_wina e g" using assms in_wina.intros(3) by blast
 
-text\<open>The intuitively true statement "with more energy the attacker will win at least as much as 
-before" can be proven when given a partial order on energies such that the \<open>defender_win_leve\<close>l is 
-the minimal energy, updates are monotonic and \<open>e \<ge> Upd(e)\<close> holds for all energies and updates:\<close>
+text\<open>\noindent Finally, we use a partial ordering of energies to prove that the attacker wins at least as much with more energy as before.\<close>
 
 lemma win_a_upwards_closure: 
   assumes
