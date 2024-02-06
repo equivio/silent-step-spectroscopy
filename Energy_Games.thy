@@ -8,7 +8,7 @@ text\<open>\noindent In this theory we introduce energy games and give basic def
 Energy games are the foundation for the later introduced full spectroscopy game, which is an 
 energy game itself, characterizing equivalence problems.\<close>
 
-text\<open>\noindent Currently we do not consider 8-dimensional energy games and use an abstract concept of energies.
+text\<open>\noindent We use an abstract concept of energies and only later consider 8-dimensional energy games.
 To combine this with our later definition of energies as a data type, there has to be an order on energies.\<close>
 
 type_synonym 'energy update = "'energy \<Rightarrow> 'energy"
