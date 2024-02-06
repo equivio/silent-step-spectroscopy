@@ -4,7 +4,7 @@ theory Energy_Games
   imports Main Misc
 begin
 
-text \<open>In this theory we introduce energy games and give basic definitions such as (winning) plays. 
+text\<open>\noindent In this theory we introduce energy games and give basic definitions such as (winning) plays. 
 Energy games are the foundation for the later introduced full spectroscopy game, which is an 
 energy game itself, characterizing equivalence problems.\<close>
 
@@ -207,8 +207,8 @@ qed
 abbreviation "is_defender_turn p \<equiv> Gd (last p)"
 abbreviation "is_attacker_turn p \<equiv> Ga (last p)"
 
-text\<open>\noindent The following definitions formalize the conditions under which the game is won by the attacker, the defender or by nobody because the game is not yet stuck.
-For this purpose we We need consider the energy level. If we reach an energy level that is equal to the defender's win level, the defender wins.\<close>
+text\<open>\noindent The following definitions formalize the conditions under which the game is won by the attacker, the defender or by nobody if the game is not yet stuck.
+For this purpose we have to consider the energy level. If we reach an energy level that is equal to the defender's win level, the defender wins.\<close>
 
 definition won_by_defender:: "'gstate \<Rightarrow> 'energy \<Rightarrow> 'gstate fplay \<Rightarrow> bool" where
   "won_by_defender g0 e0 p \<equiv> (play_stuck g0 p \<and> is_attacker_turn p) \<or> (energy_level g0 e0 p = defender_win_level)"
