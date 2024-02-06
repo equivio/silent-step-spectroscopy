@@ -82,7 +82,7 @@ The inductive property of lemma 1 is formalized as follows
             Q \<noteq> {} \<longrightarrow> distinguishes_from_inner \<chi> p Q \<longrightarrow> (\<forall>q \<in> Q. \<nexists>q'. q \<mapsto> \<tau> q')
             \<longrightarrow> in_wina (expr_pr_inner \<chi>) (Defender_Stable_Conj p Q))
         \<and> (\<forall>\<Psi>_I \<Psi> \<alpha> \<phi> p Q p' Q_\<alpha>. \<chi> = BranchConj \<alpha> \<phi> \<Psi>_I \<Psi> \<longrightarrow>
-            distinguishes_from_inner \<chi> p Q \<longrightarrow> p \<mapsto>\<alpha> p' \<longrightarrow> p' \<Turnstile>SRBB \<phi> \<longrightarrow>
+            distinguishes_from_inner \<chi> p Q \<longrightarrow>Q_\<alpha> \<noteq> {} \<longrightarrow> p \<mapsto>\<alpha> p' \<longrightarrow> p' \<Turnstile>SRBB \<phi> \<longrightarrow>
             Q \<inter> model_set_inner (Conj \<Psi>_I \<Psi>) \<subseteq> Q_\<alpha> \<longrightarrow> Q_\<alpha> \<subseteq> Q - model_set_inner (Obs \<alpha> \<phi>)
             \<longrightarrow> in_wina (expr_pr_inner \<chi>) (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>)))
       \<and>
@@ -122,7 +122,7 @@ The inductive property of lemma 1 is formalized as follows
            Q \<noteq> {} \<longrightarrow> distinguishes_from_inner \<chi> p Q \<longrightarrow> (\<forall>q\<in>Q. \<nexists>q'. q \<mapsto>\<tau> q')
            \<longrightarrow> in_wina (expr_pr_inner \<chi>) (Defender_Stable_Conj p Q))
      \<and> (\<forall>\<Psi>_I \<Psi> \<alpha> \<phi> p Q p' Q_\<alpha>. \<chi> = BranchConj \<alpha> \<phi> \<Psi>_I \<Psi> \<longrightarrow>
-           distinguishes_from_inner \<chi> p Q \<longrightarrow> p \<mapsto>\<alpha> p' \<longrightarrow> p' \<Turnstile>SRBB \<phi> \<longrightarrow>
+           distinguishes_from_inner \<chi> p Q \<longrightarrow>Q_\<alpha> \<noteq> {} \<longrightarrow> p \<mapsto>\<alpha> p' \<longrightarrow> p' \<Turnstile>SRBB \<phi> \<longrightarrow>
            Q \<inter> model_set_inner (hml_srbb_inner.Conj \<Psi>_I \<Psi>) \<subseteq> Q_\<alpha> \<longrightarrow>
            Q_\<alpha> \<subseteq> Q - model_set_inner (hml_srbb_inner.Obs \<alpha> \<phi>)
            \<longrightarrow> in_wina (expr_pr_inner \<chi>) (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>))"
@@ -138,7 +138,7 @@ The inductive property of lemma 1 is formalized as follows
            \<longrightarrow> in_wina (expr_pr_inner \<chi>) (Defender_Stable_Conj p Q))"
       and IH4:
       "(\<forall>\<Psi>_I \<Psi> \<alpha> \<phi> p Q p' Q_\<alpha>. \<chi> = BranchConj \<alpha> \<phi> \<Psi>_I \<Psi> \<longrightarrow>
-           distinguishes_from_inner \<chi> p Q \<longrightarrow> p \<mapsto>\<alpha> p' \<longrightarrow> p' \<Turnstile>SRBB \<phi> \<longrightarrow>
+           distinguishes_from_inner \<chi> p Q \<longrightarrow>Q_\<alpha> \<noteq> {}\<longrightarrow> p \<mapsto>\<alpha> p' \<longrightarrow> p' \<Turnstile>SRBB \<phi> \<longrightarrow>
            Q \<inter> model_set_inner (hml_srbb_inner.Conj \<Psi>_I \<Psi>) \<subseteq> Q_\<alpha> \<longrightarrow>
            Q_\<alpha> \<subseteq> Q - model_set_inner (hml_srbb_inner.Obs \<alpha> \<phi>)
            \<longrightarrow> in_wina (expr_pr_inner \<chi>) (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>))"
@@ -370,7 +370,7 @@ The inductive property of lemma 1 is formalized as follows
            Q \<noteq> {} \<longrightarrow> distinguishes_from_inner (hml_srbb_inner.Obs \<alpha> \<phi>) p Q \<longrightarrow> (\<forall>q\<in>Q. \<nexists>q'. q \<mapsto>\<tau> q')
            \<longrightarrow> in_wina (expr_pr_inner (hml_srbb_inner.Obs \<alpha> \<phi>)) (Defender_Stable_Conj p Q))
      \<and> (\<forall>\<Psi>_I \<Psi> \<alpha>' \<phi>' p Q p' Q_\<alpha>. hml_srbb_inner.Obs \<alpha> \<phi> = BranchConj \<alpha>' \<phi>' \<Psi>_I \<Psi> \<longrightarrow>
-           distinguishes_from_inner (hml_srbb_inner.Obs \<alpha> \<phi>) p Q \<longrightarrow> p \<mapsto>\<alpha>' p' \<longrightarrow> p' \<Turnstile>SRBB \<phi>' \<longrightarrow>
+           distinguishes_from_inner (hml_srbb_inner.Obs \<alpha> \<phi>) p Q \<longrightarrow>Q_\<alpha> \<noteq> {}\<longrightarrow> p \<mapsto>\<alpha>' p' \<longrightarrow> p' \<Turnstile>SRBB \<phi>' \<longrightarrow>
            Q \<inter> model_set_inner (hml_srbb_inner.Conj \<Psi>_I \<Psi>) \<subseteq> Q_\<alpha> \<longrightarrow>
            Q_\<alpha> \<subseteq> Q - model_set_inner (hml_srbb_inner.Obs \<alpha>' \<phi>')
            \<longrightarrow> in_wina (expr_pr_inner (hml_srbb_inner.Obs \<alpha> \<phi>)) (Defender_Branch p \<alpha>' p' (Q - Q_\<alpha>) Q_\<alpha>))" 
@@ -398,7 +398,7 @@ The inductive property of lemma 1 is formalized as follows
            Q \<noteq> {} \<longrightarrow> distinguishes_from_inner (hml_srbb_inner.Conj I \<psi>s) p Q \<longrightarrow> (\<forall>q\<in>Q. \<nexists>q'. q \<mapsto>\<tau> q')
            \<longrightarrow> in_wina (expr_pr_inner (hml_srbb_inner.Conj I \<psi>s)) (Defender_Stable_Conj p Q))
      \<and> (\<forall>\<Psi>_I \<Psi> \<alpha> \<phi> p Q p' Q_\<alpha>. hml_srbb_inner.Conj I \<psi>s = BranchConj \<alpha> \<phi> \<Psi>_I \<Psi> \<longrightarrow>
-           distinguishes_from_inner (hml_srbb_inner.Conj I \<psi>s) p Q \<longrightarrow> p \<mapsto>\<alpha> p' \<longrightarrow> p' \<Turnstile>SRBB \<phi> \<longrightarrow>
+           distinguishes_from_inner (hml_srbb_inner.Conj I \<psi>s) p Q \<longrightarrow>Q_\<alpha> \<noteq> {}\<longrightarrow> p \<mapsto>\<alpha> p' \<longrightarrow> p' \<Turnstile>SRBB \<phi> \<longrightarrow>
            Q \<inter> model_set_inner (hml_srbb_inner.Conj \<Psi>_I \<Psi>) \<subseteq> Q_\<alpha> \<longrightarrow>
            Q_\<alpha> \<subseteq> Q - model_set_inner (hml_srbb_inner.Obs \<alpha> \<phi>)
            \<longrightarrow> in_wina (expr_pr_inner (hml_srbb_inner.Conj I \<psi>s)) (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>))"
@@ -426,7 +426,7 @@ The inductive property of lemma 1 is formalized as follows
            Q \<noteq> {} \<longrightarrow> distinguishes_from_inner (StableConj I \<psi>s) p Q \<longrightarrow> (\<forall>q\<in>Q. \<nexists>q'. q \<mapsto>\<tau> q')
            \<longrightarrow> in_wina (expr_pr_inner (StableConj I \<psi>s)) (Defender_Stable_Conj p Q))
      \<and> (\<forall>\<Psi>_I \<Psi> \<alpha> \<phi> p Q p' Q_\<alpha>. StableConj I \<psi>s = BranchConj \<alpha> \<phi> \<Psi>_I \<Psi> \<longrightarrow>
-           distinguishes_from_inner (StableConj I \<psi>s) p Q \<longrightarrow> p \<mapsto>\<alpha> p' \<longrightarrow> p' \<Turnstile>SRBB \<phi> \<longrightarrow>
+           distinguishes_from_inner (StableConj I \<psi>s) p Q \<longrightarrow>Q_\<alpha> \<noteq> {}\<longrightarrow> p \<mapsto>\<alpha> p' \<longrightarrow> p' \<Turnstile>SRBB \<phi> \<longrightarrow>
            Q \<inter> model_set_inner (hml_srbb_inner.Conj \<Psi>_I \<Psi>) \<subseteq> Q_\<alpha> \<longrightarrow>
            Q_\<alpha> \<subseteq> Q - model_set_inner (hml_srbb_inner.Obs \<alpha> \<phi>)
            \<longrightarrow> in_wina (expr_pr_inner (StableConj I \<psi>s)) (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>))"
@@ -448,7 +448,7 @@ The inductive property of lemma 1 is formalized as follows
       "(\<forall>p Q. Q \<noteq> {} \<longrightarrow> distinguishes_from_inner (BranchConj \<alpha> \<phi> I \<psi>s) p Q \<longrightarrow> Q \<Zsurj>S Q
            \<longrightarrow> in_wina (expr_pr_inner (BranchConj \<alpha> \<phi> I \<psi>s)) (Attacker_Delayed p Q))
      \<and> (\<forall>\<Psi>_I \<Psi> \<alpha>' \<phi>' p Q p' Q_\<alpha>. BranchConj \<alpha> \<phi> I \<psi>s = BranchConj \<alpha>' \<phi>' \<Psi>_I \<Psi> \<longrightarrow>
-           distinguishes_from_inner (BranchConj \<alpha> \<phi> I \<psi>s) p Q \<longrightarrow> p \<mapsto>\<alpha>' p' \<longrightarrow> p' \<Turnstile>SRBB \<phi>' \<longrightarrow>
+           distinguishes_from_inner (BranchConj \<alpha> \<phi> I \<psi>s) p Q \<longrightarrow>Q_\<alpha> \<noteq> {}\<longrightarrow> p \<mapsto>\<alpha>' p' \<longrightarrow> p' \<Turnstile>SRBB \<phi>' \<longrightarrow>
            Q \<inter> model_set_inner (hml_srbb_inner.Conj \<Psi>_I \<Psi>) \<subseteq> Q_\<alpha> \<longrightarrow>
            Q_\<alpha> \<subseteq> Q - model_set_inner (hml_srbb_inner.Obs \<alpha>' \<phi>')
            \<longrightarrow> in_wina (expr_pr_inner (BranchConj \<alpha> \<phi> I \<psi>s)) (Defender_Branch p \<alpha>' p' (Q - Q_\<alpha>) Q_\<alpha>))" sorry
@@ -462,7 +462,7 @@ The inductive property of lemma 1 is formalized as follows
            Q \<noteq> {} \<longrightarrow> distinguishes_from_inner (BranchConj \<alpha> \<phi> I \<psi>s) p Q \<longrightarrow> (\<forall>q\<in>Q. \<nexists>q'. q \<mapsto>\<tau> q')
            \<longrightarrow> in_wina (expr_pr_inner (BranchConj \<alpha> \<phi> I \<psi>s)) (Defender_Stable_Conj p Q))
      \<and> (\<forall>\<Psi>_I \<Psi> \<alpha>' \<phi>' p Q p' Q_\<alpha>. BranchConj \<alpha> \<phi> I \<psi>s = BranchConj \<alpha>' \<phi>' \<Psi>_I \<Psi> \<longrightarrow>
-           distinguishes_from_inner (BranchConj \<alpha> \<phi> I \<psi>s) p Q \<longrightarrow> p \<mapsto>\<alpha>' p' \<longrightarrow> p' \<Turnstile>SRBB \<phi>' \<longrightarrow>
+           distinguishes_from_inner (BranchConj \<alpha> \<phi> I \<psi>s) p Q \<longrightarrow>Q_\<alpha> \<noteq> {}\<longrightarrow> p \<mapsto>\<alpha>' p' \<longrightarrow> p' \<Turnstile>SRBB \<phi>' \<longrightarrow>
            Q \<inter> model_set_inner (hml_srbb_inner.Conj \<Psi>_I \<Psi>) \<subseteq> Q_\<alpha> \<longrightarrow>
            Q_\<alpha> \<subseteq> Q - model_set_inner (hml_srbb_inner.Obs \<alpha>' \<phi>')
            \<longrightarrow> in_wina (expr_pr_inner (BranchConj \<alpha> \<phi> I \<psi>s)) (Defender_Branch p \<alpha>' p' (Q - Q_\<alpha>) Q_\<alpha>))"
@@ -481,7 +481,7 @@ The inductive property of lemma 1 is formalized as follows
            Q \<noteq> {} \<longrightarrow> distinguishes_from_inner \<chi> p Q \<longrightarrow> (\<forall>q\<in>Q. \<nexists>q'. q \<mapsto>\<tau> q')
            \<longrightarrow> in_wina (expr_pr_inner \<chi>) (Defender_Stable_Conj p Q))
      \<and> (\<forall>\<Psi>_I \<Psi> \<alpha> \<phi> p Q p' Q_\<alpha>. \<chi> = BranchConj \<alpha> \<phi> \<Psi>_I \<Psi> \<longrightarrow>
-           distinguishes_from_inner \<chi> p Q \<longrightarrow> p \<mapsto>\<alpha> p' \<longrightarrow> p' \<Turnstile>SRBB \<phi> \<longrightarrow>
+           distinguishes_from_inner \<chi> p Q \<longrightarrow>Q_\<alpha> \<noteq> {}\<longrightarrow> p \<mapsto>\<alpha> p' \<longrightarrow> p' \<Turnstile>SRBB \<phi> \<longrightarrow>
            Q \<inter> model_set_inner (hml_srbb_inner.Conj \<Psi>_I \<Psi>) \<subseteq> Q_\<alpha> \<longrightarrow>
            Q_\<alpha> \<subseteq> Q - model_set_inner (hml_srbb_inner.Obs \<alpha> \<phi>)
            \<longrightarrow> in_wina (expr_pr_inner \<chi>) (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>))"
@@ -501,7 +501,7 @@ The inductive property of lemma 1 is formalized as follows
            Q \<noteq> {} \<longrightarrow> distinguishes_from_inner \<chi> p Q \<longrightarrow> (\<forall>q\<in>Q. \<nexists>q'. q \<mapsto>\<tau> q')
            \<longrightarrow> in_wina (expr_pr_inner \<chi>) (Defender_Stable_Conj p Q))
      \<and> (\<forall>\<Psi>_I \<Psi> \<alpha> \<phi> p Q p' Q_\<alpha>. \<chi> = BranchConj \<alpha> \<phi> \<Psi>_I \<Psi> \<longrightarrow>
-           distinguishes_from_inner \<chi> p Q \<longrightarrow> p \<mapsto>\<alpha> p' \<longrightarrow> p' \<Turnstile>SRBB \<phi> \<longrightarrow>
+           distinguishes_from_inner \<chi> p Q \<longrightarrow>Q_\<alpha> \<noteq> {}\<longrightarrow> p \<mapsto>\<alpha> p' \<longrightarrow> p' \<Turnstile>SRBB \<phi> \<longrightarrow>
            Q \<inter> model_set_inner (hml_srbb_inner.Conj \<Psi>_I \<Psi>) \<subseteq> Q_\<alpha> \<longrightarrow>
            Q_\<alpha> \<subseteq> Q - model_set_inner (hml_srbb_inner.Obs \<alpha> \<phi>)
            \<longrightarrow> in_wina (expr_pr_inner \<chi>) (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>))"
