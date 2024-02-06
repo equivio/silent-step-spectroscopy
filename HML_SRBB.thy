@@ -100,11 +100,32 @@ lemma "(state \<Turnstile>SRBB Internal \<chi>) = (state \<Turnstile>SRBB ImmCon
 
 subsection \<open> Distinguishing Formulas \<close>
 
+text \<open>
+A formula \<open>\<phi>\<close> is said to \emph{distinguish} a process \<open>p\<close> from another process \<open>q\<close>,
+if \<open>p\<close> satisfies \<open>\<phi>\<close>, while \<open>q\<close> does not.
+\<close>
 definition distinguishes :: "('a, 's) hml_srbb \<Rightarrow> 's \<Rightarrow> 's \<Rightarrow> bool" where
   "distinguishes \<phi> p q \<equiv> p \<Turnstile>SRBB \<phi> \<and> \<not>(q \<Turnstile>SRBB \<phi>)"
 
+text \<open>
+One may evaluate if an SRBB formula distinguishes two processes by translating the formula
+into a HML formula and then check if this formula distinguishes the two processes.
+\<close>
+lemma dist_srbb_eq_dist_hml:
+  "distinguishes \<phi> p q = p <> (hml_srbb_to_hml \<phi>) q"
+  by (simp add: distinguishes_def distinguishes_hml_def)
+
+text \<open>Some basic properties of the \<open>distinguishes\<close> predicate: \<close>
+
+text \<open> \<open>\<top>\<close> can never distinguish two processes.  This is due to the fact that every process
+satisfies \<open>T\<close>, therefore the second part of the definition of \<open>distinguishes\<close> never holds. \<close>
 lemma verum_never_distinguishes:
   "\<not> distinguishes TT p q"
+  by (simp add: distinguishes_def)
+
+text \<open> A process can never be distinguished from itself, no matter the formula one chooses. \<close>
+lemma no_self_distinguishing:
+  "\<not> distinguishes \<phi> p p"
   by (simp add: distinguishes_def)
 
 
