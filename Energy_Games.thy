@@ -97,10 +97,7 @@ inductive finite_play :: "'gstate \<Rightarrow> 'gstate fplay \<Rightarrow> bool
   "finite_play g0 [g0]" |
   "finite_play g0 (p @ [gn])" if "finite_play g0 p" and "last p \<Zinj> gn"
 
-text\<open>\noindent Next we prove some properties of finite plays. 
-This includes the statements that the prefix or suffix of a finite play is itself a finite play.\<close>
-
-lemma finite_play_prefix:
+lemma %invisible finite_play_prefix:
   assumes "finite_play g0 (a @ b)" "a \<noteq> []"
   shows "finite_play g0 a"
 using assms proof(induct "a @ b" arbitrary: b rule: finite_play.induct)
@@ -113,7 +110,7 @@ next
     by (metis butlast_append butlast_snoc finite_play.intros(2))
 qed
 
-corollary finite_play_suffix:
+corollary %invisible finite_play_suffix:
   assumes "finite_play g0 (p @ [gn])" and "p \<noteq> []"
   shows "finite_play g0 p"
   using assms finite_play_prefix by fast
@@ -149,11 +146,10 @@ proof (rule notI)
   show "False"
     using A5 A6 by auto 
 qed
-text\<open>\noindent We also verify that a \<open>finite_play\<close> has at least the length $1$ and that the game positions of a finite play form a path.\<close>
-lemma finite_play_min_len: "finite_play g0 p \<Longrightarrow> length p \<ge> 1"
+lemma %invisible finite_play_min_len: "finite_play g0 p \<Longrightarrow> length p \<ge> 1"
   using add_leE finite_play.cases not_Cons_self2 not_less_eq_eq by fastforce
 
-lemma finite_play_is_path:
+lemma %invisible finite_play_is_path:
   fixes p
   assumes "finite_play g0 p"
   shows "((p = ((a @ [g]) @ b)) \<and> a \<noteq>[]) \<longrightarrow> ((last a) \<Zinj> g)"
@@ -180,7 +176,7 @@ qed
 subsection \<open>Winning\<close>
 
 text\<open>Plays can be won by the attacker or the defender. In general, we distinguish between the winner of an infinite and a finite play. 
-An infinite play is won by the defender. In contrast to the infinite play, the finite play is won if one of the players whose turn it is can no longer move.
+An infinite play is won by the defender.An infinite play is won by the defender. A finite play is won if one of the players whose turn it is can no longer move.
 Since we only consider finite plays, we just need definition for this situation and for the current player.\<close>
 
 abbreviation "no_move g0 p \<equiv> (finite_play g0 p) \<and> (\<nexists>gn. finite_play g0 (p @ [gn]))"
