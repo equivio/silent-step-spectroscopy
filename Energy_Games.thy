@@ -4,7 +4,8 @@ theory Energy_Games
   imports Main Misc
 begin
 
-text\<open>\noindent In this theory we introduce energy games and give basic definitions such as (winning) plays. 
+subsection \<open>Fundamentals\<close>
+text\<open>In this theory we introduce energy games and give basic definitions such as (winning) plays. 
 Energy games are the foundation for the later introduced full spectroscopy game, which is an 
 energy game itself, characterizing equivalence problems.We use an abstract concept of energies and only later consider 8-dimensional energy games.
 In order to be able to combine this with our later definition of energies as a data type, there has to be a partial order for energies in our formalization.\<close>
@@ -17,7 +18,7 @@ type_synonym 'gstate fplay = "'gstate list"
 
 text\<open>\noindent An energy game is played by two players on a directed graph labeled by energy updates. 
 These energy updates represent the costs of choosing a certain move.
-However, we only consider cases in which the attacker runs out of energy when the energy level reaches the \<open>defender_win_level\<close>.
+However, we only consider cases in which the attacker may run out of energy when the energy level reaches the \<open>defender_win_level\<close>.
 In contrast to other definitions of games, we do not fix a starting position.\<close>
 locale energy_game =
   fixes weight_opt :: "'gstate \<Rightarrow> 'gstate \<Rightarrow> 'energy update option" and
@@ -88,9 +89,7 @@ next
   qed
 qed
 
-subsection \<open>Finite Plays\<close>
-
-text\<open>We have already used the term \<open>valid plays\<close>, which refers to lists of states where there is a move from one state to the next in the list. 
+text\<open>\noindent We have already used the term valid plays, which refers to lists of states where there is a move from one state to the next in the list. 
 In the finite case, this is called a \<open>finite_play\<close>.\<close>
 
 inductive finite_play :: "'gstate \<Rightarrow> 'gstate fplay \<Rightarrow> bool" where
