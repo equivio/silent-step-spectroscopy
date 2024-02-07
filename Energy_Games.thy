@@ -176,7 +176,7 @@ qed
 subsection \<open>Winning\<close>
 
 text\<open>Plays can be won by the attacker or the defender. In general, we distinguish between the winner of an infinite and a finite play. 
-An infinite play is won by the defender.An infinite play is won by the defender. A finite play is won if one of the players whose turn it is can no longer move.
+An infinite play is won by the defender. A finite play is won if one of the players whose turn it is can no longer move.
 Since we only consider finite plays, we just need definition for this situation and for the current player.\<close>
 
 abbreviation "no_move g0 p \<equiv> (finite_play g0 p) \<and> (\<nexists>gn. finite_play g0 (p @ [gn]))"
@@ -227,7 +227,7 @@ lemma play_won_unique:
 
 subsubsection \<open>Winning Budgets\<close>
 
-text\<open>The attacker wins a game from a certain starting position if he manages to force the defender to get stuck before he runs out of energy. How much energy is required is described by the winning budgets:\<close>
+text\<open>The attacker wins a game from a certain starting position if they manage to force the defender to stick before they run out of energy. How much energy is required is described by the winning budgets.\<close>
 
 inductive in_wina:: "'energy \<Rightarrow> 'gstate \<Rightarrow> bool " where
  "in_wina e g" if "(Gd g) \<and> (\<forall>g'. \<not>(g \<Zinj> g')) \<and> (e \<noteq> defender_win_level)" |
