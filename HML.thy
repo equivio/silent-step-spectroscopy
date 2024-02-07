@@ -164,7 +164,6 @@ context Inhabited_Tau_LTS
 begin
 
 text \<open> \<open>hml_and_and\<close> lifts satisfaction of a hml conjunction from HML logic to HOL logic. \<close>
-
 lemma hml_and_and[simp]:
   "(p \<Turnstile> (\<psi>l \<and>hml \<psi>r))
  = (hml_conjunct_models p \<psi>l \<and> hml_conjunct_models p \<psi>r)"
@@ -784,45 +783,9 @@ text \<open> \<open>\<And>({\<psi>} \<union> \<Psi>)\<close> is equivalent to \<
 lemma conj_extract_conjunct:
   assumes "s \<notin> I"
   shows "Conj (I \<union> {s}) (\<lambda>i. if i = s then \<psi> else \<psi>s i) \<Lleftarrow>\<Rrightarrow> (\<psi> \<and>hml Pos (Conj I \<psi>s))"
-  using assms
-proof -
-  assume "s \<notin> I"
-  show "Conj (I \<union> {s}) (\<lambda>i. if i = s then \<psi> else \<psi>s i) \<Lleftarrow>\<Rrightarrow> (\<psi> \<and>hml Pos (Conj I \<psi>s))"
-    unfolding hml_eq_def and hml_impl_def
-  proof (rule conjI)
-    show "\<forall>p. p \<Turnstile> Conj (I \<union> {s}) (\<lambda>i. if i = s then \<psi> else \<psi>s i) \<longrightarrow> p \<Turnstile> \<psi> \<and>hml Pos (Conj I \<psi>s)"
-    proof (rule allI, rule impI)
-      fix p
-      assume "p \<Turnstile> Conj (I \<union> {s}) (\<lambda>i. if i = s then \<psi> else \<psi>s i)"
-      with \<open>s \<notin> I\<close>
-      have "p \<Turnstile> Conj I \<psi>s \<and> hml_conjunct_models p \<psi>"
-        by (smt (verit, ccfv_threshold) IntE Un_Int_eq(3) Un_upper2 hml_models.simps(5) singletonI subsetD)
-      then have "p \<Turnstile> Conj I \<psi>s" and "hml_conjunct_models p \<psi>"
-        by auto
-
-      show "p \<Turnstile> \<psi> \<and>hml Pos (Conj I \<psi>s)"
-        unfolding hml_and_and
-      proof (rule conjI)
-        from \<open>hml_conjunct_models p \<psi>\<close>
-        show "hml_conjunct_models p \<psi>".
-      next
-        from \<open>p \<Turnstile> Conj I \<psi>s\<close>
-        show "hml_conjunct_models p (Pos (Conj I \<psi>s))"
-          unfolding hml_conjunct_models.simps.
-      qed
-    qed
-  next
-    show "\<forall>p. p \<Turnstile> \<psi> \<and>hml Pos (Conj I \<psi>s) \<longrightarrow> p \<Turnstile> Conj (I \<union> {s}) (\<lambda>i. if i = s then \<psi> else \<psi>s i)"
-    proof (rule allI, rule impI)
-      fix p
-      assume "p \<Turnstile> \<psi> \<and>hml Pos (Conj I \<psi>s)"
-      then have "hml_conjunct_models p \<psi> \<and> hml_conjunct_models p (Pos (Conj I \<psi>s))"
-        using hml_and_and by simp
-      then show "p \<Turnstile> Conj (I \<union> {s}) (\<lambda>i. if i = s then \<psi> else \<psi>s i)" 
-        by simp
-    qed
-  qed
-qed
+  unfolding hml_eq_def and hml_impl_def
+  using assms and hml_and_and
+  by auto
 
 text \<open> \<open>\<And>({\<top>} \<union> \<Psi>)\<close> is equivalent to \<open>\<And>\<Psi>\<close> \<close>
 lemma
