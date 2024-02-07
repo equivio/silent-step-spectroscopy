@@ -38,12 +38,9 @@ fun spectroscopy_moves :: "('s, 'a) spectroscopy_position \<Rightarrow> ('s, 'a)
     "spectroscopy_moves (Attacker_Delayed p Q) (Attacker_Immediate p' Q') 
       = (if (\<exists>a. p \<mapsto>a a p' \<and> Q \<mapsto>aS a Q') then (subtract 1 0 0 0 0 0 0 0) else None)" |
 
-  finishing_or_early_conj: 
+  f_or_early_conj:
     "spectroscopy_moves (Attacker_Immediate p Q) (Defender_Conj p' Q') 
-      = (if Q = {} \<and> Q' = {} then 
-          (if (p = p') then Some id else None) 
-         else 
-          (if (Q = Q' \<and> p = p') then (subtract 0 0 0 0 1 0 0 0) else None))" |
+      =(if (Q\<noteq>{} \<and> Q = Q' \<and> p = p') then (subtract 0 0 0 0 1 0 0 0) else None)" |
 
   late_inst_conj: 
     "spectroscopy_moves (Attacker_Delayed p Q) (Defender_Conj p' Q') 
@@ -124,9 +121,9 @@ using assms proof (cases g)
       
     then show ?thesis using assms(2) by simp
   next
-    case D_Conj (*finishing_or_early_conj*)
-    then have "spectroscopy_moves g g' = Some id \<or> spectroscopy_moves g g' = (subtract 0 0 0 0 1 0 0 0)" using assms(1)
-      by (metis Attacker_Immediate local.finishing_or_early_conj)
+    case D_Conj (*early_conj*)
+    then have "spectroscopy_moves g g' = (subtract 0 0 0 0 1 0 0 0)" using assms(1)
+      by (metis Attacker_Immediate local.f_or_early_conj)
     then show ?thesis using assms(2) gets_smaller
       using mono_subtract option.sel by auto
   qed
@@ -237,9 +234,9 @@ using assms proof (cases g)
       by (smt (verit, del_insts))
     then show ?thesis by simp
   next
-    case D_Conj (*finishing_or_early_conj*)
-    then have "spectroscopy_moves g g' = Some id \<or> spectroscopy_moves g g' = (subtract 0 0 0 0 1 0 0 0)" using assms(1)
-      by (metis Attacker_Immediate local.finishing_or_early_conj)
+    case D_Conj (*early_conj*)
+    then have "spectroscopy_moves g g' = (subtract 0 0 0 0 1 0 0 0)" using assms(1)
+      by (metis Attacker_Immediate local.f_or_early_conj)
     then show ?thesis using gets_smaller by auto 
   qed
 next
