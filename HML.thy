@@ -4,31 +4,31 @@ theory HML
 begin
 
 text \<open>
-The mutually recursive data types \<open>hml\<close> and \<open>hml_conjunct\<close> represent arbitrary HML formulas.
+The mutually recursive data types @{term "hml"} and @{term "hml_conjunct"} represent arbitrary HML formulas.
 
 In particular:
 \begin{itemize}
-  \item in \<open>hml\<close>
+  \item in @{term "hml"}
   \begin{itemize}
-    \item \<open>TT\<close> encodes \<open>\<top>\<close>
-    \item \<open>Obs \<alpha> \<phi>\<close> encodes \<open>\<langle>\<alpha>\<rangle>\<phi>\<close> and is to be read as '\<open>\<alpha>\<close> can be observed and then \<open>\<phi>\<close> holds'.
-    \item \<open>Internal \<phi>\<close> encodes \<open>\<langle>\<epsilon>\<rangle>\<phi>\<close> and is to be read as 'after arbitrarily much internal behaviour \<open>\<phi>\<close> holds'.
-    \item \<open>Silent \<phi>\<close> encodes \<open>(\<tau>)\<phi>\<close> and is to be read as '\<open>\<phi>\<close> holds after possibly no or exactly one internal step'.
-    \item \<open>Conj I \<psi>s\<close> encodes \<open>\<And>\<Psi>\<close> where \<open>\<Psi> \<equiv> \<psi>s ` I\<close>  and is to be read as 'all formulas in \<open>\<Psi>\<close> hold'.
+    \item @{term "TT"} encodes \<open>\<top>\<close>
+    \item @{term "(Obs \<alpha> \<phi>)"} encodes \<open>\<langle>\<alpha>\<rangle>\<phi>\<close> and is to be read as '\<open>\<alpha>\<close> can be observed and then \<open>\<phi>\<close> holds'.
+    \item @{term "(Internal \<phi>)"} encodes \<open>\<langle>\<epsilon>\<rangle>\<phi>\<close> and is to be read as 'after arbitrarily much internal behaviour \<open>\<phi>\<close> holds'.
+    \item @{term "(Silent \<phi>)"} encodes \<open>(\<tau>)\<phi>\<close> and is to be read as '\<open>\<phi>\<close> holds after possibly no or exactly one internal step'.
+    \item @{term "(Conj I \<psi>s)"} encodes \<open>\<And>\<Psi>\<close> where \<open>\<Psi> \<equiv> \<psi>s ` I\<close>  and is to be read as 'all formulas in \<open>\<Psi>\<close> hold'.
   \end{itemize}
-  \item in \<open>hml_conjunct\<close>
+  \item in @{term "hml_conjunct"}
   \begin{itemize}
-    \item \<open>Pos \<phi>\<close> encodes \<open>\<phi>\<close> when used as a conjunct and is to be read exactly as \<open>\<phi>\<close> is.
-    \item \<open>Neg \<phi>\<close> encodes \<open>\<not>\<phi>\<close> in position of a conjunct and is to be read as '\<open>\<phi>\<close> does not hold'.
+    \item @{term "(Pos \<phi>)"} encodes \<open>\<phi>\<close> when used as a conjunct and is to be read exactly as \<open>\<phi>\<close> is.
+    \item @{term "(Neg \<phi>)"} encodes \<open>\<not>\<phi>\<close> in position of a conjunct and is to be read as '\<open>\<phi>\<close> does not hold'.
   \end{itemize}
 \end{itemize}
 
-When a variable is of type \<open>hml\<close> then \<open>\<phi>\<close> is used in most cases.
-In case a variable is of type \<open>hml_conjunct\<close> then \<open>\<psi>\<close> is used.
+When a variable is of type @{term "hml"} then @{term "\<phi>"} is used in most cases.
+In case a variable is of type @{term "hml_conjunct"} then @{term "\<psi>"} is used.
 
-Note that in canonical definitions of HML \<open>TT\<close> is not usually given, but is instead synonymous to \<open>\<And>{}\<close>.
-We include \<open>TT\<close> in the definition to enable Isabelle to infer via syntax only, that the types \<open>hml\<close>
-and \<open>hml_srbb\<close> are non-empty.  If this data constructor is omitted, Isabelle will reject the definition.
+Note that in canonical definitions of HML @{term "TT"} is not usually given, but is instead synonymous to \<open>\<And>{}\<close>.
+We include @{term "TT"} in the definition to enable Isabelle to infer via syntax only, that the types @{term "hml"}
+and @{term "hml_srbb"} are non-empty.  If this data constructor is omitted, Isabelle will reject the definition.
 \<close>
 
 
@@ -74,7 +74,7 @@ end (* LTS_Tau *)
 context Inhabited_Tau_LTS
 begin
 
-text \<open> Given this semantics, one may note that the \<open>Silent\<close> data constructor representing \<open>(\<tau>)\<phi>\<close>
+text \<open> Given this semantics, one may note that the @{term "Silent"} data constructor representing \<open>(\<tau>)\<phi>\<close>
 is redundant.  It does not add to the expressiveness of the HML language and could safely be turned
 into an abbreviation for \<open>\<And>{\<not>(\<And>{\<not>\<langle>\<tau>\<rangle>\<phi>, \<not>\<phi>})}\<close>: \<close>
 lemma "(state \<Turnstile> (Silent \<phi>))
@@ -95,7 +95,7 @@ lemma "(state \<Turnstile> (Silent \<phi>))
         insert_iff singletonD
   by fastforce
 
-text \<open> We choose to still include \<open>Silent\<close> to stay close to \cite{bisping2023lineartimebranchingtime}
+text \<open> We choose to still include @{term "Silent"} to stay close to \cite{bisping2023lineartimebranchingtime}
 and \cite{FOKKINK2019104435}. \<close>
 
 end (* Inhabited_Tau_LTS *)
@@ -104,7 +104,7 @@ context LTS_Tau
 begin
 
 text \<open>
-While \<open>T\<close> and \<open>\<And>{}\<close> differ syntactically, they mean exactly the same thing.
+While @{term "T"} and \<open>\<And>{}\<close> differ syntactically, they mean exactly the same thing.
 Every process will satisfy both of these formulas.
 \<close>
 lemma tt_eq_empty_conj: "(state \<Turnstile> TT) = (state \<Turnstile> Conj {} \<psi>)"
@@ -121,7 +121,7 @@ lemma opt_\<tau>_is_or: "(p \<Turnstile> (Silent \<phi>)) = ((p \<Turnstile> (Ob
 
 
 text \<open>
-\<open>HML_soft_poss \<alpha> \<phi>\<close> represents \<open>(\<alpha>)\<phi>\<close>,
+@{term "(HML_soft_poss \<alpha> \<phi>)"} represents \<open>(\<alpha>)\<phi>\<close>,
 which is to be interpeted as \<open>\<langle>\<alpha>\<rangle>\<phi>\<close> if \<open>\<alpha> \<noteq> \<tau>\<close> and as \<open>(\<tau>)\<phi>\<close> otherwise.
 \<close>
 abbreviation HML_soft_poss :: "'a \<Rightarrow> ('a, 'i) hml \<Rightarrow> ('a, 'i) hml" where
@@ -161,7 +161,7 @@ end (* context Inhabited_LTS *)
 context Inhabited_Tau_LTS
 begin
 
-text \<open> \<open>hml_and_and\<close> lifts satisfaction of a hml conjunction from HML logic to HOL logic. \<close>
+text \<open> @{term "hml_and_and"} lifts satisfaction of a hml conjunction from HML logic to HOL logic. \<close>
 lemma hml_and_and[simp]:
   "(p \<Turnstile> (\<psi>l \<and>hml \<psi>r))
  = (hml_conjunct_models p \<psi>l \<and> hml_conjunct_models p \<psi>r)"
@@ -174,7 +174,7 @@ end (* Inhabited_Tau_LTS *)
 context Inhabited_Tau_LTS
 begin
 
-text \<open> \<open>(HML_not \<phi>)\<close> represents \<open>\<not>\<phi>\<close> and is realized via a one element conjunction. \<close>
+text \<open> @{term "(HML_not \<phi>)"} represents \<open>\<not>\<phi>\<close> and is realized via a one element conjunction. \<close>
 abbreviation HML_not :: "('a, 's) hml \<Rightarrow> ('a, 's) hml" where
   "HML_not \<phi> \<equiv> Conj {left} (\<lambda>i. if i = left then (Neg \<phi>) else (Pos TT))"
 
@@ -186,7 +186,7 @@ lemma hml_not_not:
   by simp
 
 text \<open>
-\<open>HML_not \<phi>\<close> is satisfied, iff \<open>\<phi>\<close> is not satisfied.
+@{term "(HML_not \<phi>)"} is satisfied, iff \<open>\<phi>\<close> is not satisfied.
 This lifts the negation from HML to HOL.
 \<close>
 lemma hml_not_not_models[simp]:
@@ -201,7 +201,7 @@ lemma never_models_falsum[simp]:
   shows "\<not> state \<Turnstile> \<bottom>\<bottom>"
   by simp
 
-text \<open> \<open>(\<phi> \<or> \<phi>')\<close> represents \<open>\<phi> \<or> \<phi>'\<close> (read "or") and is realized by using binary conjunction and negation. \<close>
+text \<open> @{term "(\<phi> \<or> \<phi>')"} represents \<open>\<phi> \<or> \<phi>'\<close> (read "or") and is realized by using binary conjunction and negation. \<close>
 
 definition HML_or :: "('a, 's) hml \<Rightarrow> ('a, 's) hml \<Rightarrow> ('a, 's) hml" ("_ \<or> _" 70) where
   "\<phi>l \<or> \<phi>r \<equiv> HML_not (Neg \<phi>l \<and>hml Neg \<phi>r)"
@@ -232,7 +232,7 @@ lemma hml_impl_preord: "reflp (\<Rrightarrow>) \<and> transp (\<Rrightarrow>)"
   by (metis hml_impl_def reflpI transpI)
 
 
-text \<open> Duplicating these definitions and lemmata for the inner type \<open>hml_conjunction\<close>. \<close>
+text \<open> Duplicating these definitions and lemmata for the inner type @{term "hml_conjunction"}. \<close>
 
 definition hml_conjunct_impl :: "('a, 's) hml_conjunct \<Rightarrow> ('a, 's) hml_conjunct \<Rightarrow> bool"
   (infix "\<and>\<Rrightarrow>" 60) where
@@ -253,7 +253,7 @@ The following lemmata provide means to manipulate an HML implication
 by substituting other HML implications into it.
 
 This substitution may only occur on the right hand side of the implication.
-A notable exception is \<open>neg_pre_subst\<close>, so when substituting into a negation, where one may only
+A notable exception is @{term "neg_pre_subst"}, so when substituting into a negation, where one may only
 substitute on the left hand side of the implication.
 The lemmata differ in the choice of context, i.e. what formula is substituted into.
 \<close>
@@ -288,7 +288,7 @@ lemma conj_pre_subst:
   using assms and hml_impl_iffI by fastforce
 
 text \<open> From \<open>\<phi>' \<Rrightarrow> \<phi>''\<close> and \<open>\<phi> \<Rrightarrow> \<phi>'\<close> follows \<open>\<phi> \<Rrightarrow> \<phi>''\<close>.
-This simply lifts hml implication into the \<open>hml_conjunct\<close> data type.\<close>
+This simply lifts hml implication into the @{term "hml_conjunct"} data type.\<close>
 lemma pos_pre_subst:
   assumes "\<phi>l \<Rrightarrow> \<phi>r"
       and "\<psi> \<and>\<Rrightarrow> (Pos \<phi>l)" 
@@ -480,7 +480,7 @@ We have chosen to define this equivalence by appealing to HML formula implicatio
 definition hml_eq :: "('a, 's) hml \<Rightarrow> ('a, 's) hml \<Rightarrow> bool" (infix "\<Lleftarrow>\<Rrightarrow>" 60)  where
   "\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r \<equiv> \<phi>l \<Rrightarrow> \<phi>r \<and> \<phi>r \<Rrightarrow> \<phi>l"
 
-text \<open> \<open>\<Lleftarrow>\<Rrightarrow>\<close> is truly an equivalence relation. \<close>
+text \<open> @{term "(\<Lleftarrow>\<Rrightarrow>)"} is truly an equivalence relation. \<close>
 lemma hml_eq_equiv: "equivp (\<Lleftarrow>\<Rrightarrow>)"
   by (smt (verit, del_insts) equivpI hml_eq_def hml_impl_def reflpI sympI transpI)
 
@@ -509,7 +509,7 @@ The following lemmata provide means to manipulate an HML equivalence
 by substituting other HML equivalence into it.
 
 While one may substitute on both sides of the equivalence, only substitutions on the left hand side
-are shown.  If one needs a substitution on the other side one may to use \<open>hml_eq_equiv\<close>.
+are shown.  If one needs a substitution on the other side one may to use @{term "hml_eq_equiv"}.
 The lemmata differ in the choice of context, i.e. what formula is substituted into.
 \<close>
 
@@ -622,7 +622,7 @@ lemma conj_cong:
 text \<open>
 Wrapping two equivalent conjunction formulas in otherwise the same conjunction,
 will result in two equivalent conjunctions.
-This differs from \<open>conj_cong\<close> in how the index set is extended.
+This differs from @{term "conj_cong"} in how the index set is extended.
 \<close>
 lemma conj_cong':
   assumes "s \<notin> I"
@@ -645,7 +645,7 @@ lemma conj_congs:
 text \<open>
 Wrapping two sets of equivalent conjunction formulas in otherwise the same conjunction,
 will result in two equivalent conjunctions.
-This differs from \<open>conj_congs\<close> in how the index set is extended.
+This differs from @{term "conj_congs"} in how the index set is extended.
 \<close>
 lemma conj_congs':
   assumes "I \<inter> I' = {}"
@@ -706,7 +706,7 @@ fun n_\<epsilon>\<tau>s_then :: "nat \<Rightarrow> ('a, 's) hml \<Rightarrow> ('
   "n_\<epsilon>\<tau>s_then 0 cont = cont" |
   "n_\<epsilon>\<tau>s_then (Suc n) cont = (Internal (Silent (n_\<epsilon>\<tau>s_then n cont)))"
 
-text \<open> \<open>[\<langle>\<epsilon>\<rangle>(\<tau>)]^n \<langle>\<epsilon>\<rangle>\<phi>\<close> is equivalent to \<open>\<langle>\<epsilon>\<rangle>\<phi>\<close> \<close>
+text \<open> $[\langle \epsilon \rangle (\tau)]^n \langle \epsilon \rangle \varphi$ is equivalent to \<open>\<langle>\<epsilon>\<rangle>\<phi>\<close> \<close>
 lemma \<epsilon>\<tau>_stack_reduces: "n_\<epsilon>\<tau>s_then n (Internal \<phi>) \<Lleftarrow>\<Rrightarrow> (Internal \<phi>)"
   apply (induct n)
   apply (simp add: LTS_Tau.hml_impl_iffI hml_eq_def)
@@ -714,14 +714,14 @@ lemma \<epsilon>\<tau>_stack_reduces: "n_\<epsilon>\<tau>s_then n (Internal \<ph
   using \<epsilon>\<tau>_is_\<tau>
   by (smt (verit, del_insts) hml_eq_def hml_impl_iffI hml_models.simps(3) pre_\<epsilon> silent_reachable_trans)
 
-text \<open> wrapping two equivalent formulas into n \<open>\<langle>\<epsilon>\<rangle>(\<tau>)\<close> prefixes, yields two equivalent formulas. \<close>
+text \<open> Wrapping two equivalent formulas into n \<open>\<langle>\<epsilon>\<rangle>(\<tau>)\<close> prefixes, yields two equivalent formulas. \<close>
 lemma n_\<epsilon>\<tau>s_then_cong:
   assumes "\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r"
   shows "n_\<epsilon>\<tau>s_then n \<phi>l \<Lleftarrow>\<Rrightarrow> n_\<epsilon>\<tau>s_then n \<phi>r"
   using assms
   by (induct n) (simp add: internal_cong silent_cong)+
 
-text \<open> \<open>[\<langle>\<epsilon>\<rangle>(\<tau>)]^n\<top>\<close> is equivalent to \<open>\<top>\<close> \<close>
+text \<open> $[\langle \epsilon \rangle (\tau)]^n \top$ is equivalent to \<open>\<top>\<close> \<close>
 lemma "n_\<epsilon>\<tau>s_then n TT \<Lleftarrow>\<Rrightarrow> TT"
   using n_\<epsilon>\<tau>s_then_cong
     and \<epsilon>\<tau>_stack_reduces
@@ -1062,7 +1062,7 @@ end (* Inhabited_Tau_LTS *)
 context LTS_Tau
 begin
 
-text \<open>The previous definitions and lemmata need to be replicated for the inner type \<open>hml_conjunct\<close>.\<close>
+text \<open>The previous definitions and lemmata need to be replicated for the inner type @{term "hml_conjunct"}.\<close>
 
 definition distinguishes_conjunct_hml ::"'s \<Rightarrow> ('a, 's) hml_conjunct \<Rightarrow> 's \<Rightarrow> bool" where
   "distinguishes_conjunct_hml p \<psi> q \<equiv> (hml_conjunct_models p \<psi>) \<and> \<not>(hml_conjunct_models q \<psi>)"
@@ -1070,9 +1070,9 @@ definition distinguishes_conjunct_hml ::"'s \<Rightarrow> ('a, 's) hml_conjunct 
 
 text\<open>One may lift this notion to sets of processes, i.e. that a formula distinguishes a singular processes
 from a whole set of processes iff this formula distinguishes the processes from each processes
-in the set (\<open>distinguishes_from_hml'\<close>).
+in the set (@{term "distinguishes_from_hml'"}).
 For this project, we require a stronger notion of this lifted predicate, namely, that the process \<open>p\<close>
-must satisfy the distinguishing formula \<open>\<phi>\<close> while all processes in \<open>Q\<close> must not (\<open>distinguishes_from_hml\<close>).  
+must satisfy the distinguishing formula \<open>\<phi>\<close> while all processes in \<open>Q\<close> must not (@{term "distinguishes_from_hml"}).  
 This differs from the other way of lifting in that \<open>p\<close> must satisfy the formula even if the set of
 processes to distinguish from \<open>Q\<close> is empty.\<close>
 
@@ -1194,14 +1194,14 @@ lemma dist_conj_thinning:
 text \<open> The following three lemmata prove that the first condition of a distinguishing conjunction
 (i.e. that the distinguished process \<open>p\<close> satisfies the conjunction) holds
 for a somewhat more complex strategy of picking conjuncts. 
-These become necessary when one wants to lift the distinguishing conjunction thinning lemma to \<open>hml_srbb\<close>.
+These become necessary when one wants to lift the distinguishing conjunction thinning lemma to @{term "hml_srbb"}.
 Confer to the file of \<open>hml_srbb\<close> for more insight into the background.
 
-The strategy for picking the conjuncts -- defined as \<open>distinguishing_conjunct\<close> in each lemma head --
+The strategy for picking the conjuncts -- defined as @{term "distinguishing_conjunct"} in each lemma head --
 is robust against original conjunctions with empty index sets or that do not contain distinguishing
 conjuncts for some elements of \<open>Q\<close>. While these cases are impossible for normal distinguishing 
 conjunctions in hml (how can an empty conjunction distinguish anything; a distinguishing conjunction
-must have a subformula that actually distinguishes), in our formalisation of \<open>hml_srbb\<close> these cases
+must have a subformula that actually distinguishes), in our formalisation of @{term "hml_srbb"} these cases
 are relevant and in particular it is important that well defined conjuncts be present in such cases.
 So the strategy works as follows: if I is empty, just pick \<open>\<top>\<close> (encoded in different ways);
 if there is no distinguishing conjunct just pick any conjunct for the original conjunction;
