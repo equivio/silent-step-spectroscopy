@@ -135,18 +135,8 @@ text \<open> \<open>hml_and_and\<close> lifts satisfaction of a hml conjunction 
 lemma hml_and_and[simp]:
   "(p \<Turnstile> (\<psi>l \<and>hml \<psi>r))
  = (hml_conjunct_models p \<psi>l \<and> hml_conjunct_models p \<psi>r)"
-  unfolding hml_models.simps and hml_conjunct_models.simps
-proof (rule iffI)
-  assume "\<forall>i\<in>{left, right}. hml_conjunct_models p (if i = left then \<psi>l else if i = right then \<psi>r else Pos TT)"
-  then have for_all_l_and_r: "\<forall>i\<in>{left, right}. (if i = left then hml_conjunct_models p \<psi>l else if i = right then hml_conjunct_models p \<psi>r else hml_conjunct_models p (Pos TT))"
-    by presburger
-  then show "hml_conjunct_models p \<psi>l \<and> hml_conjunct_models p \<psi>r"
-    by (metis Inhabited_LTS_axioms Inhabited_LTS_def insertCI)
-next
-  assume "hml_conjunct_models p \<psi>l \<and> hml_conjunct_models p \<psi>r"
-  then show "\<forall>i\<in>{left, right}. hml_conjunct_models p (if i = left then \<psi>l else if i = right then \<psi>r else Pos TT)"
-    by auto
-qed
+  using Inhabited_LTS_axioms Inhabited_LTS_def hml_conjunct_models.simps(1) hml_models.simps(1) hml_models.simps(5) by force
+
 
 end (* Inhabited_Tau_LTS *)
 
@@ -596,54 +586,8 @@ lemma conj_cong:
   assumes "\<psi>sl ` I = \<psi>sr ` I"
       and "(\<psi>sl l) \<Lleftarrow>\<and>\<Rrightarrow> (\<psi>sr r)"
   shows "(Conj (I \<union> {l}) \<psi>sl) \<Lleftarrow>\<Rrightarrow> (Conj (I \<union> {r}) \<psi>sr)"
-  using assms
-proof -
-  assume "\<psi>sl ` I = \<psi>sr ` I"
-     and "(\<psi>sl l) \<Lleftarrow>\<and>\<Rrightarrow> (\<psi>sr r)"
-  hence "(\<forall>p. hml_conjunct_models p (\<psi>sl l) \<longrightarrow> hml_conjunct_models p (\<psi>sr r))
-       \<and> (\<forall>p. hml_conjunct_models p (\<psi>sr r) \<longrightarrow> hml_conjunct_models p (\<psi>sl l))"
-    unfolding hml_conjunct_eq_def
-          and hml_conjunct_impl_def by auto
-  then have
-        IHL: "\<forall>p. hml_conjunct_models p (\<psi>sl l) \<longrightarrow> hml_conjunct_models p (\<psi>sr r)"
-    and IHR: "\<forall>p. hml_conjunct_models p (\<psi>sr r) \<longrightarrow> hml_conjunct_models p (\<psi>sl l)" 
-    apply blast 
-    using \<open>(\<forall>p. hml_conjunct_models p (\<psi>sl l) \<longrightarrow> hml_conjunct_models p (\<psi>sr r)) \<and> (\<forall>p. hml_conjunct_models p (\<psi>sr r) \<longrightarrow> hml_conjunct_models p (\<psi>sl l))\<close> by blast
-  
-  show "(Conj (I \<union> {l}) \<psi>sl) \<Lleftarrow>\<Rrightarrow> (Conj (I \<union> {r}) \<psi>sr)"
-    unfolding hml_eq_def
-          and hml_impl_def
-  proof (rule conjI)
-    show "\<forall>p. p \<Turnstile> Conj (I \<union> {l}) \<psi>sl \<longrightarrow> p \<Turnstile> Conj (I \<union> {r}) \<psi>sr"
-    proof (rule allI, rule impI)
-      fix p
-      assume "p \<Turnstile> Conj (I \<union> {l}) \<psi>sl"
-      hence "\<forall>i\<in>I \<union> {l}. hml_conjunct_models p (\<psi>sl i)"
-        unfolding hml_models.simps.
-      then have "hml_conjunct_models p (\<psi>sl l)"
-        by blast
-      then have "hml_conjunct_models p (\<psi>sr r)"
-        using IHL by simp
-      then show "p \<Turnstile> Conj (I \<union> {r}) \<psi>sr"
-        using \<open>\<psi>sl ` I = \<psi>sr ` I\<close> 
-        by (smt (verit) Un_insert_right \<open>\<forall>i\<in>I \<union> {l}. hml_conjunct_models p (\<psi>sl i)\<close> hml_models.simps(5) image_iff insert_iff sup_bot.right_neutral)
-    qed
-  next
-    show "\<forall>p. p \<Turnstile> Conj (I \<union> {r}) \<psi>sr \<longrightarrow> p \<Turnstile> Conj (I \<union> {l}) \<psi>sl"
-    proof (rule allI, rule impI)
-      fix p
-      assume "p \<Turnstile> Conj (I \<union> {r}) \<psi>sr"
-      hence "\<forall>i\<in>I \<union> {r}. hml_conjunct_models p (\<psi>sr i)"
-        unfolding hml_models.simps.
-      then have "hml_conjunct_models p (\<psi>sr r)"
-        by blast
-      then have "hml_conjunct_models p (\<psi>sl l)"
-        using IHR by simp
-      then show " p \<Turnstile> Conj (I \<union> {l}) \<psi>sl" 
-        by (smt (verit, best) Un_empty_right Un_insert_right \<open>\<forall>i\<in>I \<union> {r}. hml_conjunct_models p (\<psi>sr i)\<close> \<open>\<psi>sl ` I = \<psi>sr ` I\<close> hml_models.simps(5) image_iff insert_iff)
-    qed
-  qed
-qed
+  using assms 
+  by (metis LTS_Tau.conj_pre_cong hml_conjunct_eq_def hml_eq_def)
 
 text \<open>
 Wrapping two equivalent conjunction formulas in otherwise the same conjunction,
@@ -665,47 +609,8 @@ lemma conj_congs:
   assumes "\<forall>i \<in> I. \<psi>sl i = \<psi>sr i"
       and "\<forall>i \<in> I'. (\<psi>sl i) \<Lleftarrow>\<and>\<Rrightarrow> (\<psi>sr i)"
   shows "(Conj (I \<union> I') \<psi>sl) \<Lleftarrow>\<Rrightarrow> (Conj (I \<union> I') \<psi>sr)"
-  using assms
-proof -
-  assume "\<forall>i \<in> I. \<psi>sl i = \<psi>sr i"
-     and "\<forall>i \<in> I'. (\<psi>sl i) \<Lleftarrow>\<and>\<Rrightarrow> (\<psi>sr i)"
-  hence conjunct_eq: "\<forall>i\<in>I'. (\<forall>p. hml_conjunct_models p (\<psi>sl i) \<longrightarrow> hml_conjunct_models p (\<psi>sr i))
-                   \<and> (\<forall>p. hml_conjunct_models p (\<psi>sr i) \<longrightarrow> hml_conjunct_models p (\<psi>sl i))"
-    unfolding hml_conjunct_eq_def and hml_conjunct_impl_def by auto
-  show "(Conj (I \<union> I') \<psi>sl) \<Lleftarrow>\<Rrightarrow> (Conj (I \<union> I') \<psi>sr)"
-    unfolding hml_eq_def and hml_impl_def
-  proof (rule conjI)
-    show "\<forall>p. p \<Turnstile> Conj (I \<union> I') \<psi>sl \<longrightarrow> p \<Turnstile> Conj (I \<union> I') \<psi>sr"
-    proof (rule allI, rule impI)
-      fix p
-      assume "p \<Turnstile> Conj (I \<union> I') \<psi>sl"
-      hence "(\<forall>i\<in>I. hml_conjunct_models p (\<psi>sl i))
-           \<and> (\<forall>i\<in>I'. hml_conjunct_models p (\<psi>sl i))" 
-        by simp
-      then have "\<forall>i\<in>I. hml_conjunct_models p (\<psi>sl i)"
-            and "\<forall>i\<in>I'. hml_conjunct_models p (\<psi>sl i)" by blast+
-
-      from \<open>\<forall>i\<in>I. hml_conjunct_models p (\<psi>sl i)\<close>
-       and \<open>\<forall>i\<in>I. \<psi>sl i = \<psi>sr i\<close>
-      have "\<forall>i\<in>I. hml_conjunct_models p (\<psi>sr i)" 
-        by force
-
-      from conjunct_eq
-       and \<open>\<forall>i\<in>I'. hml_conjunct_models p (\<psi>sl i)\<close>
-      have "\<forall>i\<in>I'. hml_conjunct_models p (\<psi>sr i)" 
-        by blast
-
-      from \<open>\<forall>i\<in>I. hml_conjunct_models p (\<psi>sr i)\<close>
-       and \<open>\<forall>i\<in>I'. hml_conjunct_models p (\<psi>sr i)\<close>
-      show "p \<Turnstile> Conj (I \<union> I') \<psi>sr"
-        unfolding hml_models.simps 
-        by blast
-    qed
-  next
-    show "\<forall>p. p \<Turnstile> Conj (I \<union> I') \<psi>sr \<longrightarrow> p \<Turnstile> Conj (I \<union> I') \<psi>sl" 
-      using Un_iff \<open>\<forall>i\<in>I. \<psi>sl i = \<psi>sr i\<close> conjunct_eq by auto
-  qed
-qed
+  using assms 
+  using conj_pre_congs hml_conjunct_eq_def hml_eq_def by auto
 
 text \<open>
 Wrapping two sets of equivalent conjunction formulas in otherwise the same conjunction,
@@ -760,28 +665,8 @@ subsubsection \<open> Know Equivalence Elements\<close>
 
 text \<open> \<open>\<langle>\<epsilon>\<rangle>(\<tau>)\<phi>\<close> is equivalent to \<open>\<langle>\<epsilon>\<rangle>\<phi>\<close> \<close>
 lemma \<epsilon>\<tau>_is_\<tau>: "(Internal (Silent \<phi>)) \<Lleftarrow>\<Rrightarrow> (Internal \<phi>)"
-  unfolding hml_eq_def
-proof (rule conjI)
-  from pre_\<tau>
-  have "\<phi> \<Rrightarrow> (Silent \<phi>)".
-  then show "Internal \<phi> \<Rrightarrow> Internal (Silent \<phi>)"
-    using internal_pre_cong by simp
-next
-  show "Internal (Silent \<phi>) \<Rrightarrow> Internal \<phi>"
-    unfolding hml_impl_def
-  proof (rule allI, rule impI)
-    fix p
-    assume "p \<Turnstile> Internal (Silent \<phi>)"
-    hence "p \<Turnstile> Internal \<phi> \<or> p \<Turnstile> Internal (Obs \<tau> \<phi>)" by auto
-    then show "p \<Turnstile> Internal \<phi>"
-      apply (rule disjE) apply assumption
-    proof -
-      assume "p \<Turnstile> Internal (Obs \<tau> \<phi>)"
-      then show "p \<Turnstile> Internal \<phi>"
-        using \<epsilon>_eats_\<tau> and hml_impl_iffI by simp
-    qed
-  qed
-qed
+  unfolding hml_eq_def 
+  using hml_impl_iffI hml_models.simps(3) hml_models.simps(4) silent_reachable_append_\<tau> by blast
 
 text \<open> \<open>\<langle>\<epsilon>\<rangle>\<top>\<close> is equivalent to \<open>\<top>\<close> \<close>
 lemma \<epsilon>T_is_T: "(Internal TT) \<Lleftarrow>\<Rrightarrow> TT"
@@ -910,15 +795,8 @@ text \<open> \<open>\<And>({\<top>} \<union> \<Psi>)\<close> is equivalent to \<
 lemma
   assumes "s \<notin> I"
   shows "Conj (I \<union> {s}) (\<lambda>i. if i = s then Pos TT else \<psi>s i) \<Lleftarrow>\<Rrightarrow> Conj I \<psi>s"
-  using assms
-proof -
-  assume "s \<notin> I"
-  then have "Conj (I \<union> {s}) (\<lambda>i. if i = s then Pos TT else \<psi>s i) \<Lleftarrow>\<Rrightarrow> (Pos TT \<and>hml Pos (Conj I \<psi>s))"
-    by (rule conj_extract_conjunct)
-  with hml_and_left_tt
-  show "Conj (I \<union> {s}) (\<lambda>i. if i = s then Pos TT else \<psi>s i) \<Lleftarrow>\<Rrightarrow> Conj I \<psi>s"
-    by (meson equivp_transp hml_eq_equiv)
-qed
+  using assms and conj_extract_conjunct and hml_and_left_tt and hml_eq_equiv 
+  by (meson equivp_transp)
 
 text \<open> \<open>(\<tau>)\<phi>\<close> is equivalent to \<open>\<langle>\<tau>\<rangle>\<phi> \<or> \<phi>\<close> \<close>
 lemma silent_is_or: "(Silent \<phi>) \<Lleftarrow>\<Rrightarrow> ((Obs \<tau> \<phi>) \<or> \<phi>)"
