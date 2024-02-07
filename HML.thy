@@ -3,9 +3,6 @@ theory HML
   imports Main LTS
 begin
 
-
-section \<open> Hennesy-Milner-Logic (HML) \<close>
-
 text \<open>
 The mutually recursive data types \<open>hml\<close> and \<open>hml_conjunct\<close> represent arbitrary HML formulas.
 
@@ -443,7 +440,7 @@ lemma not_pre_cong:
 end (* Inhabited_Tau_LTS *)
 
 
-subsubsection \<open> Know Pre-Order Elements\<close>
+subsubsection \<open> Known Pre-Order Elements\<close>
 
 context LTS_Tau
 begin
@@ -817,7 +814,7 @@ lemma hml_tertium_non_datur:
   using hml_absurdity and hml_not_not_eq 
   by (simp add: hml_eq_equality)
 
-subsection \<open> HML Equivalence X HML Pre-Order \<close>
+subsection \<open> HML Equivalence and HML Pre-Order \<close>
 
 text \<open>
 These lemmata provide means to substitute HML equivalences and implications into each other,
@@ -1152,8 +1149,8 @@ One may now constructed the 'thinned' conjunction with index set \<open>Q\<close
 a conjunct that \<open>q\<close> does not satisfy, thereby guaranteeing that all elements of \<open>Q\<close> can not satisfy
 this new conjunction.
 The process \<open>p\<close> must still satisfy this new conjunction since all conjuncts originate from the old
-conjunction which \<open>p\<close> satisfies and thereby all conjuncts hold for \<open>p\<close>. Said in another way: since
-no new conjuncts are constructed there is no opportunity for p to not satisfy the new conjunction.
+conjunction which \<open>p\<close> satisfies and thereby all conjuncts hold for \<open>p\<close>. In other words: since
+no new conjuncts are constructed there is no opportunity for \<open>p\<close> to not satisfy the new conjunction.
 \<close>
 
 text \<open>The following proof is a prove of a underspecified variant of the distinguishing conjunction thinning.
@@ -1194,7 +1191,7 @@ lemma dist_conj_thinning:
 
 
 text \<open> The following three lemmata prove that the first condition of a distinguishing conjunction
-(i.e. that the distinguished process \<open>p\<close> satisfies the conjunction)
+(i.e. that the distinguished process \<open>p\<close> satisfies the conjunction) holds
 for a somewhat more complex strategy of picking conjuncts. 
 These become necessary when one wants to lift the distinguishing conjunction thinning lemma to \<open>hml_srbb\<close>.
 Confer to the file of \<open>hml_srbb\<close> for more insight into the background.
