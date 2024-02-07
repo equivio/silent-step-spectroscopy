@@ -95,7 +95,8 @@ lemma "(state \<Turnstile> (Silent \<phi>))
         insert_iff singletonD
   by fastforce
 
-text \<open> We choose to still include \<open>Silent\<close> to stay close to TODO and TODO. \<close>
+text \<open> We choose to still include \<open>Silent\<close> to stay close to \cite{bisping2023lineartimebranchingtime}
+and \cite{FOKKINK2019104435}. \<close>
 
 end (* Inhabited_Tau_LTS *)
 
