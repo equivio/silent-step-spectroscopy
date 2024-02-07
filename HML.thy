@@ -1188,55 +1188,9 @@ lemma dist_conj_thinning:
   assumes "p <> (Conj I \<psi>s) Q"
   shows "p <> (Conj Q (\<lambda>q. \<psi>s (SOME i. i \<in> I \<and> \<not>(hml_conjunct_models q (\<psi>s i))))) Q"
   using assms
-proof -
-  assume "p <> Conj I \<psi>s Q"
-  hence conj_dist_from_Q: "p \<Turnstile> Conj I \<psi>s \<and> (\<forall>q\<in>Q. \<not> q \<Turnstile> Conj I \<psi>s)"
-    unfolding distinguishes_from_hml_def and distinguishes_hml_def.
-
-  show "p <> (Conj Q (\<lambda>q. \<psi>s (SOME i. i \<in> I \<and> \<not>(hml_conjunct_models q (\<psi>s i))))) Q"
-    unfolding distinguishes_from_hml_def and distinguishes_hml_def
-  proof (rule conjI)
-    from conj_dist_from_Q
-    have "p \<Turnstile> Conj I \<psi>s" and "\<forall>q\<in>Q. \<not> q \<Turnstile> Conj I \<psi>s" by auto
-
-    from \<open>\<forall>q\<in>Q. \<not> q \<Turnstile> Conj I \<psi>s\<close>
-    have "\<forall>q\<in>Q. \<exists>i. i \<in> I \<and> \<not> hml_conjunct_models q (\<psi>s i)"
-      using hml_models.simps(5) by blast
-
-    from \<open>p \<Turnstile> Conj I \<psi>s\<close>
-    have "\<forall>i\<in>I. hml_conjunct_models p (\<psi>s i)"
-      unfolding hml_models.simps.
-
-    have "\<forall>q'\<in>Q. hml_conjunct_models p (\<psi>s (SOME i. i \<in> I \<and> \<not> hml_conjunct_models q' (\<psi>s i)))"
-    proof (rule ballI)
-      fix q'
-      assume "q' \<in> Q"
-      with \<open>\<forall>i\<in>I. hml_conjunct_models p (\<psi>s i)\<close>
-       and \<open>\<forall>q\<in>Q. \<exists>i. i \<in> I \<and> \<not> hml_conjunct_models q (\<psi>s i)\<close>
-      show "hml_conjunct_models p (\<psi>s (SOME i. i \<in> I \<and> \<not> hml_conjunct_models q' (\<psi>s i)))" 
-        by (metis (no_types, lifting) tfl_some)
-    qed
-
-    then show "p \<Turnstile> Conj Q (\<lambda>q. \<psi>s (SOME i. i \<in> I \<and> \<not> hml_conjunct_models q (\<psi>s i)))"
-      unfolding hml_models.simps.
-  next
-    from conj_dist_from_Q
-    have "p \<Turnstile> Conj I \<psi>s" and "\<forall>q\<in>Q. \<not> q \<Turnstile> Conj I \<psi>s" by auto
-
-    from \<open>\<forall>q\<in>Q. \<not> q \<Turnstile> Conj I \<psi>s\<close>
-    have "\<forall>q\<in>Q. \<exists>i. i \<in> I \<and> \<not> hml_conjunct_models q (\<psi>s i)"
-      using hml_models.simps(5) by blast
-
-    then have "\<forall>q\<in>Q. \<not>(hml_conjunct_models q (\<psi>s (SOME i. i \<in> I \<and> \<not> hml_conjunct_models q (\<psi>s i))))"
-      by (metis (no_types, lifting) tfl_some)
-
-    then have "\<forall>q\<in>Q. \<exists>q'\<in>Q. \<not>(hml_conjunct_models q (\<psi>s (SOME i. i \<in> I \<and> \<not> hml_conjunct_models q' (\<psi>s i))))"
-      by auto
-
-    then show "\<forall>q\<in>Q. \<not> q \<Turnstile> Conj Q (\<lambda>q. \<psi>s (SOME i. i \<in> I \<and> \<not> hml_conjunct_models q (\<psi>s i)))"
-      unfolding hml_models.simps by auto
-  qed
-qed
+  unfolding distinguishes_from_hml_def and distinguishes_hml_def and hml_models.simps
+  using tfl_some and hml_models.simps(5)
+  by (metis (mono_tags, lifting))
 
 
 text \<open> The following three lemmata prove that the first condition of a distinguishing conjunction
