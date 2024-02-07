@@ -100,7 +100,7 @@ text \<open>
 \<open>(\<alpha>)\<phi>\<close> is satisfied if either \<open>\<langle>\<alpha>\<rangle>\<phi>\<close> (note that here \<open>\<alpha>\<close> may be equal to \<open>\<tau>\<close>) or
 if \<open>\<alpha> = \<tau>\<close> and \<open>\<phi>\<close> is already satisfied.
 \<close>
-lemma soft_poss_to_or:
+lemma soft_poss_to_or[simp]:
   "p \<Turnstile> (HML_soft_poss \<alpha> \<phi>) = (p \<Turnstile> Obs \<alpha> \<phi>) \<or> (\<alpha> = \<tau> \<and> p \<Turnstile> \<phi>)"
   by auto
 
@@ -132,7 +132,7 @@ begin
 
 text \<open> \<open>hml_and_and\<close> lifts satisfaction of a hml conjunction from HML logic to HOL logic. \<close>
 
-lemma hml_and_and:
+lemma hml_and_and[simp]:
   "(p \<Turnstile> (\<psi>l \<and>hml \<psi>r))
  = (hml_conjunct_models p \<psi>l \<and> hml_conjunct_models p \<psi>r)"
   unfolding hml_models.simps and hml_conjunct_models.simps
@@ -155,16 +155,30 @@ context Inhabited_Tau_LTS
 begin
 
 text \<open> \<open>(HML_not \<phi>)\<close> represents \<open>\<not>\<phi>\<close> and is realized via a one element conjunction. \<close>
-
 abbreviation HML_not :: "('a, 's) hml \<Rightarrow> ('a, 's) hml" where
   "HML_not \<phi> \<equiv> Conj {left} (\<lambda>i. if i = left then (Neg \<phi>) else (Pos TT))"
 
 
 text \<open> \<open>\<not>\<not>\<phi>\<close> is satisfied iff \<open>\<phi>\<close> is satisfied. \<close>
-
 lemma hml_not_not:
-  "(state \<Turnstile> \<phi>)
- = (state \<Turnstile> HML_not (HML_not \<phi>))"
+  shows "(state \<Turnstile> \<phi>)
+       = (state \<Turnstile> HML_not (HML_not \<phi>))"
+  by simp
+
+text \<open>
+\<open>HML_not \<phi>\<close> is satisfied, iff \<open>\<phi>\<close> is not satisfied.
+This lifts the negation from HML to HOL.
+\<close>
+lemma hml_not_not_models[simp]:
+  shows "(state \<Turnstile> HML_not \<phi>) = (\<not> state \<Turnstile> \<phi>)"
+  by simp
+
+abbreviation hml_falsum :: "('a, 's) hml" ("\<bottom>\<bottom>") where
+  "\<bottom>\<bottom> \<equiv> HML_not TT"
+
+text \<open> No process ever satisfies falsum. \<close>
+lemma never_models_falsum[simp]:
+  shows "\<not> state \<Turnstile> \<bottom>\<bottom>"
   by simp
 
 text \<open> \<open>(\<phi> \<or> \<phi>')\<close> represents \<open>\<phi> \<or> \<phi>'\<close> (read "or") and is realized by using binary conjunction and negation. \<close>
@@ -172,7 +186,7 @@ text \<open> \<open>(\<phi> \<or> \<phi>')\<close> represents \<open>\<phi> \<or
 definition HML_or :: "('a, 's) hml \<Rightarrow> ('a, 's) hml \<Rightarrow> ('a, 's) hml" ("_ \<or> _" 70) where
   "\<phi>l \<or> \<phi>r \<equiv> HML_not (Neg \<phi>l \<and>hml Neg \<phi>r)"
 
-lemma hml_or_or: "(p \<Turnstile> (\<phi>l \<or> \<phi>r)) = ((p \<Turnstile> \<phi>l) \<or> (p \<Turnstile> \<phi>r))"
+lemma hml_or_or[simp]: "(p \<Turnstile> (\<phi>l \<or> \<phi>r)) = ((p \<Turnstile> \<phi>l) \<or> (p \<Turnstile> \<phi>r))"
   unfolding HML_or_def 
   using Inhabited_LTS_axioms Inhabited_LTS_def hml_conjunct_models.simps(2) hml_models.simps(1) hml_models.simps(5) by force
 
@@ -186,7 +200,6 @@ subsection \<open> Pre-Order \<close>
 
 text \<open> An HML formula \<open>\<phi>l\<close> implies another (\<open>\<phi>r\<close>) if the fact that some process \<open>p\<close> satisfies \<open>\<phi>l\<close>
 implies that \<open>p\<close> must also satisfy \<open>\<phi>r\<close>, no matter the process \<open>p\<close>. \<close>
-
 definition hml_impl :: "('a, 's) hml \<Rightarrow> ('a, 's) hml \<Rightarrow> bool" (infix "\<Rrightarrow>" 60)  where
   "\<phi>l \<Rrightarrow> \<phi>r \<equiv> (\<forall>p. (p \<Turnstile> \<phi>l) \<longrightarrow> (p \<Turnstile> \<phi>r))"
 
@@ -401,10 +414,9 @@ lemma hml_and_right_pre_cong:
 
 text \<open> Prepending a negation (\<open>\<not>...\<close>) inverts implication. \<close>
 lemma not_pre_cong:
-  assumes "\<phi>l \<Rrightarrow> \<phi>r"
-  shows "HML_not \<phi>r \<Rrightarrow> HML_not \<phi>l"
-  using assms and neg_pre_cong and conj_pre_cong 
-  by simp
+  shows "\<phi>l \<Rrightarrow> \<phi>r
+       = HML_not \<phi>r \<Rrightarrow> HML_not \<phi>l"
+  using hml_impl_def by auto
 
 end (* Inhabited_Tau_LTS *)
 
@@ -415,16 +427,25 @@ context LTS_Tau
 begin
 
 text \<open> If \<open>\<phi>\<close> is satisfied, then also \<open>\<langle>\<epsilon>\<rangle>\<phi>\<close> must be satisfied. \<close>
-lemma pre_\<epsilon>: "\<phi> \<Rrightarrow> (Internal \<phi>)"
+lemma pre_\<epsilon>:
+  shows "\<phi> \<Rrightarrow> (Internal \<phi>)"
   using silent_reachable.intros(1) hml_impl_def by fastforce
 
 text \<open> If \<open>\<phi>\<close> is satisfied, then also \<open>(\<tau>)\<phi>\<close> must be satisfied. \<close>
-lemma pre_\<tau>: "\<phi> \<Rrightarrow> (Silent \<phi>)"
+lemma pre_\<tau>:
+  shows "\<phi> \<Rrightarrow> (Silent \<phi>)"
   using hml_impl_def by fastforce
 
 text \<open> If \<open>\<langle>\<epsilon>\<rangle>\<langle>\<tau>\<rangle>\<phi>\<close> is satisfied, then also \<open>\<langle>\<epsilon>\<rangle>\<phi>\<close> must be satisfied. \<close>
-lemma \<epsilon>_eats_\<tau>: "(Internal (Obs \<tau> \<phi>)) \<Rrightarrow> (Internal \<phi>)"
+lemma \<epsilon>_eats_\<tau>:
+  shows "(Internal (Obs \<tau> \<phi>)) \<Rrightarrow> (Internal \<phi>)"
   using silent_reachable_append_\<tau> hml_impl_def by fastforce
+
+text \<open>If \<open>\<And>{\<psi>, ...}\<close> is satisfied, then also \<open>\<And>{...}\<close> is satisfied.
+One may freely drop conjuncts, the conjunction slimmed in this way will still be satisfied. \<close>
+lemma drop_conjunct:
+  shows "Conj (I \<union> {s}) \<psi>s \<Rrightarrow> Conj (I - {s}) \<psi>s"
+  using Un_Diff_cancel2 hml_impl_iffI by auto
 
 
 subsection \<open> Equivalence \<close>
@@ -827,6 +848,7 @@ text \<open> \<open>\<phi>l \<and> \<phi>r\<close> is equivalent to \<open>\<phi
 lemma hml_and_commutative: "(\<phi>l \<and>hml \<phi>r) \<Lleftarrow>\<Rrightarrow> (\<phi>r \<and>hml \<phi>l)"
   using Inhabited_LTS_axioms Inhabited_LTS_def hml_eq_equality by fastforce
 
+
 text \<open> \<open>\<top> \<and> \<phi>\<close> is equivalent to \<open>\<phi>\<close> \<close>
 lemma hml_and_left_tt: "(Pos TT \<and>hml Pos \<phi>) \<Lleftarrow>\<Rrightarrow> \<phi>"
   using Inhabited_LTS_axioms Inhabited_LTS_def hml_eq_equality by fastforce
@@ -910,6 +932,16 @@ lemma hml_not_not_eq: "\<phi> \<Lleftarrow>\<Rrightarrow> HML_not (HML_not \<phi
   unfolding hml_eq_equality
   using hml_not_not by auto
 
+text \<open> \<open>\<phi> \<and> \<not>\<phi>\<close> is equivalent to \<open>\<bottom>\<close> \<close>
+lemma hml_absurdity:
+  shows "Pos \<phi> \<and>hml Neg \<phi> \<Lleftarrow>\<Rrightarrow> \<bottom>\<bottom>"
+  by (smt (verit) Inhabited_LTS_axioms Inhabited_LTS_def LTS_Tau.hml_eq_equality hml_conjunct_models.simps(1) hml_conjunct_models.simps(2) hml_models.simps(5) insertCI never_models_falsum)
+
+text \<open> \<open>\<phi> \<or> \<not>\<phi>\<close> is equivalent to \<open>\<top>\<close> \<close>
+lemma hml_tertium_non_datur:
+  shows "TT \<Lleftarrow>\<Rrightarrow> (\<phi> \<or> HML_not \<phi>)"
+  using hml_absurdity and hml_not_not_eq 
+  by (simp add: hml_eq_equality)
 
 subsection \<open> HML Equivalence X HML Pre-Order \<close>
 
@@ -1100,6 +1132,24 @@ lemma and_right_equal_subst_impl:
     shows "\<phi>' \<Rrightarrow> \<phi> \<and>hml \<phi>r"
   using assms by (simp add: hml_conjunct_impl_def hml_eq_equality hml_impl_def)
 
+subsubsection \<open> Falsum and Verum \<close>
+
+text \<open> If satisfaction of a formula entails that falsum must be satisfied means that this formula
+can never be satisfied. \<close>
+lemma entails_falsum_equals_falsum:
+  assumes "\<phi> \<Rrightarrow> \<bottom>\<bottom>"
+  shows "\<phi> \<Lleftarrow>\<Rrightarrow> \<bottom>\<bottom>"
+  using assms 
+  by (simp add: LTS_Tau.hml_eq_equality LTS_Tau.hml_impl_iffI)
+
+text \<open> If we can show that verum entails the satisfaction of a formula, the formula must be equivalent
+to verum. \<close>
+lemma follows_verum_equals_verum:
+  assumes "TT \<Rrightarrow> \<phi>"
+  shows "\<phi> \<Lleftarrow>\<Rrightarrow> TT"
+  using assms 
+  by (simp add: LTS_Tau.hml_eq_equality LTS_Tau.hml_impl_iffI)
+
 end (* Inhabited_Tau_LTS *)
 
 subsection \<open> Distinguishing Formulas \<close>
@@ -1107,14 +1157,44 @@ subsection \<open> Distinguishing Formulas \<close>
 context LTS_Tau
 begin
 
-text \<open> A formula is said to distinguishe two processes iff one process satisfies the formula,
+text \<open> A formula is said to distinguish two processes iff one process satisfies the formula,
 while the other does not. \<close>
 
 definition distinguishes_hml :: "'s \<Rightarrow> ('a, 's) hml \<Rightarrow> 's \<Rightarrow> bool" ("_ <> _ _" [70, 70, 70] 80) where
   "(p <> \<phi> q) \<equiv> (p \<Turnstile> \<phi>) \<and> \<not>(q \<Turnstile> \<phi>)"
 
+text \<open> The formula \<open>\<top>\<close> can not distinguish anything. This holds since for a formula to distinguish
+two processes, one process must not satisfy given formula, but \<open>\<top>\<close> is satisfied by all processes. \<close>
+lemma vertum_cant_distinguish:
+  shows "\<not> (p <> TT q)"
+  using distinguishes_hml_def by simp
+
+text \<open> No matter the formula chosen, a process may never be distinguished from itself. \<close>
+lemma cant_self_distinguish:
+  shows "\<not> (p <> \<phi> p)"
+  using distinguishes_hml_def by simp
+
+end (* LTS_Tau *)
+
+context Inhabited_Tau_LTS
+begin
+
+text \<open> If a formula \<open>\<phi>\<close> distinguishes the processes \<open>p\<close> and \<open>q\<close> then the inverted formula
+(i.e. \<open>\<not>\<phi>\<close>) will distinguish both processes, but in inverted order. \<close>
+lemma inverted_distinguishes:
+  shows "(p <> \<phi> q) = (q <> (HML_not \<phi>) p)"
+  using distinguishes_hml_def by auto
+
+end (* Inhabited_Tau_LTS *)
+
+context LTS_Tau
+begin
+
+text \<open>The previous definitions and lemmata need to be replicated for the inner type \<open>hml_conjunct\<close>.\<close>
+
 definition distinguishes_conjunct_hml ::"'s \<Rightarrow> ('a, 's) hml_conjunct \<Rightarrow> 's \<Rightarrow> bool" where
   "distinguishes_conjunct_hml p \<psi> q \<equiv> (hml_conjunct_models p \<psi>) \<and> \<not>(hml_conjunct_models q \<psi>)"
+
 
 text\<open>One may lift this notion to sets of processes, i.e. that a formula distinguishes a singular processes
 from a whole set of processes iff this formula distinguishes the processes from each processes
@@ -1397,6 +1477,6 @@ begin
 lemma hml_and_dist_disj: "p <> (\<psi>l \<and>hml \<psi>r) q = (p \<Turnstile> (\<psi>l \<and>hml \<psi>r) \<and> (\<not>hml_conjunct_models q \<psi>l \<or> \<not>hml_conjunct_models q \<psi>r))"
   using Inhabited_Tau_LTS.hml_and_and Inhabited_Tau_LTS_axioms distinguishes_hml_def by fastforce
 
-end
+end (* Inhabited_Tau_LTS *)
 
 end
