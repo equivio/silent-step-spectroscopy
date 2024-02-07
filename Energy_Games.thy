@@ -183,12 +183,12 @@ subsection \<open>Winning\<close>
 
 text\<open>Plays can be won by the attacker or the defender. In general, we distinguish between the winner of an infinite and a finite play. 
 An infinite play is won by the defender. In contrast to the infinite play, the finite play is won if one of the players whose turn it is can no longer move.
-Then the play is stuck. Since we only consider finite plays, we just need definition for \<open>stuck\<close> and for the current player.\<close>
+Since we only consider finite plays, we just need definition for this situation and for the current player.\<close>
 
-abbreviation "play_stuck g0 p \<equiv> (finite_play g0 p) \<and> (\<nexists>gn. finite_play g0 (p @ [gn]))"
+abbreviation "no_move g0 p \<equiv> (finite_play g0 p) \<and> (\<nexists>gn. finite_play g0 (p @ [gn]))"
 
 lemma %invisible play_stuck_def:
-  shows "play_stuck g0 p \<longleftrightarrow> ((finite_play g0 p) \<and> (\<nexists>ps. ps \<noteq> [] \<and> finite_play g0 (p @ ps)))"
+  shows "no_move g0 p \<longleftrightarrow> ((finite_play g0 p) \<and> (\<nexists>ps. ps \<noteq> [] \<and> finite_play g0 (p @ ps)))"
 proof
   assume asm: "(finite_play g0 p) \<and> (\<nexists>gn. finite_play g0 (p @ [gn]))"
   show "((finite_play g0 p) \<and> (\<nexists>ps. ps \<noteq> [] \<and> finite_play g0 (p @ ps)))" 
@@ -200,7 +200,7 @@ proof
     with asm show "False" by simp
   qed
 next
-  show "(finite_play g0 p) \<and> (\<nexists>ps. ps \<noteq> [] \<and> finite_play g0 (p @ ps)) \<Longrightarrow> play_stuck g0 p" using finite_play_suffix
+  show "(finite_play g0 p) \<and> (\<nexists>ps. ps \<noteq> [] \<and> finite_play g0 (p @ ps)) \<Longrightarrow> no_move g0 p" using finite_play_suffix
     by blast
 qed
 
@@ -211,13 +211,13 @@ text\<open>\noindent The following definitions formalize the conditions under wh
 For this purpose we have to consider the energy level. If we reach an energy level that is equal to the defender's win level, the defender wins.\<close>
 
 definition won_by_defender:: "'gstate \<Rightarrow> 'energy \<Rightarrow> 'gstate fplay \<Rightarrow> bool" where
-  "won_by_defender g0 e0 p \<equiv> (play_stuck g0 p \<and> is_attacker_turn p) \<or> (energy_level g0 e0 p = defender_win_level)"
+  "won_by_defender g0 e0 p \<equiv> (no_move g0 p \<and> is_attacker_turn p) \<or> (energy_level g0 e0 p = defender_win_level)"
 
 definition won_by_attacker:: "'gstate \<Rightarrow> 'energy \<Rightarrow> 'gstate fplay \<Rightarrow> bool" where
-  "won_by_attacker g0 e0 p \<equiv> play_stuck g0 p \<and> is_defender_turn p \<and> (energy_level g0 e0 p \<noteq> defender_win_level)"
+  "won_by_attacker g0 e0 p \<equiv> no_move g0 p \<and> is_defender_turn p \<and> (energy_level g0 e0 p \<noteq> defender_win_level)"
 
 abbreviation no_winner:: "'gstate \<Rightarrow> 'energy \<Rightarrow> 'gstate fplay \<Rightarrow> bool" where
-  "no_winner g0 e0 p \<equiv> \<not>play_stuck g0 p \<and> (energy_level g0 e0 p \<noteq> defender_win_level)"
+  "no_winner g0 e0 p \<equiv> \<not>no_move g0 p \<and> (energy_level g0 e0 p \<noteq> defender_win_level)"
 
 subsubsection \<open>Winner of a Play\<close> 
 text\<open>Now we prove that exactly one of our three cases is always true. This means, in particular, that if there is a winner, that winner is unique. \<close>
