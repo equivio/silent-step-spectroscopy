@@ -44,7 +44,7 @@ abbreviation weighted_move :: "'gstate \<Rightarrow> 'energy update \<Rightarrow
 
 abbreviation "weight g1 g2 \<equiv> the (weight_opt g1 g2)"
 
-text\<open>\noindent Starting with some energy the resulting energy level of a valid finite play can be  
+text\<open>\noindent Starting with some energy the resulting energy level of a valid play can be  
 calculated as follows:\<close>
 
 fun energy_level :: "'gstate \<Rightarrow> 'energy \<Rightarrow>'gstate fplay \<Rightarrow> 'energy" where
