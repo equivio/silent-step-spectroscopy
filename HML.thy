@@ -1219,22 +1219,9 @@ lemma dist_conjunct_image_subset_all_conjuncts:
                 then \<psi>s (SOME i. i \<in> I \<and> \<not>(hml_conjunct_models q (\<psi>s i)))
                 else \<psi>s (SOME i. i \<in> I))"
   shows "(distinguishing_conjunct I \<psi>s) ` Q \<subseteq> (\<psi>s ` I) \<union> {Pos TT}"
-proof (cases "I = {}")
-  assume "I = {}"
-  then show "distinguishing_conjunct I \<psi>s ` Q \<subseteq> \<psi>s ` I \<union> {Pos TT}"
-    by (simp add: assms image_subsetI)
-next
-  assume "I \<noteq> {}"
-
-  then have "(\<lambda>q. if \<exists>i \<in> I. \<not>(hml_conjunct_models q (\<psi>s i))
-             then \<psi>s (SOME i. i \<in> I \<and> \<not>(hml_conjunct_models q (\<psi>s i)))
-             else \<psi>s (SOME i. i \<in> I)) ` Q \<subseteq> \<psi>s ` I"
-    by (smt (verit, ccfv_threshold) empty_subsetI image_eqI image_is_empty image_subsetI subset_antisym tfl_some)
-
-  then show "distinguishing_conjunct I \<psi>s ` Q \<subseteq> \<psi>s ` I \<union> {Pos TT}"
-    using \<open>I \<noteq> {}\<close> and distinguishing_conjunct_def
-    by auto
-qed
+  apply (cases \<open>I \<noteq> {}\<close>)
+  using distinguishing_conjunct_def empty_subsetI image_eqI image_is_empty image_subsetI subset_antisym tfl_some sledgehammer
+  by (smt (verit) UnI1 some_in_eq, auto)
 
 lemma models_full_models_dist_subset:
   defines 
@@ -1246,22 +1233,12 @@ lemma models_full_models_dist_subset:
                 else \<psi>s (SOME i. i \<in> I))"
   assumes "p \<Turnstile> (Conj I \<psi>s)"
   shows "p \<Turnstile> (Conj Q (distinguishing_conjunct I \<psi>s))"
-  using assms(2)
-  unfolding hml_models.simps
-proof -
-  assume "\<forall>i\<in>I. hml_conjunct_models p (\<psi>s i)"
-
-  from dist_conjunct_image_subset_all_conjuncts
-  have "\<forall>q\<in>Q. (\<exists>i\<in>I. distinguishing_conjunct I \<psi>s q = \<psi>s i) \<or> (distinguishing_conjunct I \<psi>s q = Pos TT)"
-    unfolding distinguishing_conjunct_def
-    apply (cases "I = {}")
-    apply simp
-    using some_in_eq some_eq_ex by (smt (z3))
-
-  with \<open>\<forall>i\<in>I. hml_conjunct_models p (\<psi>s i)\<close>
-  show "\<forall>q\<in>Q. hml_conjunct_models p (distinguishing_conjunct I \<psi>s q)"
-    using distinguishing_conjunct_def by fastforce
-qed
+  using assms(2) unfolding hml_models.simps
+  apply (cases \<open>I \<noteq> {}\<close>)
+  using dist_conjunct_image_subset_all_conjuncts
+    and distinguishing_conjunct_def
+    and some_in_eq some_eq_ex 
+  by (smt (verit), auto)
 
 lemma models_full_models_dist_subset':
   fixes \<psi>s'
@@ -1289,7 +1266,6 @@ next
       and distinguishing_conjunct_def
     by (smt (verit, ccfv_threshold) hml_models.simps(5))
 qed
-
 
 lemma dist_conj_non_empty_conj:
   fixes p :: 's and q :: 's
