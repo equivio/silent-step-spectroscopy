@@ -3,7 +3,7 @@ theory Spectroscopy_Game
   imports Energy_Games Energy LTS
 begin
 
-text \<open>In this theory, we define the spectroscopy game as a locale.
+text \<open>\noindent In this theory we define the spectroscopy game as a locale.
 This game is an energy game constructed by adding stable and branching connections to a delay bisimulation game that depends on an LTS.\<close>
 text \<open>\noindent We differentiate the positions accordingly and define the moves of the game.\<close>
 datatype ('s, 'a) spectroscopy_position = 
@@ -325,7 +325,7 @@ qed
 
 end
 
-text \<open>Now we are able to define the spectroscopy game on an arbitrary (but inhabited) LTS:\<close>
+text \<open>\noindent Now we are able to define the spectroscopy game on an arbitrary (but inhabited) LTS.\<close>
 locale full_spec_game =
   Inhabited_Tau_LTS step left right \<tau>
   + energy_game "spectroscopy_moves" "spectroscopy_defender" "eneg" "less_eq"
