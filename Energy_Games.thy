@@ -9,7 +9,7 @@ Energy games are the foundation for the later introduced full spectroscopy game,
 energy game itself, characterizing equivalence problems.\<close>
 
 text\<open>\noindent We use an abstract concept of energies and only later consider 8-dimensional energy games.
-To combine this with our later definition of energies as a data type, there has to be an order on energies.\<close>
+In order to be able to combine this with our later definition of energies as a data type, there has to be a partial order for energies in our formalization.\<close>
 
 type_synonym 'energy update = "'energy \<Rightarrow> 'energy"
 
@@ -18,8 +18,8 @@ text\<open>\noindent Furthermore we focus on finite plays that may be represente
 type_synonym 'gstate fplay = "'gstate list"
 
 text\<open>\noindent An energy game is played by two players on a directed graph labeled by energy updates. 
-These energy updates represent the costs for the attacker of choosing a certain move.
-We only consider the case that the attacker moves have costs. Therefore only the attacker can run out of energy when the energy level reaches the \<open>defender_win_level\<close>.
+These energy updates represent the costs of choosing a certain move.
+However, we only consider cases in which the attacker runs out of energy when the energy level reaches the \<open>defender_win_level\<close>.
 In contrast to other definitions of games, we do not fix a starting position.\<close>
 locale energy_game =
   fixes weight_opt :: "'gstate \<Rightarrow> 'gstate \<Rightarrow> 'energy update option" and
