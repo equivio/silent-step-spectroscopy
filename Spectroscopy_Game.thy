@@ -1,11 +1,12 @@
-section \<open>Spectroscopy Game\<close>
+section \<open>Weak Spectroscopy Game\<close>
 theory Spectroscopy_Game
   imports Energy_Games Energy LTS
 begin
 
-text \<open>\noindent In this theory we define the spectroscopy game as a locale.
-This game is an energy game constructed by adding stable and branching connections to a delay bisimulation game that depends on an LTS.\<close>
-text \<open>\noindent We differentiate the positions accordingly and define the moves of the game.\<close>
+text \<open>\noindent In this theory we define the weak spectroscopy game as a locale.
+This game is an energy game constructed by adding stable and branching conjunctions to a delay bisimulation game that depends on an LTS.\<close>
+
+text \<open>\noindent We differentiate the positions accordingly and define the moves of the game corresponding to their names in \cite{bisping2023lineartimebranchingtime}.\<close>
 datatype ('s, 'a) spectroscopy_position = 
                           Attacker_Immediate (attacker_state: "'s") (defender_states: "'s set") |
                           Attacker_Branch (attacker_state: "'s") (defender_states: "'s set") |
@@ -78,8 +79,6 @@ fun spectroscopy_moves :: "('s, 'a) spectroscopy_position \<Rightarrow> ('s, 'a)
 
   others: "spectroscopy_moves _ _ = None"
 
-
-text \<open>\noindent We also explicitly define which positions are defender positions.\<close>
 fun spectroscopy_defender where
   "spectroscopy_defender (Attacker_Immediate _ _) = False" |
   "spectroscopy_defender (Attacker_Branch _ _) = False" |
@@ -322,7 +321,7 @@ qed
 
 end
 
-text \<open>\noindent Now we are able to define the spectroscopy game on an arbitrary (but inhabited) LTS.\<close>
+text \<open>\noindent Now we are able to define the weak spectroscopy game on an arbitrary (but inhabited) LTS.\<close>
 locale full_spec_game =
   Inhabited_Tau_LTS step left right \<tau>
   + energy_game "spectroscopy_moves" "spectroscopy_defender" "eneg" "less_eq"
