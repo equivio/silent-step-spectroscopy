@@ -55,7 +55,8 @@ text \<open>
 Definition of the meaning of an HML formula in the context of an LTS.
 
 Note that this formalization and semantic allows for conjunctions of arbitrary width,
-even of infinite width.
+even of infinite width.  This added expressiveness comes at the cost of making proofs regarding
+conjunctions more complex.
 \<close>
 
 primrec
@@ -71,6 +72,38 @@ where
   "(hml_conjunct_models p (Pos \<phi>)) = (p \<Turnstile> \<phi>)" |
   "(hml_conjunct_models p (Neg \<phi>)) = (\<not>(p \<Turnstile> \<phi>))"
 
+end (* LTS_Tau *)
+
+context Inhabited_Tau_LTS
+begin
+
+text \<open> Given this semantics, one may note that the \<open>Silent\<close> data constructor representing \<open>(\<tau>)\<phi>\<close>
+is redundant.  It does not add to the expressiveness of the HML language and could safely be turned
+into an abbreviation for \<open>\<And>{\<not>(\<And>{\<not>\<langle>\<tau>\<rangle>\<phi>, \<not>\<phi>})}\<close>: \<close>
+lemma "(state \<Turnstile> (Silent \<phi>))
+     = (state \<Turnstile> (Conj {left}
+                       (\<lambda>i. if i = left
+                            then Neg (Conj {left, right}
+                                           (\<lambda>j. if j = left
+                                                then Neg (Obs \<tau> \<phi>)
+                                                else if j = right
+                                                then Neg \<phi>
+                                                else undefined))
+                            else undefined)))"
+  using Inhabited_LTS_axioms Inhabited_LTS_def
+        hml_conjunct_models.simps(2)
+        hml_models.simps(2)
+        hml_models.simps(4)
+        hml_models.simps(5)
+        insert_iff singletonD
+  by fastforce
+
+text \<open> We choose to still include \<open>Silent\<close> to stay close to TODO and TODO. \<close>
+
+end (* Inhabited_Tau_LTS *)
+
+context LTS_Tau
+begin
 
 text \<open>
 While \<open>T\<close> and \<open>\<And>{}\<close> differ syntactically, they mean exactly the same thing.
