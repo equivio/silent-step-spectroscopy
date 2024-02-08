@@ -2,7 +2,7 @@ section \<open>Energy\<close>
 theory Energy
   imports Main "HOL-Library.Extended_Nat" "HOL-Lattice.Orders"
 begin
-text \<open>\noindent Following the paper \cite[p. 5]{bisping2023lineartimebranchingtime} we define energies as
+text \<open>Following the paper \cite[p. 5]{bisping2023lineartimebranchingtime} we define energies as
       eight dimensional vectors of natural numbers extended by @{text "\<infinity>"}.
       But deviate from \cite{bisping2023lineartimebranchingtime} in also defining
       an energy @{text "eneg"} that represents negative energy. This allows us to
