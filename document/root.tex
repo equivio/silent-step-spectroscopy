@@ -15,6 +15,9 @@
 % this should be the last package used
 \usepackage{pdfsetup}
 
+% do not indent paragraphs
+\setlength\parindent{0pt}
+
 % urls in roman style, theory text in math-similar italics
 \urlstyle{rm}
 \isabellestyle{it}
@@ -39,7 +42,6 @@
 \tableofcontents
 
 % include generated text of all theories
-%\input{session}
 \input{introduction}
 \input{LTS}
 \input{HML}
@@ -54,14 +56,14 @@
 \input{outcomes}
 \input{conclusion}
 
+\bibliographystyle{abbrv}
+\bibliography{root}
+
+\newpage
 \appendix
 \input{change_index}
 \input{Example_Instantiation}
 \input{HML_Context}
 \input{Weak_Traces}
-\input{Misc}
-
-\bibliographystyle{abbrv}
-\bibliography{root}
 
 \end{document}
