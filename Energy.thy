@@ -90,7 +90,7 @@ definition minus_energy_def: "e1 - e2 \<equiv> if somwhere_larger e1 e2 then ene
 
 instance ..
 
-text \<open>Afterwards we prove some lemmas to aide in the manipulation of expressions 
+text \<open>Afterwards we prove some lemmas to ease the manipulation of expressions 
   using subtraction on energies.\<close>
 lemma energy_minus:
   assumes "E a1 b1 c1 d1 e1 f1 g1 h1 \<ge> E a2 b2 c2 d2 e2 f2 g2 h2"
