@@ -48,53 +48,9 @@ abbreviation weighted_move :: "'gstate \<Rightarrow> 'energy update \<Rightarrow
 
 abbreviation "weight g1 g2 \<equiv> the (weight_opt g1 g2)"
 
-text\<open>Starting with some energy the resulting energy level of a valid finite play can be  
-calculated as follows:\<close>
+subsubsection \<open>Finite Plays\<close>
 
-fun energy_level :: "'gstate \<Rightarrow> 'energy \<Rightarrow>'gstate fplay \<Rightarrow> 'energy" where
-  "energy_level g0 e0 p = (
-    if p = [g0] then 
-      e0 
-    else (if (length p \<ge> 2) then ( if ((weight_opt (last (butlast p))(last p)) \<noteq> None) then ((weight (last (butlast p)) (last p)) (energy_level g0 e0 (butlast p)))
-                                    else undefined)
-          else undefined))"
-
-lemma %invisible energy_level_def1:
-  shows "energy_level g0 e0 [g0] = e0"
-  by simp
-
-lemma %invisible energy_level_def2:
-  assumes "p' \<noteq> []" and "energy_level g0 e0 p' \<noteq> undefined" and "weight_opt (last p') gn \<noteq> None"  
-  shows "energy_level g0 e0 (p' @ [gn]) = weight (last p') gn (energy_level g0 e0 p')"
-  using assms by (simp add: not_less_eq_eq) 
-
-lemma %invisible energy_level_def3:
-  shows "energy_level g0 e0 [] = undefined"
-  by simp
-
-lemma %invisible energy_level_def4:
-  assumes "p \<noteq> []" "hd p = g0" and e0: "e0 \<noteq> undefined" and weight_well_def: "\<And>g1 g2 e1.((weight_opt g1 g2)\<noteq> None \<and> (weight g1 g2) e1 \<noteq> undefined)"
-  shows "energy_level g0 e0 p \<noteq> undefined"
-using assms proof(induct p rule: rev_induct)
-  case Nil
-  thus ?case by simp
-next
-  case (snoc x xs)
-  thus ?case proof(cases "xs = []")
-    case True
-    hence "xs @ [x] = [x]" by simp
-    with snoc(3) have "x = g0" by simp
-    hence "energy_level g0 e0 [x] = e0" by simp
-    thus ?thesis unfolding \<open>xs @ [x] = [x]\<close> using e0 by simp
-  next
-    case False
-    then show ?thesis 
-      using energy_level_def2 weight_well_def e0 snoc.hyps snoc.prems(2) by auto 
-  qed
-qed
-
-text\<open>We have already used the term valid finite plays, which refers to lists of states where there is a move from one state to the next in the list. 
-In the finite case, this is called a \<open>finite_play\<close>.\<close>
+text\<open>A valid finite play is a lists of states where there is a move from one state to the next in the list.\<close>
 
 inductive finite_play :: "'gstate \<Rightarrow> 'gstate fplay \<Rightarrow> bool" where
   "finite_play g0 [g0]" |
@@ -158,6 +114,51 @@ lemma %invisible finite_play_is_path:
   shows "((p = ((a @ [g]) @ b)) \<and> a \<noteq>[]) \<longrightarrow> ((last a) \<Zinj> g)"
   by (metis assms butlast.simps(2) finite_play.simps finite_play_prefix snoc_eq_iff_butlast)
 
+text\<open>Starting with some energy the resulting energy level of a finite play can be  
+calculated as follows:\<close>
+
+fun energy_level :: "'gstate \<Rightarrow> 'energy \<Rightarrow>'gstate fplay \<Rightarrow> 'energy" where
+  "energy_level g0 e0 p = (
+    if p = [g0] then 
+      e0 
+    else (if (length p \<ge> 2) then ( if ((weight_opt (last (butlast p))(last p)) \<noteq> None) then ((weight (last (butlast p)) (last p)) (energy_level g0 e0 (butlast p)))
+                                    else undefined)
+          else undefined))"
+
+lemma %invisible energy_level_def1:
+  shows "energy_level g0 e0 [g0] = e0"
+  by simp
+
+lemma %invisible energy_level_def2:
+  assumes "p' \<noteq> []" and "energy_level g0 e0 p' \<noteq> undefined" and "weight_opt (last p') gn \<noteq> None"  
+  shows "energy_level g0 e0 (p' @ [gn]) = weight (last p') gn (energy_level g0 e0 p')"
+  using assms by (simp add: not_less_eq_eq) 
+
+lemma %invisible energy_level_def3:
+  shows "energy_level g0 e0 [] = undefined"
+  by simp
+
+lemma %invisible energy_level_def4:
+  assumes "p \<noteq> []" "hd p = g0" and e0: "e0 \<noteq> undefined" and weight_well_def: "\<And>g1 g2 e1.((weight_opt g1 g2)\<noteq> None \<and> (weight g1 g2) e1 \<noteq> undefined)"
+  shows "energy_level g0 e0 p \<noteq> undefined"
+using assms proof(induct p rule: rev_induct)
+  case Nil
+  thus ?case by simp
+next
+  case (snoc x xs)
+  thus ?case proof(cases "xs = []")
+    case True
+    hence "xs @ [x] = [x]" by simp
+    with snoc(3) have "x = g0" by simp
+    hence "energy_level g0 e0 [x] = e0" by simp
+    thus ?thesis unfolding \<open>xs @ [x] = [x]\<close> using e0 by simp
+  next
+    case False
+    then show ?thesis 
+      using energy_level_def2 weight_well_def e0 snoc.hyps snoc.prems(2) by auto 
+  qed
+qed
+
 lemma %invisible energy_level_fold_eq:
   assumes "finite_play g0 p"
   shows "energy_level g0 e0 p = fold (\<lambda>(g1, g2) e. (weight g1 g2) e) (pairs p) e0"
@@ -182,7 +183,7 @@ text\<open>Plays can be won by the attacker or the defender. In general, we dist
 An infinite play is won by the defender. A finite play is won if one of the players whose turn it is can no longer move.
 Since we only consider finite plays, we just need definition for this situation and for the current player.\<close>
 
-subsubsection \<open>Finite Plays\<close>
+subsubsection \<open>Winning Finite Plays\<close>
 
 abbreviation "no_move g0 p \<equiv> (finite_play g0 p) \<and> (\<nexists>gn. finite_play g0 (p @ [gn]))"
 
