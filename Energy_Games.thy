@@ -21,7 +21,8 @@ type_synonym 'gstate fplay = "'gstate list"
 
 text\<open>An energy game is played by two players on a directed graph labeled by energy updates. 
 These energy updates represent the costs of choosing a certain move.
-However, we only consider cases in which the attacker may run out of energy when the energy level reaches the \<open>defender_win_level\<close>.
+Since we will only consider cases in which the attacker's moves cost something, only they can run 
+out of energy. This is the case, when the energy level reaches the \<open>defender_win_level\<close>.
 In contrast to other definitions of games, we do not fix a starting position.\<close>
 locale energy_game =
   fixes weight_opt :: "'gstate \<Rightarrow> 'gstate \<Rightarrow> 'energy update option" and
@@ -47,7 +48,7 @@ abbreviation weighted_move :: "'gstate \<Rightarrow> 'energy update \<Rightarrow
 
 abbreviation "weight g1 g2 \<equiv> the (weight_opt g1 g2)"
 
-text\<open>Starting with some energy the resulting energy level of a valid play can be  
+text\<open>Starting with some energy the resulting energy level of a valid finite play can be  
 calculated as follows:\<close>
 
 fun energy_level :: "'gstate \<Rightarrow> 'energy \<Rightarrow>'gstate fplay \<Rightarrow> 'energy" where
@@ -92,7 +93,7 @@ next
   qed
 qed
 
-text\<open>We have already used the term valid plays, which refers to lists of states where there is a move from one state to the next in the list. 
+text\<open>We have already used the term valid finite plays, which refers to lists of states where there is a move from one state to the next in the list. 
 In the finite case, this is called a \<open>finite_play\<close>.\<close>
 
 inductive finite_play :: "'gstate \<Rightarrow> 'gstate fplay \<Rightarrow> bool" where
