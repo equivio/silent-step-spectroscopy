@@ -232,10 +232,9 @@ lemma play_won_unique:
 
 subsubsection \<open>Winning Budgets\<close>
 
-text\<open>In finite as well as infinite plays the attacker wins only if they manage to force the defender to get 
-stuck before running out of energy. If this is possible from a fixed starting position 
-some amount of energy is needed. This is described by winning budgets: \<open>e\<close> is in the winning budget of 
-\<open>g\<close> if and only if there exists a winning strategy for the attacker when starting in \<open>g\<close> 
+text\<open>The attacker wins a game if and only if they manage to force the defender to get stuck before 
+running out of energy. The needed amount of energy is described by winning budgets: \<open>e\<close> is in the 
+winning budget of \<open>g\<close> if and only if there exists a winning strategy for the attacker when starting in \<open>g\<close> 
 with energy \<open>e\<close>. In other words: \\
 - If \<open>g\<close> is an attacker position and \<open>e\<close> is not the \<open>defender_win_level\<close> then \<open>e\<close> is in the winning budget 
 of \<open>g\<close> if and only if there exists a position \<open>g'\<close> the attacker can move to (i.e. the updated energy 
@@ -286,7 +285,9 @@ lemma %invisible in_wina_Gd:
   "\<And>g'. g \<Zinj> g' \<Longrightarrow> in_wina (update e) g'"
 shows "in_wina e g" using assms in_wina.intros(3) by blast
 
-text\<open>Finally, we use a partial ordering of energies to prove that the attacker wins at least as much with more energy as before.\<close>
+text\<open>If from a certain starting position a game \<open>g\<close> is won by the attacker with some energy \<open>e\<close> (i.e.
+\<open>e\<close> is in the winning budget of \<open>g\<close>), then the game is also won by the attacker with more energy. \\
+This is proven using the inductive definition of winning budgets and the given properties of the partial order.\<close>
 
 lemma win_a_upwards_closure: 
   assumes
