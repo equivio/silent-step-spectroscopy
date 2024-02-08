@@ -178,6 +178,8 @@ text\<open>Plays can be won by the attacker or the defender. In general, we dist
 An infinite play is won by the defender. A finite play is won if one of the players whose turn it is can no longer move.
 Since we only consider finite plays, we just need definition for this situation and for the current player.\<close>
 
+subsubsection \<open>Finite Plays\<close>
+
 abbreviation "no_move g0 p \<equiv> (finite_play g0 p) \<and> (\<nexists>gn. finite_play g0 (p @ [gn]))"
 
 lemma %invisible play_stuck_def:
@@ -212,7 +214,6 @@ definition won_by_attacker:: "'gstate \<Rightarrow> 'energy \<Rightarrow> 'gstat
 abbreviation no_winner:: "'gstate \<Rightarrow> 'energy \<Rightarrow> 'gstate fplay \<Rightarrow> bool" where
   "no_winner g0 e0 p \<equiv> \<not>no_move g0 p \<and> (energy_level g0 e0 p \<noteq> defender_win_level)"
 
-subsubsection \<open>Winner of a Play\<close> 
 text\<open>Now we prove that exactly one of our three cases is always true. This means, in particular, that if there is a winner, that winner is unique. \<close>
 lemma play_won_cases:
   shows "won_by_defender g0 e0 p \<or> won_by_attacker g0 e0 p \<or> no_winner g0 e0 p"
