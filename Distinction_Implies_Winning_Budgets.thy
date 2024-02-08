@@ -6,7 +6,7 @@ begin
 context full_spec_game
 begin
 
-text \<open>\noindent In this section we prove that the if a formula distinguishes a process @{term "p"}
+text \<open>In this section we prove that the if a formula distinguishes a process @{term "p"}
       from a set of process @{term "Q"} then the price of this formula is in the attackers winning
       budget. This is the same statement as that of lemma 1 in the paper \cite[p. 20]{bisping2023lineartimebranchingtime}.
       We likewise also prove it in the same manner.
