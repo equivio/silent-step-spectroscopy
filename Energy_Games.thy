@@ -7,8 +7,11 @@ begin
 subsection \<open>Fundamentals\<close>
 text\<open>In this theory we introduce energy games and give basic definitions such as (winning) plays. 
 Energy games are the foundation for the later introduced full spectroscopy game, which is an 
-energy game itself, characterizing equivalence problems.We use an abstract concept of energies and only later consider 8-dimensional energy games.
-In order to be able to combine this with our later definition of energies as a data type, there has to be a partial order for energies in our formalization.\<close>
+energy game itself, characterizing equivalence problems. \\
+We use an abstract concept of energies and only later consider 8-dimensional energy games. 
+Through our definition of energies as a data type, which will be given later, we have certain 
+properties that are usefull for all energy games. We therefore assume that an  energy game 
+has a partial order on energies such that all updates are monotonic and never get bigger.\<close>
 
 type_synonym 'energy update = "'energy \<Rightarrow> 'energy"
 
