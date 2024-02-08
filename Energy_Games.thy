@@ -36,7 +36,7 @@ locale energy_game =
           update_gets_smaller: "\<And>g g' e. ((weight_opt g g') \<noteq> None) \<Longrightarrow> (ord (the (weight_opt g g')e) e)"
 begin
 
-text\<open>\noindent In the following we introduce some abbreviations for attacker positions and moves.\<close>
+text\<open>In the following we introduce some abbreviations for attacker positions and moves.\<close>
 
 abbreviation attacker :: "'gstate \<Rightarrow> bool" ("Ga") where "Ga p \<equiv> \<not> Gd p" 
 
@@ -47,7 +47,7 @@ abbreviation weighted_move :: "'gstate \<Rightarrow> 'energy update \<Rightarrow
 
 abbreviation "weight g1 g2 \<equiv> the (weight_opt g1 g2)"
 
-text\<open>\noindent Starting with some energy the resulting energy level of a valid play can be  
+text\<open>Starting with some energy the resulting energy level of a valid play can be  
 calculated as follows:\<close>
 
 fun energy_level :: "'gstate \<Rightarrow> 'energy \<Rightarrow>'gstate fplay \<Rightarrow> 'energy" where
@@ -92,7 +92,7 @@ next
   qed
 qed
 
-text\<open>\noindent We have already used the term valid plays, which refers to lists of states where there is a move from one state to the next in the list. 
+text\<open>We have already used the term valid plays, which refers to lists of states where there is a move from one state to the next in the list. 
 In the finite case, this is called a \<open>finite_play\<close>.\<close>
 
 inductive finite_play :: "'gstate \<Rightarrow> 'gstate fplay \<Rightarrow> bool" where
@@ -205,7 +205,7 @@ qed
 abbreviation "is_defender_turn p \<equiv> Gd (last p)"
 abbreviation "is_attacker_turn p \<equiv> Ga (last p)"
 
-text\<open>\noindent The following definitions formalize the conditions under which a finite play is won by the attacker, the defender or by nobody if the play is not yet stuck.
+text\<open>The following definitions formalize the conditions under which a finite play is won by the attacker, the defender or by nobody if the play is not yet stuck.
 For this purpose we have to consider the energy level. If we reach an energy level that is equal to the defender's win level, the defender wins.\<close>
 
 definition won_by_defender:: "'gstate \<Rightarrow> 'energy \<Rightarrow> 'gstate fplay \<Rightarrow> bool" where
@@ -274,7 +274,7 @@ lemma %invisible in_wina_Gd:
   "\<And>g'. g \<Zinj> g' \<Longrightarrow> in_wina (update e) g'"
 shows "in_wina e g" using assms in_wina.intros(3) by blast
 
-text\<open>\noindent Finally, we use a partial ordering of energies to prove that the attacker wins at least as much with more energy as before.\<close>
+text\<open>Finally, we use a partial ordering of energies to prove that the attacker wins at least as much with more energy as before.\<close>
 
 lemma win_a_upwards_closure: 
   assumes
