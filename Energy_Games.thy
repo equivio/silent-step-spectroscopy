@@ -4,11 +4,12 @@ theory Energy_Games
   imports Main Misc
 begin
 
-subsection \<open>Fundamentals\<close>
 text\<open>In this theory we introduce energy games and give basic definitions such as (winning) plays. 
 Energy games are the foundation for the later introduced full spectroscopy game, which is an 
-energy game itself, characterizing equivalence problems. \\
-We use an abstract concept of energies and only later consider 8-dimensional energy games. 
+energy game itself, characterizing equivalence problems.\<close>
+
+subsection \<open>Fundamentals\<close>
+text\<open>We use an abstract concept of energies and only later consider 8-dimensional energy games. 
 Through our definition of energies as a data type, which will be given later, we have certain 
 properties that are usefull for all energy games. We therefore assume that an  energy game 
 has a partial order on energies such that all updates are monotonic and never get bigger.\<close>
@@ -180,10 +181,12 @@ qed
 subsection \<open>Winning\<close>
 
 text\<open>Plays can be won by the attacker or the defender. In general, we distinguish between the winner of an infinite and a finite play. 
-An infinite play is won by the defender. A finite play is won if one of the players whose turn it is can no longer move.
-Since we only consider finite plays, we just need definition for this situation and for the current player.\<close>
+An infinite play is won by the defender. A finite play is won if one the other can no longer move and it is their turn. 
+This can be the case if there are no successors or if the energy update is too expensive.\<close>
 
 subsubsection \<open>Winning Finite Plays\<close>
+
+text\<open>Some natural abbreviations follow:\<close>
 
 abbreviation "no_move g0 p \<equiv> (finite_play g0 p) \<and> (\<nexists>gn. finite_play g0 (p @ [gn]))"
 
@@ -207,15 +210,17 @@ qed
 abbreviation "is_defender_turn p \<equiv> Gd (last p)"
 abbreviation "is_attacker_turn p \<equiv> Ga (last p)"
 
-text\<open>The following definitions formalize the conditions under which a finite play is won by the attacker, the defender or by nobody if the play is not yet stuck.
-For this purpose we have to consider the energy level. If we reach an energy level that is equal to the defender's win level, the defender wins.\<close>
+text\<open>The following definitions formalize the conditions under which a finite play is won by the attacker, the defender or by nobody. \\
+The defender wins if it is the attacker's turn and they have no move left or if the \<open>defender_win_level\<close> is reached.\<close>
 
 definition won_by_defender:: "'gstate \<Rightarrow> 'energy \<Rightarrow> 'gstate fplay \<Rightarrow> bool" where
   "won_by_defender g0 e0 p \<equiv> (no_move g0 p \<and> is_attacker_turn p) \<or> (energy_level g0 e0 p = defender_win_level)"
 
+text\<open>The attacker wins if it is the defender's turn, they have no move left and the \<open>defender_win_level\<close> was not reached.\<close>
 definition won_by_attacker:: "'gstate \<Rightarrow> 'energy \<Rightarrow> 'gstate fplay \<Rightarrow> bool" where
   "won_by_attacker g0 e0 p \<equiv> no_move g0 p \<and> is_defender_turn p \<and> (energy_level g0 e0 p \<noteq> defender_win_level)"
 
+text\<open>Nobody has won a finite play if the play is not yet stuck.\<close>
 abbreviation no_winner:: "'gstate \<Rightarrow> 'energy \<Rightarrow> 'gstate fplay \<Rightarrow> bool" where
   "no_winner g0 e0 p \<equiv> \<not>no_move g0 p \<and> (energy_level g0 e0 p \<noteq> defender_win_level)"
 
@@ -286,8 +291,8 @@ lemma %invisible in_wina_Gd:
 shows "in_wina e g" using assms in_wina.intros(3) by blast
 
 text\<open>If from a certain starting position a game \<open>g\<close> is won by the attacker with some energy \<open>e\<close> (i.e.
-\<open>e\<close> is in the winning budget of \<open>g\<close>), then the game is also won by the attacker with more energy. \\
-This is proven using the inductive definition of winning budgets and the given properties of the partial order.\<close>
+\<open>e\<close> is in the winning budget of \<open>g\<close>), then the game is also won by the attacker with more energy. 
+This is proven using the inductive definition of winning budgets and the given properties of the partial order \<open>ord\<close>.\<close>
 
 lemma win_a_upwards_closure: 
   assumes
