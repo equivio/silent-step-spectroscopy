@@ -235,7 +235,7 @@ text \<open>Next we define two updates on energies that update the first compone
 definition "min1_6 e \<equiv> case e of E a b c d e f g h \<Rightarrow> E (min a f) b c d e f g h | eneg \<Rightarrow> eneg "
 definition "min1_7 e \<equiv> case e of E a b c d e f g h \<Rightarrow> E (min a g) b c d e f g h | eneg \<Rightarrow> eneg "
 
-text \<open>And again prove that these updates only decrease energies.\<close>
+text \<open>Again we prove that these updates only decrease energies.\<close>
 
 lemma min_eneg:
   shows "min1_6 eneg = eneg" "min1_7 eneg = eneg"
