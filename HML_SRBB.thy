@@ -4,6 +4,40 @@ theory HML_SRBB
   imports Main HML
 begin
 
+text \<open>
+The mutually recursive data types @{term "hml_srbb"}, @{term "hml_srbb_inner"} and @{term "hml_srbb_conjunct"}
+represent the subset of all @{term "hml"} formulas, which characterize stability respecting branching
+bisimilarity (abbreviated to 'srbb').
+
+When a parameter is of type @{term "hml_srbb"} we typically use \<open>\<phi>\<close> as a name,
+for type @{term "hml_srbb_inner"} we use \<open>\<chi>\<close> and for type @{term "hml_srbb_conjunct"} we use \<open>\<psi>\<close>.
+
+The data constructors are to be interpreted as follows:
+\begin{itemize}
+  \item in @{term "hml_srbb"}:
+  \begin{itemize}
+    \item @{term "TT"} encodes \<open>\<top>\<close>
+    \item \<open>(Internal \<chi>)\<close> encodes \<open>\<langle>\<epsilon>\<rangle>\<chi>\<close>
+    \item \<open>(ImmConj I \<psi>s)\<close> encodes \<open>\<And>\<Psi>\<close>
+  \end{itemize}
+  \item in @{term "hml_srbb_inner"}
+  \begin{itemize}
+    \item \<open>(Obs \<alpha> \<phi>)\<close> encodes \<open>(\<alpha>)\<phi>\<close> (Note the difference to \cite{bisping2023lineartimebranchingtime}!)
+    \item \<open>(Conj I \<psi>s)\<close> encode \<open>\<And>\<Psi>\<close>
+    \item \<open>(StableConj I \<psi>s)\<close> encodes \<open>\<And>({\<not>\<langle>\<tau>\<rangle>\<top>} \<union> \<Psi>)\<close>
+    \item \<open>(BranchConj \<alpha> \<phi> I \<psi>s)\<close> encodes \<open>\<And>({(\<alpha>)\<phi>} \<union> \<Psi>)\<close>
+  \end{itemize}
+  \item in @{term "hml_srbb_conjunct"}
+  \begin{itemize}
+    \item \<open>(Pos \<chi>)\<close> encodes \<open>\<langle>\<epsilon>\<rangle>\<chi>\<close>
+    \item \<open>(Neg \<chi>)\<close> encodes \<open>\<not>\<langle>\<epsilon>\<rangle>\<chi>\<close>
+  \end{itemize}
+\end{itemize}
+
+In above description \<open>\<Psi>\<close> stands for \<open>\<psi>s ` I\<close>, i.e. the image of the function \<open>\<psi>s\<close> from indices to
+\<open>hml_srbb_conjunct\<close> on the set of indices \<open>I\<close>.
+\<close>
+
 datatype 
   ('act, 'i) hml_srbb =
     TT |
@@ -21,8 +55,16 @@ and
     Pos "('act, 'i) hml_srbb_inner" |
     Neg "('act, 'i) hml_srbb_inner"
 
-
 subsection \<open> Semantics of \<open>hml_srbb\<close> Formulas: \<open>\<Turnstile>\<close> and \<open>\<lbrakk> \<rbrakk>\<close> \<close>
+
+text \<open>
+This section describes how meaning is assigned to HML-SRBB formulas in the context of an LTS.
+We define what it means for a process @{term "p"} to satisfy an HML-SRBB formula @{term "\<phi>"},
+by first translating this formula @{term "\<phi>"} into the corresponding HML formula (via
+@{term "hml_srbb_to_hml"}) and then appealing to HML's models function.
+This is in contrast to defining the function by inspecting the transitions possible from @{term "p"}.
+TODO: why do it this way, pros and cons
+\<close>
 
 context Inhabited_Tau_LTS
 begin
