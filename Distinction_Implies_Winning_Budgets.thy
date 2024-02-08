@@ -489,7 +489,54 @@ The inductive property of lemma 1 is formalized as follows
            Q_\<alpha> \<subseteq> Q - model_set_inner (hml_srbb_inner.Obs \<alpha> \<phi>)
            \<longrightarrow> in_wina (expr_pr_inner \<chi>) (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>))"
     show "\<forall>p q. distinguishes_conjunct (hml_srbb_conjunct.Pos \<chi>) p q \<longrightarrow>
-             in_wina (expr_pr_conjunct (hml_srbb_conjunct.Pos \<chi>)) (Attacker_Clause p q)" sorry
+             in_wina (expr_pr_conjunct (hml_srbb_conjunct.Pos \<chi>)) (Attacker_Clause p q)" proof(rule allI impI)+
+      fix q p 
+      assume D: "distinguishes_conjunct (hml_srbb_conjunct.Pos \<chi>) p q"
+
+      have "q \<in> (silent_reachable_set {q})"
+        by (simp add: LTS_Tau.silent_reachable.intros(1) silent_reachable_set_def) 
+      hence "(silent_reachable_set {q}) \<noteq> {}" by auto
+  
+      from D have "(p \<Turnstile> (hml.Internal (hml_srbb_inner_to_hml \<chi>)))"
+        by (simp add: distinguishes_conjunct_def) 
+      hence "\<exists>p'. p \<Zsurj> p' \<and> (p' \<Turnstile> (hml_srbb_inner_to_hml \<chi>))" by simp
+      then obtain p' where " p \<Zsurj> p' \<and> (p' \<Turnstile> (hml_srbb_inner_to_hml \<chi>))" by auto
+      from D have "\<forall>q' \<in> (silent_reachable_set {q}). \<not> q' \<Turnstile> (hml.Internal (hml_srbb_inner_to_hml \<chi>))"
+        by (metis distinguishes_conjunct_def hml_conjunct_models.simps(1) hml_models.simps(3) hml_srbb_conjunct_models.elims(3) hml_srbb_conjunct_to_hml_conjunct.simps(1) silent_reachable_trans singletonD sreachable_set_is_sreachable)
+      hence "distinguishes_from_inner \<chi> p' (silent_reachable_set {q})" using \<open>p \<Zsurj> p' \<and> (p' \<Turnstile> (hml_srbb_inner_to_hml \<chi>))\<close> sreachable_set_is_sreachable
+        by (simp add: distinguishes_from_inner_def silent_reachable.intros(1))
+      hence IH: "in_wina (expr_pr_inner \<chi>) (Attacker_Delayed p' (silent_reachable_set {q}))" using IH \<open>(silent_reachable_set {q}) \<noteq> {}\<close>
+        by (smt (verit, best) \<open>q \<in> silent_reachable_set {q}\<close> silent_reachable_trans singletonD sreachable_set_is_sreachable)
+
+      from \<open>p \<Zsurj> p' \<and> (p' \<Turnstile> (hml_srbb_inner_to_hml \<chi>))\<close> have "p \<Zsurj> p'" by simp
+      hence after_clause: "in_wina (expr_pr_inner \<chi>) (Attacker_Delayed  p (silent_reachable_set {q}))"
+        using IH proof(induction rule: silent_reachable.induct)
+        case (1 p)
+        then show ?case by simp
+      next
+        case (2 p p' p'')
+        hence W_p_prime:"in_wina (expr_pr_inner \<chi>) (Attacker_Delayed p' (silent_reachable_set {q}))" by simp
+        then show ?case proof (cases "p=p'")
+          case True
+          then show ?thesis using W_p_prime by simp
+        next
+          case False
+          hence "spectroscopy_moves (Attacker_Delayed p (silent_reachable_set {q})) (Attacker_Delayed p' (silent_reachable_set {q})) = Some id" using procrastination 2(1)
+            by simp
+          then show ?thesis using W_p_prime in_wina.intros(2)
+            by (metis energy_game.in_wina_Ga_with_id_step energy_game_axioms option.discI option.sel spectroscopy_defender.simps(4))
+        qed
+      qed
+            
+      have min: "min1_6 (expr_pr_conjunct (hml_srbb_conjunct.Pos \<chi>)) \<ge> (expr_pr_inner \<chi>)" sorry
+      have move: "spectroscopy_moves (Attacker_Clause p q) (Attacker_Delayed p (silent_reachable_set {q})) = Some min1_6" using pos_neg_clause
+          using sreachable_set_is_sreachable by presburger
+      from min have "in_wina (min1_6 (expr_pr_conjunct (hml_srbb_conjunct.Pos \<chi>))) (Attacker_Delayed p (silent_reachable_set {q}))" using win_a_upwards_closure after_clause by simp
+      hence "(\<exists>g'. spectroscopy_moves (Attacker_Clause p q) g' \<noteq> None \<and> in_wina (weight (Attacker_Clause p q) g' (expr_pr_conjunct (hml_srbb_conjunct.Pos \<chi>))) g')" using move
+        by (metis option.discI option.sel)            
+      thus "in_wina (expr_pr_conjunct (hml_srbb_conjunct.Pos \<chi>)) (Attacker_Clause p q)" using in_wina.intros(2)
+        by (meson in_wina_Ga spectroscopy_defender.simps(3))
+    qed
 
   next
 
