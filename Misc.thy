@@ -2,7 +2,7 @@ section \<open>Misc\<close>
 theory Misc
   imports Main
 begin
-text \<open>\noindent This section formalizes @{text "pairs"}, which is used to
+text \<open>This section formalizes @{text "pairs"}, which is used to
       give an alternate definition for the energy level of a play.\<close>
 fun pairs :: "'a list \<Rightarrow> ('a \<times> 'a) list" where
   "pairs p = (if length p \<le> 1 then [] else (hd p, hd (tl p)) # pairs (tl p))"
