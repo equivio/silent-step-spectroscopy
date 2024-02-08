@@ -556,7 +556,56 @@ The inductive property of lemma 1 is formalized as follows
            Q_\<alpha> \<subseteq> Q - model_set_inner (hml_srbb_inner.Obs \<alpha> \<phi>)
            \<longrightarrow> in_wina (expr_pr_inner \<chi>) (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>))"
     show "\<forall>p q. distinguishes_conjunct (hml_srbb_conjunct.Neg \<chi>) p q
-           \<longrightarrow> in_wina (expr_pr_conjunct (hml_srbb_conjunct.Neg \<chi>)) (Attacker_Clause p q)" sorry
+           \<longrightarrow> in_wina (expr_pr_conjunct (hml_srbb_conjunct.Neg \<chi>)) (Attacker_Clause p q)" proof(rule allI impI)+
+      fix q p 
+      assume D: "distinguishes_conjunct (hml_srbb_conjunct.Neg \<chi>) p q"
+      hence "p\<noteq>q"
+        using distinguishes_conjunct_def by auto 
+
+      have "p \<in> (silent_reachable_set {p})"
+        by (simp add: LTS_Tau.silent_reachable.intros(1) silent_reachable_set_def) 
+      hence "(silent_reachable_set {p}) \<noteq> {}" by auto
+  
+      from D have "(q \<Turnstile> (hml.Internal (hml_srbb_inner_to_hml \<chi>)))"
+        by (simp add: distinguishes_conjunct_def) 
+      hence "\<exists>q'. q \<Zsurj> q' \<and> (q' \<Turnstile> (hml_srbb_inner_to_hml \<chi>))" by simp
+      then obtain q' where "q \<Zsurj> q' \<and> (q' \<Turnstile> (hml_srbb_inner_to_hml \<chi>))" by auto
+      from D have "\<forall>p' \<in> (silent_reachable_set {p}). \<not> p' \<Turnstile> (hml.Internal (hml_srbb_inner_to_hml \<chi>))"
+        by (metis distinguishes_conjunct_def hml_conjunct_models.simps(2) hml_models.simps(3) hml_srbb_conjunct_models.elims(2) hml_srbb_conjunct_to_hml_conjunct.simps(2) silent_reachable_trans singletonD sreachable_set_is_sreachable)
+      hence "distinguishes_from_inner \<chi> q' (silent_reachable_set {p})" using \<open>q \<Zsurj> q' \<and> (q' \<Turnstile> (hml_srbb_inner_to_hml \<chi>))\<close> sreachable_set_is_sreachable
+        by (simp add: distinguishes_from_inner_def silent_reachable.intros(1))
+      hence IH: "in_wina (expr_pr_inner \<chi>) (Attacker_Delayed q' (silent_reachable_set {p}))" using IH \<open>(silent_reachable_set {p}) \<noteq> {}\<close>
+        by (smt (verit, best) \<open>p \<in> silent_reachable_set {p}\<close> silent_reachable_trans singletonD sreachable_set_is_sreachable)
+
+      from \<open>q \<Zsurj> q' \<and> (q' \<Turnstile> (hml_srbb_inner_to_hml \<chi>))\<close> have "q \<Zsurj> q'" by simp
+      hence after_clause: "in_wina (expr_pr_inner \<chi>) (Attacker_Delayed q (silent_reachable_set {p}))"
+        using IH proof(induction rule: silent_reachable.induct)
+        case (1 q)
+        then show ?case by simp
+      next
+        case (2 q q' q'')
+        hence W_p_prime:"in_wina (expr_pr_inner \<chi>) (Attacker_Delayed q' (silent_reachable_set {p}))" by simp
+        then show ?case proof (cases "q=q'")
+          case True
+          then show ?thesis using W_p_prime by simp
+        next
+          case False
+          hence "spectroscopy_moves (Attacker_Delayed q (silent_reachable_set {p})) (Attacker_Delayed q' (silent_reachable_set {p})) = Some id" using procrastination 2(1)
+            by simp
+          then show ?thesis using W_p_prime in_wina.intros(2)
+            by (metis energy_game.in_wina_Ga_with_id_step energy_game_axioms option.discI option.sel spectroscopy_defender.simps(4))
+        qed
+      qed
+            
+      have min: "(min1_7 \<circ> (\<lambda>x. x- E 0 0 0 0 0 0 0 1)) (expr_pr_conjunct (hml_srbb_conjunct.Neg \<chi>)) \<ge> (expr_pr_inner \<chi>)" sorry
+      have move: "spectroscopy_moves (Attacker_Clause p q) (Attacker_Delayed q (silent_reachable_set {p})) = Some (min1_7 \<circ> (\<lambda>x. x- E 0 0 0 0 0 0 0 1))" using pos_neg_clause \<open>p\<noteq>q\<close>
+          using sreachable_set_is_sreachable by presburger
+      from min have "in_wina ((min1_7 \<circ> (\<lambda>x. x- E 0 0 0 0 0 0 0 1)) (expr_pr_conjunct (hml_srbb_conjunct.Neg \<chi>))) (Attacker_Delayed q (silent_reachable_set {p}))" using win_a_upwards_closure after_clause by simp
+      hence "(\<exists>g'. spectroscopy_moves (Attacker_Clause p q) g' \<noteq> None \<and> in_wina (weight (Attacker_Clause p q) g' (expr_pr_conjunct (hml_srbb_conjunct.Neg \<chi>))) g')" using move
+        by (metis option.discI option.sel)            
+      thus "in_wina (expr_pr_conjunct (hml_srbb_conjunct.Neg \<chi>)) (Attacker_Clause p q)" using in_wina.intros(2)
+        by (meson in_wina_Ga spectroscopy_defender.simps(3))
+    qed
   qed
   
   thus ?thesis
