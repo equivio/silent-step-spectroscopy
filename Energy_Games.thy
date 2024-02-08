@@ -15,11 +15,11 @@ has a partial order on energies such that all updates are monotonic and never ge
 
 type_synonym 'energy update = "'energy \<Rightarrow> 'energy"
 
-text\<open>\noindent Furthermore we focus on finite plays that may be represented as a list of states.\<close>
+text\<open>When considering finite plays, they are represented as a list of states.\<close>
 
 type_synonym 'gstate fplay = "'gstate list"
 
-text\<open>\noindent An energy game is played by two players on a directed graph labeled by energy updates. 
+text\<open>An energy game is played by two players on a directed graph labeled by energy updates. 
 These energy updates represent the costs of choosing a certain move.
 However, we only consider cases in which the attacker may run out of energy when the energy level reaches the \<open>defender_win_level\<close>.
 In contrast to other definitions of games, we do not fix a starting position.\<close>
