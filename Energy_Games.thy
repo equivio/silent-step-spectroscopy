@@ -232,7 +232,17 @@ lemma play_won_unique:
 
 subsubsection \<open>Winning Budgets\<close>
 
-text\<open>The attacker wins a game from a certain starting position if they manage to force the defender to stick before they run out of energy. How much energy is required is described by the winning budgets.\<close>
+text\<open>In finite as well as infinite plays the attacker wins only if they manage to force the defender to get 
+stuck before running out of energy. If this is possible from a fixed starting position 
+some amount of energy is needed. This is described by winning budgets: \<open>e\<close> is in the winning budget of 
+\<open>g\<close> if and only if there exists a winning strategy for the attacker when starting in \<open>g\<close> 
+with energy \<open>e\<close>. In other words: \\
+- If \<open>g\<close> is an attacker position and \<open>e\<close> is not the \<open>defender_win_level\<close> then \<open>e\<close> is in the winning budget 
+of \<open>g\<close> if and only if there exists a position \<open>g'\<close> the attacker can move to (i.e. the updated energy 
+level is in the winning budget of \<open>g'\<close>). \\
+- If \<open>g\<close> is a defender position and \<open>e\<close> is not the \<open>defender_win_level\<close> then \<open>e\<close> is in the winning budget 
+of \<open>g\<close> if and only if for all successors \<open>g'\<close> the accordingly updated energy is in the winning 
+budget of \<open>g'\<close>. (In our definition this is split into two cases.)\<close>
 
 inductive in_wina:: "'energy \<Rightarrow> 'gstate \<Rightarrow> bool " where
  "in_wina e g" if "(Gd g) \<and> (\<forall>g'. \<not>(g \<Zinj> g')) \<and> (e \<noteq> defender_win_level)" |
