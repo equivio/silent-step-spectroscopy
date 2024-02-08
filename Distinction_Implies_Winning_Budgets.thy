@@ -27,13 +27,16 @@ proof-
   ultimately have conj_win: "in_wina (expressiveness_price \<phi>) (Defender_Conj p {})" 
     by (simp add: in_wina.intros(1))
 
-  from finishing_or_early_conj[of p "{}" p "{}"] have next_move: 
-    "spectroscopy_moves (Attacker_Immediate p {}) (Defender_Conj p {}) = Some id" 
-    by force
+  from late_inst_conj[of p "{}" p "{}"] have next_move0: 
+    "spectroscopy_moves (Attacker_Delayed p {}) (Defender_Conj p {}) = Some id" by force
+
+  from delay[of p "{}" p "{}"] have next_move1: 
+    "spectroscopy_moves (Attacker_Immediate p {}) (Attacker_Delayed p {}) = Some id" by force
 
   moreover have "attacker (Attacker_Immediate p {})" by simp
   ultimately show ?thesis using in_wina.intros(2)[of "Attacker_Immediate p {}" "expressiveness_price \<phi>"]
-    by (metis conj_win id_apply not_neg option.distinct(1) option.sel)
+    using next_move0 next_move1
+    by (metis conj_win id_apply in_wina.intros(2) not_neg option.distinct(1) option.sel spectroscopy_defender.simps(4))
 qed
 
 text \<open>Next we show the statement for the case that @{term "Q \<noteq> {}"}. Following the proof of
@@ -277,7 +280,7 @@ proof-
       have def_conj_wina: "in_wina (e5 (expressiveness_price (ImmConj I \<psi>s))) (Defender_Conj p Q)" by blast
 
       have imm_to_conj: "spectroscopy_moves (Attacker_Immediate p Q) (Defender_Conj p Q) \<noteq> None" 
-        by simp
+        by (simp add: \<open>Q \<noteq> {}\<close>)
       have imm_to_conj_wgt: "weight (Attacker_Immediate p Q) (Defender_Conj p Q) = e5" 
         by (simp add: \<open>Q \<noteq> {}\<close>)
 
