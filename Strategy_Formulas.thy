@@ -1062,6 +1062,20 @@ next
   }
 qed
 
+text \<open>To proof \<open>spectroscopy_game_correctness\<close> we need the following implication:
+If \<open>\<phi>\<close> is a strategy formula for \<open>Attacker_Immediate p Q\<close> with energy \<open>e\<close>, then \<open>\<phi>\<close> distinguishes 
+\<open>p\<close> from \<open>Q\<close>. 
+\\
+\\
+We prove a more detailed result for all possible game positions \<open>g\<close> by induction. (Note that the 
+case of \<open>g\<close> being an attacker branching position is not explicitly needed as part of the induction
+hypothesis but is proven as a part of case \<open>branch_conj\<close>.) The induction relies on the inductive 
+structure of strategy formulas. 
+\\
+Since our formalization differentiates immediate conjunctions and conjunctions two \<open>Defender_Conj\<close> 
+cases are necessary. Specifically the strategy construction rule \<open>early_conj\<close> uses immediate 
+conjunctions while \<open>late_conj\<close> uses conjunctions. \label{derivation:lemma3}
+\<close>
 
 lemma strategy_formulas_distinguish:
   shows "(strategy_formula g e \<phi> \<longrightarrow>
@@ -1074,8 +1088,10 @@ lemma strategy_formulas_distinguish:
         (case g of
        Attacker_Delayed p Q \<Rightarrow> (Q \<Zsurj>S Q) \<longrightarrow> distinguishes_from (Internal \<chi>) p Q
       | Defender_Conj p Q \<Rightarrow> distinguishes_from_inner \<chi> p Q
-      | Defender_Stable_Conj p Q \<Rightarrow> (\<forall>q. \<not> p \<mapsto> \<tau> q) \<longrightarrow> distinguishes_from_inner \<chi> p Q
-      | Defender_Branch p \<alpha> p' Q Qa \<Rightarrow>((p \<mapsto> \<alpha> p') \<and> (Qa \<noteq> {})) \<longrightarrow> distinguishes_from_inner \<chi> p (Q\<union>Qa)
+      | Defender_Stable_Conj p Q \<Rightarrow> (\<forall>q. \<not> p \<mapsto> \<tau> q) 
+          \<longrightarrow> distinguishes_from_inner \<chi> p Q
+      | Defender_Branch p \<alpha> p' Q Qa \<Rightarrow>((p \<mapsto> \<alpha> p') \<and> (Qa \<noteq> {})) 
+          \<longrightarrow> distinguishes_from_inner \<chi> p (Q\<union>Qa)
       | _ \<Rightarrow> True))
       \<and>
       (strategy_formula_conjunct g e \<psi> \<longrightarrow>
