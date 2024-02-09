@@ -242,8 +242,8 @@ running out of energy. The needed amount of energy is described by winning budge
 winning budget of \<open>g\<close> if and only if there exists a winning strategy for the attacker when starting in \<open>g\<close> 
 with energy \<open>e\<close>. In other words: \\
 - If \<open>g\<close> is an attacker position and \<open>e\<close> is not the \<open>defender_win_level\<close> then \<open>e\<close> is in the winning budget 
-of \<open>g\<close> if and only if there exists a position \<open>g'\<close> the attacker can move to (i.e. the updated energy 
-level is in the winning budget of \<open>g'\<close>). \\
+of \<open>g\<close> if and only if there exists a position \<open>g'\<close> the attacker can move to. I.e. the updated energy 
+level is in the winning budget of \<open>g'\<close>. \\
 - If \<open>g\<close> is a defender position and \<open>e\<close> is not the \<open>defender_win_level\<close> then \<open>e\<close> is in the winning budget 
 of \<open>g\<close> if and only if for all successors \<open>g'\<close> the accordingly updated energy is in the winning 
 budget of \<open>g'\<close>. (In our definition this is split into two cases.)\<close>
