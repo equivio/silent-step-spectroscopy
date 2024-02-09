@@ -210,7 +210,7 @@ qed
 abbreviation "is_defender_turn p \<equiv> Gd (last p)"
 abbreviation "is_attacker_turn p \<equiv> Ga (last p)"
 
-text\<open>The following definitions formalize the conditions under which a finite play is won by the attacker, the defender or by nobody. \\
+text\<open>The following definitions formalize the conditions under which a finite play is won by the attacker, the defender or not won (yet). \\
 The defender wins if it is the attacker's turn and they have no move left or if the \<open>defender_win_level\<close> is reached.\<close>
 
 definition won_by_defender:: "'gstate \<Rightarrow> 'energy \<Rightarrow> 'gstate fplay \<Rightarrow> bool" where
@@ -220,7 +220,7 @@ text\<open>The attacker wins if it is the defender's turn, they have no move lef
 definition won_by_attacker:: "'gstate \<Rightarrow> 'energy \<Rightarrow> 'gstate fplay \<Rightarrow> bool" where
   "won_by_attacker g0 e0 p \<equiv> no_move g0 p \<and> is_defender_turn p \<and> (energy_level g0 e0 p \<noteq> defender_win_level)"
 
-text\<open>Nobody has won a finite play if the play is not yet stuck.\<close>
+text\<open>There is no winner of a finite play if the play is not yet stuck.\<close>
 abbreviation no_winner:: "'gstate \<Rightarrow> 'energy \<Rightarrow> 'gstate fplay \<Rightarrow> bool" where
   "no_winner g0 e0 p \<equiv> \<not>no_move g0 p \<and> (energy_level g0 e0 p \<noteq> defender_win_level)"
 
