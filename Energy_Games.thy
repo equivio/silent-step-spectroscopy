@@ -11,7 +11,7 @@ energy game itself, characterizing equivalence problems.\<close>
 subsection \<open>Fundamentals\<close>
 text\<open>We use an abstract concept of energies and only later consider 8-dimensional energy games. 
 Through our definition of energies as a data type, which will be given later, we enforce certain 
-properties for all energy games. We therefore assume that an  energy game 
+properties for all energy games. We therefore assume that an energy game 
 has a partial order on energies such that all updates are monotonic and never increase.\<close>
 
 type_synonym 'energy update = "'energy \<Rightarrow> 'energy"
