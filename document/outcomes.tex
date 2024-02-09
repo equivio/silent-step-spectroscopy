@@ -8,7 +8,12 @@ This is inconsistent with the definition of the expressiveness price. Also the m
 case of an empty set $Q$ at an attacker (immediate) position the attacker can move to the corresponding 
 defender conjunction position by first going delaying. These two moves combined actually have zero costs.
 \\
-The move empty\_stbl\_conj\_answer () was added.TODO
+The move empty\_stbl\_conj\_answer (moving from adefender stable conjunction position to a defender conjunction
+position if $Q$ is empty) with costs $e_4$ was added. This is necessary for the proof of Lemma 
+winning\_budget\_implies\_strategy\_formul in Section \ref{derivation:lemma3}. Before 
+$e \in Win_a (p, \emptyset)_d^s $ was true for any energy (not equal to the defender\_win\_level), in particular $\bold{0}$. 
+Since an empty stable conjuction has costs of $e_4$ no strategy formula with an appropriate price could be constructed. 
+With the added move $e_4 \leq e $ holds true for any $e \in Win_a (p, \emptyset)_d^s $ and therefore resolves this issue.
 \item In lemma strategy\_formulas\_distinguish in Section \ref{derivation:lemma3} the case of $g$ being a defender branching position was adjusted: 
 When considering $g=(p,\alpha ,p', Q- Q \alpha, Q \alpha)_d^\eta$ the conditions $p \overset{\alpha}{\longrightarrow} p'$ and $Q \alpha \neq \emptyset$ were 
 added. 
