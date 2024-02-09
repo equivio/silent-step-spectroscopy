@@ -1,7 +1,15 @@
 \section{Contributions to the Paper}
 
 \begin{itemize}
-\item In lemma strategy\_formulas\_distinguish in \ref{derivation:lemma3} the case of $g$ being a defender branching position was adjusted: 
+\item In the definition of the weak spectroscopy game in Section \ref{specmoves} the moves were changed: 
+\\
+The finishing move was removed. This move adjusted the cost of an empty immediate conjunction to be zero.
+This is inconsistent with the definition of the expressiveness price. Also the move is not needed. In the 
+case of an empty set $Q$ at an attacker (immediate) position the attacker can move to the corresponding 
+defender conjunction position by first going delaying. These two moves combined actually have zero costs.
+\\
+The move empty\_stbl\_conj\_answer () was added.TODO
+\item In lemma strategy\_formulas\_distinguish in Section \ref{derivation:lemma3} the case of $g$ being a defender branching position was adjusted: 
 When considering $g=(p,\alpha ,p', Q- Q \alpha, Q \alpha)_d^\eta$ the conditions $p \overset{\alpha}{\longrightarrow} p'$ and $Q \alpha \neq \emptyset$ were 
 added. 
 \end{itemize}

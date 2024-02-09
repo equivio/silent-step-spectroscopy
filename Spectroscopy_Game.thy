@@ -19,6 +19,9 @@ datatype ('s, 'a) spectroscopy_position =
 
 context Inhabited_Tau_LTS begin
 
+
+text\<open>\label{specmoves}\<close>
+
 fun spectroscopy_moves :: "('s, 'a) spectroscopy_position \<Rightarrow> ('s, 'a) spectroscopy_position \<Rightarrow> energy update option" where 
   delay: 
     "spectroscopy_moves (Attacker_Immediate p Q) (Attacker_Delayed p' Q') 
