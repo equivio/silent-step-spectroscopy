@@ -62,8 +62,13 @@ This section describes how meaning is assigned to HML-SRBB formulas in the conte
 We define what it means for a process @{term "p"} to satisfy an HML-SRBB formula @{term "\<phi>"},
 by first translating this formula @{term "\<phi>"} into the corresponding HML formula (via
 @{term "hml_srbb_to_hml"}) and then appealing to HML's models function.
-This is in contrast to defining the function by inspecting the transitions possible from @{term "p"}.
-TODO: why do it this way, pros and cons
+This is in contrast to defining the function directly by inspecting the transitions possible from @{term "p"}.
+Defining it this way allows (and forces) us to reuse the definitions and properties of @{term "hml"}.
+
+Alternatively, we considered defining the HML-SRBB subset via a predicate on @{term "hml"} like
+\<open>is_srbb :: "('a,'s) hml \<Rightarrow> bool"\<close>. For a concrete instance of this approach reference \<open>is_trace_formula\<close>
+the file 'Weak_Trace.thy'. We decided against it since we were unable to figure how to define
+expressiveness prices (c.f. 'Expressiveness_Price.thy') in this approach.
 \<close>
 
 context Inhabited_Tau_LTS
