@@ -22,7 +22,7 @@ type_synonym 'gstate fplay = "'gstate list"
 
 text\<open>An energy game is played by two players on a directed graph labeled by energy updates. 
 These energy updates represent the costs of choosing a certain move.
-Since we will only consider cases in which the attacker's moves cost something, only they can run 
+Since we will only consider cases in which the attacker's moves may actually have costs, only they can run 
 out of energy. This is the case, when the energy level reaches the \<open>defender_win_level\<close>.
 In contrast to other definitions of games, we do not fix a starting position.\<close>
 locale energy_game =
