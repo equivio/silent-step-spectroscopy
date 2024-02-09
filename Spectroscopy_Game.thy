@@ -4,9 +4,8 @@ theory Spectroscopy_Game
 begin
 
 text \<open>In this theory we define the weak spectroscopy game as a locale.
-This game is an energy game constructed by adding stable and branching conjunctions to a delay bisimulation game that depends on an LTS.\<close>
-
-text \<open>We differentiate the positions accordingly and define the moves of the game corresponding to their names in \cite{bisping2023lineartimebranchingtime}.\<close>
+This game is an energy game constructed by adding stable and branching conjunctions to a delay bisimulation game that depends on an LTS.
+\\ We differentiate the positions accordingly and define the moves of the game corresponding to their names in \cite{bisping2023lineartimebranchingtime}.\<close>
 datatype ('s, 'a) spectroscopy_position = 
                           Attacker_Immediate (attacker_state: "'s") (defender_states: "'s set") |
                           Attacker_Branch (attacker_state: "'s") (defender_states: "'s set") |
