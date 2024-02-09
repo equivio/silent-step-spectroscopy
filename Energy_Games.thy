@@ -240,13 +240,13 @@ subsubsection \<open>Winning Budgets\<close>
 text\<open>The attacker wins a game if and only if they manage to force the defender to get stuck before 
 running out of energy. The needed amount of energy is described by winning budgets: \<open>e\<close> is in the 
 winning budget of \<open>g\<close> if and only if there exists a winning strategy for the attacker when starting in \<open>g\<close> 
-with energy \<open>e\<close>. In other words: \\
+with energy \<open>e\<close>. In more detail this yields the following definition: \\
 - If \<open>g\<close> is an attacker position and \<open>e\<close> is not the \<open>defender_win_level\<close> then \<open>e\<close> is in the winning budget 
-of \<open>g\<close> if and only if there exists a position \<open>g'\<close> the attacker can move to. I.e. if the updated energy 
+of \<open>g\<close> if and only if there exists a position \<open>g'\<close> the attacker can move to. In other words, if the updated energy 
 level is in the winning budget of \<open>g'\<close>. (This corresponds to the second case of the following definition.) \\
 - If \<open>g\<close> is a defender position and \<open>e\<close> is not the \<open>defender_win_level\<close> then \<open>e\<close> is in the winning budget 
 of \<open>g\<close> if and only if for all successors \<open>g'\<close> the accordingly updated energy is in the winning 
-budget of \<open>g'\<close>. I.e. if the attacker will win from every successor the defender can move to. (In the following definition this is split into cases one and three.)\<close>
+budget of \<open>g'\<close>. In other words, if the attacker will win from every successor the defender can move to. (In the following definition this is split into cases one and three.)\<close>
 
 inductive in_wina:: "'energy \<Rightarrow> 'gstate \<Rightarrow> bool " where
  "in_wina e g" if "(Gd g) \<and> (\<forall>g'. \<not>(g \<Zinj> g')) \<and> (e \<noteq> defender_win_level)" |
