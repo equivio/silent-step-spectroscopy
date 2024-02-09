@@ -182,7 +182,7 @@ subsection \<open>Winning\<close>
 
 text\<open>Plays can be won by the attacker or the defender. In general, we distinguish between the winner of an infinite and a finite play. 
 Any infinite play is won by the defender. A finite play is won if one the other player can no longer move and it is their turn. 
-This can be the case if there are no successors or if the energy update is too expensive.\<close>
+This can be the case if there are no successors or if all possible energy updates would be too expensive.\<close>
 
 subsubsection \<open>Winning Finite Plays\<close>
 
