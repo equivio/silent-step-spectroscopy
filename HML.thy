@@ -53,7 +53,8 @@ Definition of the meaning of an HML formula in the context of an LTS.
 
 Note that this formalization and semantic allows for conjunctions of arbitrary width,
 even of infinite width.  This added expressiveness comes at the cost of making proofs regarding
-conjunctions more complex.
+conjunctions more complex. TODO: Talk about alternative formulation of conjunctions via CSets
+and problems when using Sets. Cite thesis from which we have derived this.
 \<close>
 
 primrec

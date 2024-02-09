@@ -35,7 +35,16 @@ The data constructors are to be interpreted as follows:
 \end{itemize}
 
 In above description \<open>\<Psi>\<close> stands for \<open>\<psi>s ` I\<close>, i.e. the image of the function \<open>\<psi>s\<close> from indices to
-\<open>hml_srbb_conjunct\<close> on the set of indices \<open>I\<close>.
+\<open>hml_srbb_conjunct\<close> on the set of indices \<open>I\<close>. For justifications regarding the explicit inclusion of
+@{term "TT"} and the encoding of conjunctions via index sets @{term "I"} and mapping from indices to
+conjuncts @{term "\<psi>s"}, reference the @{term "TT"} and @{term "Conj"} data constructors of the type
+@{term "hml"} in the file 'HML.thy'.
+\\ \\
+In the beginning, instead of defining the subset as a new data type,  we considered defining the
+HML-SRBB subset via a predicate on @{term "hml"} like \<open>is_srbb :: "('a,'s) hml \<Rightarrow> bool"\<close>.
+For a concrete instance of this approach reference \<open>is_trace_formula\<close> in the file 'Weak\_Trace.thy'.
+We decided against it since we were unable to figure out how to define expressiveness prices
+(c.f. 'Expressiveness\_Price.thy') in this approach.
 \<close>
 
 datatype 
@@ -59,32 +68,39 @@ subsection \<open> Semantics of \<open>hml_srbb\<close> Formulas: \<open>\<Turns
 
 text \<open>
 This section describes how meaning is assigned to HML-SRBB formulas in the context of an LTS.
-We define what it means for a process @{term "p"} to satisfy an HML-SRBB formula @{term "\<phi>"},
-by first translating this formula @{term "\<phi>"} into the corresponding HML formula (via
-@{term "hml_srbb_to_hml"}) and then appealing to HML's models function.
+We define what it means for a process @{term "p"} to satisfy an HML-SRBB formula @{term "\<phi>"} -
+written as \<open>p \<Turnstile>SRBB \<phi>\<close>, by first translating this formula @{term "\<phi>"} into the corresponding HML formula
+(via @{term "hml_srbb_to_hml"}) and then appealing to HML's models function.
 This is in contrast to defining the function directly by inspecting the transitions possible from @{term "p"}.
-Defining it this way allows (and forces) us to reuse the definitions and properties of @{term "hml"}.
-
-Alternatively, we considered defining the HML-SRBB subset via a predicate on @{term "hml"} like
-\<open>is_srbb :: "('a,'s) hml \<Rightarrow> bool"\<close>. For a concrete instance of this approach reference \<open>is_trace_formula\<close>
-the file 'Weak_Trace.thy'. We decided against it since we were unable to figure how to define
-expressiveness prices (c.f. 'Expressiveness_Price.thy') in this approach.
+Defining it via translation to @{term "hml"} allows (and forces) us to reuse the definitions and
+properties of @{term "hml"}.
 \<close>
 
 context Inhabited_Tau_LTS
 begin
 
 primrec
-      hml_srbb_to_hml :: "('a, 's) hml_srbb \<Rightarrow> ('a, 's) hml"
-  and hml_srbb_inner_to_hml :: "('a, 's) hml_srbb_inner \<Rightarrow> ('a, 's) hml"
-  and hml_srbb_conjunct_to_hml_conjunct :: "('a, 's) hml_srbb_conjunct \<Rightarrow> ('a, 's) hml_conjunct" where
-  "hml_srbb_to_hml TT = hml.TT" |
-  "hml_srbb_to_hml (Internal \<chi>) = hml.Internal (hml_srbb_inner_to_hml \<chi>)" |
-  "hml_srbb_to_hml (ImmConj I \<psi>s) = hml.Conj I (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s)" |
+  hml_srbb_to_hml
+  :: "('a, 's) hml_srbb \<Rightarrow> ('a, 's) hml"
+and
+  hml_srbb_inner_to_hml
+  :: "('a, 's) hml_srbb_inner \<Rightarrow> ('a, 's) hml"
+and
+  hml_srbb_conjunct_to_hml_conjunct
+  :: "('a, 's) hml_srbb_conjunct \<Rightarrow> ('a, 's) hml_conjunct"
+where
+  "hml_srbb_to_hml TT =
+    hml.TT" |
+  "hml_srbb_to_hml (Internal \<chi>) =
+    hml.Internal (hml_srbb_inner_to_hml \<chi>)" |
+  "hml_srbb_to_hml (ImmConj I \<psi>s) =
+    hml.Conj I (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s)" |
 
-  "hml_srbb_inner_to_hml (Obs a \<phi>) = HML_soft_poss a (hml_srbb_to_hml \<phi>)" |
+  "hml_srbb_inner_to_hml (Obs a \<phi>) =
+    HML_soft_poss a (hml_srbb_to_hml \<phi>)" |
 (*equivalent to? (if a = \<tau> then hml_srbb_to_hml \<phi> else hml.Obs a (hml_srbb_to_hml \<phi>))*)
-  "hml_srbb_inner_to_hml (Conj I \<psi>s) = hml.Conj I (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s)" |
+  "hml_srbb_inner_to_hml (Conj I \<psi>s) =
+    hml.Conj I (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s)" |
 
   "hml_srbb_inner_to_hml (StableConj I \<psi>s) =
     (hml_conjunct.Neg (hml.Obs \<tau> hml.TT)
@@ -94,8 +110,10 @@ primrec
      (hml_conjunct.Pos (HML_soft_poss a (hml_srbb_to_hml \<phi>))
       \<and>hml hml_conjunct.Pos (hml.Conj I (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s)))" |
 
-  "hml_srbb_conjunct_to_hml_conjunct (Pos \<chi>) = hml_conjunct.Pos (hml.Internal (hml_srbb_inner_to_hml \<chi>))" |
-  "hml_srbb_conjunct_to_hml_conjunct (Neg \<chi>) = hml_conjunct.Neg (hml.Internal (hml_srbb_inner_to_hml \<chi>))"
+  "hml_srbb_conjunct_to_hml_conjunct (Pos \<chi>) =
+    hml_conjunct.Pos (hml.Internal (hml_srbb_inner_to_hml \<chi>))" |
+  "hml_srbb_conjunct_to_hml_conjunct (Neg \<chi>) =
+    hml_conjunct.Neg (hml.Internal (hml_srbb_inner_to_hml \<chi>))"
 
 
 fun hml_srbb_models :: "'s \<Rightarrow> ('a, 's) hml_srbb \<Rightarrow> bool" (infix "\<Turnstile>SRBB" 60)where
