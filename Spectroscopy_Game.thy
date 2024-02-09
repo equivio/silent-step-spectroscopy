@@ -324,7 +324,7 @@ qed
 end
 
 text \<open>Now we are able to define the weak spectroscopy game on an arbitrary (but inhabited) LTS.\<close>
-locale full_spec_game =
+locale full_weak_spec_game =
   Inhabited_Tau_LTS step left right \<tau>
   + energy_game "spectroscopy_moves" "spectroscopy_defender" "eneg" "less_eq"
   for step :: \<open>'s \<Rightarrow> 'a \<Rightarrow> 's \<Rightarrow> bool\<close> (\<open>_ \<mapsto>_ _\<close> [70, 70, 70] 80) and
