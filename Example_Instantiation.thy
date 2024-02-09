@@ -265,7 +265,7 @@ lemma no_winner_example:
   shows "Game.no_winner a (E 10 10) [a, b2, c]"
   using no_move_example2 energy_level_example_1 by simp
 
-lemma attacker_turn_not_stuck:
+lemma attacker_turn_no_move:
   assumes "finite_play a p" and "Game.is_attacker_turn p"
   shows "\<not>Game.no_move a p"
 using assms proof - 
