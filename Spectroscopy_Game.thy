@@ -5,6 +5,9 @@ begin
 
 text \<open>In this theory we define the weak spectroscopy game as a locale.
 This game is an energy game constructed by adding stable and branching conjunctions to a delay bisimulation game that depends on an LTS.
+We play the spectroscopy game to compare the behaviour of processes and analyze which behavioural equivalences apply.
+The moves of a spectroscopy game depend on the transitions of the processes and the available energy.
+So in other words: \\If the defender wins the spectroscopy game starting from a certain energy, the corresponding behavioral equivalence applies.
 \\ We differentiate the positions accordingly and define the moves of the game corresponding to their names in \cite{bisping2023lineartimebranchingtime}.\<close>
 datatype ('s, 'a) spectroscopy_position = 
                           Attacker_Immediate (attacker_state: "'s") (defender_states: "'s set") |
@@ -324,7 +327,7 @@ qed
 end
 
 text \<open>Now we are able to define the weak spectroscopy game on an arbitrary (but inhabited) LTS.\<close>
-locale full_weak_spec_game =
+locale full_spec_game =
   Inhabited_Tau_LTS step left right \<tau>
   + energy_game "spectroscopy_moves" "spectroscopy_defender" "eneg" "less_eq"
   for step :: \<open>'s \<Rightarrow> 'a \<Rightarrow> 's \<Rightarrow> bool\<close> (\<open>_ \<mapsto>_ _\<close> [70, 70, 70] 80) and
