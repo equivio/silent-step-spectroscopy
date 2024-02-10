@@ -234,47 +234,46 @@ lemma energy_level_example_4:
   shows "energy_level a (E 10 10) [c] = undefined"
   using Game.energy_level.elims Game.energy_level.pelims by simp
 
-text \<open>We also take a look at our definition of play stuck using different examples of plays.
+text \<open>We also take a look at our definition of no move using different examples of plays.
 In particular we check our definition regarding invalid games.\<close>
-lemma play_stuck_example:
-  shows "Game.play_stuck a [a, b2, c, d1, e]"
+lemma no_move_example:
+  shows "Game.no_move a [a, b2, c, d1, e]"
   by (metis Game.finite_play_is_path Game.finite_play_suffix2 Game_finite_play_example append_Cons append_Nil last_ConsL list.distinct(1) weight_opt.simps(38))
  
-lemma play_not_stuck_example:
-  shows "\<not>(Game.play_stuck a [a, b2, c])"
+lemma no_move_example2:
+  shows "\<not>(Game.no_move a [a, b2, c])"
 proof (-) 
   have "finite_play a ([a, b2, c] @ [d1])"
     by (metis Game.finite_play_suffix Game_finite_play_example append_Cons append_Nil list.distinct(1))
-  thus "\<not>(Game.play_stuck a [a, b2, c])" by auto
+  thus "\<not>(Game.no_move a [a, b2, c])" by auto
 qed
-text \<open>\<close>
-lemma play_stuck_invalid_game: 
-  shows "\<not>(Game.play_stuck a [a, b2, d1])"
+lemma no_move_invalid_game: 
+  shows "\<not>(Game.no_move a [a, b2, d1])"
   by (smt (verit, best) Game.finite_play.simps butlast.simps(2) butlast_snoc distinct_adj_Cons distinct_adj_Cons_Cons last.simps last_snoc weight_opt.simps(18))
 
-lemma play_stuck_invalid_game_1: 
-  shows "\<not>Game.play_stuck a [a, b2, b1]"
+lemma no_move_invalid_game_1: 
+  shows "\<not>Game.no_move a [a, b2, b1]"
   by (metis Game.finite_play.cases butlast.simps(2) butlast_snoc last.simps last_snoc list.discI weight_opt.simps(16))
 
 text \<open>In the following we look at play examples and check who wins the corresponding game.\<close>
 lemma attacker_wins_example:
   shows "Game.won_by_attacker a (E 10 10) [a, b2, c, d1, e]"
-  using play_stuck_example energy_level_example
+  using no_move_example energy_level_example
   by (simp add: Game.won_by_attacker_def)
 
 lemma no_winner_example: 
   shows "Game.no_winner a (E 10 10) [a, b2, c]"
-  using play_not_stuck_example energy_level_example_1 by simp
+  using no_move_example2 energy_level_example_1 by simp
 
-lemma attacker_turn_not_stuck:
+lemma attacker_turn_no_move:
   assumes "finite_play a p" and "Game.is_attacker_turn p"
-  shows "\<not>Game.play_stuck a p"
+  shows "\<not>Game.no_move a p"
 using assms proof - 
   from assms have "last p = a \<or> last p = d1 \<or> last p = d2"
     using defender.elims(3) by blast
   hence "(last p)\<Zinj> b1 \<or> (last p) \<Zinj> e" by auto
   hence "(\<exists>gn. finite_play a (p @ [gn]))" using assms(1) Game.finite_play.intros(2) by blast 
-  thus "\<not>Game.play_stuck a p" by simp
+  thus "\<not>Game.no_move a p" by simp
 qed
 text \<open>Finally, we verify our definition of win\_a using scenarios where we expect the attacker to have a winning strategy (or not).\<close>
 
