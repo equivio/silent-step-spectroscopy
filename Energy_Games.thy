@@ -10,8 +10,8 @@ energy game itself, characterizing equivalence problems.\<close>
 
 subsection \<open>Fundamentals\<close>
 text\<open>We use an abstract concept of energies and only later consider 8-dimensional energy games. 
-Through our definition of energies as a data type, which will be given later, we enforce certain 
-properties for all energy games. We therefore assume that an energy game 
+Through our later given definition of energies as a data type we obtain certain 
+properties that we enforce for all energy games. We therefore assume that an energy game 
 has a partial order on energies such that all updates are monotonic and never increase.\<close>
 
 type_synonym 'energy update = "'energy \<Rightarrow> 'energy"
@@ -22,7 +22,7 @@ type_synonym 'gstate fplay = "'gstate list"
 
 text\<open>An energy game is played by two players on a directed graph labeled by energy updates. 
 These energy updates represent the costs of choosing a certain move.
-Since we will only consider cases in which the attacker's moves may actually have costs, only they can run 
+Since we will only consider cases in which the attacker's moves may actually have nonzero costs, only they can run 
 out of energy. This is the case, when the energy level reaches the \<open>defender_win_level\<close>.
 In contrast to other definitions of games, we do not fix a starting position.\<close>
 locale energy_game =
@@ -181,7 +181,7 @@ qed
 subsection \<open>Winning\<close>
 
 text\<open>Plays can be won by the attacker or the defender. In general, we distinguish between the winner of an infinite and a finite play. 
-Any infinite play is won by the defender. A finite play is won if one player can no longer move and it is their turn. 
+Any infinite play is won by the defender. A finite play is won if one player can no longer move. 
 This can be the case if there are no successors or if all possible energy updates would be too expensive.\<close>
 
 subsubsection \<open>Winning Finite Plays\<close>
@@ -211,7 +211,7 @@ abbreviation "is_defender_turn p \<equiv> Gd (last p)"
 abbreviation "is_attacker_turn p \<equiv> Ga (last p)"
 
 text\<open>The following definitions formalize the conditions under which a finite play is won by the attacker, the defender or not won (yet). \\
-The defender wins if it is the attacker's turn and they have no move left or if the \<open>defender_win_level\<close> is reached.\<close>
+The defender wins if it is the attacker's turn and they have no move left or if the \<open>defender_win_level\<close> was reached.\<close>
 
 definition won_by_defender:: "'gstate \<Rightarrow> 'energy \<Rightarrow> 'gstate fplay \<Rightarrow> bool" where
   "won_by_defender g0 e0 p \<equiv> (no_move g0 p \<and> is_attacker_turn p) \<or> (energy_level g0 e0 p = defender_win_level)"
@@ -224,7 +224,7 @@ text\<open>There is no winner of a finite play if the play is not yet stuck.\<cl
 abbreviation no_winner:: "'gstate \<Rightarrow> 'energy \<Rightarrow> 'gstate fplay \<Rightarrow> bool" where
   "no_winner g0 e0 p \<equiv> \<not>no_move g0 p \<and> (energy_level g0 e0 p \<noteq> defender_win_level)"
 
-text\<open>Now we prove that exactly one of our three cases is always true. This means, in particular, that if there is a winner, that winner is unique. \<close>
+text\<open>Now we prove that exactly one of our three cases is always true. In particular, if there is a winner, that winner is unique. \<close>
 lemma play_won_cases:
   shows "won_by_defender g0 e0 p \<or> won_by_attacker g0 e0 p \<or> no_winner g0 e0 p"
   unfolding won_by_attacker_def won_by_defender_def by blast
@@ -252,10 +252,6 @@ inductive in_wina:: "'energy \<Rightarrow> 'gstate \<Rightarrow> bool " where
  "in_wina e g" if "(Gd g) \<and> (\<forall>g'. \<not>(g \<Zinj> g')) \<and> (e \<noteq> defender_win_level)" |
  "in_wina e g" if "(Ga g) \<and> (\<exists>g'. ((g \<Zinj> g') \<and> (in_wina ((weight g g') e) g')))\<and> (e \<noteq> defender_win_level)" |
  "in_wina e g" if "(Gd g) \<and> (\<forall>g'. ((g \<Zinj> g') \<longrightarrow> (in_wina ((weight g g') e) g'))) \<and> (e \<noteq> defender_win_level)"
-
-definition wina_set
-  where
-"wina_set g = {e. in_wina e g}"
 
 lemma %invisible defender_win_level_not_in_wina:
   shows "\<forall>g. \<not>in_wina defender_win_level g" 
@@ -290,7 +286,7 @@ lemma %invisible in_wina_Gd:
   "\<And>g'. g \<Zinj> g' \<Longrightarrow> in_wina (update e) g'"
 shows "in_wina e g" using assms in_wina.intros(3) by blast
 
-text\<open>If from a certain starting position a game \<open>g\<close> is won by the attacker with some energy \<open>e\<close> (i.e.
+text\<open>If from a certain starting position \<open>g\<close> a game is won by the attacker with some energy \<open>e\<close> (i.e.
 \<open>e\<close> is in the winning budget of \<open>g\<close>), then the game is also won by the attacker with more energy. 
 This is proven using the inductive definition of winning budgets and the given properties of the partial order \<open>ord\<close>.\<close>
 
