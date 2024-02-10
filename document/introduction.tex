@@ -1,7 +1,12 @@
+\newpage
 \section{Introduction}
-In the research field of modelling and verification we are interested in comparing model and specification.
-We formalize both and use various techniques to check whether the model fulfills its specification.
-These two techniques differ in the "language" we use for formalization.
-Model and specification can be modeled in the same or in different languages.
-We focus on the possibility of formalizing the model as a game that characterizes the moves for the processes and the specification by HML formulas.
-Between a play of the game and a HML formula exist...
+In our project we are interested in comparing model and specification.
+We formalize both as processes and use various techniques to check whether the model fulfills its specification.
+One possibility to compare model and specification are games that provide a correspondence between the winner of the game and the behavior of the processes.
+Otherwise, we could use a logic, known as Hennessy-Milner logic (HML), to describe formulas that distinguish processes and thus the model and its specification.
+These techniques for checking whether the model fulfills its specification may also be compared directly.
+The attacker wins a play if and only if there is a formula that distinguishes the corresponding processes.
+\\\\
+Based on the paper xyz, we analyze such a game and a variant of HML.
+We check whether these two techniques actually lead to identical results and thus to the same conclusion on whether the processes have the same behavior.
+For this purpose, we examine how to formalize the game, HML and their correspondence with Isabelle and prove their correctness.
