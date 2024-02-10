@@ -22,15 +22,7 @@ In particular:
     \item @{term "(Neg \<phi>)"} encodes \<open>\<not>\<phi>\<close> in position of a conjunct and is to be read as '\<open>\<phi>\<close> does not hold'.
   \end{itemize}
 \end{itemize}
-
-When a variable is of type @{term "hml"} then @{term "\<phi>"} is used in most cases.
-In case a variable is of type @{term "hml_conjunct"} then @{term "\<psi>"} is used.
-
-Note that in canonical definitions of HML @{term "TT"} is not usually given, but is instead synonymous to \<open>\<And>{}\<close>.
-We include @{term "TT"} in the definition to enable Isabelle to infer via syntax only, that the types @{term "hml"}
-and @{term "hml_srbb"} are non-empty.  If this data constructor is omitted, Isabelle will reject the definition.
 \<close>
-
 
 datatype 
   ('act, 'i) hml =
@@ -44,17 +36,48 @@ and
     Pos "('act, 'i) hml" |
     Neg "('act, 'i) hml"
 
+text \<open>
+When a variable is of type @{term "hml"} then @{term "\<phi>"} is used in most cases.
+In case a variable is of type @{term "hml_conjunct"} then @{term "\<psi>"} is used.
+\\
+\\
+Note that in canonical definitions of HML @{term "TT"} is not usually part of the syntax,
+but is instead synonymous to \<open>\<And>{}\<close>.
+We include @{term "TT"} in the definition to enable Isabelle to infer via syntax only,
+that the types @{term "hml"} and @{term "hml_srbb"} are non-empty.
+Isabelle is unable to show that the types are non-empty if the @{term "TT"} data constructor is not
+given due to the way we've chosen to formalize the conjunct.
+This formalization allows for conjunctions of arbitrary - even of infinite - width and has been
+taken from \cite{Pohlmann2021ReducingReactive} (Appendix B).
+This added expressiveness comes at the cost of making proofs regarding conjunctions more complex
+and restricts the ways in which functions may be derived for these types (c.f. 'Expressiveness\_Price.thy').
+\\
+\\
+Initially, we considered two alternative approaches of formalizing the conjunction (both would not
+have required an index type \<open>'i\<close> and wouldn't need the data constructor \<open>TT\<close>):
+\begin{enumerate}
+  \item \label{lbl:set_conj} \<open>Conj "'a hml set"\<close> 
+  \item \label{lbl:cset_conj} \<open>Conj "'a hml cset"\<close> 
+\end{enumerate}
+Approach \ref{lbl:set_conj} is rejected by Isabelle, since \<open>set\<close> is not a bounded natural functor.
+In particular, the \<open>set\<close> functor violates the boundedness condition of BNF, which is that there must
+be a fixed upper bound to the cardinality of the types resulting from the \<open>set\<close> functor. Such an
+upper bound can not exist due to Cantor's diagonalization proof. 
+\\
+\\
+Approach \ref{lbl:cset_conj} does not present this issue and is accepted by Isabelle. \cite{Pohlmann2021ReducingReactive}
+shows that it can be employed fruitfully.  We ultimately decided against it and for the formalization
+via an additional index type since we were able to overcome the technical challenges presented by
+the more general formalization.
+\<close>
 
 context LTS_Tau
 begin
 
 text \<open>
 Definition of the meaning of an HML formula in the context of an LTS.
-
-Note that this formalization and semantic allows for conjunctions of arbitrary width,
-even of infinite width.  This added expressiveness comes at the cost of making proofs regarding
-conjunctions more complex. TODO: Talk about alternative formulation of conjunctions via CSets
-and problems when using Sets. Cite thesis from which we have derived this.
+We define what it means for a process @{term "p"} to satisfy a formula @{term "\<phi>"} (written as
+\<open>p \<Turnstile> \<phi>\<close>) by inspecting the transitions available at process @{term "p"}.
 \<close>
 
 primrec
