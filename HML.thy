@@ -71,11 +71,12 @@ via an additional index type since we were able to overcome the technical challe
 the more general formalization.
 \<close>
 
+subsection \<open> Semantics of \<open>hml\<close> Formulas: \<open>\<Turnstile>\<close> \<close>
+
 context LTS_Tau
 begin
 
 text \<open>
-Definition of the meaning of an HML formula in the context of an LTS.
 We define what it means for a process @{term "p"} to satisfy a formula @{term "\<phi>"} (written as
 \<open>p \<Turnstile> \<phi>\<close>) by inspecting the transitions available at process @{term "p"}.
 \<close>
@@ -122,6 +123,19 @@ lemma "(state \<Turnstile> (Silent \<phi>))
 text \<open> We choose to still include @{term "Silent"} to stay close to \cite{bisping2023lineartimebranchingtime}
 and \cite{FOKKINK2019104435}. \<close>
 
+text \<open>
+Similarely, one may wonder why we define the set of HML formulas with two mutually recursive data types,
+instead of simply having just one data type by either:
+\begin{itemize}
+  \item inlining the \<open>hml_conjunct\<close> data type into the only place where it occurs (the conjunction), 
+    viz: \<open>Conj "'i set" "'i \<Rightarrow> (('a,'i) hml + ('a,'i) hml)"\<close>, or
+  \item adding a data constructor for negation (e.g. \<open>Not "('a,'i) hml"\<close>) and then in the conjunction
+    simply mapping to the \<open>hml\<close> data type, i.e. \<open>Conj "'i set" "i \<Rightarrow> ('a, 'i) hml"\<close>
+    (c.f. \cite{Pohlmann2021ReducingReactive}).
+\end{itemize}
+Once again, we choose to go for a mutually recursive definition to stay close to \cite{bisping2023lineartimebranchingtime}.
+\<close>
+
 end (* Inhabited_Tau_LTS *)
 
 context LTS_Tau
@@ -143,6 +157,9 @@ lemma conj_\<phi>_is_\<phi>:
 lemma opt_\<tau>_is_or: "(p \<Turnstile> (Silent \<phi>)) = ((p \<Turnstile> (Obs \<tau> \<phi>)) \<or> (p \<Turnstile> \<phi>))"
   by simp
 
+subsection \<open> \<open>hml\<close> Meta-Syntax \<close>
+
+subsubsection \<open> Soft Poss: \<open>(\<alpha>)\<phi>\<close> \<close>
 
 text \<open>
 @{term "(HML_soft_poss \<alpha> \<phi>)"} represents \<open>(\<alpha>)\<phi>\<close>,
@@ -160,6 +177,8 @@ lemma soft_poss_to_or[simp]:
   by auto
 
 end (* context LTS_Tau *)
+
+subsubsection \<open> Binary Conjunction: \<open>\<and>\<close> \<close>
 
 context Inhabited_LTS
 begin
@@ -194,6 +213,7 @@ lemma hml_and_and[simp]:
 
 end (* Inhabited_Tau_LTS *)
 
+subsubsection \<open> Negation: \<open>\<not>\<close> \<close>
 
 context Inhabited_Tau_LTS
 begin
@@ -217,6 +237,8 @@ lemma hml_not_not_models[simp]:
   shows "(state \<Turnstile> HML_not \<phi>) = (\<not> state \<Turnstile> \<phi>)"
   by simp
 
+subsubsection \<open> Falsum: \<open>\<bottom>\<close> \<close>
+
 abbreviation hml_falsum :: "('a, 's) hml" ("\<bottom>\<bottom>") where
   "\<bottom>\<bottom> \<equiv> HML_not TT"
 
@@ -224,6 +246,8 @@ text \<open> No process ever satisfies falsum. \<close>
 lemma never_models_falsum[simp]:
   shows "\<not> state \<Turnstile> \<bottom>\<bottom>"
   by simp
+
+subsubsection \<open> Binary Disjunction: \<open>\<or>\<close> \<close>
 
 text \<open> @{term "(\<phi> \<or> \<phi>')"} represents \<open>\<phi> \<or> \<phi>'\<close> (read "or") and is realized by using binary conjunction and negation. \<close>
 
