@@ -59,12 +59,12 @@ end
 
 text \<open>We then use this order to define a predicate that decides if an @{term "e1 :: energy"} 
       may be subtracted from another @{term "e2 :: energy"} without the result being negative.
-      We encode this by @{term "e1"} being @{text "somwhere_larger"} than @{term "e2"}.\<close>
+      We encode this by @{term "e1"} being @{text "somewhere_larger"} than @{term "e2"}.\<close>
 
-abbreviation somwhere_larger where "somwhere_larger e1 e2 \<equiv> \<not>(e1 \<ge> e2)"
+abbreviation somewhere_larger where "somewhere_larger e1 e2 \<equiv> \<not>(e1 \<ge> e2)"
 
-lemma somwhere_larger_eq:
-  assumes "somwhere_larger e1 e2"
+lemma somewhere_larger_eq:
+  assumes "somewhere_larger e1 e2"
   shows "(e1 = eneg \<and> e2 \<noteq> eneg) \<or> one e1 < one e2 \<or> two e1 < two e2 
          \<or> three e1 < three e2 \<or> four e1 < four e2 \<or> five e1 < five e2 
          \<or> six e1 < six e2 \<or> seven e1 < seven e2 \<or> eight e1 < eight e2"
@@ -86,7 +86,7 @@ abbreviation (input) "direct_minus e1 e2 \<equiv> E ((one e1) - (one e2))
                                              ((seven e1) - (seven e2))
                                              ((eight e1) - (eight e2))"
 
-definition minus_energy_def: "e1 - e2 \<equiv> if somwhere_larger e1 e2 then eneg else direct_minus e1 e2"
+definition minus_energy_def: "e1 - e2 \<equiv> if somewhere_larger e1 e2 then eneg else direct_minus e1 e2"
 
 instance ..
 
@@ -97,7 +97,7 @@ lemma energy_minus:
   shows "E a1 b1 c1 d1 e1 f1 g1 h1 - E a2 b2 c2 d2 e2 f2 g2 h2
          = E (a1 - a2) (b1 - b2) (c1 - c2) (d1 - d2) 
              (e1 - e2) (f1 - f2) (g1 -g2) (h1 - h2)"
-  unfolding minus_energy_def somwhere_larger_eq using assms by simp
+  unfolding minus_energy_def somewhere_larger_eq using assms by simp
 
 lemma direct_minus_eq:
   assumes "s \<le> x"
@@ -157,7 +157,7 @@ proof
   fix x y :: energy
   assume "x \<le> y"
 
-  show "x - s \<le> y - s" proof(cases "somwhere_larger x s")
+  show "x - s \<le> y - s" proof(cases "somewhere_larger x s")
     case True
     hence "x - s = eneg" unfolding minus_energy_def by simp
     show ?thesis unfolding \<open>x - s = eneg\<close> by (rule eneg_leq)
@@ -310,7 +310,7 @@ proof(cases "x=eneg")
 next
   case False
   thus ?thesis
-    using min_1_6_simps min_less_iff_conj somwhere_larger_eq by fastforce
+    using min_1_6_simps min_less_iff_conj somewhere_larger_eq by fastforce
 qed
 
 lemma gets_smaller_min_1_7: 
@@ -321,7 +321,7 @@ proof(cases "x=eneg")
 next
   case False
   thus ?thesis
-    using min_1_7_simps min_less_iff_conj somwhere_larger_eq by fastforce
+    using min_1_7_simps min_less_iff_conj somewhere_larger_eq by fastforce
 qed
 
 end

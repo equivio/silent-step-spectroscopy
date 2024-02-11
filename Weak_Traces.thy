@@ -97,7 +97,7 @@ next
     have "expr_pr_inner (BranchConj \<alpha> \<phi> I \<psi>s) \<le> E \<infinity> 0 0 0 0 0 0 0" unfolding \<O>_inner_def by auto
     with \<open>I = {}\<close>
     have "expressiveness_price \<phi> \<le> E \<infinity> 0 0 0 0 0 0 0" unfolding expr_pr_inner.simps 
-      by (smt (verit) bot.extremum_uniqueI bot_enat_def branch_conj_depth_inner.simps(4) ccpo_Sup_singleton enat_ord_simps(6) energy.distinct(1) energy.sel(1) energy.sel(2) energy.sel(3) energy.sel(4) energy.sel(5) energy.sel(6) energy.sel(7) energy.sel(8) expressiveness_price.elims image_empty imm_conj_depth_inner.simps(4) insert_is_Un inst_conj_depth_inner.simps(4) leq_not_eneg less_numeral_extra(3) max_neg_conj_depth_inner.simps(4) max_pos_conj_depth_inner.simps(4) neg_depth_inner.simps(4) somwhere_larger_eq st_conj_depth_inner.simps(4))
+      by (smt (verit) bot.extremum_uniqueI bot_enat_def branch_conj_depth_inner.simps(4) ccpo_Sup_singleton enat_ord_simps(6) energy.distinct(1) energy.sel(1) energy.sel(2) energy.sel(3) energy.sel(4) energy.sel(5) energy.sel(6) energy.sel(7) energy.sel(8) expressiveness_price.elims image_empty imm_conj_depth_inner.simps(4) insert_is_Un inst_conj_depth_inner.simps(4) leq_not_eneg less_numeral_extra(3) max_neg_conj_depth_inner.simps(4) max_pos_conj_depth_inner.simps(4) neg_depth_inner.simps(4) somewhere_larger_eq st_conj_depth_inner.simps(4))
     then have "\<phi> \<in> \<O> (E \<infinity> 0 0 0 0 0 0 0)" unfolding \<O>_def by auto
     with \<open>I = {}\<close>
     show "is_trace_formula_inner (BranchConj \<alpha> \<phi> I \<psi>s)" 
