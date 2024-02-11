@@ -1,1 +1,14 @@
+\newpage
 \section{Introduction}
+We formalize the eight-dimensional spectroscopy energy game as introduced by Benjamin Bisping and David N. Jansen in \cite{bisping2023lineartimebranchingtime}, that ``can be used to decide a wide array of behavioral equivalences between stability-respecting branching bisimilarity and weak trace equivalence in one go''\cite{bisping2023lineartimebranchingtime}. And prove the correspondence between ``attacker-winning energy budgets and distinguishing sublanguages of Hennessy-Milner logic characterized by eight dimensions of formula expressiveness''.
+
+In our formalization we try to follow \cite{bisping2023lineartimebranchingtime} as closely as possible, while pointing out any deviations we make as part of our formalization, as well as any errors we were able to find and rectify while formalizing the paper.
+
+For this we first formalize labeled transition systems, on which then Hennessy-Milner logic is defined, along with branching Hennessy-Milner logic.
+We then define energies which will be used as part of the spectroscopy energy game, and are re-used as the expressiveness prices of branching Hennessy-Milner formulas. These prices are defined next.
+We further define energy games and instantiate the spectroscopy energy game for a given labeled transition system.
+
+Afterwards we state our formalization of the theorem 1 of \cite{bisping2023lineartimebranchingtime}, that ``relates attacker-winning energy budgets and distinguishing sublanguages of Hennessy-Milner logic''. Mirroring the proof given in \cite{bisping2023lineartimebranchingtime} we prove this theorem in three lemmas. The first proves, by induction, over the structure of branching Hennessy-Milner formulas, that given a distinguishing formula the attacker is able to win the corresponding spectroscopy game. The second and third inductively prove the other direction. With the second constructing a formula with bounded price and the third showing that this formula distinguishes the processes at hand. % the discription of lemma 2 and 3 seem to bief.
+
+We then compactly list of all the changes that our formalization was able to contribute to the \cite{bisping2023lineartimebranchingtime}.
+Closing off we give our conclusions. % this needs more work, and "meat".
