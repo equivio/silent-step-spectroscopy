@@ -230,8 +230,7 @@ abbreviation "e5 \<equiv> subtract_fn 0 0 0 0 1 0 0 0"
 abbreviation "subtract a b c d e f g h \<equiv> Some (subtract_fn a b c d e f g h)"
 
 subsection \<open>Minimum Updates\<close>
-text \<open>Next we define two updates on energies that update the first component to be
-      the minimum of two other components.\<close>
+text \<open>Next we define two energy updates that replace the first component with the minimum of two other components.\<close>
 definition "min1_6 e \<equiv> case e of E a b c d e f g h \<Rightarrow> E (min a f) b c d e f g h | eneg \<Rightarrow> eneg "
 definition "min1_7 e \<equiv> case e of E a b c d e f g h \<Rightarrow> E (min a g) b c d e f g h | eneg \<Rightarrow> eneg "
 
