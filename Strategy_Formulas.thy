@@ -6,8 +6,8 @@ begin
 context full_spec_game
 begin
 text \<open>\label{stratFormula}\<close>
-text \<open>For the proof of the lemma \ref{lemma2} we define strategy formulas. 
-These formulas create a bridge between HML formulas, the spectroscopy game and our definition of winning budgets.\<close>
+text \<open>Strategy formulas create a bridge between HML formulas, the spectroscopy game and our definition of winning budgets. 
+Those are required for the proof of the lemma \ref{th1}.\<close>
 inductive 
 strategy_formula :: "('s, 'a) spectroscopy_position \<Rightarrow> energy \<Rightarrow> ('a, 's)hml_srbb \<Rightarrow> bool"
 and strategy_formula_inner 
