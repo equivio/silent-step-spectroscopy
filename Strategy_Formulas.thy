@@ -5,10 +5,9 @@ begin
 
 context full_spec_game
 begin
-text \<open>For the proof of the following lemma we define strategy formulas. 
-These formulas create a bridge between HML formulas, the spectroscopy game and our definition of winning budgets.
-Like in the paper we distinguish several cases. It is worth noting that one rule is new.
-Since in our HML we distinguish between a conjunction and an immediate conjunction, we added a new strategy formula for this case.\<close>
+text \<open>\label{stratFormula}\<close>
+text \<open>For the proof of the lemma \ref{lemma2} we define strategy formulas. 
+These formulas create a bridge between HML formulas, the spectroscopy game and our definition of winning budgets.\<close>
 inductive 
 strategy_formula :: "('s, 'a) spectroscopy_position \<Rightarrow> energy \<Rightarrow> ('a, 's)hml_srbb \<Rightarrow> bool"
 and strategy_formula_inner 
@@ -118,7 +117,7 @@ position, by \<open>e\<close> being in the winning budget of \<open>g\<close>, w
 the attacker can move to. If by induction the property holds true for that successor we show that it 
 then holds for \<open>g\<close> as well. (case 2)
 \<close>
-
+text \<open>\label{lemma2}\<close>
 lemma winning_budget_implies_strategy_formula:
   fixes g e
   assumes "in_wina e g"
