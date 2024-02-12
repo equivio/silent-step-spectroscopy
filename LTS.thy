@@ -3,19 +3,32 @@ theory LTS
   imports Main
 begin
 
+text \<open>
+The locale @{term "LTS"} represents a labeled transition system consisting of a set of states $\mathcal{P}$, 
+a set of actions $\Sigma$, and a transition relation $\cdot\xrightarrow{\cdot}\cdot \subseteq \mathcal{P}\times\Sigma\times\mathcal{P}$. 
+We formalise the sets of states and actions by type variables \<open>'s\<close> and \<open>'a\<close>. A LTS is then determined by the transition relation @{term "step"}. 
+We provide the notation \<open>p \<mapsto>\<alpha> p'\<close> for $p \xrightarrow{\alpha} p'$.
+\<close>
+
 locale LTS =
   fixes step :: "'s \<Rightarrow> 'a \<Rightarrow> 's \<Rightarrow> bool" ("_ \<mapsto> _ _" [70,70,70] 80)
 begin
 
+text \<open>One may lift @{term "step"} to sets of steps. \<open>P \<mapsto>S \<alpha> Q\<close> iff for all states \<open>q\<close> in \<open>Q\<close> there exists
+a state \<open>p\<close> in \<open>P\<close> such that \<open>p \<mapsto> \<alpha> q\<close> and for all \<open>p\<close> in P and for all \<open>q\<close>, if \<open>p \<mapsto> \<alpha> q\<close> then \<open>q\<close> is in \<open>Q\<close>.\<close>
 abbreviation step_setp ("_ \<mapsto>S _ _" [70,70,70] 80) where
   "P \<mapsto>S \<alpha> Q \<equiv> (\<forall>q \<in> Q. \<exists>p \<in> P. p \<mapsto> \<alpha> q) \<and> (\<forall>p \<in> P. \<forall>q. p \<mapsto> \<alpha> q \<longrightarrow> q \<in> Q)"
 
+text \<open>The set of possible \<open>\<alpha>\<close> steps for a set of states \<open>P\<close> are all \<open>q\<close> such that there exists a state \<open>p\<close> in P with \<open>p \<mapsto> \<alpha> q\<close>.\<close>
 definition step_set :: "'s set \<Rightarrow> 'a \<Rightarrow> 's set" where
   "step_set P \<alpha> \<equiv> { q . \<exists>p \<in> P. p \<mapsto> \<alpha> q }"
 
+text \<open>The set of possible \<open>\<alpha>\<close> steps for a set of states \<open>P\<close> is an instance of @{term "step"} lifted to sets of steps.\<close>
 lemma step_set_is_step_set: "P \<mapsto>S \<alpha> (step_set P \<alpha>)"
   using step_set_def by force
 
+text \<open>For a set of states \<open>P\<close> and an action \<open>\<alpha>\<close> there exists exactly one \<open>Q\<close> such that \<open>P \<mapsto>S \<alpha> Q\<close> and therefore
+exactly one instantiation of the lifted @{term "step"}.\<close>
 lemma exactly_one_step_set: "\<exists>!Q. P \<mapsto>S \<alpha> Q"
 proof -
   from step_set_is_step_set
@@ -26,12 +39,13 @@ proof -
     by blast
 qed
 
+text \<open>The lifted @{term "step"} (\<open>P \<mapsto>S \<alpha> Q\<close>) is a set of possible \<open>\<alpha>\<close> steps for a set of states \<open>P\<close>.\<close>
 lemma step_set_eq:
   assumes "P \<mapsto>S \<alpha> Q"
   shows "Q = step_set P \<alpha>"
   using assms step_set_is_step_set exactly_one_step_set by fastforce
 
-end (* locale LTS *)
+end (*<*) (* locale LTS *) (*>*)
 
 
 locale LTS_Tau =
