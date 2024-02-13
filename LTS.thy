@@ -64,7 +64,7 @@ text \<open>@{term "soft_step"} is a variation of @{term "step"}. Following the 
 abbreviation soft_step ("_ \<mapsto>a _ _" [70,70,70] 80) where
   "p \<mapsto>a \<alpha> q \<equiv> p \<mapsto>\<alpha> q \<or> (\<alpha> = \<tau> \<and> p = q)" 
 
-text \<open>A state \<open>p\<close> is @{term "silent_reachable"} from another state \<open>p'\<close> iff there exists a path of \<open>\<tau>\<close>-transitions
+text \<open>A state \<open>p\<close> is @{term "silent_reachable"}, represented by the symbol \<open>\<Zsurj>\<close>, from another state \<open>p'\<close> iff there exists a path of \<open>\<tau>\<close>-transitions.
 from \<open>p'\<close> to \<open>p\<close>.\<close>
 inductive silent_reachable :: "'s \<Rightarrow> 's \<Rightarrow> bool"  (infix "\<Zsurj>" 80)
   where
