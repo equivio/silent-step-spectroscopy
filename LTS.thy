@@ -40,7 +40,7 @@ proof -
     by blast
 qed
 
-text \<open>The lifted @{term "step"} (\<open>P \<mapsto>S \<alpha> Q\<close>) is a set of possible \<open>\<alpha>\<close> steps for a set of states \<open>P\<close>.\<close>
+text \<open>The lifted @{term "step"} (\<open>P \<mapsto>S \<alpha> Q\<close>) is therefore this set \<open>Q\<close>.\<close>
 lemma step_set_eq:
   assumes "P \<mapsto>S \<alpha> Q"
   shows "Q = step_set P \<alpha>"
