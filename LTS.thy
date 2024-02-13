@@ -185,7 +185,7 @@ lemma prepend_\<tau>_weak_trace:
     and weak_step_sequence.intros(2)
   by fastforce
 
-text \<open>if state \<open>p'\<close> is reachable from state \<open>p\<close> via a sequence of \<open>\<tau>\<close>-transitions, and there exists a weak trace \<open>tr\<close> starting from \<open>p'\<close>,
+text \<open>If state \<open>p'\<close> is reachable from state \<open>p\<close> via a sequence of \<open>\<tau>\<close>-transitions, and there exists a weak trace \<open>tr\<close> starting from \<open>p'\<close>,
 then \<open>tr\<close> is also a weak trace starting from \<open>p\<close>.\<close>
 lemma silent_prepend_weak_traces:
   assumes "p \<Zsurj> p'"
