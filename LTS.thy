@@ -21,11 +21,11 @@ a state \<open>p\<close> in \<open>P\<close> such that \<open>p \<mapsto> \<alph
 abbreviation step_setp ("_ \<mapsto>S _ _" [70,70,70] 80) where
   "P \<mapsto>S \<alpha> Q \<equiv> (\<forall>q \<in> Q. \<exists>p \<in> P. p \<mapsto> \<alpha> q) \<and> (\<forall>p \<in> P. \<forall>q. p \<mapsto> \<alpha> q \<longrightarrow> q \<in> Q)"
 
-text \<open>The set of possible \<open>\<alpha>\<close> steps for a set of states \<open>P\<close> are all \<open>q\<close> such that there is a state \<open>p\<close> in \<open>P\<close> with \<open>p \<mapsto> \<alpha> q\<close>.\<close>
+text \<open>The set of possible \<open>\<alpha>\<close>-steps for a set of states \<open>P\<close> are all \<open>q\<close> such that there is a state \<open>p\<close> in \<open>P\<close> with \<open>p \<mapsto> \<alpha> q\<close>.\<close>
 definition step_set :: "'s set \<Rightarrow> 'a \<Rightarrow> 's set" where
   "step_set P \<alpha> \<equiv> { q . \<exists>p \<in> P. p \<mapsto> \<alpha> q }"
 
-text \<open>The set of possible \<open>\<alpha>\<close> steps for a set of states \<open>P\<close> is an instance of @{term "step"} lifted to sets of steps.\<close>
+text \<open>The set of possible \<open>\<alpha>\<close>-steps for a set of states \<open>P\<close> is an instance of @{term "step"} lifted to sets of steps.\<close>
 lemma step_set_is_step_set: "P \<mapsto>S \<alpha> (step_set P \<alpha>)"
   using step_set_def by force
 
@@ -59,8 +59,8 @@ locale LTS_Tau =
     fixes \<tau> :: 'a
 begin
 
-text \<open>@{term "soft_step"} is a variation of @{term "step"}. Following the semantics of the silent step \<open>\<tau>\<close>, a
-\<open>\<tau>\<close>-transition can always be performed from a state \<open>p\<close> to itself.\<close>
+text \<open>The paper introduces a transition $p \xrightarrow{(\alpha)} if $p \xrightarrow{\alpha} p'$, or if $\alpha = \tau$ and $p = p'$ (cf. \cite[defintion 2]{bisping2023lineartimebranchingtime}). 
+We define @{term "soft_step"} analagously and provide the notation \<open>p \<mapsto>a \<alpha> p'\<close>.\<close>
 abbreviation soft_step ("_ \<mapsto>a _ _" [70,70,70] 80) where
   "p \<mapsto>a \<alpha> q \<equiv> p \<mapsto>\<alpha> q \<or> (\<alpha> = \<tau> \<and> p = q)" 
 
@@ -319,7 +319,7 @@ end (* locale LTS_Tau *)
 text \<open>@{term "Inhabited_LTS"} and @{term "Inhabited_Tau_LTS"} are extensions of @{term "LTS"} and @{term "LTS_Tau"} respectively.
 They ensure that the corresponding transition systems have at least two states by fixing two different type variables, \<open>left\<close> and \<open>right\<close>.
 This ensures that the type \<open>'s\<close> has atleast two distinct elements.
-We later use them in the formalization of binary Hennesy-Milner logic conjunctions (\<open>\<and>\<close>), to ensure that the index set has at least two indices. 
+We later use them in the formalization of binary Hennesy-Milner logic conjunctions (\<open>\<and>\<close>), to ensure that the index set has at least two indices.\<close> 
 locale Inhabited_LTS = LTS step
   for step :: "'s \<Rightarrow> 'a \<Rightarrow> 's \<Rightarrow> bool" ("_ \<mapsto> _ _" [70,70,70] 80) +
   fixes left :: 's
