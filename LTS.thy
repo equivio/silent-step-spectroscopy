@@ -235,7 +235,7 @@ definition weakly_trace_preordered (infix "\<lesssim>WT" 60) where
 definition weakly_trace_equivalent (infix "\<simeq>WT" 60) where
 "p \<simeq>WT q \<equiv> p \<lesssim>WT q \<and> q \<lesssim>WT p"
 
-text \<open>Just like @{term"step_setp"}, one can lift @{term "silent_reachable"} to sets of States.\<close>
+text \<open>Just like @{term"step_setp"}, one can lift @{term "silent_reachable"} to sets of states.\<close>
 abbreviation silent_reachable_setp (infix "\<Zsurj>S" 80) where
   "P \<Zsurj>S Q \<equiv> ((\<forall>q \<in> Q. \<exists>p \<in> P. p \<Zsurj> q) \<and> (\<forall>p \<in> P. \<forall>q. p \<Zsurj> q \<longrightarrow> q \<in> Q))"
 
