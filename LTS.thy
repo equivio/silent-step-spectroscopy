@@ -16,7 +16,7 @@ locale LTS =
   fixes step :: "'s \<Rightarrow> 'a \<Rightarrow> 's \<Rightarrow> bool" ("_ \<mapsto> _ _" [70,70,70] 80)
 begin
 
-text \<open>One may lift @{term "step"} to sets of states. \<open>P \<mapsto>S \<alpha> Q\<close> iff for all states \<open>q\<close> in \<open>Q\<close> there exists
+text \<open>One may lift @{term "step"} to sets of states, written as \<open>P \<mapsto>S \<alpha> Q\<close>. We define \<open>P \<mapsto>S \<alpha> Q\<close> to be true iff for all states \<open>q\<close> in \<open>Q\<close> there exists
 a state \<open>p\<close> in \<open>P\<close> such that \<open>p \<mapsto> \<alpha> q\<close> and for all \<open>p\<close> in P and for all \<open>q\<close>, if \<open>p \<mapsto> \<alpha> q\<close> then \<open>q\<close> is in \<open>Q\<close>.\<close>
 abbreviation step_setp ("_ \<mapsto>S _ _" [70,70,70] 80) where
   "P \<mapsto>S \<alpha> Q \<equiv> (\<forall>q \<in> Q. \<exists>p \<in> P. p \<mapsto> \<alpha> q) \<and> (\<forall>p \<in> P. \<forall>q. p \<mapsto> \<alpha> q \<longrightarrow> q \<in> Q)"
