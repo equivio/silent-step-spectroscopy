@@ -3,11 +3,21 @@ theory Strategy_Formulas
     imports Spectroscopy_Game Expressiveness_Price
 begin
 
+text\<open>In this section strategy formulas are introduced as a tool of proving lemma \<open>spectroscopy_game_correctness\<close> 
+in section \ref{th1}. We first define strategy formulas, creating a bridge between HML formulas, the
+spectroscopy game and winning budgets. We then show that for some energy \<open>e\<close> in a winning budget there 
+exists a strategy formula with with expressiveness price \<open>\<le> e\<close>. Afterwards we show that this formula 
+actually distinguishes. \<close>
+
 context full_spec_game
 begin
 text \<open>\label{stratFormula}\<close>
-text \<open>Strategy formulas create a bridge between HML formulas, the spectroscopy game and our definition of winning budgets. 
-Those are required for the proof of the lemma \ref{th1}.\<close>
+text \<open>We define strategy formulas inductively. For example \<open>\<langle>\<alpha>\<rangle>\<phi>\<close> is a strategy formula for some attacker
+delayed position \<open>g\<close> with energy \<open>e\<close> if and only if \<open>\<phi>\<close> is a strategy formula at the through an observation move
+reached attacker (immediate) position with the according to the move updated energy. Then the function 
+\<open>strategy_formula_inner g e \<langle>\<alpha>\<rangle>\<phi>\<close> returns true. Similarly every derivation rule for strategy formulas corresponds to 
+possible moves in the spectroscopy game. To account for the three different data types a HML
+formula can have in our formalization, we define three functions at the same time:\<close>
 inductive 
 strategy_formula :: "('s, 'a) spectroscopy_position \<Rightarrow> energy \<Rightarrow> ('a, 's)hml_srbb \<Rightarrow> bool"
 and strategy_formula_inner 
