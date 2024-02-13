@@ -29,8 +29,7 @@ text \<open>The set of possible \<open>\<alpha>\<close> steps for a set of state
 lemma step_set_is_step_set: "P \<mapsto>S \<alpha> (step_set P \<alpha>)"
   using step_set_def by force
 
-text \<open>For a set of states \<open>P\<close> and an action \<open>\<alpha>\<close> there exists exactly one \<open>Q\<close> such that \<open>P \<mapsto>S \<alpha> Q\<close> and therefore
-exactly one instantiation of the lifted @{term "step"}.\<close>
+text \<open>For a set of states \<open>P\<close> and an action \<open>\<alpha>\<close> there exists exactly one \<open>Q\<close> such that \<open>P \<mapsto>S \<alpha> Q\<close>.\<close>
 lemma exactly_one_step_set: "\<exists>!Q. P \<mapsto>S \<alpha> Q"
 proof -
   from step_set_is_step_set
