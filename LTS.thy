@@ -317,6 +317,13 @@ lemma soft_step_set_eq:
 
 end (* locale LTS_Tau *)
 
+text \<open>@{term "Inhabited_LTS"} and @{term "Inhabited_Tau_LTS"} are extensions of @{term "LTS"} and @{term "LTS_Tau"} respectively.
+They ensure that the corresponding transition systems have at least two states by fixing two different type variables, \<open>left\<close> and \<open>right\<close>.
+This ensures that the type \<open>'s\<close> has atleast two distinct elements.
+We later use them to formalize binary conjunction (\<open>\<and>\<close>) to ensure that the index set has at least two indices. 
+The binary conjunction is then used to translate @{term "hml_srbb"} formulas to @{term "hml"} formulas.
+The @{term "Inhabited_Tau_LTS"} is used to formalize \<open>\<not>\<phi>\<close> by @{term "(HML_not \<phi>)"}, which is realized via a one element conjunction and therefore
+needs at least one type variable.\<close>
 locale Inhabited_LTS = LTS step
   for step :: "'s \<Rightarrow> 'a \<Rightarrow> 's \<Rightarrow> bool" ("_ \<mapsto> _ _" [70,70,70] 80) +
   fixes left :: 's
