@@ -3,11 +3,11 @@ theory Strategy_Formulas
     imports Spectroscopy_Game Expressiveness_Price
 begin
 
-text\<open>In this section strategy formulas are introduced as a tool of proving lemma \<open>spectroscopy_game_correctness\<close> 
+text\<open>In this section we introduce strategy formulas as a tool of proving lemma \<open>spectroscopy_game_correctness\<close> 
 in section \ref{th1}. We first define strategy formulas, creating a bridge between HML formulas, the
 spectroscopy game and winning budgets. We then show that for some energy \<open>e\<close> in a winning budget there 
-exists a strategy formula with with expressiveness price \<open>\<le> e\<close>. Afterwards we show that this formula 
-actually distinguishes. \<close>
+exists a strategy formula with expressiveness price \<open>\<le> e\<close>. Afterwards we prove that this formula 
+actually distinguishes the corresponding processes.\<close>
 
 context full_spec_game
 begin
