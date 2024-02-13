@@ -11,7 +11,10 @@ Based on the paper \cite{bisping2023lineartimebranchingtime}, we formalize a gam
 We check whether these two techniques actually lead to identical results and thus to the same conclusion on whether the processes have the same behavior.
 For this purpose, we examine how to formalize the game, HML and their correspondence with Isabelle and prove their correctness.
 \\\\
-First, we formalize HML and a subset of HML, which we denote HML$_\text{srbb}$, as well as a price function for formulas.
-We then describe our formalization of the spectroscopy game and its basis in the form of energy games.
+First, we formalize the term LTS and the different kinds of steps.
+Afterwards we describe our formalization of HML and a subset of HML, which we denote HML$_\text{srbb}$.
+Within this HML section, we introduce several implications and equivalences that we expect to hold for HML formulas.
+In the following sections, we present our formalization of energies as a data type that should fulfill certain properties and a price function for formulas.
+Before we outline a proof of correctness for the correspondence between the results of the spectroscopy game and distinguishing formulas we formalize spectroscopy game and its basis in the form of energy games.
 Following these fundamentals, we outline a proof of correctness for the correspondence between the results of the spectroscopy game and distinguishing formulas.
 Finally, we discuss the errors and inaccuracies we found in the paper and thus present our contributions to the paper\cite{bisping2023lineartimebranchingtime}.
