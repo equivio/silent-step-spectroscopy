@@ -21,7 +21,7 @@ a state \<open>p\<close> in \<open>P\<close> such that \<open>p \<mapsto> \<alph
 abbreviation step_setp ("_ \<mapsto>S _ _" [70,70,70] 80) where
   "P \<mapsto>S \<alpha> Q \<equiv> (\<forall>q \<in> Q. \<exists>p \<in> P. p \<mapsto> \<alpha> q) \<and> (\<forall>p \<in> P. \<forall>q. p \<mapsto> \<alpha> q \<longrightarrow> q \<in> Q)"
 
-text \<open>The set of possible \<open>\<alpha>\<close> steps for a set of states \<open>P\<close> are all \<open>q\<close> such that there exists a state \<open>p\<close> in P with \<open>p \<mapsto> \<alpha> q\<close>.\<close>
+text \<open>The set of possible \<open>\<alpha>\<close> steps for a set of states \<open>P\<close> are all \<open>q\<close> such that there is a state \<open>p\<close> in \<open>P\<close> with \<open>p \<mapsto> \<alpha> q\<close>.\<close>
 definition step_set :: "'s set \<Rightarrow> 'a \<Rightarrow> 's set" where
   "step_set P \<alpha> \<equiv> { q . \<exists>p \<in> P. p \<mapsto> \<alpha> q }"
 
