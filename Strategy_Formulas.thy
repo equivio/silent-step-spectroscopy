@@ -12,9 +12,9 @@ actually distinguishes the corresponding processes.\<close>
 context full_spec_game
 begin
 text \<open>\label{stratFormula}\<close>
-text \<open>We define strategy formulas inductively. For example \<open>\<langle>\<alpha>\<rangle>\<phi>\<close> is a strategy formula for some attacker
-delayed position \<open>g\<close> with energy \<open>e\<close> if and only if \<open>\<phi>\<close> is a strategy formula at the through an observation move
-reached attacker (immediate) position with the according to the move updated energy. Then the function 
+text \<open>We define strategy formulas inductively. For example for \<open>\<langle>\<alpha>\<rangle>\<phi>\<close> to be a strategy formula for some attacker
+delayed position \<open>g\<close> with energy \<open>e\<close> the following must hold: \<open>\<phi>\<close> is a strategy formula at the from \<open> g\<close> through an observation move
+reached attacker (immediate) position with the energy \<open> e \<close> updated according to the move. Then the function 
 \<open>strategy_formula_inner g e \<langle>\<alpha>\<rangle>\<phi>\<close> returns true. Similarly every derivation rule for strategy formulas corresponds to 
 possible moves in the spectroscopy game. To account for the three different data types a HML
 formula can have in our formalization, we define three functions at the same time:\<close>
