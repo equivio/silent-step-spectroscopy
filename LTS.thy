@@ -59,7 +59,7 @@ locale LTS_Tau =
     fixes \<tau> :: 'a
 begin
 
-text \<open>The paper introduces a transition $p \xrightarrow{(\alpha)} if $p \xrightarrow{\alpha} p'$, or if $\alpha = \tau$ and $p = p'$ (cf. \cite[defintion 2]{bisping2023lineartimebranchingtime}). 
+text \<open>The paper introduces a transition $p \xrightarrow{(\alpha)}p'$ if $p \xrightarrow{\alpha} p'$, or if $\alpha = \tau$ and $p = p'$ (cf. \cite[defintion 2]{bisping2023lineartimebranchingtime}). 
 We define @{term "soft_step"} analagously and provide the notation \<open>p \<mapsto>a \<alpha> p'\<close>.\<close>
 abbreviation soft_step ("_ \<mapsto>a _ _" [70,70,70] 80) where
   "p \<mapsto>a \<alpha> q \<equiv> p \<mapsto>\<alpha> q \<or> (\<alpha> = \<tau> \<and> p = q)" 
