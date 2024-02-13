@@ -8,7 +8,7 @@ subsection \<open>Labeled Transition Systems\<close>
 text \<open>
 The locale @{term "LTS"} represents a labeled transition system (cf. \cite[defintion 1]{bisping2023lineartimebranchingtime}) consisting of a set of states $\mathcal{P}$, 
 a set of actions $\Sigma$, and a transition relation $\cdot\xrightarrow{\cdot}\cdot \subseteq \mathcal{P}\times\Sigma\times\mathcal{P}$. 
-We formalise the sets of states and actions by type variables \<open>'s\<close> and \<open>'a\<close>. A LTS is then determined by the transition relation @{term "step"}. 
+We formalise the sets of states and actions by the type variables \<open>'s\<close> and \<open>'a\<close>. An LTS is then determined by the transition relation @{term "step"}. 
 We provide the notation \<open>p \<mapsto>\<alpha> p'\<close> for $p \xrightarrow{\alpha} p'$.
 \<close>
 
