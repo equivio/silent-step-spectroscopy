@@ -711,7 +711,7 @@ next
     by metis
 
   thus "expressiveness_price (ImmConj I \<psi>s) \<le> e" using imm_conj_upds E
-    by (metis \<open>e = E e1 e2 e3 e4 e5 e6 e7 e8\<close> energy.discI energy.sel(1) energy.sel(2) energy.sel(3) energy.sel(4) energy.sel(5) energy.sel(6) energy.sel(7) energy.sel(8) expressiveness_price.elims leD somwhere_larger_eq) 
+    by (metis \<open>e = E e1 e2 e3 e4 e5 e6 e7 e8\<close> energy.discI energy.sel(1) energy.sel(2) energy.sel(3) energy.sel(4) energy.sel(5) energy.sel(6) energy.sel(7) energy.sel(8) expressiveness_price.elims leD somewhere_larger_eq) 
 qed
 qed
 
@@ -924,7 +924,7 @@ proof-
       using Sup_least 
       by metis+
         thus "expr_pr_inner (BranchConj \<alpha> \<phi> Q \<Phi>) \<le> e" using expr e3_le e2_le e1_le 
-          by (smt (verit, del_insts) Sup_insert Sup_union_distrib \<open>e = E e1 e2 e3 e4 e5 e6 e7 e8\<close> ccpo_Sup_singleton dual_order.trans energy.distinct(1) energy.sel(1) energy.sel(2) energy.sel(3) energy.sel(4) energy.sel(5) energy.sel(6) energy.sel(7) energy.sel(8) ile_eSuc image_empty linorder_not_less plus_1_eSuc(1) somwhere_larger_eq)
+          by (smt (verit, del_insts) Sup_insert Sup_union_distrib \<open>e = E e1 e2 e3 e4 e5 e6 e7 e8\<close> ccpo_Sup_singleton dual_order.trans energy.distinct(1) energy.sel(1) energy.sel(2) energy.sel(3) energy.sel(4) energy.sel(5) energy.sel(6) energy.sel(7) energy.sel(8) ile_eSuc image_empty linorder_not_less plus_1_eSuc(1) somewhere_larger_eq)
       qed
     qed
 
