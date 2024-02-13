@@ -280,7 +280,7 @@ lemma sreachable_set_eq:
   shows "Q = silent_reachable_set P"
   using exactly_one_sreachable_set sreachable_set_is_sreachable assms by fastforce
 
-text \<open>Lifting @{term "soft_step"} to sets of states.\<close>
+text \<open>We likewise lift @{term "soft_step"} to sets of states.\<close>
 abbreviation soft_step_setp ("_ \<mapsto>aS _ _" [70,70,70] 80) where
   "P \<mapsto>aS \<alpha> Q \<equiv> (\<forall>q \<in> Q. \<exists>p \<in> P. p \<mapsto>a \<alpha> q) \<and> (\<forall>p \<in> P. \<forall>q. p \<mapsto>a \<alpha> q \<longrightarrow> q \<in> Q)"
 
