@@ -86,7 +86,7 @@ lemma silent_reachable_trans:
 using assms silent_reachable.intros(2)
   by (induct, blast+)
 
-text \<open>@{term "silent_reachable_loopless"} is a variation of @{term "silent_reachable"} that doesn't use self-loops.\<close>
+text \<open>@{term "silent_reachable_loopless"} is a variation of @{term "silent_reachable"} that does not use self-loops.\<close>
 inductive silent_reachable_loopless :: "'s \<Rightarrow> 's \<Rightarrow> bool"  (infix "\<Zsurj>L" 80)
   where
     "p \<Zsurj>L p" |
