@@ -304,6 +304,8 @@ primrec
 
 subsection \<open>Expressiveness price function\<close>
 
+text \<open>This combines the eight function to the @{term "expressiveness_price"} function mentioned above.\<close>
+
 fun expressiveness_price :: "('a, 's) hml_srbb \<Rightarrow> energy" where
   "expressiveness_price \<phi> = E (modal_depth_srbb            \<phi>)
                               (branching_conjunction_depth \<phi>)
@@ -314,6 +316,7 @@ fun expressiveness_price :: "('a, 's) hml_srbb \<Rightarrow> energy" where
                               (max_negative_conjunct_depth \<phi>)
                               (negation_depth              \<phi>)"
 
+text \<open>Here we can see the price of an immediate conjunction.\<close>
 lemma expressiveness_price_ImmConj_def:
   shows "expressiveness_price (ImmConj I \<psi>s) = E 
     (Sup ((modal_depth_srbb_conjunct \<circ> \<psi>s) ` I))
@@ -342,11 +345,16 @@ lemma expressiveness_price_ImmConj_empty_def:
   shows "expressiveness_price (ImmConj I \<psi>s) = E 0 0 0 0 0 0 0 0" using assms 
   unfolding expressiveness_price_ImmConj_def by (simp add: bot_enat_def)
 
+text \<open>The price of a fromula cannot be negative.\<close>
 lemma srbb_price_never_neg : "expressiveness_price \<phi> \<noteq> eneg"
   by simp
 
+text \<open>We can now define a sublanguage of Hennessy--Milner logic @{term "\<O>"} by the set of formulas with prices below an energy coordinate.\<close>
 definition \<O> :: "energy \<Rightarrow> (('a, 's) hml_srbb) set" where
   "\<O> energy \<equiv> {\<phi> . expressiveness_price \<phi> \<le> energy}"
+
+text \<open>Formalizing HML_SRBB by mutually recursive data types leads to expressiveness price functions of these other types,
+namely @{term "expr_pr_inner"} and @{term "expr_pr_conjunct"} and corresponding definitions and lemmas.\<close>
 
 fun expr_pr_inner :: "('a, 's) hml_srbb_inner \<Rightarrow> energy" where
   "expr_pr_inner \<chi> = E (modal_depth_srbb_inner \<chi>)
@@ -380,10 +388,16 @@ lemma \<psi>_price_never_neg: "expr_pr_conjunct \<psi> \<noteq> eneg"
 definition \<O>_conjunct :: "energy \<Rightarrow> (('a, 's) hml_srbb_conjunct) set" where
   "\<O>_conjunct energy \<equiv> {\<chi> . expr_pr_conjunct \<chi> \<le> energy}"
 
-subsection \<open>Lemmas on expressiveness of different formulas\<close>
+subsection \<open>Prices of certain formulas\<close>
+
+text \<open>
+We demonstrate the pricing mechanisms for various formulas. These proofs operate under the assumption of an expressiveness price \<open>e\<close> for a given formula \<open>\<chi>\<close> and proceed to determine the price of a derived formula, such as \<open>Pos \<chi>\<close>. 
+The proofs all are of a similar nature. They systematically break down the expression function(s) into their constituent parts and apply their definitions to the constructed formula \<open>(Pos \<chi>)\<close>.\<close>
 
 context full_spec_game
 begin
+
+text \<open>For example, here we establish that the expressiveness price of \<open>Internal \<chi>\<close> is equal to the expressiveness price of \<open>\<chi>\<close>.\<close>
 
 lemma expr_internal_eq:
   shows "expressiveness_price (Internal \<chi>) = expr_pr_inner \<chi>"
@@ -410,6 +424,8 @@ proof-
             by auto
         qed
 
+text \<open>If the price of a formula \<open>\<chi>\<close> is not greater than the minimum update @{term "min1_6"} apllied to some energy $e$,
+then \<open>Pos \<chi>\<close> is not greater than \<open>e\<close>.\<close>
 lemma expr_pos:
   assumes "expr_pr_inner \<chi> \<le> (min1_6 e)"
   shows "expr_pr_conjunct (Pos \<chi>) \<le> e"
@@ -960,20 +976,7 @@ lemma expressiveness_price_ImmConj_geq_parts':
 
 end (* full_spec_game *)
 
-subsection \<open>characterizing equivalence by energy coordinates\<close>
-
-context Inhabited_Tau_LTS
-begin
-
-definition expr_preord :: "'s \<Rightarrow> energy \<Rightarrow> 's \<Rightarrow> bool" ("_ \<preceq> _ _" 60) where
-  "(p \<preceq> e q) \<equiv> hml_preordered (\<O> e) p q"
-
-definition expr_equiv :: "'s \<Rightarrow> energy \<Rightarrow> 's \<Rightarrow> bool" ("_ \<sim> _ _" 60) where
-  "(p \<sim> e q) \<equiv> hml_equivalent (\<O> e) p q"
-
-end
-
-
+text \<open>Here we show the prices for some specific formulas.\<close>
 context Inhabited_LTS
 begin
 
@@ -1079,6 +1082,21 @@ qed
 lemma expr_obs_phi:
   shows "e1 (expr_pr_inner (Obs \<alpha> \<phi>)) = expressiveness_price \<phi>"
   by (simp add: direct_minus_eq energy_leq_cases le_iff_add)
+
+end
+
+subsection \<open>characterizing equivalence by energy coordinates\<close>
+
+context Inhabited_Tau_LTS
+begin
+
+text \<open>A state \<open>p\<close> preorders another state \<open>q\<close> with respect to some energy \<open>e\<close> iff \<open>p\<close> HML preorders \<open>q\<close> with respect to the HML sublanguage @{term "\<O>"} derived from \<open>e\<close>\<close>
+definition expr_preord :: "'s \<Rightarrow> energy \<Rightarrow> 's \<Rightarrow> bool" ("_ \<preceq> _ _" 60) where
+  "(p \<preceq> e q) \<equiv> hml_preordered (\<O> e) p q"
+
+text \<open>Conversely, \<open>p\<close> and \<open>q\<close> are equivalent with respect to \<open>e\<close> iff they are equivalent with respect to that HML sublanguage @{term "\<O>"}.\<close>
+definition expr_equiv :: "'s \<Rightarrow> energy \<Rightarrow> 's \<Rightarrow> bool" ("_ \<sim> _ _" 60) where
+  "(p \<sim> e q) \<equiv> hml_equivalent (\<O> e) p q"
 
 end
 
