@@ -8,7 +8,7 @@ These techniques for checking whether to processes have the same behaviour may a
 The attacker wins a play if and only if there is a formula that distinguishes the corresponding processes.
 \\\\
 Previously, it was only possible to decide equivalence problems individually, but recently there have been ideas of deciding all these problems at once.
-Therefore, xyz included prices as vectors for various components of the HML formulas and for the moves of equivalence games.
+Therefore, xyz included prices as eight-dimensional vectors for various components of the HML formulas and for the moves of equivalence games.
 The attacker wins a play with a certain initial energy $e$ if and only if there is a formula that distinguishes the corresponding processes with a price less than or equal to $e$.
 Then the initial energy and the price of a formula encode the applying behavioural equivalences and therefore we are able to decide for a whole spectrum of behavioural equivalences at the same time which of them apply.
 \\\\
@@ -24,5 +24,9 @@ Afterwards we describe our formalization of HML and a subset of HML, which we de
 Within this HML section, we introduce several implications and equivalences that we expect to hold for HML formulas.
 In the following sections, we present our formalization of energies as a data type that should fulfill certain properties and a price function for formulas.
 Before we outline a proof of correctness for the correspondence between the results of the spectroscopy game and distinguishing formulas we formalize spectroscopy game and its basis in the form of energy games.
-Following these fundamentals, we outline a proof of correctness for the correspondence between the results of the spectroscopy game and distinguishing formulas.
+Following these fundamentals, we state our formalization of the theorem $1$ of \cite{bisping2023lineartimebranchingtime}, that ``relates attacker-winning energy budgets and distinguishing sublanguages of Hennessy-Milner logic''. 
+Based on the proof in \cite{bisping2023lineartimebranchingtime} we show this theorem through three lemmas. 
+The first lemma states that given a distinguishing formula, the attacker is able to win the corresponding spectroscopy game, which we prove by induction.
+Using the same technique, we prove the second lemma, which claimes that if the attacker wins the spectroscopy game with an initial energy $e$, then there exists a (strategy) formula with a price less than or equal to $e$.
+Afterwards, the third lemma completes this cycle by stating that if there is a (strategy) formula $\phi$, then $\phi$ distingusihes the corresponding processes.
 Finally, we discuss the errors and inaccuracies we found in the paper and thus present our contributions to the paper\cite{bisping2023lineartimebranchingtime}.
