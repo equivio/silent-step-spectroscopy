@@ -1,1 +1,17 @@
 \section{Conclusion}
+We were able to formalize the majority of the paper, including the spectroscopy energy game as introduced by Benjamin Bisping and David N. Jansen in \cite{bisping2023lineartimebranchingtime}, 
+and prove one direction of theorem 1, namely ``if the attacker wins this energy game, given an energy $e$, then there exists a formula $\varphi \in$ HML$_{SRBB}$ with price expr$(\varphi) \leq$ $e$''. 
+In the other direction, we provide a distinct proof skeleton, including proofs for individual induction cases.
+\\
+Due to the nature of Isabelle, the implementation differs in subtle and some not-so-subtle ways from \cite{bisping2023lineartimebranchingtime}. The gravest change is to the definition of HML$_{SRBB}$. 
+We have implemented this definition using three mutually recursive data types. As a result, we had two definitions for $\bigwedge\psi$, \textbf{ImmConj} and \textbf{Conj}, each with a different type. 
+This has led to minor changes in the proof of lemma 2. The other difference to the HML$_{SRBB}$ definition of \cite{bisping2023lineartimebranchingtime} concerned the observation of actions. 
+Instead of the more common $\langle \alpha \rangle\varphi$ observation, we define the logic using $(\alpha)\varphi$. We argue that both definitions have the same distinguishing power. However, 
+this begets a change to the spectroscopy game as the formulas have different distinguishing power outside of their context and therefore cost a different amount of energy.
+These and other deviations are usually justified directly at their occurrence in the code. An overview can be found at (Index of changes). 
+\\
+One major change to \cite{bisping2023lineartimebranchingtime} is a new game move $(p,\varnothing)_{d}^{s}$ $\overset{\hat{e}_4}{\rightarrowtail} (p,\varnothing)_d$. 
+Before, the attacker could use an empty stability conjunction \textbf{StableConj} without having the proper budget. Now the defender can exploit that by invoking the new move.
+\\
+We formalized an energy game closely related to \cite{bisping2023lineartimebranchingtime} that can decide (almost) all behavioral equivalences between stability-respecting branching bisimilarity and weak trace equivalence at once.
+Provided our definition of coordinates in an 8-dimensional space of energies corresponds to these equivalences, we implemented a (mostly) machine-checkable proof for the correctness of this spectroscopy game.
