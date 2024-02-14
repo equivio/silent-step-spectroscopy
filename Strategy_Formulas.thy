@@ -16,7 +16,7 @@ text \<open>We define strategy formulas inductively. For example for \<open>\<la
 delayed position \<open>g\<close> with energy \<open>e\<close> the following must hold: \<open>\<phi>\<close> is a strategy formula at the from \<open> g\<close> through an observation move
 reached attacker (immediate) position with the energy \<open> e \<close> updated according to the move. Then the function 
 \<open>strategy_formula_inner g e \<langle>\<alpha>\<rangle>\<phi>\<close> returns true. Similarly every derivation rule for strategy formulas corresponds to 
-possible moves in the spectroscopy game. To account for the three different data types a HML
+possible moves in the spectroscopy game. To account for the three different data types a HML$_{\text{srbb}}$
 formula can have in our formalization, we define three functions at the same time:\<close>
 inductive 
 strategy_formula :: "('s, 'a) spectroscopy_position \<Rightarrow> energy \<Rightarrow> ('a, 's)hml_srbb \<Rightarrow> bool"
