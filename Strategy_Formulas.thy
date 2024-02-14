@@ -127,7 +127,6 @@ position, by \<open>e\<close> being in the winning budget of \<open>g\<close>, w
 the attacker can move to. If by induction the property holds true for that successor we show that it 
 then holds for \<open>g\<close> as well. (case 2)
 \<close>
-text \<open>\label{lemma2}\<close>
 lemma winning_budget_implies_strategy_formula:
   fixes g e
   assumes "in_wina e g"
