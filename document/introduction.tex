@@ -1,15 +1,17 @@
 \newpage
 \section{Introduction} %todo reference to expose
-In general, we are interested in checking whether a model fulfills its specification or replacing a program with one that has the same behavior.
+In general, we are interested in checking whether a model fulfills its specification or replacing a program with one that has the same behaviour.
 For these core problems of reactive systems and programming, we have to get an idea of what same behavior for processes actually means.
-One possibility are games that provide a correspondence between the winner of the game and the behavior of the processes.
+One possibility are games that provide a correspondence between the winner of the game and the behaviour of the processes.
 Otherwise, we could use a logic, known as Hennessy-Milner logic (HML), to describe formulas that distinguish processes and thus the model and its specification.
-These techniques for checking whether the model fulfills its specification may also be compared directly.
+These techniques for checking whether to processes have the same behaviour may also be compared directly.
 The attacker wins a play if and only if there is a formula that distinguishes the corresponding processes.
 \\\\
 Previously, it was only possible to decide equivalence problems individually, but recently there have been ideas of deciding all these problems at once.
-Therefore, xyz included prices for different components of the HML formulas and for the moves of equivalence games.
-These prices correspond to certain behavioral equivalences.
+Therefore, xyz included prices as vectors for various components of the HML formulas and for the moves of equivalence games.
+The attacker wins a play with a certain initial energy $e$ if and only if there is a formula that distinguishes the corresponding processes with a price less than or equal to $e$.
+Then the initial energy and the price of a formula encode the applying behavioural equivalences.
+Therefore, we can decide for a whole spectrum of behavioural equivalences at the same time which of them apply.
 \\\\
 Based on the paper \cite{bisping2023lineartimebranchingtime}, we formalize a game in which moves may have costs and a variant of HML.
 We check whether these two techniques actually lead to identical results and thus to the same conclusion on whether the processes have the same behavior.
