@@ -241,7 +241,7 @@ lemma hml_not_not_models[simp]:
 
 subsubsection \<open> Falsum: \<open>\<bottom>\<close> \<close>
 
-abbreviation hml_falsum :: "('a, 's) hml" ("\<bottom>\<bottom>") where
+abbreviation HML_falsum :: "('a, 's) hml" ("\<bottom>\<bottom>") where
   "\<bottom>\<bottom> \<equiv> HML_not TT"
 
 text \<open> No process ever satisfies falsum. \<close>
@@ -588,7 +588,7 @@ lemma conj_subst:
   assumes "\<psi>l \<Lleftarrow>\<and>\<Rrightarrow> \<psi>r"
       and "(Conj (I \<union> {s}) (\<lambda>i. if i = s then \<psi>l else \<psi>s i)) \<Lleftarrow>\<Rrightarrow> \<phi>"
   shows "(Conj (I \<union> {s}) (\<lambda>i. if i = s then \<psi>r else \<psi>s i)) \<Lleftarrow>\<Rrightarrow> \<phi>"
-  using assms
+  using assms 
   by (smt (verit) LTS_Tau.hml_impl_iffI hml_conjunct_eq_def hml_conjunct_impl_def hml_eq_def hml_models.simps(5))
 
 lemma pos_subst:
@@ -747,6 +747,12 @@ text \<open> \<open>\<langle>\<epsilon>\<rangle>(\<tau>)\<phi>\<close> is equiva
 lemma \<epsilon>\<tau>_is_\<tau>: "(Internal (Silent \<phi>)) \<Lleftarrow>\<Rrightarrow> (Internal \<phi>)"
   unfolding hml_eq_def 
   using hml_impl_iffI hml_models.simps(3) hml_models.simps(4) silent_reachable_append_\<tau> by blast
+
+text \<open> \<open>\<langle>\<epsilon>\<rangle>\<langle>\<epsilon>\<rangle>\<phi>\<close> is equivalent to \<open>\<langle>\<epsilon>\<rangle>\<phi>\<close> \<close>
+lemma \<epsilon>\<epsilon>_is_\<epsilon>: "(Internal (Internal \<phi>)) \<Lleftarrow>\<Rrightarrow> (Internal \<phi>)"
+  unfolding hml_eq_equality
+  using silent_reachable_trans hml_models.simps(3)
+  by (meson silent_reachable.intros(1))
 
 text \<open> \<open>\<langle>\<epsilon>\<rangle>\<top>\<close> is equivalent to \<open>\<top>\<close> \<close>
 lemma \<epsilon>T_is_T: "(Internal TT) \<Lleftarrow>\<Rrightarrow> TT"
@@ -1268,7 +1274,7 @@ lemma dist_conjunct_image_subset_all_conjuncts:
                 else \<psi>s (SOME i. i \<in> I))"
   shows "(distinguishing_conjunct I \<psi>s) ` Q \<subseteq> (\<psi>s ` I) \<union> {Pos TT}"
   apply (cases \<open>I \<noteq> {}\<close>)
-  using distinguishing_conjunct_def empty_subsetI image_eqI image_is_empty image_subsetI subset_antisym tfl_some sledgehammer
+  using distinguishing_conjunct_def empty_subsetI image_eqI image_is_empty image_subsetI subset_antisym tfl_some 
   by (smt (verit) UnI1 some_in_eq, auto)
 
 lemma models_full_models_dist_subset:
