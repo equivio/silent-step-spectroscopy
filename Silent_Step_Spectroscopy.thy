@@ -17,7 +17,7 @@ To show the other direction one can construct a (strategy) formula with an appro
 the constructive proof of \<open>winning_budget_implies_strategy_formula\<close>. From lemma 
 \<open>strategy_formulas_distinguish\<close> we then know that this formula actually distinguishes \<open>p\<close> from \<open>Q\<close>.
 \<close>
-
+text \<open>\label{th1}\<close>
 theorem spectroscopy_game_correctness:
   fixes e p Q
   shows "(\<exists>\<phi>. distinguishes_from \<phi> p Q \<and> expressiveness_price \<phi> \<le> e)
