@@ -35,7 +35,7 @@ fun wtrace_to_srbb :: "'act list \<Rightarrow> ('act, 'i) hml_srbb"
 
   "wtrace_to_conjunct tr = Pos (wtrace_to_inner tr)" \<comment> \<open>Should never happen\<close>
 
-text \<open>@{term "wtrace_to_srbb"} \<open>tr\<close> is in our modal-logical characterization of weak traces.\<close>
+text \<open>@{term "wtrace_to_srbb trace"} is in our modal-logical characterization of weak traces.\<close>
 lemma trace_to_srbb_is_trace_formula:
   "is_trace_formula (wtrace_to_srbb trace)"
   apply (induct trace)
@@ -130,6 +130,7 @@ lemma modal_depth_only_is_trace_form:
 context Inhabited_Tau_LTS
 begin                 
 
+text \<open>If a formula \<open>\<phi>\<close> is in HML$_{WT}$ and a state \<open>p\<close> models \<open>\<phi>\<close> then there exists a weak trace \<open>tr\<close> of \<open>p\<close> such that @{term "wtrace_to_srbb tr"} is equivalent to \<open>\<phi>\<close>.\<close>
 lemma trace_formula_implies_trace:
   fixes \<psi> ::"('a, 's) hml_srbb_conjunct"
   shows
@@ -450,7 +451,7 @@ next
   then show ?case by auto
 qed
 
-
+text \<open>\<open>t\<close> is a weak trace of a state \<open>p\<close> iff \<open>p\<close> models the formula obtained from @{term "wtrace_to_srbb t"}.\<close>
 lemma trace_equals_trace_to_formula: 
   "t \<in> weak_traces p = (p \<Turnstile>SRBB (wtrace_to_srbb t))"
 proof
@@ -565,7 +566,7 @@ from this(1, 2) have "p \<Zsurj>\<mapsto>\<Zsurj> a p''" unfolding weak_step_def
 qed
 qed
 
-
+text \<open>If a state \<open>p\<close> weakly trace-preorders another state \<open>q\<close>, \<open>\<phi>\<close> is in our modal-logical characterization HML$_{WT}$, and \<open>p\<close> models \<open>\<phi>\<close> then \<open>q\<close> models \<open>\<phi>\<close>.\<close>
 lemma aux:
   fixes \<phi> :: "('a, 's) hml_srbb"
   fixes \<chi> :: "('a, 's) hml_srbb_inner"
@@ -587,6 +588,10 @@ proof -
   qed
 qed 
 
+text \<open>These are the main lemmas of this Theory. They establish that the colloquial, relational notion of of weak trace preorder/equivalence 
+has the same distinctive power as the one derived from the coordinate (\<open>\<infinity>, 0, 0, 0, 0, 0, 0, 0\<close>).
+\\\\
+A state \<open>p\<close> weakly trace-preorders a state \<open>q\<close> iff it also preorders \<open>q\<close> with respect to the coordinate (\<open>\<infinity>, 0, 0, 0, 0, 0, 0, 0\<close>).\<close>
 lemma expr_preorder_characterizes_relational_preorder_traces: "(p \<lesssim>WT q) = (p \<preceq> (E \<infinity> 0 0 0 0 0 0 0) q)"
   unfolding expr_preord_def hml_preordered_def
 proof
@@ -602,6 +607,7 @@ next
     by (simp, blast+)
 qed
 
+text \<open>Two states \<open>p\<close> and \<open>q\<close> are weakly trace equivalent iff they they are equivalent with respect to the coordinate (\<open>\<infinity>, 0, 0, 0, 0, 0, 0, 0\<close>).\<close>
 lemma "(p \<simeq>WT q) = (p \<sim> (E \<infinity> 0 0 0 0 0 0 0) q)"
   unfolding weakly_trace_equivalent_def expr_equiv_def \<O>_def hml_equivalent_def hml_preordered_def
   using expr_preorder_characterizes_relational_preorder_traces
