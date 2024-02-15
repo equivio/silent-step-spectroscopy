@@ -3,9 +3,21 @@ theory Strategy_Formulas
     imports Spectroscopy_Game Expressiveness_Price
 begin
 
+text\<open>In this section we introduce strategy formulas as a tool of proving lemma \<open>spectroscopy_game_correctness\<close> 
+in section \ref{th1}. We first define strategy formulas, creating a bridge between HML formulas, the
+spectroscopy game and winning budgets. We then show that for some energy \<open>e\<close> in a winning budget there 
+exists a strategy formula with expressiveness price \<open>\<le> e\<close>. Afterwards we prove that this formula 
+actually distinguishes the corresponding processes.\<close>
+
 context full_spec_game
 begin
-
+text \<open>\label{stratFormula}\<close>
+text \<open>We define strategy formulas inductively. For example for \<open>\<langle>\<alpha>\<rangle>\<phi>\<close> to be a strategy formula for some attacker
+delayed position \<open>g\<close> with energy \<open>e\<close> the following must hold: \<open>\<phi>\<close> is a strategy formula at the from \<open> g\<close> through an observation move
+reached attacker (immediate) position with the energy \<open> e \<close> updated according to the move. Then the function 
+\<open>strategy_formula_inner g e \<langle>\<alpha>\<rangle>\<phi>\<close> returns true. Similarly every derivation rule for strategy formulas corresponds to 
+possible moves in the spectroscopy game. To account for the three different data types a HML$_{\text{srbb}}$
+formula can have in our formalization, we define three functions at the same time:\<close>
 inductive 
 strategy_formula :: "('s, 'a) spectroscopy_position \<Rightarrow> energy \<Rightarrow> ('a, 's)hml_srbb \<Rightarrow> bool"
 and strategy_formula_inner 
@@ -115,7 +127,6 @@ position, by \<open>e\<close> being in the winning budget of \<open>g\<close>, w
 the attacker can move to. If by induction the property holds true for that successor we show that it 
 then holds for \<open>g\<close> as well. (case 2)
 \<close>
-
 lemma winning_budget_implies_strategy_formula:
   fixes g e
   assumes "in_wina e g"

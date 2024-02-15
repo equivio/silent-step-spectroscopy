@@ -9,11 +9,18 @@ case of an empty set $Q$ at an attacker (immediate) position the attacker can mo
 defender conjunction position by first going delaying. These two moves combined actually have zero costs.
 \\
 The move empty\_stbl\_conj\_answer (moving from adefender stable conjunction position to a defender conjunction
-position if $Q$ is empty) with costs $e_4$ was added. This is necessary for the proof of Lemma 
-winning\_budget\_implies\_strategy\_formula in Section \ref{derivation:lemma3}. Before 
+position if $Q$ is empty) with costs $e_4$ was added. This is necessary for the proof of lemma 
+winning\_budget\_implies\_strategy\_formula in section \ref{derivation:lemma3}. Before 
 $e \in Win_a (p, \emptyset)_d^s $ was true for any energy (not equal to the defender\_win\_level), in particular $\bold{0}$. 
 Since an empty stable conjuction has costs of $e_4$ no strategy formula with an appropriate price could be constructed. 
 With the added move $e_4 \leq e $ holds true for any $e \in Win_a (p, \emptyset)_d^s $ and therefore resolves this issue.
+\\
+The changes of the weak sprectroscopy game impact the definition of strategy formulas. As shown in the proof 
+of lemma winning\_budget\_implies\_strategy\_formula in section \ref{derivation:lemma3} our definition that is close 
+to the paper still works. (For example one could choose to add a derivation rule corresponding to the move empty\_stbl\_conj\_answer to the definition 
+of strategy formulas. We instead constructed the necessary formula in the proof and used that for an empty set the rule stable\_conj could be applied.
+More detail is found in the proof in the case $Q=\emptyset$ in case 5 ($g$ being a defender stable conjunction position) 
+of case 3 ($g$ being a defender position with successors).)
 \item In lemma strategy\_formulas\_distinguish in Section \ref{derivation:lemma3} the case of $g$ being a defender branching position was adjusted: 
 When considering $g=(p,\alpha ,p', Q- Q \alpha, Q \alpha)_d^\eta$ the conditions $p \overset{\alpha}{\longrightarrow} p'$ and $Q \alpha \neq \emptyset$ were 
 added. 
