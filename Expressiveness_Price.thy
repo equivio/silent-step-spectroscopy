@@ -250,6 +250,12 @@ primrec
 
 subsection \<open>Maximal modal depth of positive clauses in conjunctions\<close>
 
+text \<open>
+Maximal modal depth of positive clauses in conjunctions.
+
+This counter calculates the modal depth for every positive clause in a conjunction (\<open>Pos \<chi>\<close>).
+\<close>
+
 primrec
       max_positive_conjunct_depth :: "('a, 's) hml_srbb \<Rightarrow> enat"
   and max_pos_conj_depth_inner :: "('a, 's) hml_srbb_inner \<Rightarrow> enat"
@@ -267,6 +273,12 @@ primrec
   "max_pos_conj_depth_conjunct (Neg \<chi>) = max_pos_conj_depth_inner \<chi>"
 
 subsection \<open>Maximal modal depth of negative clauses in conjunctions\<close>
+
+text \<open>
+Maximal modal depth of negative clauses in conjunctions.
+
+This counter calculates the modal depth for every negative clause in a conjunction (\<open>Neg \<chi>\<close>).
+\<close>
 
 primrec
       max_negative_conjunct_depth :: "('a, 's) hml_srbb \<Rightarrow> enat"
@@ -286,6 +298,15 @@ primrec
 
 subsection \<open>Depth of negations\<close>
 
+text \<open>
+Depth of negations (occurences of \<open>Neg \<chi>\<close> on a path of the syntax tree).
+
+This counter is increased on each:
+\begin{itemize}
+  \item \<open>Neg \<chi>\<close>
+\end{itemize}
+\<close>
+
 primrec
       negation_depth :: "('a, 's) hml_srbb \<Rightarrow> enat"
   and neg_depth_inner :: "('a, 's) hml_srbb_inner \<Rightarrow> enat"
@@ -304,7 +325,7 @@ primrec
 
 subsection \<open>Expressiveness price function\<close>
 
-text \<open>This combines the eight function to the @{term "expressiveness_price"} function mentioned above.\<close>
+text \<open>This combines the eight functions to the @{term "expressiveness_price"} function mentioned above.\<close>
 
 fun expressiveness_price :: "('a, 's) hml_srbb \<Rightarrow> energy" where
   "expressiveness_price \<phi> = E (modal_depth_srbb            \<phi>)
@@ -316,7 +337,7 @@ fun expressiveness_price :: "('a, 's) hml_srbb \<Rightarrow> energy" where
                               (max_negative_conjunct_depth \<phi>)
                               (negation_depth              \<phi>)"
 
-text \<open>Here we can see the price of an immediate conjunction.\<close>
+text \<open>Here we can see the decomposed price of an immediate conjunction.\<close>
 lemma expressiveness_price_ImmConj_def:
   shows "expressiveness_price (ImmConj I \<psi>s) = E 
     (Sup ((modal_depth_srbb_conjunct \<circ> \<psi>s) ` I))
@@ -354,7 +375,7 @@ definition \<O> :: "energy \<Rightarrow> (('a, 's) hml_srbb) set" where
   "\<O> energy \<equiv> {\<phi> . expressiveness_price \<phi> \<le> energy}"
 
 text \<open>Formalizing HML$_{SRBB}$ by mutually recursive data types leads to expressiveness price functions of these other types,
-namely @{term "expr_pr_inner"} and @{term "expr_pr_conjunct"} and corresponding definitions and lemmas.\<close>
+namely @{term "expr_pr_inner"} and @{term "expr_pr_conjunct"}, and corresponding definitions and lemmas.\<close>
 
 fun expr_pr_inner :: "('a, 's) hml_srbb_inner \<Rightarrow> energy" where
   "expr_pr_inner \<chi> = E (modal_depth_srbb_inner \<chi>)
@@ -392,7 +413,7 @@ subsection \<open>Prices of certain formulas\<close>
 
 text \<open>
 We demonstrate the pricing mechanisms for various formulas. These proofs operate under the assumption of an expressiveness price \<open>e\<close> for a given formula \<open>\<chi>\<close> and proceed to determine the price of a derived formula, such as \<open>Pos \<chi>\<close>. 
-The proofs all are of a similar nature. They systematically break down the expression function(s) into their constituent parts and apply their definitions to the constructed formula \<open>(Pos \<chi>)\<close>.\<close>
+The proofs all are of a similar nature. They break down the expression function(s) into their constituent parts and apply their definitions to the constructed formula (\<open>(Pos \<chi>)\<close>).\<close>
 
 context full_spec_game
 begin
