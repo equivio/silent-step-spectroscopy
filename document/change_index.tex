@@ -1,7 +1,13 @@
 \section{Index of Changes}
 \begin{itemize}
     \item In \ref{deviation:eneg} energies are extended to include a negative inhabitant. 
-    \item  In lemma winning\_budget\_implies\_strategy\_formula in \ref{derivation:lemma2} a different kind of induction is used compared to the paper 
+    \item In our definition of the spectroscopy game we changed the conditions of the observation move. 
+    Instead of $p \overset{\alpha}{\longrightarrow}p'$, $Q \overset{\alpha}{\longrightarrow} Q'$ and $\alpha \neq \tau$
+    we allow an observation move if  $p \overset{(\alpha)}{\longrightarrow}p'$, $Q \overset{(\alpha)}{\longrightarrow} Q'$.
+    This is necessary due to our formalization of HML_{SRBB}. We believe this to have the same distinguishing power 
+    since observations only occur after internal behaviour. However we omitted a proof. 
+    This changes results in a similar change of the corresponding derivation rule for strategy formulas.
+    \item In lemma winning\_budget\_implies\_strategy\_formula in \ref{derivation:lemma2} a different kind of induction is used compared to the paper 
     where we only look at direct successors and therefore added the not too interesting case of g being an 
     attacker branching position which was omitted in the paper.
    \item In lemma strategy\_formulas\_distinguish in  \ref{derivation:lemma3} we added a case to account for the difference between 
