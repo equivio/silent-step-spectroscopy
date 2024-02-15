@@ -62,7 +62,9 @@ have required an index type \<open>'i\<close> and wouldn't need the data constru
 Approach \ref{lbl:set_conj} is rejected by Isabelle, since \<open>set\<close> is not a bounded natural functor.
 In particular, the \<open>set\<close> functor violates the boundedness condition of BNF, which is that there must
 be a fixed upper bound to the cardinality of the types resulting from the \<open>set\<close> functor. Such an
-upper bound can not exist due to Cantor's theorem. 
+upper bound can not exist due to Cantor's theorem. \footnote{We'd like to thank Robin Cogan for
+helping us figure this out as well as helping a lot with the initial formalization of HML as well as
+HML-SRBB.}
 \\
 \\
 Approach \ref{lbl:cset_conj} does not present this issue and is accepted by Isabelle. \cite{Pohlmann2021ReducingReactive}
