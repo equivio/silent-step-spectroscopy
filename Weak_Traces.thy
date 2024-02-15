@@ -6,11 +6,11 @@ begin
 text \<open>The inductive @{term "is_trace_formula"} represents the modal-logical characterization of weak traces HML$_{WT}$.
 In particular:
 \begin{itemize}
-  \item $\top \in HML$_{WT}$ encoded by  @{term "is_trace_formula"} \<open>TT\<close>, @{term "is_trace_formula"} @{term "(ImmConj I \<psi>s)"} if \<open>I = {}\<close> and @{term "is_trace_formula"} @{term "(Conj I \<psi>s)"} if \<open>I = {}.\<close>.
+  \item $\top \in$ HML$_{WT}$ encoded by  @{term "is_trace_formula"} \<open>TT\<close>, @{term "is_trace_formula"} @{term "(ImmConj I \<psi>s)"} if \<open>I = {}\<close> and @{term "is_trace_formula"} @{term "(Conj I \<psi>s)"} if \<open>I = {}.\<close>.
   \item \<open>\<langle>\<epsilon>\<rangle>\<chi>\<close> $\in$ HML$_{WT}$ if \<open>\<phi>\<close> $\in$ HML$_{WT}$ encoded by @{term "is_trace_formula"} @{term "(Internal \<chi>)"} if @{term "is_trace_formula"} \<open>\<chi>\<close>.
   \item \<open>(\<alpha>)\<phi>\<close> $\in$ HML$_{WT}$ if \<open>\<phi>\<close> $\in$ HML$_{WT}$ encoded by @{term "is_trace_formula"} @{term "(Obs \<alpha> \<phi>)"} if @{term "is_trace_formula"} \<open>\<phi>\<close>.
   \item \<open>\<And>{(\<alpha>)\<phi>} \<union> \<Psi>\<close> $\in$ HML$_{WT}$ if \<open>\<phi>\<close> $\in$ HML$_{WT}$ and \<open>\<Psi> = {}\<close> encoded by @{term "is_trace_formula"} @{term "(BranchConj \<alpha> \<phi> I \<psi>s)"} if @{term "is_trace_formula"} \<open>\<phi>\<close> and \<open>I = {}\<close>.
-\<close>
+\end{itemize}\<close>
 
 inductive
       is_trace_formula :: "('act, 'i) hml_srbb \<Rightarrow> bool"
