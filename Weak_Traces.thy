@@ -3,6 +3,15 @@ theory Weak_Traces
   imports Main HML_SRBB Expressiveness_Price
 begin
 
+text \<open>The inductive @{term "is_trace_formula"} represents the modal-logical characterization of weak traces HML$_{WT}$.
+In particular:
+\begin{itemize}
+  \item $\top \in HML$_{WT}$ encoded by  @{term "is_trace_formula"} \<open>TT\<close>, @{term "is_trace_formula"} @{term "(ImmConj I \<psi>s)"} if \<open>I = {}\<close> and @{term "is_trace_formula"} @{term "(Conj I \<psi>s)"} if \<open>I = {}.\<close>.
+  \item \<open>\<langle>\<epsilon>\<rangle>\<chi>\<close> $\in$ HML$_{WT}$ if \<open>\<phi>\<close> $\in$ HML$_{WT}$ encoded by @{term "is_trace_formula"} @{term "(Internal \<chi>)"} if @{term "is_trace_formula"} \<open>\<chi>\<close>.
+  \item \<open>(\<alpha>)\<phi>\<close> $\in$ HML$_{WT}$ if \<open>\<phi>\<close> $\in$ HML$_{WT}$ encoded by @{term "is_trace_formula"} @{term "(Obs \<alpha> \<phi>)"} if @{term "is_trace_formula"} \<open>\<phi>\<close>.
+  \item \<open>\<And>{(\<alpha>)\<phi>} \<union> \<Psi>\<close> $\in$ HML$_{WT}$ if \<open>\<phi>\<close> $\in$ HML$_{WT}$ and \<open>\<Psi> = {}\<close> encoded by @{term "is_trace_formula"} @{term "(BranchConj \<alpha> \<phi> I \<psi>s)"} if @{term "is_trace_formula"} \<open>\<phi>\<close> and \<open>I = {}\<close>.
+\<close>
+
 inductive
       is_trace_formula :: "('act, 'i) hml_srbb \<Rightarrow> bool"
   and is_trace_formula_inner :: "('act, 'i) hml_srbb_inner \<Rightarrow> bool" where
@@ -14,7 +23,7 @@ inductive
   "is_trace_formula_inner (Conj I \<psi>s)" if "I = {}" |
   "is_trace_formula_inner (BranchConj \<alpha> \<phi> I \<psi>s)" if "I = {}" and "is_trace_formula \<phi>"
 
-
+text \<open>We define a function that translates a (weak) trace \<open>tr\<close> to a formula \<open>\<phi>\<close> such that a state \<open>p\<close> models \<open>\<phi>\<close>, \<open>p \<Turnstile> \<phi>\<close> iff \<open>tr\<close> is a (weak) trace of \<open>p\<close>.\<close>
 fun wtrace_to_srbb :: "'act list \<Rightarrow> ('act, 'i) hml_srbb"
   and wtrace_to_inner :: "'act list \<Rightarrow> ('act, 'i) hml_srbb_inner"
   and wtrace_to_conjunct :: "'act list \<Rightarrow> ('act, 'i) hml_srbb_conjunct" where
@@ -26,6 +35,7 @@ fun wtrace_to_srbb :: "'act list \<Rightarrow> ('act, 'i) hml_srbb"
 
   "wtrace_to_conjunct tr = Pos (wtrace_to_inner tr)" \<comment> \<open>Should never happen\<close>
 
+text \<open>@{term "wtrace_to_srbb"} \<open>tr\<close> is in our modal-logical characterization of weak traces.\<close>
 lemma trace_to_srbb_is_trace_formula:
   "is_trace_formula (wtrace_to_srbb trace)"
   apply (induct trace)
@@ -35,6 +45,8 @@ lemma trace_to_srbb_is_trace_formula:
     and wtrace_to_inner.simps(2)
     and wtrace_to_srbb.simps(2)
   by fastforce+
+
+text \<open>The following three lemmas show that the modal-logical characterization of HML$_{WT}$ corresponds to the sublanguage of HML$_SRBB$, obtain by the energy coordinates \<open>(\<infinity>, 0, 0, 0, 0, 0, 0, 0)\<close>.\<close>
 
 lemma trace_formula_to_expressiveness:
   fixes \<phi> :: "('act, 'i) hml_srbb"
