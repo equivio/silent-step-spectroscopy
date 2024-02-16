@@ -1,14 +1,15 @@
 \section{Index of Changes}
 \begin{itemize}
     \item In \ref{deviation:eneg} energies are extended to include a negative inhabitant. 
-    \item Since a formalization of infinite plays was not needed we did not include one. While the same could be said about finite plays we formalized those to check our definition of energy games. 
+    \item Since a formalization of infinite plays was not needed we did not include one. While the 
+same could be said about finite plays we formalized those to check our definition of energy games.
+    \item We ommited a definition of winning a game and instead we only made statements about winning budgets. 
+(By declaring all infinite plays to be won by the defender as done in \cite{bisping2023lineartimebranchingtime}, 
+there always exists a winner and the attacker wins a game if and only if the starting energy is in the winning budget of the starting position.)
     \item In \cite{bisping2023lineartimebranchingtime} the winning budget of a state in an energy game 
 is defined as the set of all starting energies such that there exists a winning strategy for the attacker 
 when starting from that state. Our formalization does not define attacker winning strategies and instead 
 uses the characterization by proposition 2 \cite[p. 9]{bisping2023lineartimebranchingtime} as the definition of winning budgets.
-We also omitted an explicit definition of winning a game and implicitly assumed that there 
-always exists a winner and the attacker wins if and only if the starting energy is in the winning budget of the starting position. This holds by declaring all
-infinite plays to be won by the defender. A proof is given in the paper. 
     \item In our definition of the spectroscopy game we changed the conditions of the observation move. 
     Instead of $p \overset{\alpha}{\longrightarrow}p'$, $Q \overset{\alpha}{\longrightarrow} Q'$ and $\alpha \neq \tau$
     we allow an observation move if  $p \overset{(\alpha)}{\longrightarrow}p'$, $Q \overset{(\alpha)}{\longrightarrow} Q'$.
