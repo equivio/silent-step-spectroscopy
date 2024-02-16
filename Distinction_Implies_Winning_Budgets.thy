@@ -72,7 +72,7 @@ text \<open>Next we show the statement for the case that @{term "Q \<noteq> {}"}
     we can conclude that @{term "Q = {}"}.
     But adding this assumption allows us to directly apply the induction hypothesis. Without
     further having to do this case distinction.\label{deviation:lemma1_Q_a}
-    The induction itself is then done via the rule \<open>indict\<close> on\\\<open>hml_srbb_hml_srbb_inner_hml_srbb_conjunct\<close>.
+    The induction itself is then done via the rule \<open>induct\<close> on\\\<open>hml_srbb_hml_srbb_inner_hml_srbb_conjunct\<close>.
     The parts of this proof that are completed work as described in the paper.
     A notable exceptions to this is that we also have to prove the statement for the 
     formula @{term "TT"}\label{deviation:lemma1TT}. This holds trivialy as @{term "TT"} does not distinguishes any @{term "p"} from any
