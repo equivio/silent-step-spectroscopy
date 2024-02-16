@@ -1,12 +1,18 @@
+section\<open>Instantiation of an Energy Game\<close>
+
 theory Example_Instantiation
   imports Energy_Games "HOL-Library.Extended_Nat"
 begin
-text \<open>In this theory we create an instantiation of energy game to test our definitions.\<close>
-text \<open>Based on our definition of energy  with eight dimensions, we first define energy..\<close>
+text \<open>In this theory we create an instantiation of a two-dimensional energy game to test our definitions.\<close>
+
+subsection\<open>Two-dimensional Energies\<close>
+
+text \<open>We first define energies in a similar manner to our definition of energies with eight dimensions: 
+We use \<open>eneg\<close> when the energy level is equal to or lower than the \<open>defender_win_level\<close>. We define 
+component-wise subtraction and the update \<open>min_update\<close> where the first component is replaced by the minimum of both entries.\<close>
+
 datatype energy = E (one: "enat") (two: "enat") | eneg
 
-text \<open>We define the following definitions and abbreviations to update our energy levels.
-Note that we always use "eneg" when the energy level is equal to or lower than the "defender win level".\<close>
 instantiation energy :: minus
 begin
 abbreviation "direct_minus e1 e2 \<equiv> E ((one e1) - (one e2)) ((two e1) - (two e2))"
@@ -28,6 +34,8 @@ definition "min_update e1 \<equiv> if (e1 = eneg) then eneg else  E (min (one e1
 
 lemma min_update[simp]:
   shows "min_update (E a b) = E (min a b) b" unfolding min_update_def using energy.sel by fastforce
+
+subsection\<open>Energy Game Example\<close>
 
 text \<open>In preparation for our instantiation we define our states, the updates for our energy levels and which states are defender positions.\<close>
 datatype state = a | b1 | b2 | c | d1 | d2 | e
@@ -51,6 +59,8 @@ fun defender :: "state \<Rightarrow> bool" where
   "defender c = True" |
   "defender e = True" |
   "defender _ = False"
+
+text\<open>Now we can state our energy game example:\<close>
 
 interpretation Game: energy_game "weight_opt" "defender" "eneg" "order" 
 proof
@@ -168,9 +178,11 @@ lemma moves:
        "\<not>(c \<Zinj> e)" "\<not>(e \<Zinj> d1)"
   by simp+
 
-text\<open>In the following we check our definition of finite play with two examples: one that is a finite play and one that is not.
-We also look at the "behavior" of our finite game definition if we change the starting position.\<close>
-lemma Game_finite_play_example:
+subsection\<open>Checking Definitions\<close>
+
+text\<open>Now we check our definition of finite plays with two examples: one that is a finite play and one that is not.
+Afterwards we check the "behavior" of our definition when changing the starting position.\<close>
+lemma finite_play_example:
   shows "finite_play a [a, b2, c, d1, e]"
 proof-
   have "finite_play a [a]" by (rule Game.finite_play.intros(1))
@@ -180,16 +192,16 @@ proof-
   thus "finite_play a [a, b2, c, d1, e]" using  Game.finite_play.intros(2) by fastforce
 qed
 
-lemma Game_finite_play_counterexample:
+lemma finite_play_counterexample:
   shows "\<not>finite_play a [a, b2, e, d1, e]"
   using Game.finite_play.intros Game.finite_play_is_path
   by (metis append_Cons append_Nil last_snoc list.distinct(1) weight_opt.simps(20)) 
 
-lemma Game_finite_play_check:
+lemma finite_play_check:
   shows "\<not>finite_play b2 [a, b2, c, d1, e]"
   by (metis Game.finite_play.cases Game.finite_play_prefix append.left_neutral append_Cons last_ConsL last_appendR not_Cons_self2 state.distinct(3) weight_opt.simps(39))
 
-lemma Game_finite_play_check_2:
+lemma finite_play_check_2:
   assumes "x\<noteq>a"
   shows "\<not>finite_play x [a, b2, c, d1, e]" 
 proof (rule notI)
@@ -201,8 +213,10 @@ proof (rule notI)
   from A1 A3 show "False" by simp
 qed
 
+text \<open>To check our calculation of energy levels, we look at different plays and their energy levels using the following lemmas.\<close>
+
 abbreviation "energy_level \<equiv> Game.energy_level"
-text \<open>To check our calculation of energy levels, we look at different games and their energy levels using the following lemmas.\<close>
+
 lemma energy_level_example:
   shows "energy_level a (E 10 10) [a, b2, c, d1, e] = E 9 8"
 proof-
@@ -234,17 +248,18 @@ lemma energy_level_example_4:
   shows "energy_level a (E 10 10) [c] = undefined"
   using Game.energy_level.elims Game.energy_level.pelims by simp
 
-text \<open>We also take a look at our definition of no move using different examples of plays.
-In particular we check our definition regarding invalid games.\<close>
+text \<open>We also take a look at our definition of \<open>no_move\<close> using different examples of plays.
+In particular we check our definition regarding invalid plays.\<close>
+
 lemma no_move_example:
   shows "Game.no_move a [a, b2, c, d1, e]"
-  by (metis Game.finite_play_is_path Game.finite_play_suffix2 Game_finite_play_example append_Cons append_Nil last_ConsL list.distinct(1) weight_opt.simps(38))
+  by (metis Game.finite_play_is_path Game.finite_play_suffix2 finite_play_example append_Cons append_Nil last_ConsL list.distinct(1) weight_opt.simps(38))
  
 lemma no_move_example2:
   shows "\<not>(Game.no_move a [a, b2, c])"
 proof (-) 
   have "finite_play a ([a, b2, c] @ [d1])"
-    by (metis Game.finite_play_suffix Game_finite_play_example append_Cons append_Nil list.distinct(1))
+    by (metis Game.finite_play_suffix finite_play_example append_Cons append_Nil list.distinct(1))
   thus "\<not>(Game.no_move a [a, b2, c])" by auto
 qed
 lemma no_move_invalid_game: 
@@ -255,7 +270,8 @@ lemma no_move_invalid_game_1:
   shows "\<not>Game.no_move a [a, b2, b1]"
   by (metis Game.finite_play.cases butlast.simps(2) butlast_snoc last.simps last_snoc list.discI weight_opt.simps(16))
 
-text \<open>In the following we look at play examples and check who wins the corresponding game.\<close>
+text \<open>In the following we look at examples of plays and check who wins.\<close>
+
 lemma attacker_wins_example:
   shows "Game.won_by_attacker a (E 10 10) [a, b2, c, d1, e]"
   using no_move_example energy_level_example
@@ -275,26 +291,27 @@ using assms proof -
   hence "(\<exists>gn. finite_play a (p @ [gn]))" using assms(1) Game.finite_play.intros(2) by blast 
   thus "\<not>Game.no_move a p" by simp
 qed
-text \<open>Finally, we verify our definition of win\_a using scenarios where we expect the attacker to have a winning strategy (or not).\<close>
 
-lemma attackers_winas_defender_stuck:
+text \<open>Finally, we verify our definition of wining budgets.\<close>
+
+lemma wina_of_e:
   shows "Game.in_wina (E 9 8) e"
   by (simp add: Game.in_wina.intros(1))
 
-lemma attacker_has_wina_example:
+lemma wina_of_e_exist:
   shows "\<exists>e1. Game.in_wina e1 e" 
-  using attackers_winas_defender_stuck by blast
+  using wina_of_e by blast
 
-lemma attackers_winas_defender_stuck_gen: 
+lemma attacker_wins_at_e: 
   shows "\<forall>e'. e' \<noteq> eneg \<longrightarrow> Game.in_wina e' e"
   by (simp add: Game.in_wina.intros(1))
 
-lemma attacker_winas_example_attacker:
+lemma wina_of_d1:
   shows "Game.in_wina (E 9 8) d1" 
 proof -
   have A1: "\<not>(defender d1)" by simp
   have A2: "d1 \<Zinj> e" by simp
-  have A3: "Game.in_wina (E 9 8) e" by (rule attackers_winas_defender_stuck)
+  have A3: "Game.in_wina (E 9 8) e" by (rule wina_of_e)
   have "Game.weight d1 e = id"by simp
   hence "(Game.weight d1 e (E 9 8)) = E 9 8 " by simp
   hence "(Game.in_wina (((Game.weight d1 e (E 9 8)))) e)" using A3 by simp
@@ -303,12 +320,12 @@ proof -
   thus "Game.in_wina (E 9 8) d1" using Game.in_wina.intros(2) by blast 
 qed
 
-lemma attacker_winas_example_attacker_2:
+lemma wina_of_d2:
   shows "Game.in_wina (E 8 9) d2" 
 proof -
   have A1: "\<not>(defender d2)" by simp
   have A2: "d2 \<Zinj> e" by simp
-  have A3: "Game.in_wina (E 8 9) e" by (simp add: attackers_winas_defender_stuck_gen)
+  have A3: "Game.in_wina (E 8 9) e" by (simp add: attacker_wins_at_e)
   have "Game.weight d2 e = id"by simp
   hence "(Game.weight d2 e (E 8 9)) = E 8 9 " by simp
   hence "(Game.in_wina (((Game.weight d2 e (E 8 9)))) e)" using A3 by simp
@@ -317,14 +334,14 @@ proof -
   thus "Game.in_wina (E 8 9) d2" using Game.in_wina.intros(2) by blast 
 qed
 
-lemma defender_not_stuck_wina:
+lemma wina_of_c:
   shows "Game.in_wina (E 9 9) c"
 proof -
   have A1: "defender c" by auto
   have A2: "\<forall>g'. (c \<Zinj> g') \<longrightarrow> (g' = d1 \<or> g' = d2)"
     by (metis moves(9) state.exhaust weight_opt.simps(21) weight_opt.simps(22) weight_opt.simps(23) weight_opt.simps(24))
-  have A3: "Game.in_wina (E 9 8) d1" using attacker_winas_example_attacker by blast
-  have A4: "Game.in_wina (E 8 9) d2" using attacker_winas_example_attacker_2 by blast
+  have A3: "Game.in_wina (E 9 8) d1" using wina_of_d1 by blast
+  have A4: "Game.in_wina (E 8 9) d2" using wina_of_d2 by blast
 
   have "\<not>order (E 9 9) (E 0 1)" by simp
   hence "(E 9 9 - (E 0 1)) = E ((one (E 9 9)) - (one (E 0 1))) ((two (E 9 9)) - (two (E 0 1)))" using minus_energy_def
@@ -352,7 +369,7 @@ proof -
 qed
 
 
-lemma attacker_does_not_win_example:
+lemma not_wina_of_c:
   shows "\<not>Game.in_wina (E 0 0) c"
 proof -
   have "order (E 0 0) (E 0 1)" by simp
