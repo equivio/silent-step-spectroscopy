@@ -1,4 +1,4 @@
-section \<open>LTS\<close>
+section \<open>LTS \label{sect:LTS}\<close>
 theory LTS
   imports Main
 begin

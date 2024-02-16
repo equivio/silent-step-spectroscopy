@@ -76,6 +76,15 @@ Defining it via translation to @{term "hml"} allows (and forces) us to reuse the
 properties of @{term "hml"}.
 \<close>
 
+subsubsection \<open> Mapping \<open>hml_srbb\<close> to \<open>hml\<close> \<close>
+
+text \<open>
+We ensure that @{term "hml_srbb"} is a subset of @{term "hml"} by mapping each constructor of
+@{term "hml_srbb"} to a composition of constructors of @{term "hml"}.  This mapping is straight
+forward when viewing above interpretation of the data constructors of @{term "hml_srbb"}. The only
+clause of note is the translation of the @{term "Obs"} data constructor of type @{term "hml_srbb_inner"}.
+\<close>
+
 context Inhabited_Tau_LTS
 begin
 
@@ -115,6 +124,19 @@ where
   "hml_srbb_conjunct_to_hml_conjunct (Neg \<chi>) =
     hml_conjunct.Neg (hml.Internal (hml_srbb_inner_to_hml \<chi>))"
 
+text \<open>
+Given this translation we may now note that the HML-SRBB subset diverges significantly from the one
+given in \cite{bisping2023lineartimebranchingtime}. Specifically, Bisping et al allow for true observation
+clauses $\langle \alpha \rangle$ under the non-terminal $\chi$ with the side condition that $\alpha \neq \tau$,
+while we instead opted to allow for 'soft observations' $(\alpha)$ in the corresponding type @{term "hml_srbb_inner"},
+without any constraint on $\alpha$.  We choose to do so, since we are unable to express the side
+condition $\alpha \neq \tau$ at type level. This is rooted in the way in which we defined $\tau$ as
+being a fixed but otherwise arbitrary inhabitant of the label type \<open>'a\<close> (c.f. section \ref{sect:LTS}).
+For an alternative definition of $\tau$ which allows for type level distinction of $\tau$ from all other
+labels reference appendix \ref{appndx:LTSOptTau}.
+\<close>
+
+subsubsection \<open> The Models Relation \<open>\<Turnstile>\<close> for \<open>hml_srbb\<close> \<close>
 
 fun hml_srbb_models :: "'s \<Rightarrow> ('a, 's) hml_srbb \<Rightarrow> bool" (infix "\<Turnstile>SRBB" 60)where
   "hml_srbb_models state formula = (state \<Turnstile> (hml_srbb_to_hml formula))"
@@ -125,6 +147,8 @@ fun hml_srbb_inner_models :: "('a, 's) hml_srbb_inner \<Rightarrow> 's \<Rightar
 fun hml_srbb_conjunct_models :: "('a, 's) hml_srbb_conjunct \<Rightarrow> 's \<Rightarrow> bool" where
   "hml_srbb_conjunct_models \<psi> s = (hml_conjunct_models s (hml_srbb_conjunct_to_hml_conjunct \<psi>))"
 
+
+subsubsection \<open> The Semantic Function \<open>\<lbrakk> \<rbrakk>\<close> for \<open>hml_srbb\<close> \<close>
 
 abbreviation model_set :: "('a, 's) hml_srbb \<Rightarrow> 's set" where
   "model_set \<phi> \<equiv> {p. p \<Turnstile>SRBB \<phi>}"
