@@ -1,6 +1,11 @@
 \section{Index of Changes}
 \begin{itemize}
     \item In \ref{deviation:eneg} energies are extended to include a negative inhabitant. 
+    \item In the paper the winning budget of $g$ w.r.t. some game $G$ is defined as the set of all starting energies $e$ such that when starting in $g$ 
+the game is won by the attacker, which means a winning strategy for the attacker exists. In our formalization we did not define (winning) strategies
+and instead used proposition 2 as a definition of winning budgets. We also omitted an explicit definition of winning a game and implicitly assumed that there 
+always exists a winner and the attacker wins if and only if the starting energy is in the winning budget of the starting position. This holds by declaring all
+infinite plays to be won by the defender. A proof is given in the paper. 
     \item In our definition of the spectroscopy game we changed the conditions of the observation move. 
     Instead of $p \overset{\alpha}{\longrightarrow}p'$, $Q \overset{\alpha}{\longrightarrow} Q'$ and $\alpha \neq \tau$
     we allow an observation move if  $p \overset{(\alpha)}{\longrightarrow}p'$, $Q \overset{(\alpha)}{\longrightarrow} Q'$.
