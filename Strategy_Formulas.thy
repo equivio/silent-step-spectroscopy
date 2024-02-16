@@ -3,9 +3,21 @@ theory Strategy_Formulas
     imports Spectroscopy_Game Expressiveness_Price
 begin
 
+text\<open>In this section we introduce strategy formulas as a tool of proving lemma \<open>spectroscopy_game_correctness\<close> 
+in section \ref{th1}. We first define strategy formulas, creating a bridge between HML formulas, the
+spectroscopy game and winning budgets. We then show that for some energy \<open>e\<close> in a winning budget there 
+exists a strategy formula with expressiveness price \<open>\<le> e\<close>. Afterwards we prove that this formula 
+actually distinguishes the corresponding processes.\<close>
+
 context full_spec_game
 begin
-
+text \<open>\label{stratFormula}\<close>
+text \<open>We define strategy formulas inductively. For example for \<open>\<langle>\<alpha>\<rangle>\<phi>\<close> to be a strategy formula for some attacker
+delayed position \<open>g\<close> with energy \<open>e\<close> the following must hold: \<open>\<phi>\<close> is a strategy formula at the from \<open> g\<close> through an observation move
+reached attacker (immediate) position with the energy \<open> e \<close> updated according to the move. Then the function 
+\<open>strategy_formula_inner g e \<langle>\<alpha>\<rangle>\<phi>\<close> returns true. Similarly every derivation rule for strategy formulas corresponds to 
+possible moves in the spectroscopy game. To account for the three different data types a HML$_{\text{srbb}}$
+formula can have in our formalization, we define three functions at the same time:\<close>
 inductive 
 strategy_formula :: "('s, 'a) spectroscopy_position \<Rightarrow> energy \<Rightarrow> ('a, 's)hml_srbb \<Rightarrow> bool"
 and strategy_formula_inner 
@@ -102,17 +114,39 @@ where
           \<and> in_wina (e - (E 0 1 1 0 0 0 0 0)) (Attacker_Clause p q)
           \<and> strategy_formula_conjunct (Attacker_Clause p q) (e - (E 0 1 1 0 0 0 0 0)) (\<Phi> q)"
 
+text \<open>To proof \<open>spectroscopy_game_correctness\<close> we need the following implication:
+If \<open>e\<close> is in the winning budget of \<open>Attacker_Immediate p Q\<close>, there is a strategy formula \<open>\<phi>\<close> for
+\<open>Attacker_Immediate p Q\<close> with energy \<open>e\<close> with expressiveness price \<open>\<le> e\<close>. 
+\\
+\\
+We prove a more detailed result for all possible game positions \<open>g\<close> by induction over the structure of winning budgets:\label{derivation:lemma2}
+\\
+We first show that the statement holds if \<open>g\<close> has no outgoing edges. (case 1) This can only be the case for 
+defender positions. If a defender position \<open>g\<close> has outgoing edges and the statement holds true for all successors we show that the statement holds true for \<open>g\<close> as well. (case 3) If \<open>g\<close> is an attacker 
+position, by \<open>e\<close> being in the winning budget of \<open>g\<close>, we know there exists a successor of \<open>g\<close> that 
+the attacker can move to. If by induction the property holds true for that successor we show that it 
+then holds for \<open>g\<close> as well. (case 2)
+\<close>
 lemma winning_budget_implies_strategy_formula:
   fixes g e
   assumes "in_wina e g"
   shows
-    "(\<exists>p Q. g = Attacker_Immediate p Q) \<Longrightarrow> (\<exists>\<phi>. strategy_formula g e \<phi> \<and> expressiveness_price \<phi> \<le> e)"
-    "(\<exists>p Q. g = Attacker_Delayed p Q) \<Longrightarrow> (\<exists>\<phi>. strategy_formula_inner g e \<phi> \<and> expr_pr_inner \<phi> \<le> e)"
-    "(\<exists>p q. g = Attacker_Clause p q) \<Longrightarrow> (\<exists>\<phi>. strategy_formula_conjunct g e \<phi> \<and> expr_pr_conjunct \<phi> \<le> e)"
-    "(\<exists>p Q. g = Defender_Conj p Q) \<Longrightarrow> (\<exists>\<phi>. strategy_formula_inner g e \<phi> \<and> expr_pr_inner \<phi> \<le> e)"
-    "(\<exists>p Q. g =  Defender_Stable_Conj p Q) \<Longrightarrow> (\<exists>\<phi>. strategy_formula_inner g e \<phi> \<and> expr_pr_inner \<phi> \<le> e)"
-    "(\<exists>p \<alpha> p' Q Qa. g = Defender_Branch p \<alpha> p' Q Qa) \<Longrightarrow> (\<exists>\<phi>. strategy_formula_inner g e \<phi> \<and> expr_pr_inner \<phi> \<le> e)"
-    "(\<exists>p Q. g = Attacker_Branch p Q) \<Longrightarrow> \<exists>p Q. (g = Attacker_Branch p Q \<and> (\<exists>\<phi>. strategy_formula (Attacker_Immediate p Q) (e- E 1 0 0 0 0 0 0 0) \<phi> \<and> expressiveness_price \<phi> \<le> (e- E 1 0 0 0 0 0 0 0)))"
+    "(\<exists>p Q. g = Attacker_Immediate p Q)
+        \<Longrightarrow> (\<exists>\<phi>. strategy_formula g e \<phi> \<and> expressiveness_price \<phi> \<le> e)"
+    "(\<exists>p Q. g = Attacker_Delayed p Q) 
+        \<Longrightarrow> (\<exists>\<phi>. strategy_formula_inner g e \<phi> \<and> expr_pr_inner \<phi> \<le> e)"
+    "(\<exists>p q. g = Attacker_Clause p q)  
+        \<Longrightarrow> (\<exists>\<phi>. strategy_formula_conjunct g e \<phi> \<and> expr_pr_conjunct \<phi> \<le> e)"
+    "(\<exists>p Q. g = Defender_Conj p Q) 
+        \<Longrightarrow> (\<exists>\<phi>. strategy_formula_inner g e \<phi> \<and> expr_pr_inner \<phi> \<le> e)"
+    "(\<exists>p Q. g =  Defender_Stable_Conj p Q)
+        \<Longrightarrow> (\<exists>\<phi>. strategy_formula_inner g e \<phi>  \<and> expr_pr_inner \<phi> \<le> e)"
+    "(\<exists>p \<alpha> p' Q Qa. g = Defender_Branch p \<alpha> p' Q Qa) 
+        \<Longrightarrow> (\<exists>\<phi>. strategy_formula_inner g e \<phi> \<and> expr_pr_inner \<phi> \<le> e)"
+    "(\<exists>p Q. g = Attacker_Branch p Q) 
+        \<Longrightarrow> \<exists>p Q. (g = Attacker_Branch p Q 
+              \<and> (\<exists>\<phi>. strategy_formula (Attacker_Immediate p Q) (e- E 1 0 0 0 0 0 0 0) \<phi> 
+              \<and> expressiveness_price \<phi> \<le> (e- E 1 0 0 0 0 0 0 0)))"
 using assms proof(induction rule: in_wina.induct)
   case (1 g e)
   {
@@ -1039,6 +1073,20 @@ next
   }
 qed
 
+text \<open>To proof \<open>spectroscopy_game_correctness\<close> we need the following implication:
+If \<open>\<phi>\<close> is a strategy formula for \<open>Attacker_Immediate p Q\<close> with energy \<open>e\<close>, then \<open>\<phi>\<close> distinguishes 
+\<open>p\<close> from \<open>Q\<close>. 
+\\
+\\
+We prove a more detailed result for all possible game positions \<open>g\<close> by induction. (Note that the 
+case of \<open>g\<close> being an attacker branching position is not explicitly needed as part of the induction
+hypothesis but is proven as a part of case \<open>branch_conj\<close>.) The induction relies on the inductive 
+structure of strategy formulas. 
+\\
+Since our formalization differentiates immediate conjunctions and conjunctions two \<open>Defender_Conj\<close> 
+cases are necessary. Specifically the strategy construction rule \<open>early_conj\<close> uses immediate 
+conjunctions while \<open>late_conj\<close> uses conjunctions. \label{derivation:lemma3}
+\<close>
 
 lemma strategy_formulas_distinguish:
   shows "(strategy_formula g e \<phi> \<longrightarrow>
@@ -1051,8 +1099,10 @@ lemma strategy_formulas_distinguish:
         (case g of
        Attacker_Delayed p Q \<Rightarrow> (Q \<Zsurj>S Q) \<longrightarrow> distinguishes_from (Internal \<chi>) p Q
       | Defender_Conj p Q \<Rightarrow> distinguishes_from_inner \<chi> p Q
-      | Defender_Stable_Conj p Q \<Rightarrow> (\<forall>q. \<not> p \<mapsto> \<tau> q) \<longrightarrow> distinguishes_from_inner \<chi> p Q
-      | Defender_Branch p \<alpha> p' Q Qa \<Rightarrow>((p \<mapsto> \<alpha> p') \<and> (Qa \<noteq> {})) \<longrightarrow> distinguishes_from_inner \<chi> p (Q\<union>Qa)
+      | Defender_Stable_Conj p Q \<Rightarrow> (\<forall>q. \<not> p \<mapsto> \<tau> q) 
+          \<longrightarrow> distinguishes_from_inner \<chi> p Q
+      | Defender_Branch p \<alpha> p' Q Qa \<Rightarrow>((p \<mapsto> \<alpha> p') \<and> (Qa \<noteq> {})) 
+          \<longrightarrow> distinguishes_from_inner \<chi> p (Q\<union>Qa)
       | _ \<Rightarrow> True))
       \<and>
       (strategy_formula_conjunct g e \<psi> \<longrightarrow>
