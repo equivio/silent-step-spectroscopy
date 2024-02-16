@@ -119,7 +119,7 @@ If \<open>e\<close> is in the winning budget of \<open>Attacker_Immediate p Q\<c
 \<open>Attacker_Immediate p Q\<close> with energy \<open>e\<close> with expressiveness price \<open>\<le> e\<close>. 
 \\
 \\
-We prove a more detailed result for all possible game positions \<open>g\<close> by induction over the structure of winning budgets:\label{derivation:lemma2}
+We prove a more detailed result for all possible game positions \<open>g\<close> by induction over the structure of winning budgets:\label{deviation:lemma2}
 \\
 We first show that the statement holds if \<open>g\<close> has no outgoing edges. (case 1) This can only be the case for 
 defender positions. If a defender position \<open>g\<close> has outgoing edges and the statement holds true for all successors we show that the statement holds true for \<open>g\<close> as well. (case 3) If \<open>g\<close> is an attacker 
@@ -1085,7 +1085,7 @@ structure of strategy formulas.
 \\
 Since our formalization differentiates immediate conjunctions and conjunctions two \<open>Defender_Conj\<close> 
 cases are necessary. Specifically the strategy construction rule \<open>early_conj\<close> uses immediate 
-conjunctions while \<open>late_conj\<close> uses conjunctions. \label{derivation:lemma3}
+conjunctions while \<open>late_conj\<close> uses conjunctions. \label{deviation:lemma3}
 \<close>
 
 lemma strategy_formulas_distinguish:
