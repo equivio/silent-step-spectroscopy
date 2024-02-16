@@ -1,7 +1,22 @@
 section \<open>HML Contexts\<close>
+
+text \<open>
+This section contains definitions for context based definitions of substitution and congruence.
+These are not used in the remainder of the project, since handing a set of lemmata which handle
+substitution or congruence under a single prefix to automatic proof search proved to be more convenient
+then manually specifying where exactly in the formula substitution ought to occur.
+
+The added control provided by the mechanisms in this section was never needed and thereby never justified
+manually constructing a context term.
+We keep this section for the amusement of the interested reader.
+\<close>
+
 theory HML_Context
   imports Main HML
 begin
+
+text \<open> The data type @{term "hml_precontext"} specifies where within a formula one may substitute
+an implication leading to a new implication. \<close>
 
 datatype 
   ('act, 'i) hml_precontext =
@@ -11,6 +26,12 @@ datatype
     SilentPC "('act, 'i) hml_precontext" |
     ConjPC "'i set" "'i \<Rightarrow> ('act, 'i) hml_conjunct" "'i set" "'i \<Rightarrow> ('act, 'i) hml_precontext"
 
+text \<open> Given a context and a formula, one may place the formula into the hole of the context to
+generate a new formula. Usually, the resulting formula is the one in which one want to substitute
+a subformula, while the argument formula is the formula to be substituted.
+
+Note that this definition of data type and filling function ensures that one can never substitute under a negated
+conjunct.\<close>
 
 primrec 
       fill_pre :: "('act, 'i) hml \<Rightarrow> ('act, 'i) hml_precontext \<Rightarrow> ('act, 'i) hml" where
@@ -38,6 +59,8 @@ lemma pre_cong:
 
 end (* LTS_Tau *)
 
+text \<open> The data type @{term "hml_context"} specifies where within a formula one may substitute
+an equivalence leading to a new equivalence. \<close>
 
 datatype 
   ('act, 'i) hml_context =
@@ -50,6 +73,9 @@ and
   ('act, 'i) hml_conjunct_context =
     PosC "('act, 'i) hml_context" |
     NegC "('act, 'i) hml_context"
+
+text \<open> The function @{term "fill"} serves the same purpose as @{term "fill_pre"}, i.e filling the
+hole in a context with a formula, resulting in a formula.\<close>
 
 primrec 
       fill :: "('act, 'i) hml \<Rightarrow> ('act, 'i) hml_context \<Rightarrow> ('act, 'i) hml"
@@ -65,10 +91,15 @@ primrec
   "fill_conjunct \<phi> (PosC \<phi>') = (Pos (fill \<phi> \<phi>'))" |
   "fill_conjunct \<phi> (NegC \<phi>') = (Neg (fill \<phi> \<phi>'))"
 
+text \<open> One may note that here both the context definition as well as the filling function mirror the
+structure of the underlying formula data type exactly. \<close>
+
 
 context LTS_Tau
 begin
 
+text \<open> One may substitute an equivalence on one side of another equivalence, which will yield a
+new equivalence. \<close>
 lemma hml_subst: "\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r \<Longrightarrow> (fill \<phi>l C) \<Lleftarrow>\<Rrightarrow> \<phi> \<Longrightarrow> (fill \<phi>r C) \<Lleftarrow>\<Rrightarrow> \<phi>"
              and "\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r \<Longrightarrow> (fill_conjunct \<phi>l C') \<Lleftarrow>\<and>\<Rrightarrow> \<psi> \<Longrightarrow> (fill_conjunct \<phi>r C') \<Lleftarrow>\<and>\<Rrightarrow> \<psi>"
   apply (induct C and C' arbitrary: \<phi> and \<psi>)
@@ -161,7 +192,7 @@ proof -
   qed
 qed
 
-
+text \<open> Substituting an equivalence somewhere in a formula preserves equivalence. \<close>
 lemma hml_cong: "\<forall>\<phi>l \<phi>r. \<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r \<longrightarrow> fill \<phi>l C \<Lleftarrow>\<Rrightarrow> fill \<phi>r C"
   and hml_conj_cong: "\<forall>\<phi>l \<phi>r. \<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r \<longrightarrow> fill_conjunct \<phi>l C' \<Lleftarrow>\<and>\<Rrightarrow> fill_conjunct \<phi>r C'"
   apply (induct C and C')
