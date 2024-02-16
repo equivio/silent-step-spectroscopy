@@ -1,4 +1,4 @@
-section \<open>The expressiveness price function\<close>
+section \<open>The expressiveness price function \label{sect:ExpressivenessMeasure}\<close>
 
 theory Expressiveness_Price
   imports HML_SRBB Energy Spectroscopy_Game

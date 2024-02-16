@@ -1,4 +1,4 @@
-section \<open> Stability Respecting Branching Bisimilarity - Subset of HML \<close>
+section \<open> Stability Respecting Branching Bisimilarity - Subset of HML \label{sect:hmlSRBB} \<close>
 
 theory HML_SRBB
   imports Main HML

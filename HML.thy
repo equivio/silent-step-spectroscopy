@@ -4,6 +4,24 @@ theory HML
 begin
 
 text \<open>
+In the context of this project, Hennesy-Milner-Logic (HML) formulas are used to characterize different
+notions of behavioral equivalence (e.g trace equivalence, contra-simulation, weak bisimulation, ...).
+A particular equivalence $\sim_x$ is characterized by a subsets of the full HML language ($\mathrm{HML}_x$)
+for which each element formula may only distinguish two processes iff those two processes are not
+considered equivalent by the equivalence $\sim_x$. 
+In this section, we define a dataype representing HML formulas (\ref{sect:hmlDatatype}) and
+define the meaning of such formulas (\ref{sect:hmlSemantic}). 
+Next, we define what it means of an HML formula to imply another formula (\ref{sect:hmlImpl}) and
+introduce equivalence of HML formulas (\ref{sect:hmlEq}).
+Finally, the notion of a formula distinguishing two processes is introduced in (\ref{sect:hmlDist}).
+Sections \ref{sect:hmlSRBB} and \ref{sect:ExpressivenessMeasure} give insights into how sub-languages are defined in this project.
+For a concrete example of how behavioural equivalences can be characterized by HML language subsets,
+reference the proof corresponding proof for weak trace equivalence in appendix \ref{appndx:weakTraces}.
+\<close> 
+
+subsection \<open> Representation of HML formulas: the \<open>hml\<close> datatype \label{sect:hmlDatatype} \<close>
+
+text \<open>
 The mutually recursive data types @{term "hml"} and @{term "hml_conjunct"} represent arbitrary HML formulas.
 
 In particular:
@@ -50,7 +68,7 @@ given due to the way we've chosen to formalize the conjunct.
 This formalization allows for conjunctions of arbitrary - even of infinite - width and has been
 taken from \cite{Pohlmann2021ReducingReactive} (Appendix B).
 This added expressiveness comes at the cost of making proofs regarding conjunctions more complex
-and restricts the ways in which functions may be derived for these types (c.f. 'Expressiveness\_Price.thy').
+and restricts the ways in which functions may be derived for these types (c.f. section \ref{sect:ExpressivenessMeasure}).
 \\
 \\
 Initially, we considered two alternative approaches of formalizing the conjunction (both would not
@@ -73,7 +91,7 @@ via an additional index type since we were able to overcome the technical challe
 the more general formalization.
 \<close>
 
-subsection \<open> Semantics of \<open>hml\<close> Formulas: \<open>\<Turnstile>\<close> \<close>
+subsection \<open> Semantics of \<open>hml\<close> Formulas: \<open>\<Turnstile>\<close> \label{sect:hmlSemantic}\<close>
 
 context LTS_Tau
 begin
@@ -266,7 +284,7 @@ end (* context Inhabited_Tau_LTS *)
 context LTS_Tau
 begin
 
-subsection \<open> Pre-Order \<close>
+subsection \<open> Pre-Order \label{sect:hmlImpl}\<close>
 
 text \<open> An HML formula \<open>\<phi>l\<close> implies another (\<open>\<phi>r\<close>) if the fact that some process \<open>p\<close> satisfies \<open>\<phi>l\<close>
 implies that \<open>p\<close> must also satisfy \<open>\<phi>r\<close>, no matter the process \<open>p\<close>. \<close>
@@ -518,7 +536,7 @@ lemma drop_conjunct:
   using Un_Diff_cancel2 hml_impl_iffI by auto
 
 
-subsection \<open> Equivalence \<close>
+subsection \<open> Equivalence \label{sect:hmlEq} \<close>
 
 text \<open>
 A HML formula \<open>\<phi>l\<close> is said to be equivalent to some other HML formula \<open>\<phi>r\<close> (written \<open>\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r\<close>)
@@ -1080,7 +1098,7 @@ lemma follows_verum_equals_verum:
 
 end (* Inhabited_Tau_LTS *)
 
-subsection \<open> Distinguishing Formulas \<close>
+subsection \<open> Distinguishing Formulas \label{sect:hmlDist} \<close>
 
 context LTS_Tau
 begin
