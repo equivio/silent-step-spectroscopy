@@ -64,13 +64,38 @@ but is instead synonymous to \<open>\<And>{}\<close>.
 We include @{term "TT"} in the definition to enable Isabelle to infer via syntax only,
 that the types @{term "hml"} and @{term "hml_srbb"} are non-empty.
 Isabelle is unable to show that the types are non-empty if the @{term "TT"} data constructor is not
-given due to the way we've chosen to formalize the conjunct.
+given due to the way we've chosen to formalize the conjunction.
 This formalization allows for conjunctions of arbitrary - even of infinite - width and has been
 taken from \cite{Pohlmann2021ReducingReactive} (Appendix B).
 This added expressiveness comes at the cost of making proofs regarding conjunctions more complex
 and restricts the ways in which functions may be derived for these types (c.f. section \ref{sect:ExpressivenessMeasure}).
 \\
 \\
+To illustrate how this ability to express conjunctions of infinite width may be used, we provide the 
+example formula @{term "arbitrarily_many_\<alpha>s"}.  Even though we did not yet assign meaning to HML formulas
+(for this reference \ref{sect:hmlSemantic}), we claim that this example formula may only be satisfied by a process from 
+which any number of $\alpha$ steps may be observed.  This formula is constructed by first defining
+a function @{term "n_times_\<alpha>_then"} which - given an action $\alpha$ and a formula $\varphi$ - will produce
+a formula with n $\langle \alpha \rangle$ clauses followed by $\varphi$, i.e. $[\langle \alpha \rangle]^n \varphi$.
+\footnote{The reader may excuse the abuse of notation. $[...]^n$ is supposed to read as 'repeated the part
+in brackets n times.}
+Using this function we are now able to formalize $\bigwedge\nolimits_{i \in \mathbb{N}} [\langle \alpha \rangle]^i \top$:
+we define the formula @{term "arbitrarily_many_\<alpha>s"} as being a conjunction which has the full
+set of natural numbers $\mathbb{N}$ as index set and then using the function @{term "n_times_\<alpha>_then"}
+as mapping from index to conjunct formula.  Note that \<open>Pos \<circ>\<close> is needed to satisfy the type checker.
+For an example LTS where each process satisfies this formula consider $(\mathbb{N},\{()\}, \Delta(\mathbb{N}, ()))$,
+where $\Delta(\mathbb{N}, ())$ stands for the diagonal relation on $\mathbb{N}$, where each element is
+additionally labeled with $()$.
+\<close>
+
+fun n_times_\<alpha>_then :: "'act \<Rightarrow> ('act, 'i) hml \<Rightarrow> nat \<Rightarrow> ('act, 'i) hml" where
+  "n_times_\<alpha>_then \<alpha> \<phi> 0 = \<phi>" |
+  "n_times_\<alpha>_then \<alpha> \<phi> (Suc n) = Obs \<alpha> (n_times_\<alpha>_then \<alpha> \<phi> n)"
+
+definition arbitrarily_many_\<alpha>s :: "'act \<Rightarrow> ('act, nat) hml" where
+  "arbitrarily_many_\<alpha>s \<alpha> \<equiv> Conj \<nat> (Pos \<circ> (n_times_\<alpha>_then \<alpha> TT))"
+
+text \<open>
 Initially, we considered two alternative approaches of formalizing the conjunction (both would not
 have required an index type \<open>'i\<close> and wouldn't need the data constructor \<open>TT\<close>):
 \begin{enumerate}
@@ -176,6 +201,7 @@ lemma conj_\<phi>_is_\<phi>:
 
 lemma opt_\<tau>_is_or: "(p \<Turnstile> (Silent \<phi>)) = ((p \<Turnstile> (Obs \<tau> \<phi>)) \<or> (p \<Turnstile> \<phi>))"
   by simp
+
 
 subsection \<open> \<open>hml\<close> Meta-Syntax \<close>
 
