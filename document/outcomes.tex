@@ -18,6 +18,13 @@ $e \in Win_a (p, \emptyset)_d^s $ was true for any energy (not equal to the defe
 Since an empty stable conjuction has costs of $e_4$ no strategy formula with an appropriate price could be constructed. 
 With the added move $e_4 \leq e $ holds true for any $e \in Win_a (p, \emptyset)_d^s $ and therefore resolves this issue.
 
-\item In lemma strategy\_formulas\_distinguish in section \ref{derivation:lemma3} the case of $g$ being a defender branching position was adjusted: 
-When considering $g=(p,\alpha ,p', Q- Q \alpha, Q \alpha)_d^\eta$ the conditions $p \overset{\alpha}{\longrightarrow} p'$ and $Q \alpha \neq \emptyset$ were added. 
+\item The changes of the weak sprectroscopy game impact the definition of strategy formulas. As shown in the proof 
+of lemma winning\_budget\_implies\_strategy\_formula in section \ref{derivation:lemma3} our definition that is close 
+to the paper still works. (For example one could choose to add a derivation rule corresponding to the move empty\_stbl\_conj\_answer to the definition 
+of strategy formulas. We instead constructed the necessary formula in the proof and used that for an empty set the rule stable\_conj could be applied.
+More detail is found in the proof in the case $Q=\emptyset$ in case 5 ($g$ being a defender stable conjunction position) 
+of case 3 ($g$ being a defender position with successors).)
+\item In lemma strategy\_formulas\_distinguish in Section \ref{derivation:lemma3} the case of $g$ being a defender branching position was adjusted: 
+When considering $g=(p,\alpha ,p', Q- Q \alpha, Q \alpha)_d^\eta$ the conditions $p \overset{\alpha}{\longrightarrow} p'$ and $Q \alpha \neq \emptyset$ were 
+added. 
 \end{itemize}
