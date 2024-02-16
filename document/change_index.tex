@@ -1,8 +1,7 @@
 \section{Index of Changes}
 \begin{itemize}
     \item In \ref{deviation:eneg} energies are extended to include a negative inhabitant. 
-    \item In the paper the winning budget of $g$ w.r.t. some game $G$ is defined as the set of all starting energies such that when starting in $g$ 
-the game is won by the attacker (which is defined as some winning strategy for the attacker existing). In our formalization we did not define (winning) strategies
+    \item In \cite{bisping2023lineartimebranchingtime} the winning budget of a state in an energy game is defined as the set of all starting energies such that there exists a winning strategy for the attacker when starting from that state. Our formalization does not define attacker winning strategies and instead uses the characterization by proposition 2 \cite[p. 9]{bisping2023lineartimebranchingtime} as the definition of winning budgets.
 and instead used proposition 2 as a definition of winning budgets. We also omitted an explicit definition of winning a game and implicitly assumed that there 
 always exists a winner and the attacker wins if and only if the starting energy is in the winning budget of the starting position. This holds by declaring all
 infinite plays to be won by the defender. A proof is given in the paper. 
