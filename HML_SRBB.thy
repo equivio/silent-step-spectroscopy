@@ -125,7 +125,7 @@ where
     hml_conjunct.Neg (hml.Internal (hml_srbb_inner_to_hml \<chi>))"
 
 text \<open>
-Given this translation we may now note that the HML-SRBB subset diverges significantly from the one
+Given this translation we may now note that this HML-SRBB subset diverges significantly from the one
 given in \cite{bisping2023lineartimebranchingtime}. Specifically, Bisping et al allow for true observation
 clauses $\langle \alpha \rangle$ under the non-terminal $\chi$ with the side condition that $\alpha \neq \tau$,
 while we instead opted to allow for 'soft observations' $(\alpha)$ in the corresponding type @{term "hml_srbb_inner"},
@@ -134,6 +134,49 @@ condition $\alpha \neq \tau$ at type level. This is rooted in the way in which w
 being a fixed but otherwise arbitrary inhabitant of the label type \<open>'a\<close> (c.f. section \ref{sect:LTS}).
 For an alternative definition of $\tau$ which allows for type level distinction of $\tau$ from all other
 labels reference appendix \ref{appndx:LTSOptTau}.
+
+One may now wonder if this modification is valid or if it in any way impacts the results of this
+project.  While we do not not formally prove that this modification does not alter the meaning of
+the HML-SRBB subset, we may provide some evidence that the divergence is permitted:
+\begin{enumerate}
+  \item The proof that weak trace equivalence is characterized by a specific subset of our HML-SRBB
+    (appendix \ref{appndx:weakTraces}) still works.  If this were not the case, our change would most definitly have
+    been problematic.
+  \item \label{lbl:srbbArgument} One can argue that all occurances of the 'soft' observation
+    $(\alpha)\varphi$ are equivalent to some formula in \cite{bisping2023lineartimebranchingtime}'s
+    dialect of HML-SRBB.
+\end{enumerate}
+
+Item \ref{lbl:srbbArgument} may be justified by case analysis on the $\alpha$ in $(\alpha)\varphi$:
+\begin{enumerate}
+  \item If $\alpha \neq \tau$:\\
+    By the definition of $(\alpha)\varphi$ in \ref{SoftPossDef} it follows that $(\alpha)\varphi = \langle \alpha \rangle \varphi$
+    and since $\alpha \neq \tau$ we have exactly the observation in $\chi$ of \cite{bisping2023lineartimebranchingtime}.
+  \item If $\alpha = \tau$:
+    \begin{itemize}
+      \item By the definition of $(\alpha)\varphi$ in \ref{SoftPossDef} it follows that $(\alpha)\varphi = (\tau) \varphi$.
+      \item When closely inspecting the definitions of the data types @{term "hml_srbb"}, @{term "hml_srbb_inner"} and
+        @{term "hml_srbb_conjunct"} as well as the corresponding translation functions, one can observe that
+        the @{term "Obs"} in question must be preceeded by an @{term "hml.Internal"}, so we may inspect:
+        $\langle\varepsilon\rangle(\tau)\varphi$
+      \item From \ref{equivalenceProofs} we know $\langle \varepsilon \rangle (\tau) \varphi \Lleftarrow\Rrightarrow \langle\varepsilon\rangle\varphi$
+      \item Next we do a case analysis on the $\varphi$ (in our encoding the type @{term "hml_srbb"}) in $\langle\varepsilon\rangle\varphi$:
+        \begin{enumerate}
+          \item $\varphi = \top$:\\
+            Here, we know from \ref{equivalenceProofs} that $\langle\varepsilon\rangle\top \Lleftarrow\Rrightarrow \top$, which is in
+            \cite{bisping2023lineartimebranchingtime}'s HML-SRBB.
+          \item $\varphi = \langle \varepsilon \rangle \chi$:\\
+            Once again, from \ref{equivalenceProofs} we know $\langle\varepsilon\rangle\langle\varepsilon\rangle\chi \Lleftarrow\Rrightarrow \langle\varepsilon\rangle\chi$,
+            which is in \cite{bisping2023lineartimebranchingtime}'s HML-SRBB.
+          \item $\varphi = \bigwedge\nolimits_{i \in I} {\psi s}(i)$:\\
+            Here, we can observe that $\langle\varepsilon\rangle\bigwedge\nolimits_{i \in I} {\psi s}(i)$ is directly in
+            \cite{bisping2023lineartimebranchingtime}'s HML-SRBB.
+        \end{enumerate}
+    \end{itemize}
+\end{enumerate}
+While this argument is not a proper proof (inductively moving this argument over the whole formula,
+not just one observation is missing), it provides us with confidence that our adaptation of the
+HML-SRBB language does not impact the results of the project.
 \<close>
 
 subsubsection \<open> The Models Relation \<open>\<Turnstile>\<close> for \<open>hml_srbb\<close> \<close>

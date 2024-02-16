@@ -205,7 +205,7 @@ lemma opt_\<tau>_is_or: "(p \<Turnstile> (Silent \<phi>)) = ((p \<Turnstile> (Ob
 
 subsection \<open> \<open>hml\<close> Meta-Syntax \<close>
 
-subsubsection \<open> Soft Poss: \<open>(\<alpha>)\<phi>\<close> \<close>
+subsubsection \<open> Soft Poss: \<open>(\<alpha>)\<phi>\<close> \label{SoftPossDef}\<close>
 
 text \<open>
 @{term "(HML_soft_poss \<alpha> \<phi>)"} represents \<open>(\<alpha>)\<phi>\<close>,
@@ -785,7 +785,7 @@ context LTS_Tau
 begin
 
 
-subsubsection \<open> Know Equivalence Elements\<close>
+subsubsection \<open> Know Equivalence Elements \label{equivalenceProofs} \<close>
 
 text \<open> \<open>\<langle>\<epsilon>\<rangle>(\<tau>)\<phi>\<close> is equivalent to \<open>\<langle>\<epsilon>\<rangle>\<phi>\<close> \<close>
 lemma \<epsilon>\<tau>_is_\<tau>: "(Internal (Silent \<phi>)) \<Lleftarrow>\<Rrightarrow> (Internal \<phi>)"
