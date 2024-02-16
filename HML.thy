@@ -11,15 +11,15 @@ In particular:
   \item in @{term "hml"}
   \begin{itemize}
     \item @{term "TT"} encodes \<open>\<top>\<close>
-    \item @{term "(Obs \<alpha> \<phi>)"} encodes \<open>\<langle>\<alpha>\<rangle>\<phi>\<close> and is to be read as '\<open>\<alpha>\<close> can be observed and then \<open>\<phi>\<close> holds'.
-    \item @{term "(Internal \<phi>)"} encodes \<open>\<langle>\<epsilon>\<rangle>\<phi>\<close> and is to be read as 'after arbitrarily much internal behaviour \<open>\<phi>\<close> holds'.
-    \item @{term "(Silent \<phi>)"} encodes \<open>(\<tau>)\<phi>\<close> and is to be read as '\<open>\<phi>\<close> holds after possibly no or exactly one internal step'.
-    \item @{term "(Conj I \<psi>s)"} encodes \<open>\<And>\<Psi>\<close> where \<open>\<Psi> \<equiv> \<psi>s ` I\<close>  and is to be read as 'all formulas in \<open>\<Psi>\<close> hold'.
+    \item \<open>(Obs \<alpha> \<phi>)\<close> encodes \<open>\<langle>\<alpha>\<rangle>\<phi>\<close> and is to be read as '\<open>\<alpha>\<close> can be observed and then \<open>\<phi>\<close> holds'.
+    \item \<open>(Internal \<phi>)\<close> encodes \<open>\<langle>\<epsilon>\<rangle>\<phi>\<close> and is to be read as 'after arbitrarily much internal behaviour \<open>\<phi>\<close> holds'.
+    \item \<open>(Silent \<phi>)\<close> encodes \<open>(\<tau>)\<phi>\<close> and is to be read as '\<open>\<phi>\<close> holds after possibly no or exactly one internal step'.
+    \item \<open>(Conj I \<psi>s)\<close> encodes \<open>\<And>\<Psi>\<close> where \<open>\<Psi> \<equiv> \<psi>s ` I\<close>  and is to be read as 'all formulas in \<open>\<Psi>\<close> hold'.
   \end{itemize}
   \item in @{term "hml_conjunct"}
   \begin{itemize}
-    \item @{term "(Pos \<phi>)"} encodes \<open>\<phi>\<close> when used as a conjunct and is to be read exactly as \<open>\<phi>\<close> is.
-    \item @{term "(Neg \<phi>)"} encodes \<open>\<not>\<phi>\<close> in position of a conjunct and is to be read as '\<open>\<phi>\<close> does not hold'.
+    \item \<open>(Pos \<phi>)\<close> encodes \<open>\<phi>\<close> when used as a conjunct and is to be read exactly as \<open>\<phi>\<close> is.
+    \item \<open>(Neg \<phi>)\<close> encodes \<open>\<not>\<phi>\<close> in position of a conjunct and is to be read as '\<open>\<phi>\<close> does not hold'.
   \end{itemize}
 \end{itemize}
 \<close>
