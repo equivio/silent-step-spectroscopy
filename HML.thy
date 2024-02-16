@@ -171,7 +171,7 @@ abbreviation HML_soft_poss :: "'a \<Rightarrow> ('a, 'i) hml \<Rightarrow> ('a, 
   "HML_soft_poss \<alpha> \<phi> \<equiv> if \<alpha> = \<tau> then Silent \<phi> else Obs \<alpha> \<phi>"
 
 text \<open>
-\<open>(\<alpha>)\<phi>\<close> is satisfied if either \<open>\<langle>\<alpha>\<rangle>\<phi>\<close> (note that here \<open>\<alpha>\<close> may be equal to \<open>\<tau>\<close>) or
+\<open>(\<alpha>)\<phi>\<close> is satisfied if either \<open>\<langle>\<alpha>\<rangle>\<phi>\<close> is satisfied (note that here \<open>\<alpha>\<close> may be equal to \<open>\<tau>\<close>) or
 if \<open>\<alpha> = \<tau>\<close> and \<open>\<phi>\<close> is already satisfied.
 \<close>
 lemma soft_poss_to_or[simp]:
