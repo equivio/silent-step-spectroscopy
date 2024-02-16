@@ -1,4 +1,4 @@
-section \<open> Hennesy-Milner-Logic (HML)\<close>
+section \<open> Hennesy-Milner-Logic (HML) \label{sect:HML}\<close>
 theory HML
   imports Main LTS
 begin
@@ -1295,7 +1295,7 @@ text \<open> The following three lemmata prove that the first condition of a dis
 (i.e. that the distinguished process \<open>p\<close> satisfies the conjunction) holds
 for a somewhat more complex strategy of picking conjuncts. 
 These become necessary when one wants to lift the distinguishing conjunction thinning lemma to @{term "hml_srbb"}.
-Confer to the file of \<open>hml_srbb\<close> for more insight into the background.
+Confer to the section \ref{sect:hmlSRBB} for more insight into the background.
 
 The strategy for picking the conjuncts -- defined as @{term "distinguishing_conjunct"} in each lemma head --
 is robust against original conjunctions with empty index sets or that do not contain distinguishing

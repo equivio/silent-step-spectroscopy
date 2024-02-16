@@ -38,13 +38,7 @@ In above description \<open>\<Psi>\<close> stands for \<open>\<psi>s ` I\<close>
 \<open>hml_srbb_conjunct\<close> on the set of indices \<open>I\<close>. For justifications regarding the explicit inclusion of
 @{term "TT"} and the encoding of conjunctions via index sets @{term "I"} and mapping from indices to
 conjuncts @{term "\<psi>s"}, reference the @{term "TT"} and @{term "Conj"} data constructors of the type
-@{term "hml"} in the file 'HML.thy'.
-\\ \\
-In the beginning, instead of defining the subset as a new data type,  we considered defining the
-HML-SRBB subset via a predicate on @{term "hml"} like \<open>is_srbb :: "('a,'s) hml \<Rightarrow> bool"\<close>.
-For a concrete instance of this approach reference \<open>is_trace_formula\<close> in the file 'Weak\_Trace.thy'.
-We decided against it since we were unable to figure out how to define expressiveness prices
-(c.f. 'Expressiveness\_Price.thy') in this approach.
+@{term "hml"} in section \ref{sect:HML}.
 \<close>
 
 datatype 
@@ -63,6 +57,14 @@ and
   ('act, 'i) hml_srbb_conjunct =
     Pos "('act, 'i) hml_srbb_inner" |
     Neg "('act, 'i) hml_srbb_inner"
+
+text \<open>
+In the beginning, instead of defining the subset as a new data type,  we considered defining the
+HML-SRBB subset via a predicate on @{term "hml"} like \<open>is_srbb :: "('a,'s) hml \<Rightarrow> bool"\<close>.
+For a concrete instance of this approach reference \<open>is_trace_formula\<close> in appendix \ref{appndx:weakTraces}.
+We decided against it since we were unable to figure out how to define expressiveness prices
+(c.f. section \ref{sect:ExpressivenessMeasure}) in this approach.
+\<close>
 
 subsection \<open> Semantics of \<open>hml_srbb\<close> Formulas: \<open>\<Turnstile>\<close> and \<open>\<lbrakk> \<rbrakk>\<close> \<close>
 
