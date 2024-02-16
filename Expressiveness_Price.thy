@@ -6,7 +6,12 @@ begin
 
 text \<open>
 The expressiveness price function assigns a price - an eight element tuple - to a \<open>hml_srbb\<close> formula.
-It may be defined as a single function:
+This price is supposed to capture the expressiveness power needed to describe a certain property and
+will later be used to select subsets of specific expressiveness power (which is linked to the behavioural
+equivalence characterized by this subset) of the HML-SRBB sublanguage.
+
+
+The expressiveness price function may be defined as a single function:
 \begin{align*}
   expr(\top) := expr^\varepsilon(\top) :=& 0 \\
   expr(\langle\varepsilon\rangle\chi) :=& expr^\varepsilon(\chi) \\
@@ -35,7 +40,7 @@ The eight dimensions are intended to measure the following properties of formula
   \item Depth of negations
 \end{enumerate}
 
-Instead of defining the expressiveness price function in one go, we instead define eight functions (one for each dimension)
+Instead of defining the expressiveness price function in one go, we define eight functions (one for each dimension)
 and then use them in combination to build the result tupel.\\
 
 Note that, since all these functions stem from the above singular function, they all look very similar,
@@ -366,7 +371,7 @@ lemma expressiveness_price_ImmConj_empty_def:
   shows "expressiveness_price (ImmConj I \<psi>s) = E 0 0 0 0 0 0 0 0" using assms 
   unfolding expressiveness_price_ImmConj_def by (simp add: bot_enat_def)
 
-text \<open>The price of a fromula cannot be negative.\<close>
+text \<open>The price of a formula cannot be negative.\<close>
 lemma srbb_price_never_neg : "expressiveness_price \<phi> \<noteq> eneg"
   by simp
 
