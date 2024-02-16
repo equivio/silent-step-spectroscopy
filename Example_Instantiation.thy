@@ -368,7 +368,6 @@ proof -
   thus "Game.in_wina (E 9 9) c" using A7 Game.in_wina.intros(3) energy.distinct(1) A2 A1 A6 by blast  
 qed
 
-
 lemma not_wina_of_c:
   shows "\<not>Game.in_wina (E 0 0) c"
 proof -
