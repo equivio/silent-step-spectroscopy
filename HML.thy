@@ -32,7 +32,7 @@ In particular:
     \item \<open>(Obs \<alpha> \<phi>)\<close> encodes \<open>\<langle>\<alpha>\<rangle>\<phi>\<close> and is to be read as '\<open>\<alpha>\<close> can be observed and then \<open>\<phi>\<close> holds'.
     \item \<open>(Internal \<phi>)\<close> encodes \<open>\<langle>\<epsilon>\<rangle>\<phi>\<close> and is to be read as 'after arbitrarily much internal behaviour \<open>\<phi>\<close> holds'.
     \item \<open>(Silent \<phi>)\<close> encodes \<open>(\<tau>)\<phi>\<close> and is to be read as '\<open>\<phi>\<close> holds after possibly no or exactly one internal step'.
-    \item \<open>(Conj I \<psi>s)\<close> encodes \<open>\<And>\<Psi>\<close> where \<open>\<Psi> \<equiv> \<psi>s ` I\<close>  and is to be read as 'all formulas in \<open>\<Psi>\<close> hold'.
+    \item \<open>(Conj I \<psi>s)\<close> encodes $\bigwedge\nolimits_{i \in \mathrm{\texttt{I}}} {\psi s}(i)$ and is to be read as 'for all i in I the conjunct ${\psi s}(i)$ holds'.
   \end{itemize}
   \item in @{term "hml_conjunct"}
   \begin{itemize}

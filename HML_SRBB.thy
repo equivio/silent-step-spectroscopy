@@ -18,14 +18,14 @@ The data constructors are to be interpreted as follows:
   \begin{itemize}
     \item @{term "TT"} encodes \<open>\<top>\<close>
     \item \<open>(Internal \<chi>)\<close> encodes \<open>\<langle>\<epsilon>\<rangle>\<chi>\<close>
-    \item \<open>(ImmConj I \<psi>s)\<close> encodes \<open>\<And>\<Psi>\<close>
+    \item \<open>(ImmConj I \<psi>s)\<close> encodes $\bigwedge\nolimits_{i \in \mathrm{\texttt{I}}} {\psi s}(i)$
   \end{itemize}
   \item in @{term "hml_srbb_inner"}
   \begin{itemize}
     \item \<open>(Obs \<alpha> \<phi>)\<close> encodes \<open>(\<alpha>)\<phi>\<close> (Note the difference to \cite{bisping2023lineartimebranchingtime}!)
-    \item \<open>(Conj I \<psi>s)\<close> encode \<open>\<And>\<Psi>\<close>
-    \item \<open>(StableConj I \<psi>s)\<close> encodes \<open>\<And>({\<not>\<langle>\<tau>\<rangle>\<top>} \<union> \<Psi>)\<close>
-    \item \<open>(BranchConj \<alpha> \<phi> I \<psi>s)\<close> encodes \<open>\<And>({(\<alpha>)\<phi>} \<union> \<Psi>)\<close>
+    \item \<open>(Conj I \<psi>s)\<close> encode $\bigwedge\nolimits_{i \in \mathrm{\texttt{I}}} {\psi s}(i)$
+    \item \<open>(StableConj I \<psi>s)\<close> encodes $\neg\langle\tau\rangle\top \land \bigwedge\nolimits_{i \in \mathrm{\texttt{I}}} {\psi s}(i)$
+    \item \<open>(BranchConj \<alpha> \<phi> I \<psi>s)\<close> encodes $(\alpha)\varphi \land \bigwedge\nolimits_{i \in \mathrm{\texttt{I}}} {\psi s}(i)$
   \end{itemize}
   \item in @{term "hml_srbb_conjunct"}
   \begin{itemize}
@@ -34,11 +34,9 @@ The data constructors are to be interpreted as follows:
   \end{itemize}
 \end{itemize}
 
-In above description \<open>\<Psi>\<close> stands for \<open>\<psi>s ` I\<close>, i.e. the image of the function \<open>\<psi>s\<close> from indices to
-\<open>hml_srbb_conjunct\<close> on the set of indices \<open>I\<close>. For justifications regarding the explicit inclusion of
-@{term "TT"} and the encoding of conjunctions via index sets @{term "I"} and mapping from indices to
-conjuncts @{term "\<psi>s"}, reference the @{term "TT"} and @{term "Conj"} data constructors of the type
-@{term "hml"} in section \ref{sect:HML}.
+For justifications regarding the explicit inclusion of @{term "TT"} and
+the encoding of conjunctions via index sets @{term "I"} and mapping from indices to conjuncts @{term "\<psi>s"},
+reference the @{term "TT"} and @{term "Conj"} data constructors of the type @{term "hml"} in section \ref{sect:HML}.
 \<close>
 
 datatype 
@@ -63,7 +61,7 @@ In the beginning, instead of defining the subset as a new data type,  we conside
 HML-SRBB subset via a predicate on @{term "hml"} like \<open>is_srbb :: "('a,'s) hml \<Rightarrow> bool"\<close>.
 For a concrete instance of this approach reference \<open>is_trace_formula\<close> in appendix \ref{appndx:weakTraces}.
 We decided against it since we were unable to figure out how to define expressiveness prices
-(c.f. section \ref{sect:ExpressivenessMeasure}) in this approach.
+(c.f. section \ref{sect:ExpressivenessMeasure}) when using this approach.
 \<close>
 
 subsection \<open> Semantics of \<open>hml_srbb\<close> Formulas: \<open>\<Turnstile>\<close> and \<open>\<lbrakk> \<rbrakk>\<close> \<close>
