@@ -1,6 +1,6 @@
 \section{Conclusion}
-We were able to formalize the majority of the paper, including the spectroscopy energy game as introduced by Bisping and Jansen in \cite{bisping2023lineartimebranchingtime}, 
-and prove one direction of the theorem stating correctness, namely ``if the attacker wins the weak spectroscopy game, given an energy $e$, then there exists a formula $\varphi \in$ HML$_{SRBB}$ with price expr$(\varphi) \leq$ $e$''. 
+We were able to formalize the majority of the paper, including the weak spectroscopy game as introduced by Bisping and Jansen in \cite{bisping2023lineartimebranchingtime}, 
+and to prove one direction of the theorem stating correctness, namely ``if the attacker wins the weak spectroscopy game, given an energy $e$, then there exists a formula $\varphi \in$ HML$_{SRBB}$ with price expr$(\varphi) \leq$ $e$''. 
 For the other direction, we provide a comprehensive proof skeleton, including proofs for individual induction cases.
 \\
 Due to the nature of Isabelle, the formalization differs from \cite{bisping2023lineartimebranchingtime}. The gravest change is to the definition of HML$_{SRBB}$. 
@@ -10,8 +10,15 @@ We argue that both definitions have the same distinguishing power.
 These changes led to necessary adaptations of our definition of the weak spectroscopy game and thereby affected the following definitions and proofs.
 An overview of these and other deviations can be found at (Index of changes). 
 \\
-One major change to \cite{bisping2023lineartimebranchingtime} is a new game move $(p,\varnothing)_{d}^{s}$ $\overset{\hat{e}_4}{\rightarrowtail} (p,\varnothing)_d$. 
+One major change to \cite{bisping2023lineartimebranchingtime} is adding a new game move $(p,\varnothing)_{d}^{s}$ $\overset{\hat{e}_4}{\rightarrowtail} (p,\varnothing)_d$ from \textbf{Defender\_Stable\_Conj} to \textbf{Defender\_Conj} if $Q = \varnothing$. 
 Without that, the attacker could use an empty stability conjunction \textbf{StableConj} without having the proper budget. 
 \\
 We formalized a weak spectroscopy game closely related to \cite{bisping2023lineartimebranchingtime} that can decide (almost) all behavioral equivalences between stability-respecting branching bisimilarity and weak trace equivalence at once.
 Provided our definition of coordinates in an 8-dimensional space of energies corresponds to these equivalences, we implemented a (mostly) machine-checkable proof for the correctness of this spectroscopy game.
+
+To further increase confidence in the results of \cite{bisping2023lineartimebranchingtime}, additional proofs are neccesary. Firstly, the proof for ``given an energy $e$, if there exists a formula $\varphi \in$ HML$_{SRBB}$ with price expr$(\varphi) \leq$ $e$, then the attacker wins the weak spectroscopy game''.
+As mentioned, that proof is almost finished and we are highly confident in its correctness. 
+Secondly, \cite{bisping2023lineartimebranchingtime} uses coordinates of energies to define equivalences. One can show that the HML sublanguages obtained from these coordinates correspond to the desired equivalences.
+Since our formalization of the model relation \textbf{hml\_models} is only defined on the parameterization of \textbf{HML} by the state type 's, one could also show that this formalization sufficiently captures the expressiveness power of \textbf{HML} on labeled transition systems.
+Finally, Proposition 1 of \cite{bisping2023lineartimebranchingtime} claims that their slightly different modal characterization of HML$_{SRBB}$ corresponds to the modal characterization of \cite{FOKKINK2019104435}. 
+The proof for Proposition 1 in \cite{bisping2023lineartimebranchingtime} could be turned into a machine-checkable proof. 
