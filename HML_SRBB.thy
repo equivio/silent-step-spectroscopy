@@ -3,7 +3,7 @@ section \<open> Stability Respecting Branching Bisimilarity - Subset of HML \lab
 text \<open> This section describes the largest subset of the full HML language in \ref{sect:HML} that we are
 using for purposes of silent step spectroscopy.  It is supposed to characterize the most fine grained
 behavioural equivalence that we may decide: Stability Respecting Branching Bisimilarity (SRBB). While
-there is good reason to believe that this subset truly characterizes SRBB (c.f. \cite{bisping2023lineartimebranchingtime}),
+there are good reasons to believe that this subset truly characterizes SRBB (c.f. \cite{bisping2023lineartimebranchingtime}),
 we do no provide a formal proof of this fact. From this sub-language smaller subsets are derived
 via the notion of expressiveness prices (see section \ref{sect:ExpressivenessMeasure}). \<close>
 
