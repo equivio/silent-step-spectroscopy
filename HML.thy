@@ -1,7 +1,25 @@
-section \<open> Hennesy-Milner-Logic (HML)\<close>
+section \<open> Hennesy-Milner-Logic (HML) \label{sect:HML}\<close>
 theory HML
   imports Main LTS
 begin
+
+text \<open>
+In the context of this project, Hennesy-Milner-Logic (HML) formulas are used to characterize different
+notions of behavioral equivalence (e.g trace equivalence, contra-simulation, weak bisimulation, ...).
+A particular equivalence $\sim_x$ is characterized by a subsets of the full HML language ($\mathrm{HML}_x$)
+for which each element formula may only distinguish two processes iff those two processes are not
+considered equivalent by the equivalence $\sim_x$. 
+In this section, we define a dataype representing HML formulas (\ref{sect:hmlDatatype}) and
+define the meaning of such formulas (\ref{sect:hmlSemantic}). 
+Next, we define what it means of an HML formula to imply another formula (\ref{sect:hmlImpl}) and
+introduce equivalence of HML formulas (\ref{sect:hmlEq}).
+Finally, the notion of a formula distinguishing two processes is introduced in (\ref{sect:hmlDist}).
+Sections \ref{sect:hmlSRBB} and \ref{sect:ExpressivenessMeasure} give insights into how sub-languages are defined in this project.
+For a concrete example of how behavioural equivalences can be characterized by HML language subsets,
+reference the proof corresponding proof for weak trace equivalence in appendix \ref{appndx:weakTraces}.
+\<close> 
+
+subsection \<open> Representation of HML formulas: the \<open>hml\<close> datatype \label{sect:hmlDatatype} \<close>
 
 text \<open>
 The mutually recursive data types @{term "hml"} and @{term "hml_conjunct"} represent arbitrary HML formulas.
@@ -11,26 +29,18 @@ In particular:
   \item in @{term "hml"}
   \begin{itemize}
     \item @{term "TT"} encodes \<open>\<top>\<close>
-    \item @{term "(Obs \<alpha> \<phi>)"} encodes \<open>\<langle>\<alpha>\<rangle>\<phi>\<close> and is to be read as '\<open>\<alpha>\<close> can be observed and then \<open>\<phi>\<close> holds'.
-    \item @{term "(Internal \<phi>)"} encodes \<open>\<langle>\<epsilon>\<rangle>\<phi>\<close> and is to be read as 'after arbitrarily much internal behaviour \<open>\<phi>\<close> holds'.
-    \item @{term "(Silent \<phi>)"} encodes \<open>(\<tau>)\<phi>\<close> and is to be read as '\<open>\<phi>\<close> holds after possibly no or exactly one internal step'.
-    \item @{term "(Conj I \<psi>s)"} encodes \<open>\<And>\<Psi>\<close> where \<open>\<Psi> \<equiv> \<psi>s ` I\<close>  and is to be read as 'all formulas in \<open>\<Psi>\<close> hold'.
+    \item \<open>(Obs \<alpha> \<phi>)\<close> encodes \<open>\<langle>\<alpha>\<rangle>\<phi>\<close> and is to be read as '\<open>\<alpha>\<close> can be observed and then \<open>\<phi>\<close> holds'.
+    \item \<open>(Internal \<phi>)\<close> encodes \<open>\<langle>\<epsilon>\<rangle>\<phi>\<close> and is to be read as 'after arbitrarily much internal behaviour \<open>\<phi>\<close> holds'.
+    \item \<open>(Silent \<phi>)\<close> encodes \<open>(\<tau>)\<phi>\<close> and is to be read as '\<open>\<phi>\<close> holds after possibly no or exactly one internal step'.
+    \item \<open>(Conj I \<psi>s)\<close> encodes $\bigwedge\nolimits_{i \in \mathrm{\texttt{I}}} {\psi s}(i)$ and is to be read as 'for all i in I the conjunct ${\psi s}(i)$ holds'.
   \end{itemize}
   \item in @{term "hml_conjunct"}
   \begin{itemize}
-    \item @{term "(Pos \<phi>)"} encodes \<open>\<phi>\<close> when used as a conjunct and is to be read exactly as \<open>\<phi>\<close> is.
-    \item @{term "(Neg \<phi>)"} encodes \<open>\<not>\<phi>\<close> in position of a conjunct and is to be read as '\<open>\<phi>\<close> does not hold'.
+    \item \<open>(Pos \<phi>)\<close> encodes \<open>\<phi>\<close> when used as a conjunct and is to be read exactly as \<open>\<phi>\<close> is.
+    \item \<open>(Neg \<phi>)\<close> encodes \<open>\<not>\<phi>\<close> in position of a conjunct and is to be read as '\<open>\<phi>\<close> does not hold'.
   \end{itemize}
 \end{itemize}
-
-When a variable is of type @{term "hml"} then @{term "\<phi>"} is used in most cases.
-In case a variable is of type @{term "hml_conjunct"} then @{term "\<psi>"} is used.
-
-Note that in canonical definitions of HML @{term "TT"} is not usually given, but is instead synonymous to \<open>\<And>{}\<close>.
-We include @{term "TT"} in the definition to enable Isabelle to infer via syntax only, that the types @{term "hml"}
-and @{term "hml_srbb"} are non-empty.  If this data constructor is omitted, Isabelle will reject the definition.
 \<close>
-
 
 datatype 
   ('act, 'i) hml =
@@ -44,16 +54,76 @@ and
     Pos "('act, 'i) hml" |
     Neg "('act, 'i) hml"
 
+text \<open>
+When a variable is of type @{term "hml"} then @{term "\<phi>"} is used in most cases.
+In case a variable is of type @{term "hml_conjunct"} then @{term "\<psi>"} is used.
+\\
+\\
+Note that in canonical definitions of HML @{term "TT"} is not usually part of the syntax,
+but is instead synonymous to \<open>\<And>{}\<close>.
+We include @{term "TT"} in the definition to enable Isabelle to infer via syntax only,
+that the types @{term "hml"} and @{term "hml_srbb"} are non-empty.
+Isabelle is unable to show that the types are non-empty if the @{term "TT"} data constructor is not
+given due to the way we've chosen to formalize the conjunction.
+This formalization allows for conjunctions of arbitrary - even of infinite - width and has been
+taken from \cite{Pohlmann2021ReducingReactive} (Appendix B).
+This added expressiveness comes at the cost of making proofs regarding conjunctions more complex
+and restricts the ways in which functions may be derived for these types (c.f. section \ref{sect:ExpressivenessMeasure}).
+\\
+\\
+To illustrate how this ability to express conjunctions of infinite width may be used, we provide the 
+example formula @{term "arbitrarily_many_\<alpha>s"}.  Even though we did not yet assign meaning to HML formulas
+(for this reference \ref{sect:hmlSemantic}), we claim that this example formula may only be satisfied by a process from 
+which any number of $\alpha$ steps may be observed.  This formula is constructed by first defining
+a function @{term "n_times_\<alpha>_then"} which - given an action $\alpha$ and a formula $\varphi$ - will produce
+a formula with n $\langle \alpha \rangle$ clauses followed by $\varphi$, i.e. $[\langle \alpha \rangle]^n \varphi$.
+\footnote{The reader may excuse the abuse of notation. $[...]^n$ is supposed to read as 'repeated the part
+in brackets n times.}
+Using this function we are now able to formalize $\bigwedge\nolimits_{i \in \mathbb{N}} [\langle \alpha \rangle]^i \top$:
+we define the formula @{term "arbitrarily_many_\<alpha>s"} as being a conjunction which has the full
+set of natural numbers $\mathbb{N}$ as index set and then using the function @{term "n_times_\<alpha>_then"}
+as mapping from index to conjunct formula.  Note that \<open>Pos \<circ>\<close> is needed to satisfy the type checker.
+For an example LTS where each process satisfies this formula consider $(\mathbb{N},\{()\}, \Delta(\mathbb{N}, ()))$,
+where $\Delta(\mathbb{N}, ())$ stands for the diagonal relation on $\mathbb{N}$, where each element is
+additionally labeled with $()$.
+\<close>
+
+fun n_times_\<alpha>_then :: "'act \<Rightarrow> ('act, 'i) hml \<Rightarrow> nat \<Rightarrow> ('act, 'i) hml" where
+  "n_times_\<alpha>_then \<alpha> \<phi> 0 = \<phi>" |
+  "n_times_\<alpha>_then \<alpha> \<phi> (Suc n) = Obs \<alpha> (n_times_\<alpha>_then \<alpha> \<phi> n)"
+
+definition arbitrarily_many_\<alpha>s :: "'act \<Rightarrow> ('act, nat) hml" where
+  "arbitrarily_many_\<alpha>s \<alpha> \<equiv> Conj \<nat> (Pos \<circ> (n_times_\<alpha>_then \<alpha> TT))"
+
+text \<open>
+Initially, we considered two alternative approaches of formalizing the conjunction (both would not
+have required an index type \<open>'i\<close> and wouldn't need the data constructor \<open>TT\<close>):
+\begin{enumerate}
+  \item \label{lbl:set_conj} \<open>Conj "'a hml set"\<close> 
+  \item \label{lbl:cset_conj} \<open>Conj "'a hml cset"\<close> 
+\end{enumerate}
+Approach \ref{lbl:set_conj} is rejected by Isabelle, since \<open>set\<close> is not a bounded natural functor.
+In particular, the \<open>set\<close> functor violates the boundedness condition of BNF \cite{HOLDatatypes}, which is that there must
+be a fixed upper bound to the cardinality of the types resulting from the \<open>set\<close> functor. Such an
+upper bound can not exist due to Cantor's theorem. \footnote{We'd like to thank Robin Cogan for
+helping us figure this out as well as helping a lot with the initial formalization of HML as well as
+HML-SRBB.}
+\\
+\\
+Approach \ref{lbl:cset_conj} does not present this issue and is accepted by Isabelle. \cite{Pohlmann2021ReducingReactive}
+shows that it can be employed fruitfully.  We ultimately decided against it and for the formalization
+via an additional index type since we were able to overcome the technical challenges presented by
+the more general formalization.
+\<close>
+
+subsection \<open> Semantics of \<open>hml\<close> Formulas: \<open>\<Turnstile>\<close> \label{sect:hmlSemantic}\<close>
 
 context LTS_Tau
 begin
 
 text \<open>
-Definition of the meaning of an HML formula in the context of an LTS.
-
-Note that this formalization and semantic allows for conjunctions of arbitrary width,
-even of infinite width.  This added expressiveness comes at the cost of making proofs regarding
-conjunctions more complex.
+We define what it means for a process @{term "p"} to satisfy a formula @{term "\<phi>"} (written as
+\<open>p \<Turnstile> \<phi>\<close>) by inspecting the transitions available at process @{term "p"}.
 \<close>
 
 primrec
@@ -98,6 +168,19 @@ lemma "(state \<Turnstile> (Silent \<phi>))
 text \<open> We choose to still include @{term "Silent"} to stay close to \cite{bisping2023lineartimebranchingtime}
 and \cite{FOKKINK2019104435}. \<close>
 
+text \<open>
+Similarely, one may wonder why we define the set of HML formulas with two mutually recursive data types,
+instead of simply having just one data type by either:
+\begin{itemize}
+  \item inlining the \<open>hml_conjunct\<close> data type into the only place where it occurs (the conjunction), 
+    viz: \<open>Conj "'i set" "'i \<Rightarrow> (('a,'i) hml + ('a,'i) hml)"\<close>, or
+  \item adding a data constructor for negation (e.g. \<open>Not "('a,'i) hml"\<close>) and then in the conjunction
+    simply mapping to the \<open>hml\<close> data type, i.e. \<open>Conj "'i set" "i \<Rightarrow> ('a, 'i) hml"\<close>
+    (c.f. \cite{Pohlmann2021ReducingReactive}).
+\end{itemize}
+Once again, we choose to go for a mutually recursive definition to stay close to \cite{bisping2023lineartimebranchingtime}.
+\<close>
+
 end (* Inhabited_Tau_LTS *)
 
 context LTS_Tau
@@ -120,6 +203,10 @@ lemma opt_\<tau>_is_or: "(p \<Turnstile> (Silent \<phi>)) = ((p \<Turnstile> (Ob
   by simp
 
 
+subsection \<open> \<open>hml\<close> Meta-Syntax \<close>
+
+subsubsection \<open> Soft Poss: \<open>(\<alpha>)\<phi>\<close> \label{SoftPossDef}\<close>
+
 text \<open>
 @{term "(HML_soft_poss \<alpha> \<phi>)"} represents \<open>(\<alpha>)\<phi>\<close>,
 which is to be interpeted as \<open>\<langle>\<alpha>\<rangle>\<phi>\<close> if \<open>\<alpha> \<noteq> \<tau>\<close> and as \<open>(\<tau>)\<phi>\<close> otherwise.
@@ -128,7 +215,7 @@ abbreviation HML_soft_poss :: "'a \<Rightarrow> ('a, 'i) hml \<Rightarrow> ('a, 
   "HML_soft_poss \<alpha> \<phi> \<equiv> if \<alpha> = \<tau> then Silent \<phi> else Obs \<alpha> \<phi>"
 
 text \<open>
-\<open>(\<alpha>)\<phi>\<close> is satisfied if either \<open>\<langle>\<alpha>\<rangle>\<phi>\<close> (note that here \<open>\<alpha>\<close> may be equal to \<open>\<tau>\<close>) or
+\<open>(\<alpha>)\<phi>\<close> is satisfied if either \<open>\<langle>\<alpha>\<rangle>\<phi>\<close> is satisfied (note that here \<open>\<alpha>\<close> may be equal to \<open>\<tau>\<close>) or
 if \<open>\<alpha> = \<tau>\<close> and \<open>\<phi>\<close> is already satisfied.
 \<close>
 lemma soft_poss_to_or[simp]:
@@ -136,6 +223,8 @@ lemma soft_poss_to_or[simp]:
   by auto
 
 end (* context LTS_Tau *)
+
+subsubsection \<open> Binary Conjunction: \<open>\<and>\<close> \<close>
 
 context Inhabited_LTS
 begin
@@ -170,6 +259,7 @@ lemma hml_and_and[simp]:
 
 end (* Inhabited_Tau_LTS *)
 
+subsubsection \<open> Negation: \<open>\<not>\<close> \<close>
 
 context Inhabited_Tau_LTS
 begin
@@ -193,13 +283,17 @@ lemma hml_not_not_models[simp]:
   shows "(state \<Turnstile> HML_not \<phi>) = (\<not> state \<Turnstile> \<phi>)"
   by simp
 
-abbreviation hml_falsum :: "('a, 's) hml" ("\<bottom>\<bottom>") where
+subsubsection \<open> Falsum: \<open>\<bottom>\<close> \<close>
+
+abbreviation HML_falsum :: "('a, 's) hml" ("\<bottom>\<bottom>") where
   "\<bottom>\<bottom> \<equiv> HML_not TT"
 
 text \<open> No process ever satisfies falsum. \<close>
 lemma never_models_falsum[simp]:
   shows "\<not> state \<Turnstile> \<bottom>\<bottom>"
   by simp
+
+subsubsection \<open> Binary Disjunction: \<open>\<or>\<close> \<close>
 
 text \<open> @{term "(\<phi> \<or> \<phi>')"} represents \<open>\<phi> \<or> \<phi>'\<close> (read "or") and is realized by using binary conjunction and negation. \<close>
 
@@ -216,7 +310,7 @@ end (* context Inhabited_Tau_LTS *)
 context LTS_Tau
 begin
 
-subsection \<open> Pre-Order \<close>
+subsection \<open> Pre-Order \label{sect:hmlImpl}\<close>
 
 text \<open> An HML formula \<open>\<phi>l\<close> implies another (\<open>\<phi>r\<close>) if the fact that some process \<open>p\<close> satisfies \<open>\<phi>l\<close>
 implies that \<open>p\<close> must also satisfy \<open>\<phi>r\<close>, no matter the process \<open>p\<close>. \<close>
@@ -468,7 +562,7 @@ lemma drop_conjunct:
   using Un_Diff_cancel2 hml_impl_iffI by auto
 
 
-subsection \<open> Equivalence \<close>
+subsection \<open> Equivalence \label{sect:hmlEq} \<close>
 
 text \<open>
 A HML formula \<open>\<phi>l\<close> is said to be equivalent to some other HML formula \<open>\<phi>r\<close> (written \<open>\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r\<close>)
@@ -538,7 +632,7 @@ lemma conj_subst:
   assumes "\<psi>l \<Lleftarrow>\<and>\<Rrightarrow> \<psi>r"
       and "(Conj (I \<union> {s}) (\<lambda>i. if i = s then \<psi>l else \<psi>s i)) \<Lleftarrow>\<Rrightarrow> \<phi>"
   shows "(Conj (I \<union> {s}) (\<lambda>i. if i = s then \<psi>r else \<psi>s i)) \<Lleftarrow>\<Rrightarrow> \<phi>"
-  using assms
+  using assms 
   by (smt (verit) LTS_Tau.hml_impl_iffI hml_conjunct_eq_def hml_conjunct_impl_def hml_eq_def hml_models.simps(5))
 
 lemma pos_subst:
@@ -691,12 +785,18 @@ context LTS_Tau
 begin
 
 
-subsubsection \<open> Know Equivalence Elements\<close>
+subsubsection \<open> Know Equivalence Elements \label{equivalenceProofs} \<close>
 
 text \<open> \<open>\<langle>\<epsilon>\<rangle>(\<tau>)\<phi>\<close> is equivalent to \<open>\<langle>\<epsilon>\<rangle>\<phi>\<close> \<close>
 lemma \<epsilon>\<tau>_is_\<tau>: "(Internal (Silent \<phi>)) \<Lleftarrow>\<Rrightarrow> (Internal \<phi>)"
   unfolding hml_eq_def 
   using hml_impl_iffI hml_models.simps(3) hml_models.simps(4) silent_reachable_append_\<tau> by blast
+
+text \<open> \<open>\<langle>\<epsilon>\<rangle>\<langle>\<epsilon>\<rangle>\<phi>\<close> is equivalent to \<open>\<langle>\<epsilon>\<rangle>\<phi>\<close> \<close>
+lemma \<epsilon>\<epsilon>_is_\<epsilon>: "(Internal (Internal \<phi>)) \<Lleftarrow>\<Rrightarrow> (Internal \<phi>)"
+  unfolding hml_eq_equality
+  using silent_reachable_trans hml_models.simps(3)
+  by (meson silent_reachable.intros(1))
 
 text \<open> \<open>\<langle>\<epsilon>\<rangle>\<top>\<close> is equivalent to \<open>\<top>\<close> \<close>
 lemma \<epsilon>T_is_T: "(Internal TT) \<Lleftarrow>\<Rrightarrow> TT"
@@ -1024,7 +1124,7 @@ lemma follows_verum_equals_verum:
 
 end (* Inhabited_Tau_LTS *)
 
-subsection \<open> Distinguishing Formulas \<close>
+subsection \<open> Distinguishing Formulas \label{sect:hmlDist} \<close>
 
 context LTS_Tau
 begin
@@ -1195,7 +1295,7 @@ text \<open> The following three lemmata prove that the first condition of a dis
 (i.e. that the distinguished process \<open>p\<close> satisfies the conjunction) holds
 for a somewhat more complex strategy of picking conjuncts. 
 These become necessary when one wants to lift the distinguishing conjunction thinning lemma to @{term "hml_srbb"}.
-Confer to the file of \<open>hml_srbb\<close> for more insight into the background.
+Confer to the section \ref{sect:hmlSRBB} for more insight into the background.
 
 The strategy for picking the conjuncts -- defined as @{term "distinguishing_conjunct"} in each lemma head --
 is robust against original conjunctions with empty index sets or that do not contain distinguishing
@@ -1218,7 +1318,7 @@ lemma dist_conjunct_image_subset_all_conjuncts:
                 else \<psi>s (SOME i. i \<in> I))"
   shows "(distinguishing_conjunct I \<psi>s) ` Q \<subseteq> (\<psi>s ` I) \<union> {Pos TT}"
   apply (cases \<open>I \<noteq> {}\<close>)
-  using distinguishing_conjunct_def empty_subsetI image_eqI image_is_empty image_subsetI subset_antisym tfl_some sledgehammer
+  using distinguishing_conjunct_def empty_subsetI image_eqI image_is_empty image_subsetI subset_antisym tfl_some 
   by (smt (verit) UnI1 some_in_eq, auto)
 
 lemma models_full_models_dist_subset:

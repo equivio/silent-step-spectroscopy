@@ -1,4 +1,4 @@
-section \<open>The expressiveness price function\<close>
+section \<open>The expressiveness price function \label{sect:ExpressivenessMeasure}\<close>
 
 theory Expressiveness_Price
   imports HML_SRBB Energy Spectroscopy_Game
@@ -6,7 +6,12 @@ begin
 
 text \<open>
 The expressiveness price function assigns a price - an eight element tuple - to a \<open>hml_srbb\<close> formula.
-It may be defined as a single function:
+This price is supposed to capture the expressiveness power needed to describe a certain property and
+will later be used to select subsets of specific expressiveness power (which is linked to the behavioural
+equivalence characterized by this subset) of the HML-SRBB sublanguage.
+
+
+The expressiveness price function may be defined as a single function:
 \begin{align*}
   expr(\top) := expr^\varepsilon(\top) :=& 0 \\
   expr(\langle\varepsilon\rangle\chi) :=& expr^\varepsilon(\chi) \\
@@ -35,7 +40,7 @@ The eight dimensions are intended to measure the following properties of formula
   \item Depth of negations
 \end{enumerate}
 
-Instead of defining the expressiveness price function in one go, we instead define eight functions (one for each dimension)
+Instead of defining the expressiveness price function in one go, we define eight functions (one for each dimension)
 and then use them in combination to build the result tupel.\\
 
 Note that, since all these functions stem from the above singular function, they all look very similar,
@@ -248,7 +253,13 @@ primrec
   "imm_conj_depth_conjunct (Neg \<chi>) = imm_conj_depth_inner \<chi>"
 
 
-section \<open>Maximal modal depth of positive clauses in conjunctions\<close>
+subsection \<open>Maximal modal depth of positive clauses in conjunctions\<close>
+
+text \<open>
+Maximal modal depth of positive clauses in conjunctions.
+
+This counter calculates the modal depth for every positive clause in a conjunction (\<open>Pos \<chi>\<close>).
+\<close>
 
 primrec
       max_positive_conjunct_depth :: "('a, 's) hml_srbb \<Rightarrow> enat"
@@ -268,6 +279,12 @@ primrec
 
 subsection \<open>Maximal modal depth of negative clauses in conjunctions\<close>
 
+text \<open>
+Maximal modal depth of negative clauses in conjunctions.
+
+This counter calculates the modal depth for every negative clause in a conjunction (\<open>Neg \<chi>\<close>).
+\<close>
+
 primrec
       max_negative_conjunct_depth :: "('a, 's) hml_srbb \<Rightarrow> enat"
   and max_neg_conj_depth_inner :: "('a, 's) hml_srbb_inner \<Rightarrow> enat"
@@ -285,6 +302,15 @@ primrec
   "max_neg_conj_depth_conjunct (Neg \<chi>) = modal_depth_srbb_inner \<chi>"
 
 subsection \<open>Depth of negations\<close>
+
+text \<open>
+Depth of negations (occurences of \<open>Neg \<chi>\<close> on a path of the syntax tree).
+
+This counter is increased on each:
+\begin{itemize}
+  \item \<open>Neg \<chi>\<close>
+\end{itemize}
+\<close>
 
 primrec
       negation_depth :: "('a, 's) hml_srbb \<Rightarrow> enat"
@@ -304,6 +330,8 @@ primrec
 
 subsection \<open>Expressiveness price function\<close>
 
+text \<open>This combines the eight functions to the @{term "expressiveness_price"} function mentioned above.\<close>
+
 fun expressiveness_price :: "('a, 's) hml_srbb \<Rightarrow> energy" where
   "expressiveness_price \<phi> = E (modal_depth_srbb            \<phi>)
                               (branching_conjunction_depth \<phi>)
@@ -314,6 +342,7 @@ fun expressiveness_price :: "('a, 's) hml_srbb \<Rightarrow> energy" where
                               (max_negative_conjunct_depth \<phi>)
                               (negation_depth              \<phi>)"
 
+text \<open>Here we can see the decomposed price of an immediate conjunction.\<close>
 lemma expressiveness_price_ImmConj_def:
   shows "expressiveness_price (ImmConj I \<psi>s) = E 
     (Sup ((modal_depth_srbb_conjunct \<circ> \<psi>s) ` I))
@@ -342,11 +371,16 @@ lemma expressiveness_price_ImmConj_empty_def:
   shows "expressiveness_price (ImmConj I \<psi>s) = E 0 0 0 0 0 0 0 0" using assms 
   unfolding expressiveness_price_ImmConj_def by (simp add: bot_enat_def)
 
+text \<open>The price of a formula cannot be negative.\<close>
 lemma srbb_price_never_neg : "expressiveness_price \<phi> \<noteq> eneg"
   by simp
 
+text \<open>We can now define a sublanguage of Hennessy--Milner logic @{term "\<O>"} by the set of formulas with prices below an energy coordinate.\<close>
 definition \<O> :: "energy \<Rightarrow> (('a, 's) hml_srbb) set" where
   "\<O> energy \<equiv> {\<phi> . expressiveness_price \<phi> \<le> energy}"
+
+text \<open>Formalizing HML$_{SRBB}$ by mutually recursive data types leads to expressiveness price functions of these other types,
+namely @{term "expr_pr_inner"} and @{term "expr_pr_conjunct"}, and corresponding definitions and lemmas.\<close>
 
 fun expr_pr_inner :: "('a, 's) hml_srbb_inner \<Rightarrow> energy" where
   "expr_pr_inner \<chi> = E (modal_depth_srbb_inner \<chi>)
@@ -380,10 +414,16 @@ lemma \<psi>_price_never_neg: "expr_pr_conjunct \<psi> \<noteq> eneg"
 definition \<O>_conjunct :: "energy \<Rightarrow> (('a, 's) hml_srbb_conjunct) set" where
   "\<O>_conjunct energy \<equiv> {\<chi> . expr_pr_conjunct \<chi> \<le> energy}"
 
-subsection \<open>Lemmas on expressiveness of different formulas\<close>
+subsection \<open>Prices of certain formulas\<close>
+
+text \<open>
+We demonstrate the pricing mechanisms for various formulas. These proofs operate under the assumption of an expressiveness price \<open>e\<close> for a given formula \<open>\<chi>\<close> and proceed to determine the price of a derived formula, such as \<open>Pos \<chi>\<close>. 
+The proofs all are of a similar nature. They break down the expression function(s) into their constituent parts and apply their definitions to the constructed formula (\<open>(Pos \<chi>)\<close>).\<close>
 
 context full_spec_game
 begin
+
+text \<open>For example, here we establish that the expressiveness price of \<open>Internal \<chi>\<close> is equal to the expressiveness price of \<open>\<chi>\<close>.\<close>
 
 lemma expr_internal_eq:
   shows "expressiveness_price (Internal \<chi>) = expr_pr_inner \<chi>"
@@ -410,6 +450,8 @@ proof-
             by auto
         qed
 
+text \<open>If the price of a formula \<open>\<chi>\<close> is not greater than the minimum update @{term "min1_6"} apllied to some energy $e$,
+then \<open>Pos \<chi>\<close> is not greater than \<open>e\<close>.\<close>
 lemma expr_pos:
   assumes "expr_pr_inner \<chi> \<le> (min1_6 e)"
   shows "expr_pr_conjunct (Pos \<chi>) \<le> e"
@@ -960,20 +1002,7 @@ lemma expressiveness_price_ImmConj_geq_parts':
 
 end (* full_spec_game *)
 
-subsection \<open>characterizing equivalence by energy coordinates\<close>
-
-context Inhabited_Tau_LTS
-begin
-
-definition expr_preord :: "'s \<Rightarrow> energy \<Rightarrow> 's \<Rightarrow> bool" ("_ \<preceq> _ _" 60) where
-  "(p \<preceq> e q) \<equiv> hml_preordered (\<O> e) p q"
-
-definition expr_equiv :: "'s \<Rightarrow> energy \<Rightarrow> 's \<Rightarrow> bool" ("_ \<sim> _ _" 60) where
-  "(p \<sim> e q) \<equiv> hml_equivalent (\<O> e) p q"
-
-end
-
-
+text \<open>Here we show the prices for some specific formulas.\<close>
 context Inhabited_LTS
 begin
 
@@ -1024,61 +1053,24 @@ lemma "expressiveness_price (Internal (Conj {} \<psi>s)) = E 0 0 0 0 0 0 0 0"
 lemma "expressiveness_price (Internal (BranchConj \<alpha> TT {} \<psi>s)) = E 1 0 0 0 0 0 0 0"
   by (simp add: Sup_enat_def)
 
-lemma expr_obs:
-  assumes "expressiveness_price \<phi> \<le> (e - E 1 0 0 0 0 0 0 0)"
-  shows "expr_pr_inner (Obs \<alpha> \<phi>) \<le> e"
-proof-
-  have expr_pr_obs: "expr_pr_inner (Obs \<alpha> \<phi>) = 
-                  (E (modal_depth_srbb_inner (Obs \<alpha> \<phi>))
-                 (branch_conj_depth_inner (Obs \<alpha> \<phi>))
-                 (inst_conj_depth_inner (Obs \<alpha> \<phi>))
-                 (st_conj_depth_inner (Obs \<alpha> \<phi>))
-                 (imm_conj_depth_inner (Obs \<alpha> \<phi>))
-                 (max_pos_conj_depth_inner (Obs \<alpha> \<phi>))
-                 (max_neg_conj_depth_inner (Obs \<alpha> \<phi>))
-                 (neg_depth_inner (Obs \<alpha> \<phi>)))"
-    using expr_pr_inner.simps by blast
-  have obs_upds: "modal_depth_srbb_inner (Obs \<alpha> \<phi>) = 1 + modal_depth_srbb \<phi>" 
-  "branch_conj_depth_inner (Obs \<alpha> \<phi>) = branching_conjunction_depth \<phi>"
-  "inst_conj_depth_inner (Obs \<alpha> \<phi>) = instable_conjunction_depth \<phi>"
-  "st_conj_depth_inner (Obs \<alpha> \<phi>) = stable_conjunction_depth \<phi>"
-  "imm_conj_depth_inner (Obs \<alpha> \<phi>) = immediate_conjunction_depth \<phi>"
-  "max_pos_conj_depth_inner (Obs \<alpha> \<phi>) = max_positive_conjunct_depth \<phi>"
-  "max_neg_conj_depth_inner (Obs \<alpha> \<phi>) = max_negative_conjunct_depth \<phi>"
-  "neg_depth_inner (Obs \<alpha> \<phi>) = negation_depth \<phi>"
-    by simp+
-
-  obtain e1 e2 e3 e4 e5 e6 e7 e8 where "e = E e1 e2 e3 e4 e5 e6 e7 e8"
-    by (metis antisym assms eneg_leq energy.exhaust_sel gets_smaller srbb_price_never_neg)
-  hence "(e - (E 1 0 0 0 0 0 0 0)) = (E (e1-1) e2 e3 e4 e5 e6 e7 e8) \<or> 
-                  ((e - (E 1 0 0 0 0 0 0 0)) = eneg)"
-            using minus_energy_def
-            by simp
-  then show ?thesis
-  proof(rule disjE)
-  assume "e - E 1 0 0 0 0 0 0 0 = eneg"
-  hence "e = (E 0 0 0 0 0 0 0 0)"
-    using assms
-    using antisym eneg_leq min_eneg(2) by fastforce
-  then show ?thesis 
-    using \<open>e - E 1 0 0 0 0 0 0 0 = eneg\<close> assms 
-    using eneg_leq order_class.order_eq_iff by auto
-next
-  assume "e - E 1 0 0 0 0 0 0 0 = E (e1 - 1) e2 e3 e4 e5 e6 e7 e8"
-  hence "modal_depth_srbb \<phi> \<le> (e1 - 1)"
-    using assms leq_not_eneg by force
-  hence "modal_depth_srbb_inner (Obs \<alpha> \<phi>) \<le> e1"
-    using obs_upds
-    by (metis \<open>e - E 1 0 0 0 0 0 0 0 = E (e1 - 1) e2 e3 e4 e5 e6 e7 e8\<close> \<open>e = E e1 e2 e3 e4 e5 e6 e7 e8\<close> add_diff_assoc_enat add_diff_cancel_enat add_mono_thms_linordered_semiring(1) enat.simps(3) energy.distinct(1) energy.sel(1) le_numeral_extra(4) leq_not_eneg minus_energy_def one_enat_def)
-  then show ?thesis
-    using expr_pr_obs obs_upds 
-    using \<open>e - E 1 0 0 0 0 0 0 0 = E (e1 - 1) e2 e3 e4 e5 e6 e7 e8\<close> \<open>e = E e1 e2 e3 e4 e5 e6 e7 e8\<close> assms leq_not_eneg by fastforce 
-qed
-qed
-
 lemma expr_obs_phi:
   shows "e1 (expr_pr_inner (Obs \<alpha> \<phi>)) = expressiveness_price \<phi>"
   by (simp add: direct_minus_eq energy_leq_cases le_iff_add)
+
+end
+
+subsection \<open>characterizing equivalence by energy coordinates\<close>
+
+context Inhabited_Tau_LTS
+begin
+
+text \<open>A state \<open>p\<close> preorders another state \<open>q\<close> with respect to some energy \<open>e\<close> iff \<open>p\<close> HML preorders \<open>q\<close> with respect to the HML sublanguage @{term "\<O>"} derived from \<open>e\<close>\<close>
+definition expr_preord :: "'s \<Rightarrow> energy \<Rightarrow> 's \<Rightarrow> bool" ("_ \<preceq> _ _" 60) where
+  "(p \<preceq> e q) \<equiv> hml_preordered (\<O> e) p q"
+
+text \<open>Conversely, \<open>p\<close> and \<open>q\<close> are equivalent with respect to \<open>e\<close> iff they are equivalent with respect to that HML sublanguage @{term "\<O>"}.\<close>
+definition expr_equiv :: "'s \<Rightarrow> energy \<Rightarrow> 's \<Rightarrow> bool" ("_ \<sim> _ _" 60) where
+  "(p \<sim> e q) \<equiv> hml_equivalent (\<O> e) p q"
 
 end
 
