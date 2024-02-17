@@ -74,7 +74,7 @@ We decided against it since we were unable to figure out how to define expressiv
 subsection \<open> Semantics of \<open>hml_srbb\<close> Formulas: \<open>\<Turnstile>\<close> and \<open>\<lbrakk> \<rbrakk>\<close> \<close>
 
 text \<open>
-This section describes how meaning is assigned to HML-SRBB formulas in the context of an LTS.
+This section describes how semantic meaning is assigned to HML-SRBB formulas in the context of an LTS.
 We define what it means for a process @{term "p"} to satisfy an HML-SRBB formula @{term "\<phi>"} -
 written as \<open>p \<Turnstile>SRBB \<phi>\<close>, by first translating this formula @{term "\<phi>"} into the corresponding HML formula
 (via @{term "hml_srbb_to_hml"}) and then appealing to HML's models function.
