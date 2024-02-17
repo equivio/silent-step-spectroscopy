@@ -3,7 +3,7 @@ We were able to formalize the majority of the paper, including the spectroscopy 
 and prove one direction of the theorem stating correctness, namely ``if the attacker wins the weak spectroscopy game, given an energy $e$, then there exists a formula $\varphi \in$ HML$_{SRBB}$ with price expr$(\varphi) \leq$ $e$''. 
 For the other direction, we provide a comprehensive proof skeleton, including proofs for individual induction cases.
 \\
-Due to the nature of Isabelle, the implementation differs in subtle and some not-so-subtle ways from \cite{bisping2023lineartimebranchingtime}. The gravest change is to the definition of HML$_{SRBB}$. 
+Due to the nature of Isabelle, the formalization differs from \cite{bisping2023lineartimebranchingtime}. The gravest change is to the definition of HML$_{SRBB}$. 
 We have implemented this definition using three mutually recursive data types. As a result, we had two definitions for a conjunction $\bigwedge\psi$, \textbf{ImmConj} and \textbf{Conj}, each with a different type. 
 The other difference to the HML$_{SRBB}$ definition of \cite{bisping2023lineartimebranchingtime} concerned the observation of actions. 
 We argue that both definitions have the same distinguishing power. 
