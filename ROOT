@@ -31,6 +31,7 @@ session LinearTimeBranchingTimeSpectroscopyAccountingForSilentSteps = HOL +
     Silent_Step_Spectroscopy
     Weak_Traces
     HML_Context
+    LTS_Prime
     Example_Instantiation
 
 (* Dependencies on document source files: *)

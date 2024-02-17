@@ -1,4 +1,4 @@
-section \<open>Weak Traces\<close>
+section \<open>Weak Traces \label{appndx:weakTraces}\<close>
 theory Weak_Traces
   imports Main HML_SRBB Expressiveness_Price
 begin
