@@ -415,7 +415,7 @@ lemma srbb_dist_conjunct_implies_dist_imm_conjunction:
 text \<open>
 If $\bigwedge\nolimits_{i \in I} {\psi s}(i)$ distinguishes @{term "p"} from @{term "p"},
 then there must be at least one conjunct in this conjunction that distinguishes @{term "p"} from @{term "p"}.
-This differs from @{term "srbb_dist_imm_conjunction_implies_dist_conjunct"} in that it addresses
+This differs from \\@{term "srbb_dist_imm_conjunction_implies_dist_conjunct"} in that it addresses
 simple conjunctions in @{term "hml_srbb_inner"}.
 \<close>
 lemma srbb_dist_conjunction_implies_dist_conjunct:
