@@ -24,7 +24,7 @@ datatype ('s, 'a) spectroscopy_position =
 context Inhabited_Tau_LTS begin
 
 text\<open>\label{specmoves}\<close>
-text\<open>We also define the moves of the weak spectroscopy game. Their names indicate the respective HML formulas they correspond to. This correspondence will be shown in section \ref{derivation:lemma3} \<close>
+text\<open>We also define the moves of the weak spectroscopy game. Their names indicate the respective HML formulas they correspond to. This correspondence will be shown in section \ref{deviation:lemma3} \<close>
 fun spectroscopy_moves :: "('s, 'a) spectroscopy_position \<Rightarrow> ('s, 'a) spectroscopy_position \<Rightarrow> energy update option" where 
   delay: 
     "spectroscopy_moves (Attacker_Immediate p Q) (Attacker_Delayed p' Q') 
