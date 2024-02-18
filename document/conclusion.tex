@@ -17,7 +17,6 @@ We formalized a weak spectroscopy game closely related to \cite{bisping2023linea
 Provided our definition of coordinates in an 8-dimensional space of energies corresponds to these equivalences, we implemented a (mostly) machine-checkable proof for the correctness of this spectroscopy game.
 
 To further increase confidence in the results of \cite{bisping2023lineartimebranchingtime}, additional proofs are neccesary. Firstly, the proof for ``given an energy $e$, if there exists a formula $\varphi \in$ HML$_{SRBB}$ with price expr$(\varphi) \leq$ $e$, then the attacker wins the weak spectroscopy game''.
-As mentioned, that proof is almost finished and we are highly confident in its correctness. 
 Secondly, \cite{bisping2023lineartimebranchingtime} uses coordinates of energies to define equivalences. One can show that the HML sublanguages obtained from these coordinates correspond to the desired equivalences.
 Since our formalization of the model relation \textbf{hml\_models} is only defined on the parameterization of \textbf{HML} by the state type \texttt{'s}, one could also show that this formalization sufficiently captures the expressiveness power of \textbf{HML} on labeled transition systems.
 Finally, Proposition 1 of \cite{bisping2023lineartimebranchingtime} claims that their slightly different modal characterization of HML$_{SRBB}$ corresponds to the modal characterization of \cite{FOKKINK2019104435}. 
