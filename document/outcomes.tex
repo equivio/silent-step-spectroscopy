@@ -1,28 +1,28 @@
 \section{Contributions to the Paper}
 \begin{itemize}
-\item The proof of distinction\_implies\_winning\_budgets in \ref{deviation:lemma1_Q_a} 
-(lemma 1 in \cite{bisping2023lineartimebranchingtime}) required ammending, the sixt case
-of the inductiv property is ammended by $Q_\alpha \neq {}$, in order to be able to directly
-apply the induction hypothesis in the proof.
+    \item The proof of \texttt{distinction\_implies\_winning\_budgets} in \ref{deviation:lemma1_Q_a} 
+    (lemma 1 in \cite{bisping2023lineartimebranchingtime}) required ammending, the sixt case
+    of the inductiv property is ammended by $Q_\alpha \neq {}$, in order to be able to directly
+    apply the induction hypothesis in the proof.
 
-\item The sixth inductive property of the lemma strategy\_formulas\_distinguish in \ref{deviation:lemma3} 
-(lemma 3 in \cite{bisping2023lineartimebranchingtime}) was adjusted.
-The case of $g=(p,\alpha ,p', Q- Q_\alpha, Q_\alpha)_d^\eta$ being a defender branching position
-required adding the assumtions that $p \overset{\alpha}{\longrightarrow} p'$ and $Q_\alpha \neq \emptyset$
-to match those of the branching conjunction move rule (cf. \cite[p. 13]{bisping2023lineartimebranchingtime}). 
+    \item The sixth inductive property of the lemma \texttt{strategy\_formulas\_distinguish} in \ref{deviation:lemma3} 
+    (lemma 3 in \cite{bisping2023lineartimebranchingtime}) was adjusted.
+    The case of $g=(p,\alpha ,p', Q- Q_\alpha, Q_\alpha)_d^\eta$ being a defender branching position
+    required adding the assumtions that $p \overset{\alpha}{\longrightarrow} p'$ and $Q_\alpha \neq \emptyset$
+    to match those of the branching conjunction move rule (cf. \cite[p. 13]{bisping2023lineartimebranchingtime}). 
 
-\item In the definition of the weak spectroscopy game in section \ref{specmoves} the moves were changed: 
-The move `finishing' was removed. This move adjusted the cost of an empty immediate conjunction to be zero.
-This is inconsistent with the definition of the expressiveness price. This move is also not needed, as in the case of $Q$ being an empty set at an attacker immediate position, the attacker can move to the corresponding
-defender conjunction position by performing a `delay' move, followed by a `late instable conjunction' move. Both of these moves have zero costs.
+    \item In the definition of the weak spectroscopy game in section \ref{specmoves} the moves were changed: 
+    The move `finishing' was removed. This move adjusted the cost of an empty immediate conjunction to be zero.
+    This is inconsistent with the definition of the expressiveness price. This move is also not needed, as in the case of $Q$ being an empty set at an attacker immediate position, the attacker can move to the corresponding
+    defender conjunction position by performing a `delay' move, followed by a `late instable conjunction' move. Both of these moves have zero costs.
 
-\item The move empty\_stbl\_conj\_answer (moving from adefender stable conjunction position to a defender conjunction
-position if $Q$ is empty) with costs $e_4$ was added. This is necessary for the proof of lemma 
-winning\_budget\_implies\_strategy\_formula in section \ref{derivation:lemma3}. Before 
-$e \in Win_a (p, \emptyset)_d^s $ was true for any energy (not equal to the defender\_win\_level), in particular $\bold{0}$. 
-Since an empty stable conjuction has costs of $e_4$ no strategy formula with an appropriate price could be constructed. 
-With the added move $e_4 \leq e $ holds true for any $e \in Win_a (p, \emptyset)_d^s $ and therefore resolves this issue.
+    \item The move \texttt{empty\_stbl\_conj\_answer} (moving from adefender stable conjunction position to a defender conjunction
+    position if $Q$ is empty) with costs $e_4$ was added. This is necessary for the proof of lemma\\ 
+    \texttt{winning\_budget\_implies\_strategy\_formula} in section \ref{deviation:lemma3}. Before 
+    $e \in Win_a (p, \emptyset)_d^s $ was true for any energy (not equal to the \texttt{defender\_win\_level}), in particular $\bold{0}$. 
+    Since an empty stable conjuction has costs of $e_4$ no strategy formula with an appropriate price could be constructed. 
+    With the added move $e_4 \leq e $ holds true for any $e \in Win_a (p, \emptyset)_d^s $ and therefore resolves this issue.
 
-\item In lemma strategy\_formulas\_distinguish in section \ref{derivation:lemma3} the case of $g$ being a defender branching position was adjusted: 
-When considering $g=(p,\alpha ,p', Q- Q \alpha, Q \alpha)_d^\eta$ the conditions $p \overset{\alpha}{\longrightarrow} p'$ and $Q \alpha \neq \emptyset$ were added. 
+    \item In lemma \texttt{strategy\_formulas\_distinguish} in section \ref{deviation:lemma3} the case of $g$ being a defender branching position was adjusted: 
+    When considering $g=(p,\alpha ,p', Q- Q \alpha, Q \alpha)_d^\eta$ the conditions $p \overset{\alpha}{\longrightarrow} p'$ and $Q \alpha \neq \emptyset$ were added. 
 \end{itemize}
