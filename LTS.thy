@@ -3,19 +3,34 @@ theory LTS
   imports Main
 begin
 
+subsection \<open>Labeled Transition Systems\<close>
+
+text \<open>
+The locale @{term "LTS"} represents a labeled transition system (cf. \cite[defintion 1]{bisping2023lineartimebranchingtime}) consisting of a set of states $\mathcal{P}$, 
+a set of actions $\Sigma$, and a transition relation $\cdot\xrightarrow{\cdot}\cdot \subseteq \mathcal{P}\times\Sigma\times\mathcal{P}$. 
+We formalise the sets of states and actions by the type variables \<open>'s\<close> and \<open>'a\<close>. An LTS is then determined by the transition relation @{term "step"}. 
+Due to thecnical limitations we use the notation \<open>p \<mapsto>\<alpha> p'\<close> which has same meaing as $p \xrightarrow{\alpha} p'$ has in \cite{bisping2023lineartimebranchingtime}.
+
+\<close>
+
 locale LTS =
   fixes step :: "'s \<Rightarrow> 'a \<Rightarrow> 's \<Rightarrow> bool" ("_ \<mapsto> _ _" [70,70,70] 80)
 begin
 
+text \<open>One may lift @{term "step"} to sets of states, written as \<open>P \<mapsto>S \<alpha> Q\<close>. We define \<open>P \<mapsto>S \<alpha> Q\<close> to be true iff for all states \<open>q\<close> in \<open>Q\<close> there exists
+a state \<open>p\<close> in \<open>P\<close> such that \<open>p \<mapsto> \<alpha> q\<close> and for all \<open>p\<close> in P and for all \<open>q\<close>, if \<open>p \<mapsto> \<alpha> q\<close> then \<open>q\<close> is in \<open>Q\<close>.\<close>
 abbreviation step_setp ("_ \<mapsto>S _ _" [70,70,70] 80) where
   "P \<mapsto>S \<alpha> Q \<equiv> (\<forall>q \<in> Q. \<exists>p \<in> P. p \<mapsto> \<alpha> q) \<and> (\<forall>p \<in> P. \<forall>q. p \<mapsto> \<alpha> q \<longrightarrow> q \<in> Q)"
 
+text \<open>The set of possible \<open>\<alpha>\<close>-steps for a set of states \<open>P\<close> are all \<open>q\<close> such that there is a state \<open>p\<close> in \<open>P\<close> with \<open>p \<mapsto> \<alpha> q\<close>.\<close>
 definition step_set :: "'s set \<Rightarrow> 'a \<Rightarrow> 's set" where
   "step_set P \<alpha> \<equiv> { q . \<exists>p \<in> P. p \<mapsto> \<alpha> q }"
 
+text \<open>The set of possible \<open>\<alpha>\<close>-steps for a set of states \<open>P\<close> is an instance of @{term "step"} lifted to sets of steps.\<close>
 lemma step_set_is_step_set: "P \<mapsto>S \<alpha> (step_set P \<alpha>)"
   using step_set_def by force
 
+text \<open>For a set of states \<open>P\<close> and an action \<open>\<alpha>\<close> there exists exactly one \<open>Q\<close> such that \<open>P \<mapsto>S \<alpha> Q\<close>.\<close>
 lemma exactly_one_step_set: "\<exists>!Q. P \<mapsto>S \<alpha> Q"
 proof -
   from step_set_is_step_set
@@ -26,13 +41,18 @@ proof -
     by blast
 qed
 
+text \<open>The lifted @{term "step"} (\<open>P \<mapsto>S \<alpha> Q\<close>) is therefore this set \<open>Q\<close>.\<close>
 lemma step_set_eq:
   assumes "P \<mapsto>S \<alpha> Q"
   shows "Q = step_set P \<alpha>"
   using assms step_set_is_step_set exactly_one_step_set by fastforce
 
-end (* locale LTS *)
+end (*<*) (* locale LTS *) (*>*)
 
+subsection \<open>Labeled Transition Systems with Silent Steps\<close>
+
+text \<open>We formalize transition systems with \textit{silent steps} as an extension of ordinary transition systems
+with a fixed \textit{silent action} \<open>\<tau>\<close>.\<close>
 
 locale LTS_Tau =
   LTS step
@@ -40,18 +60,24 @@ locale LTS_Tau =
     fixes \<tau> :: 'a
 begin
 
+text \<open>The paper introduces a transition $p \xrightarrow{(\alpha)}p'$ if $p \xrightarrow{\alpha} p'$, or if $\alpha = \tau$ and $p = p'$ (cf. \cite[defintion 2]{bisping2023lineartimebranchingtime}). 
+We define @{term "soft_step"} analagously and provide the notation \<open>p \<mapsto>a \<alpha> p'\<close>.\<close>
 abbreviation soft_step ("_ \<mapsto>a _ _" [70,70,70] 80) where
   "p \<mapsto>a \<alpha> q \<equiv> p \<mapsto>\<alpha> q \<or> (\<alpha> = \<tau> \<and> p = q)" 
 
+text \<open>A state \<open>p\<close> is @{term "silent_reachable"}, represented by the symbol \<open>\<Zsurj>\<close>, from another state \<open>p'\<close> iff there exists a path of \<open>\<tau>\<close>-transitions.
+from \<open>p'\<close> to \<open>p\<close>.\<close>
 inductive silent_reachable :: "'s \<Rightarrow> 's \<Rightarrow> bool"  (infix "\<Zsurj>" 80)
   where
     "p \<Zsurj> p" |
     "p \<Zsurj> p''" if "p \<mapsto> \<tau> p'" and "p' \<Zsurj> p''"
 
+text \<open>If \<open>p'\<close> is silent reachable from \<open>p\<close> and there is a \<open>\<tau>\<close>-transition from \<open>p'\<close> to \<open>p''\<close> then \<open>p''\<close> is silent reachable from \<open>p\<close>\<close>
 lemma silent_reachable_append_\<tau>: "p \<Zsurj> p' \<Longrightarrow> p' \<mapsto> \<tau> p'' \<Longrightarrow> p \<Zsurj> p''"
   apply (induct rule: silent_reachable.induct)
   using silent_reachable.intros by blast+
 
+text \<open>@{term "silent_reachable"} is transitive.\<close>
 lemma silent_reachable_trans:
   assumes
     \<open>p \<Zsurj> p'\<close>
@@ -61,11 +87,13 @@ lemma silent_reachable_trans:
 using assms silent_reachable.intros(2)
   by (induct, blast+)
 
+text \<open>@{term "silent_reachable_loopless"} is a variation of @{term "silent_reachable"} that does not use self-loops.\<close>
 inductive silent_reachable_loopless :: "'s \<Rightarrow> 's \<Rightarrow> bool"  (infix "\<Zsurj>L" 80)
   where
     "p \<Zsurj>L p" |
     "p \<Zsurj>L p''" if "p \<mapsto> \<tau> p'" and "p' \<Zsurj>L p''" and "p \<noteq> p'"
 
+text \<open>If a state \<open>p'\<close> is @{term "silent_reachable"} from \<open>p\<close> it is also @{term "silent_reachable_loopless"}.\<close>
 lemma silent_reachable_impl_loopless:
   assumes "p \<Zsurj> p'"
   shows "p \<Zsurj>L p'"
@@ -83,6 +111,8 @@ next
   qed
 qed
 
+text \<open>@{term "weak_step"} defines a new notion of transition relation between states. A state \<open>p\<close> can reach
+\<open>p'\<close> by performing an \<open>\<alpha>\<close>-transition, possibly proceeded and followed by any number of \<open>\<tau>\<close>-transitions.\<close>
 definition weak_step ("_ \<Zsurj>\<mapsto>\<Zsurj> _ _" [70, 70, 70] 80) where
   "p  \<Zsurj>\<mapsto>\<Zsurj> \<alpha> p' \<equiv> if \<alpha> = \<tau> 
                     then p \<Zsurj> p'
@@ -119,6 +149,8 @@ next
     using weak_step_def by auto
 qed
 
+text \<open>A sequence of @{term "weak_step"}'s from one state \<open>p\<close> to another \<open>p'\<close> is called a @{term "weak_step_sequence"}
+That means that \<open>p'\<close> can be reached from \<open>p\<close> with that sequence of steps.\<close>
 inductive weak_step_sequence :: "'s \<Rightarrow> 'a list \<Rightarrow> 's \<Rightarrow> bool" ("_ \<Zsurj>\<mapsto>\<Zsurj>$ _ _" [70,70,70] 80) where
   "p \<Zsurj>\<mapsto>\<Zsurj>$ [] p'" if "p \<Zsurj> p'" |
   "p \<Zsurj>\<mapsto>\<Zsurj>$ (\<alpha>#rt) p''" if "p \<Zsurj>\<mapsto>\<Zsurj> \<alpha> p'" "p' \<Zsurj>\<mapsto>\<Zsurj>$ rt p''"
@@ -132,14 +164,18 @@ lemma weak_step_sequence_trans:
   apply (smt (verit) LTS_Tau.weak_step_sequence.simps append_Nil silent_reachable_trans)
   by force
 
-
+text \<open>@{term "weak_traces"} of a state or all possible sequences of weak transitions that can be performed.
+In the context of labeled transition systems, weak traces captures the observable behavior of a state.\<close>
 abbreviation weak_traces :: "'s \<Rightarrow> 'a list set"
   where "weak_traces p \<equiv> {tr. \<exists>p'. p \<Zsurj>\<mapsto>\<Zsurj>$ tr p'}"
 
+text \<open>The empty trace is in @{term "weak_traces"} for all states.\<close>
 lemma empty_trace_allways_weak_trace:
   shows "[] \<in> weak_traces p"
   using silent_reachable.intros(1) weak_step_sequence.intros(1) by fastforce
 
+text \<open>Since @{term "weak_step"}'s can be proceeded and followed by any number \<open>\<tau>\<close>-transitions and the empty
+@{term "weak_step_sequence"} also allows for \<open>\<tau>\<close>-transitions, a \<open>\<tau>\<close> can be prepended to a weak trace of a state.\<close>
 lemma prepend_\<tau>_weak_trace:
   assumes "tr \<in> weak_traces p"
   shows "(\<tau> # tr) \<in> weak_traces p"
@@ -150,6 +186,8 @@ lemma prepend_\<tau>_weak_trace:
     and weak_step_sequence.intros(2)
   by fastforce
 
+text \<open>If state \<open>p'\<close> is reachable from state \<open>p\<close> via a sequence of \<open>\<tau>\<close>-transitions, and there exists a weak trace \<open>tr\<close> starting from \<open>p'\<close>,
+then \<open>tr\<close> is also a weak trace starting from \<open>p\<close>.\<close>
 lemma silent_prepend_weak_traces:
   assumes "p \<Zsurj> p'"
       and "tr \<in> weak_traces p'"
@@ -171,6 +209,8 @@ proof-
     by blast
 qed
 
+text \<open>If there is an \<open>\<alpha>\<close>-transition from \<open>p\<close> to \<open>p'\<close>, and \<open>p'\<close> has a weak trace \<open>tr\<close>, then the sequence \<open>(\<alpha> # tr)\<close> 
+is a valid (weak) trace of \<open>p\<close>.\<close>
 lemma step_prepend_weak_traces:
   assumes "p \<mapsto> \<alpha> p'"
       and "tr \<in> weak_traces p'"
@@ -187,13 +227,16 @@ proof -
   then show "(\<alpha> # tr) \<in> weak_traces p" by auto
 qed
 
+text \<open>One of the behavioral preorders/-equivalences that we talk about is trace preorder/-equivalence.
+This is the modal characterization for "one state is weakly trace preordered to the other", @{term "weakly_trace_preordered"}
+denoted by \<open>\<lesssim>WT\<close>, and "two states are weakly trace equivalent", @{term "weakly_trace_equivalent"} denoted \<open>\<simeq>WT\<close>.\<close>
 definition weakly_trace_preordered (infix "\<lesssim>WT" 60) where
   "p \<lesssim>WT q \<equiv> weak_traces p \<subseteq> weak_traces q"
 
 definition weakly_trace_equivalent (infix "\<simeq>WT" 60) where
 "p \<simeq>WT q \<equiv> p \<lesssim>WT q \<and> q \<lesssim>WT p"
 
-
+text \<open>Just like @{term"step_setp"}, one can lift @{term "silent_reachable"} to sets of states.\<close>
 abbreviation silent_reachable_setp (infix "\<Zsurj>S" 80) where
   "P \<Zsurj>S Q \<equiv> ((\<forall>q \<in> Q. \<exists>p \<in> P. p \<Zsurj> q) \<and> (\<forall>p \<in> P. \<forall>q. p \<Zsurj> q \<longrightarrow> q \<in> Q))"
 
@@ -238,6 +281,7 @@ lemma sreachable_set_eq:
   shows "Q = silent_reachable_set P"
   using exactly_one_sreachable_set sreachable_set_is_sreachable assms by fastforce
 
+text \<open>We likewise lift @{term "soft_step"} to sets of states.\<close>
 abbreviation soft_step_setp ("_ \<mapsto>aS _ _" [70,70,70] 80) where
   "P \<mapsto>aS \<alpha> Q \<equiv> (\<forall>q \<in> Q. \<exists>p \<in> P. p \<mapsto>a \<alpha> q) \<and> (\<forall>p \<in> P. \<forall>q. p \<mapsto>a \<alpha> q \<longrightarrow> q \<in> Q)"
 
@@ -273,6 +317,10 @@ lemma soft_step_set_eq:
 
 end (* locale LTS_Tau *)
 
+text \<open>@{term "Inhabited_LTS"} and @{term "Inhabited_Tau_LTS"} are extensions of @{term "LTS"} and @{term "LTS_Tau"} respectively.
+They ensure that the corresponding transition systems have at least two states by fixing two different type variables, \<open>left\<close> and \<open>right\<close>.
+This ensures that the type \<open>'s\<close> has atleast two distinct elements.
+We later use them in the formalization of binary Hennesy-Milner logic conjunctions (\<open>\<and>\<close>), to ensure that the index set has at least two indices.\<close> 
 locale Inhabited_LTS = LTS step
   for step :: "'s \<Rightarrow> 'a \<Rightarrow> 's \<Rightarrow> bool" ("_ \<mapsto> _ _" [70,70,70] 80) +
   fixes left :: 's
