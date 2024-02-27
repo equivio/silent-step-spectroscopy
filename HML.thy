@@ -1,4 +1,4 @@
-section \<open> Hennesy-Milner-Logic (HML) \label{sect:HML}\<close>
+section \<open> Hennessy-Milner Logic (HML) \label{sect:HML}\<close>
 theory HML
   imports Main LTS
 begin
@@ -19,7 +19,7 @@ For a concrete example of how behavioural equivalences can be characterized by H
 reference the proof corresponding proof for weak trace equivalence in appendix \ref{appndx:weakTraces}.
 \<close> 
 
-subsection \<open> Representation of HML formulas: the \<open>hml\<close> datatype \label{sect:hmlDatatype} \<close>
+subsection \<open> Representation of HML Formulas: The \<open>hml\<close> datatype \label{sect:hmlDatatype} \<close>
 
 text \<open>
 The mutually recursive data types @{term "hml"} and @{term "hml_conjunct"} represent arbitrary HML formulas.
@@ -116,7 +116,7 @@ via an additional index type since we were able to overcome the technical challe
 the more general formalization.
 \<close>
 
-subsection \<open> Semantics of \<open>hml\<close> Formulas: \<open>\<Turnstile>\<close> \label{sect:hmlSemantic}\<close>
+subsection \<open> Semantics of HML Formulas \label{sect:hmlSemantic}\<close>
 
 context LTS_Tau
 begin
@@ -203,9 +203,9 @@ lemma opt_\<tau>_is_or: "(p \<Turnstile> (Silent \<phi>)) = ((p \<Turnstile> (Ob
   by simp
 
 
-subsection \<open> \<open>hml\<close> Meta-Syntax \<close>
+subsection \<open>HML Meta Syntax\<close>
 
-subsubsection \<open> Soft Poss: \<open>(\<alpha>)\<phi>\<close> \label{SoftPossDef}\<close>
+subsubsection \<open> Soft Poss  \label{SoftPossDef}\<close>
 
 text \<open>
 @{term "(HML_soft_poss \<alpha> \<phi>)"} represents \<open>(\<alpha>)\<phi>\<close>,
@@ -224,7 +224,7 @@ lemma soft_poss_to_or[simp]:
 
 end (* context LTS_Tau *)
 
-subsubsection \<open> Binary Conjunction: \<open>\<and>\<close> \<close>
+subsubsection \<open> Binary Conjunction\<close>
 
 context Inhabited_LTS
 begin
@@ -259,7 +259,7 @@ lemma hml_and_and[simp]:
 
 end (* Inhabited_Tau_LTS *)
 
-subsubsection \<open> Negation: \<open>\<not>\<close> \<close>
+subsubsection \<open> Negation\<close>
 
 context Inhabited_Tau_LTS
 begin
@@ -283,17 +283,17 @@ lemma hml_not_not_models[simp]:
   shows "(state \<Turnstile> HML_not \<phi>) = (\<not> state \<Turnstile> \<phi>)"
   by simp
 
-subsubsection \<open> Falsum: \<open>\<bottom>\<close> \<close>
+subsubsection \<open> Falsum\<close>
 
 abbreviation HML_falsum :: "('a, 's) hml" ("\<bottom>\<bottom>") where
   "\<bottom>\<bottom> \<equiv> HML_not TT"
 
-text \<open> No process ever satisfies falsum. \<close>
+text \<open> No process ever satisfies falsum.\<close>
 lemma never_models_falsum[simp]:
   shows "\<not> state \<Turnstile> \<bottom>\<bottom>"
   by simp
 
-subsubsection \<open> Binary Disjunction: \<open>\<or>\<close> \<close>
+subsubsection \<open> Binary Disjunction\<close>
 
 text \<open> @{term "(\<phi> \<or> \<phi>')"} represents \<open>\<phi> \<or> \<phi>'\<close> (read "or") and is realized by using binary conjunction and negation. \<close>
 
@@ -434,7 +434,7 @@ lemma not_pre_subst:
 end (* Inhabited_Tau_LTS *)
 
 
-subsubsection \<open> Pre-Congruence \<close>
+subsubsection \<open> Pre-Congruence\<close>
 
 text \<open>
 The following lemmata provide means to manipulate an HML implication
@@ -785,7 +785,7 @@ context LTS_Tau
 begin
 
 
-subsubsection \<open> Know Equivalence Elements \label{equivalenceProofs} \<close>
+subsubsection \<open> Known Equivalence Elements \label{equivalenceProofs} \<close>
 
 text \<open> \<open>\<langle>\<epsilon>\<rangle>(\<tau>)\<phi>\<close> is equivalent to \<open>\<langle>\<epsilon>\<rangle>\<phi>\<close> \<close>
 lemma \<epsilon>\<tau>_is_\<tau>: "(Internal (Silent \<phi>)) \<Lleftarrow>\<Rrightarrow> (Internal \<phi>)"
@@ -923,7 +923,7 @@ thereby providing further support for equational reasoning on HML formulas.
 Of note is the fact that this always yields an HML implication.
 \<close>
 
-subsubsection \<open> Observations \<open>\<langle>\<alpha>\<rangle>...\<close> \<close>
+subsubsection \<open> Observations \<close>
 
 lemma obs_left_impl_subst_equal:
   assumes "\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r"
@@ -943,7 +943,7 @@ lemma obs_equal_subst_impl:
     shows "\<phi> \<Rrightarrow> (Obs \<alpha> \<phi>r)"
   using assms by (simp add: hml_eq_def obs_pre_subst)
 
-subsubsection \<open> Internal Behavior \<open>\<langle>\<epsilon>\<rangle>...\<close> \<close>
+subsubsection \<open> Internal Behavior \<close>
 
 lemma internal_left_impl_subst_equal:
   assumes "\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r"
@@ -963,7 +963,7 @@ lemma internal_equal_subst_impl:
     shows "\<phi> \<Rrightarrow> (Internal \<phi>r)"
   using assms and hml_eq_def and internal_pre_subst by blast
 
-subsubsection \<open> Silent Step \<open>(\<tau>)...\<close> \<close>
+subsubsection \<open> Silent Step\<close>
 
 lemma silent_left_impl_subst_equal:
   assumes "\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r"
@@ -983,7 +983,7 @@ lemma silent_equal_subst_impl:
     shows "\<phi> \<Rrightarrow> (Silent \<phi>r)"
   using assms and hml_eq_def and silent_pre_subst by blast
 
-subsubsection \<open> Conjunctions \<open>\<And>\<Psi>\<close> \<close>
+subsubsection \<open> Conjunctions\<close>
 
 lemma conjunction_left_impl_subst_equal:
   assumes "\<psi>sl ` I = \<psi>sr ` I"
@@ -1066,7 +1066,7 @@ lemma not_equal_subst_impl:
     shows "\<phi> \<Rrightarrow> HML_not \<phi>l"
   using assms by (smt (verit) hml_conjunct_impl_def hml_eq_def hml_impl_iffI hml_models.simps(5) neg_pre_cong)
 
-subsubsection \<open> And, i.e. Binary Conjunction \<close>
+subsubsection \<open> Binary Conjunction \<close>
 
 lemma and_lr_impl_subst_equal:
   assumes "\<phi>l \<Lleftarrow>\<and>\<Rrightarrow> \<phi>r"
@@ -1104,15 +1104,7 @@ lemma and_right_equal_subst_impl:
     shows "\<phi>' \<Rrightarrow> \<phi> \<and>hml \<phi>r"
   using assms by (simp add: hml_conjunct_impl_def hml_eq_equality hml_impl_def)
 
-subsubsection \<open> Falsum and Verum \<close>
-
-text \<open> If satisfaction of a formula entails that falsum must be satisfied means that this formula
-can never be satisfied. \<close>
-lemma entails_falsum_equals_falsum:
-  assumes "\<phi> \<Rrightarrow> \<bottom>\<bottom>"
-  shows "\<phi> \<Lleftarrow>\<Rrightarrow> \<bottom>\<bottom>"
-  using assms 
-  by (simp add: LTS_Tau.hml_eq_equality LTS_Tau.hml_impl_iffI)
+subsubsection \<open> Verum and Falsum\<close>
 
 text \<open> If we can show that verum entails the satisfaction of a formula, the formula must be equivalent
 to verum. \<close>
@@ -1122,10 +1114,17 @@ lemma follows_verum_equals_verum:
   using assms 
   by (simp add: LTS_Tau.hml_eq_equality LTS_Tau.hml_impl_iffI)
 
+text \<open> If satisfaction of a formula entails that falsum must be satisfied means that this formula
+can never be satisfied. \<close>
+lemma entails_falsum_equals_falsum:
+  assumes "\<phi> \<Rrightarrow> \<bottom>\<bottom>"
+  shows "\<phi> \<Lleftarrow>\<Rrightarrow> \<bottom>\<bottom>"
+  using assms 
+  by (simp add: LTS_Tau.hml_eq_equality LTS_Tau.hml_impl_iffI)
 end (* Inhabited_Tau_LTS *)
 
 subsection \<open> Distinguishing Formulas \label{sect:hmlDist} \<close>
-
+subsubsection \<open> Fundamentals \<close>
 context LTS_Tau
 begin
 

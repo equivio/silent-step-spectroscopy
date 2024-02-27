@@ -5,7 +5,7 @@ theory Example_Instantiation
 begin
 text \<open>In this theory we create an instantiation of a two-dimensional energy game to test our definitions.\<close>
 
-subsection\<open>Two-dimensional Energies\<close>
+subsection\<open>Two-Dimensional Energies\<close>
 
 text \<open>We first define energies in a similar manner to our definition of energies with eight dimensions: 
 We use \<open>eneg\<close> when the energy level is equal to or lower than the \<open>defender_win_level\<close>. We define 

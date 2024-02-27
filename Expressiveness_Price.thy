@@ -1,4 +1,4 @@
-section \<open>The expressiveness price function \label{sect:ExpressivenessMeasure}\<close>
+section \<open>Expressiveness Price Function \label{sect:ExpressivenessMeasure}\<close>
 
 theory Expressiveness_Price
   imports HML_SRBB Energy Spectroscopy_Game
@@ -47,7 +47,7 @@ Note that, since all these functions stem from the above singular function, they
 and differ mostly in where the $1+$ is placed.
 \<close>
 
-subsection \<open>Modal depth\<close>
+subsection \<open>Modal Depth\<close>
 
 text \<open>
 (Maximal) Modal depth (of observations $\langle\alpha\rangle$, $(\alpha)$)\\
@@ -115,7 +115,7 @@ lemma "modal_depth_srbb (ImmConj \<nat> (\<lambda>n. Pos (Obs \<alpha> (observe_
   by (metis sucs_of_nats_in_enats_sup_infinite) 
 
 
-subsection \<open>Depth of branching conjunctions\<close>
+subsection \<open>Depth of Branching Conjunctions\<close>
 
 text \<open>
 Depth of branching conjunctions (with one observation clause not starting with $\langle\varepsilon\rangle$)\\
@@ -148,8 +148,37 @@ primrec
   "branch_conj_depth_conjunct (Pos \<chi>) = branch_conj_depth_inner \<chi>" |
   "branch_conj_depth_conjunct (Neg \<chi>) = branch_conj_depth_inner \<chi>" 
 
+subsection \<open>Depth of Stable Conjunctions\<close>
 
-subsection \<open>Depth of instable conjunctions\<close>
+text \<open>
+Depth of stable conjunctions (that do enforce stability by a $\neg\langle\tau\rangle\top$-conjunct)
+
+This counter is increased on each:
+\begin{itemize}
+  \item \<open>StableConj\<close>
+\end{itemize}
+
+Note that if the \<open>StableConj\<close> is empty (i.e. has no other conjuncts),
+it is still counted!
+\<close>
+
+primrec
+      stable_conjunction_depth :: "('a, 's) hml_srbb \<Rightarrow> enat"
+  and st_conj_depth_inner :: "('a, 's) hml_srbb_inner \<Rightarrow> enat"
+  and st_conj_depth_conjunct :: "('a, 's) hml_srbb_conjunct \<Rightarrow> enat" where
+  "stable_conjunction_depth TT = 0" |
+  "stable_conjunction_depth (Internal \<chi>) = st_conj_depth_inner \<chi>" |
+  "stable_conjunction_depth (ImmConj I \<psi>s) = Sup ((st_conj_depth_conjunct \<circ> \<psi>s) ` I)" |
+
+  "st_conj_depth_inner (Obs _ \<phi>) = stable_conjunction_depth \<phi>" |
+  "st_conj_depth_inner (Conj I \<psi>s) = Sup ((st_conj_depth_conjunct \<circ> \<psi>s) ` I)" |
+  "st_conj_depth_inner (StableConj I \<psi>s) = 1 + Sup ((st_conj_depth_conjunct \<circ> \<psi>s) ` I)" |
+  "st_conj_depth_inner (BranchConj _ \<phi> I \<psi>s) = Sup ({stable_conjunction_depth \<phi>} \<union> ((st_conj_depth_conjunct \<circ> \<psi>s) ` I))" |
+
+  "st_conj_depth_conjunct (Pos \<chi>) = st_conj_depth_inner \<chi>" |
+  "st_conj_depth_conjunct (Neg \<chi>) = st_conj_depth_inner \<chi>" 
+
+subsection \<open>Depth of Instable Conjunctions\<close>
 
 text \<open>
 Depth of instable conjunctions (that do not enforce stability by a $\neg\langle\tau\rangle\top$-conjunct)
@@ -190,39 +219,7 @@ primrec
   "inst_conj_depth_conjunct (Pos \<chi>) = inst_conj_depth_inner \<chi>" |
   "inst_conj_depth_conjunct (Neg \<chi>) = inst_conj_depth_inner \<chi>" 
 
-
-subsection \<open>Depth of stable conjunctions\<close>
-
-text \<open>
-Depth of stable conjunctions (that do enforce stability by a $\neg\langle\tau\rangle\top$-conjunct)
-
-This counter is increased on each:
-\begin{itemize}
-  \item \<open>StableConj\<close>
-\end{itemize}
-
-Note that if the \<open>StableConj\<close> is empty (i.e. has no other conjuncts),
-it is still counted!
-\<close>
-
-primrec
-      stable_conjunction_depth :: "('a, 's) hml_srbb \<Rightarrow> enat"
-  and st_conj_depth_inner :: "('a, 's) hml_srbb_inner \<Rightarrow> enat"
-  and st_conj_depth_conjunct :: "('a, 's) hml_srbb_conjunct \<Rightarrow> enat" where
-  "stable_conjunction_depth TT = 0" |
-  "stable_conjunction_depth (Internal \<chi>) = st_conj_depth_inner \<chi>" |
-  "stable_conjunction_depth (ImmConj I \<psi>s) = Sup ((st_conj_depth_conjunct \<circ> \<psi>s) ` I)" |
-
-  "st_conj_depth_inner (Obs _ \<phi>) = stable_conjunction_depth \<phi>" |
-  "st_conj_depth_inner (Conj I \<psi>s) = Sup ((st_conj_depth_conjunct \<circ> \<psi>s) ` I)" |
-  "st_conj_depth_inner (StableConj I \<psi>s) = 1 + Sup ((st_conj_depth_conjunct \<circ> \<psi>s) ` I)" |
-  "st_conj_depth_inner (BranchConj _ \<phi> I \<psi>s) = Sup ({stable_conjunction_depth \<phi>} \<union> ((st_conj_depth_conjunct \<circ> \<psi>s) ` I))" |
-
-  "st_conj_depth_conjunct (Pos \<chi>) = st_conj_depth_inner \<chi>" |
-  "st_conj_depth_conjunct (Neg \<chi>) = st_conj_depth_inner \<chi>" 
-
-
-subsection \<open>Depth of immediate conjunctions\<close>
+subsection \<open>Depth of Immediate Conjunctions\<close>
 
 text \<open>
 Depth of immediate conjunctions (that are not preceded by $\langle\varepsilon\rangle$)
@@ -253,7 +250,7 @@ primrec
   "imm_conj_depth_conjunct (Neg \<chi>) = imm_conj_depth_inner \<chi>"
 
 
-subsection \<open>Maximal modal depth of positive clauses in conjunctions\<close>
+subsection \<open>Maximal Modal Depth of Positive Clauses in Conjunctions\<close>
 
 text \<open>
 Maximal modal depth of positive clauses in conjunctions.
@@ -277,7 +274,7 @@ primrec
   "max_pos_conj_depth_conjunct (Pos \<chi>) = modal_depth_srbb_inner \<chi>" |
   "max_pos_conj_depth_conjunct (Neg \<chi>) = max_pos_conj_depth_inner \<chi>"
 
-subsection \<open>Maximal modal depth of negative clauses in conjunctions\<close>
+subsection \<open>Maximal Modal Depth of Negative Clauses in Conjunctions\<close>
 
 text \<open>
 Maximal modal depth of negative clauses in conjunctions.
@@ -301,7 +298,7 @@ primrec
   "max_neg_conj_depth_conjunct (Pos \<chi>) = max_neg_conj_depth_inner \<chi>" |
   "max_neg_conj_depth_conjunct (Neg \<chi>) = modal_depth_srbb_inner \<chi>"
 
-subsection \<open>Depth of negations\<close>
+subsection \<open>Depth of Negations\<close>
 
 text \<open>
 Depth of negations (occurences of \<open>Neg \<chi>\<close> on a path of the syntax tree).
@@ -328,7 +325,7 @@ primrec
   "neg_depth_conjunct (Pos \<chi>) = neg_depth_inner \<chi>" |
   "neg_depth_conjunct (Neg \<chi>) = 1 + neg_depth_inner \<chi>" 
 
-subsection \<open>Expressiveness price function\<close>
+subsection \<open>Expressiveness Price Function\<close>
 
 text \<open>This combines the eight functions to the @{term "expressiveness_price"} function mentioned above.\<close>
 
@@ -414,7 +411,7 @@ lemma \<psi>_price_never_neg: "expr_pr_conjunct \<psi> \<noteq> eneg"
 definition \<O>_conjunct :: "energy \<Rightarrow> (('a, 's) hml_srbb_conjunct) set" where
   "\<O>_conjunct energy \<equiv> {\<chi> . expr_pr_conjunct \<chi> \<le> energy}"
 
-subsection \<open>Prices of certain formulas\<close>
+subsection \<open>Prices of Certain Formulas\<close>
 
 text \<open>
 We demonstrate the pricing mechanisms for various formulas. These proofs operate under the assumption of an expressiveness price \<open>e\<close> for a given formula \<open>\<chi>\<close> and proceed to determine the price of a derived formula, such as \<open>Pos \<chi>\<close>. 
@@ -1059,7 +1056,7 @@ lemma expr_obs_phi:
 
 end
 
-subsection \<open>characterizing equivalence by energy coordinates\<close>
+subsection \<open>Characterizing Equivalence by Energy Coordinates\<close>
 
 context Inhabited_Tau_LTS
 begin

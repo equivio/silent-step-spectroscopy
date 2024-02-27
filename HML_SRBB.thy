@@ -1,4 +1,4 @@
-section \<open> Stability Respecting Branching Bisimilarity - Subset of HML \label{sect:hmlSRBB} \<close>
+section \<open> Stability-Respecting Branching Bisimilarity (HML$_\text{SRBB}$) \label{sect:hmlSRBB} \<close>
 
 text \<open> This section describes the largest subset of the full HML language in \ref{sect:HML} that we are
 using for purposes of silent step spectroscopy.  It is supposed to characterize the most fine grained
@@ -71,7 +71,7 @@ We decided against it since we were unable to figure out how to define expressiv
 (c.f. section \ref{sect:ExpressivenessMeasure}) when using this approach.
 \<close>
 
-subsection \<open> Semantics of \<open>hml_srbb\<close> Formulas: \<open>\<Turnstile>\<close> and \<open>\<lbrakk> \<rbrakk>\<close> \<close>
+subsection \<open> Semantics of HML$_\text{SRBB}$ Formulas \<close>
 
 text \<open>
 This section describes how semantic meaning is assigned to HML-SRBB formulas in the context of an LTS.
@@ -83,7 +83,7 @@ Defining it via translation to @{term "hml"} allows (and forces) us to reuse the
 properties of @{term "hml"}.
 \<close>
 
-subsubsection \<open> Mapping \<open>hml_srbb\<close> to \<open>hml\<close> \<close>
+subsubsection \<open> Mapping HML$_\text{SRBB}$ to HML \<close>
 
 text \<open>
 We ensure that @{term "hml_srbb"} is a subset of @{term "hml"} by mapping each constructor of
@@ -186,7 +186,7 @@ not just one observation is missing), it provides us with confidence that our ad
 HML-SRBB language does not impact the results of the project.
 \<close>
 
-subsubsection \<open> The Models Relation \<open>\<Turnstile>\<close> for \<open>hml_srbb\<close> \<close>
+subsubsection \<open>Models Relation for HML$_\text{SRBB}$ \<close>
 
 text \<open>
 We say that a process @{term "p"} satisfies an HML-SRBB formula @{term "\<phi>"}, denoted as @{term "p \<Turnstile>SRBB \<phi>"},
@@ -203,7 +203,7 @@ fun hml_srbb_conjunct_models :: "('a, 's) hml_srbb_conjunct \<Rightarrow> 's \<R
   "hml_srbb_conjunct_models \<psi> s = (hml_conjunct_models s (hml_srbb_conjunct_to_hml_conjunct \<psi>))"
 
 
-subsubsection \<open> The Semantic Function \<open>\<lbrakk> \<rbrakk>\<close> for \<open>hml_srbb\<close> \<close>
+subsubsection \<open> Semantic Function for HML$_\text{SRBB}$ \<close>
 
 text \<open>
 We define the meaning of an HML-SRBB formula @{term "\<phi>"} (written \<open>\<lbrakk>\<phi>\<rbrakk>\<close>) to be the set of all processes
@@ -220,7 +220,7 @@ abbreviation model_set_conjunct :: "('a, 's) hml_srbb_conjunct \<Rightarrow> 's 
   "model_set_conjunct \<psi> \<equiv> {p. hml_srbb_conjunct_models \<psi> p}"
 
 
-subsection \<open> Different variants of \<open>\<top>\<close> \<close>
+subsection \<open> Different Variants of Verum \<close>
 
 text \<open> \<open>\<top>\<close> is equal to \<open>\<And>{}\<close> \<close>
 lemma empty_imm_conj:
@@ -864,7 +864,7 @@ proof -
   qed
 qed
 
-subsection \<open> \<open>hml_srbb\<close> Implication \<close>
+subsection \<open> HML$_\text{SRBB}$ Implication \<close>
 
 text \<open>
 Same as for \<open>hml\<close>, we define what is means for one \<open>hml_srbb\<close> formula to imply another (denoted as \<open>\<phi>p \<Rrightarrow> \<phi>c\<close>), by
@@ -934,7 +934,7 @@ lemma srbb_impl_conjunct_to_hml_impl:
   by (simp add: hml_conjunct_impl_def hml_srbb_impl_conjunct_def)
 
 
-subsection \<open> \<open>hml__srbb\<close> Equivalence \<close>
+subsection \<open> HML$_\text{SRBB}$ Equivalence \<close>
 
 text \<open>
 We define HML-SRBB formula equivalence to by appealing to HML-SRBB implication.
@@ -1157,7 +1157,7 @@ lemma srbb_TT_is_empty_conj: "TT \<Lleftarrow>srbb\<Rrightarrow> ImmConj {} \<ps
   by (simp add: hml_srbb_eq_def hml_srbb_impl_def)
 
 
-subsection \<open> Distinguishing Formulas \& Equivalence \<close>
+subsection \<open> Distinguishing Formulas and Equivalence \<close>
 
 text \<open> If $\varphi$ is equivalent to $\varphi'$ and $\varphi$ distinguishes process @{term "p"} from
 process @{term "q"}, the $\varphi'$ also distinguishes process @{term "p"} from process @{term "q"} \<close>
@@ -1169,7 +1169,7 @@ lemma dist_equal_dist:
   by (simp add: distinguishes_def hml_srbb_eq_iff)
 
 
-subsection \<open> \<open>hml_srbb\<close> Formula Set derived Preorder on Processes \<close>
+subsection \<open> HML$_\text{SRBB}$ Formula Set derived Pre-Order on Processes \<close>
 
 text \<open> A set of HML-SRBB formulas preorder two processes @{term "p"} and @{term "q"}, if
 for all formulas in this set the fact that @{term "p"} satisfies a formula means that also
@@ -1194,7 +1194,7 @@ next
     by (smt (verit, best) hml_preordered_def transpI)
 qed
 
-subsection \<open> \<open>hml_srbb\<close> Formula Set derived Equivalence of Processes \<close>
+subsection \<open>HML$_\text{SRBB}$ Formula Set derived Equivalence of Processes \<close>
 
 text \<open> A set of HML-SRBB formulas equates two processes @{term "p"} and @{term "q"}, if
 this set of formulas preorders these two processes in both directions. \<close>

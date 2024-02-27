@@ -3,7 +3,7 @@ theory LTS
   imports Main
 begin
 
-subsection \<open>Labeled Transition Systems\<close>
+subsection \<open>Labelled Transition Systems\<close>
 
 text \<open>
 The locale @{term "LTS"} represents a labeled transition system (cf. \cite[defintion 1]{bisping2023lineartimebranchingtime}) consisting of a set of states $\mathcal{P}$, 
@@ -49,7 +49,7 @@ lemma step_set_eq:
 
 end (*<*) (* locale LTS *) (*>*)
 
-subsection \<open>Labeled Transition Systems with Silent Steps\<close>
+subsection \<open>Labelled Transition Systems with Silent Steps\<close>
 
 text \<open>We formalize transition systems with \textit{silent steps} as an extension of ordinary transition systems
 with a fixed \textit{silent action} \<open>\<tau>\<close>.\<close>

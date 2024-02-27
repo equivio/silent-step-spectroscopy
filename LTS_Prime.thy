@@ -1,4 +1,4 @@
-section \<open> Alternative LTS locale with $\tau$ steps \label{appndx:LTSOptTau}\<close>
+section \<open> Alternative LTS locale with $\tau$ Steps \label{appndx:LTSOptTau}\<close>
 
 theory LTS_Prime
   imports Main

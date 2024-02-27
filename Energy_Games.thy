@@ -49,8 +49,6 @@ abbreviation weighted_move :: "'gstate \<Rightarrow> 'energy update \<Rightarrow
 
 abbreviation "weight g1 g2 \<equiv> the (weight_opt g1 g2)"
 
-subsubsection \<open>Finite Plays\<close>
-
 text\<open>A valid finite play is a lists of states where there is a move from one state to the next in the list.\<close>
 
 inductive finite_play :: "'gstate \<Rightarrow> 'gstate fplay \<Rightarrow> bool" where
