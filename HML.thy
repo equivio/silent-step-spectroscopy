@@ -19,7 +19,7 @@ For a concrete example of how behavioural equivalences can be characterized by H
 reference the proof corresponding proof for weak trace equivalence in appendix \ref{appndx:weakTraces}.
 \<close> 
 
-subsection \<open> Representation of HML Formulas: The \<open>hml\<close> datatype \label{sect:hmlDatatype} \<close>
+subsection \<open> Representation of HML Formulas \label{sect:hmlDatatype} \<close>
 
 text \<open>
 The mutually recursive data types @{term "hml"} and @{term "hml_conjunct"} represent arbitrary HML formulas.
