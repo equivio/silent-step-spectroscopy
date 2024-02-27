@@ -65,7 +65,7 @@ that the types @{term "hml"} and @{term "hml_srbb"} are non-empty.
 Isabelle is unable to show that the types are non-empty if the @{term "TT"} data constructor is not
 given due to the way we have chosen to formalize the conjunction.
 This formalization allows for conjunctions of arbitrary - even of infinite - width and has been
-taken from \cite{Pohlmann2021ReducingReactive} (Appendix B).
+taken from \cite{Pohlmann2021ReducingReactive} (appendix B).
 This added expressiveness comes at the cost of making proofs regarding conjunctions more complex
 and restricts the ways in which functions may be derived for these types (c.f. section \ref{sect:ExpressivenessMeasure}).
 \\
@@ -192,7 +192,7 @@ Every process will satisfy both of these formulas.
 lemma tt_eq_empty_conj: "(state \<Turnstile> TT) = (state \<Turnstile> Conj {} \<psi>)"
   by simp
 
-text \<open> \<open>\<And>{\<phi>}\<close> (i.e. the single element conjunction) is satisfied iff \<open>\<phi>\<close> is satisfied. \<close>
+text \<open> \<open>\<And>{\<phi>}\<close> (i.e. the single element conjunction) is satisfied if and only if \<open>\<phi>\<close> is satisfied. \<close>
 lemma conj_\<phi>_is_\<phi>:
   "(state \<Turnstile> \<phi>)
  = (state \<Turnstile> Conj {state} (\<lambda>i. if i = state then (Pos \<phi>) else (Pos TT)))"
@@ -564,8 +564,7 @@ subsection \<open> Equivalence \label{sect:hmlEq} \<close>
 text \<open>
 A HML formula \<open>\<phi>l\<close> is said to be equivalent to some other HML formula \<open>\<phi>r\<close>, written \<open>\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r\<close>,
 if and only if  process \<open>p\<close> satisfies \<open>\<phi>l\<close> if and only if it also satisfies \<open>\<phi>r\<close>, regardless of the process \<open>p\<close>.
-
-We have chosen to define this equivalence by appealing to HML formula implication (c.f. \ref{sect:hmImpl}).
+We have chosen to define this equivalence by appealing to HML formula implication (\ref{sect:hmlImpl}).
 \<close>
 
 definition hml_eq :: "('a, 's) hml \<Rightarrow> ('a, 's) hml \<Rightarrow> bool" (infix "\<Lleftarrow>\<Rrightarrow>" 60)  where
@@ -1234,8 +1233,7 @@ This subsection provides proofs regarding conjunctions that distinguish a proces
 processes \<open>Q\<close>. In particular, the property of distinguishing conjunction thinning is proven.
 This property states that if a conjunction distinguishes \<open>p\<close> from \<open>Q\<close> with some arbitrary index set
 \<open>I\<close>, then one can construct another conjunction with the index set \<open>Q\<close> (with one conjunct per
-process to be distinguished from) that also distinguished \<open>p\<close> from \<open>Q\<close>.
-
+process to be distinguished from) that also distinguished \<open>p\<close> from \<open>Q\<close>. 
 Intuitively, this proposition should hold, since for the conjunction to distinguish from \<open>Q\<close> it must
 contain at least one conjunct for each element \<open>q\<close> of \<open>Q\<close> that is not satisfied by \<open>q\<close>.
 One may now constructed the 'thinned' conjunction with index set \<open>Q\<close> by picking for each \<open>q\<close> in \<open>Q\<close>

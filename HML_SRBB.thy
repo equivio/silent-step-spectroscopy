@@ -1,11 +1,10 @@
 section \<open> Stability-Respecting Branching Bisimilarity (HML$_\text{SRBB}$) \label{sect:hmlSRBB} \<close>
-
-text \<open> This section describes the largest subset of the full HML language in \ref{sect:HML} that we are
-using for purposes of silent step spectroscopy.  It is supposed to characterize the most fine grained
-behavioural equivalence that we may decide: Stability Respecting Branching Bisimilarity (SRBB). While
-there are good reasons to believe that this subset truly characterizes SRBB (c.f. \cite{bisping2023lineartimebranchingtime}),
-we do no provide a formal proof of this fact. From this sub-language smaller subsets are derived
-via the notion of expressiveness prices (see section \ref{sect:ExpressivenessMeasure}). \<close>
+text \<open> This section describes the largest subset of the full HML language in section \ref{sect:HML} that we are
+using for purposes of silent step spectroscopy. It is supposed to characterize the most fine grained
+behavioural equivalence that we may decide: Stability-Respecting Branching Bisimilarity (SRBB). While
+there are good reasons to believe that this subset truly characterizes SRBB (c.f.\cite{bisping2023lineartimebranchingtime}),
+we do not provide a formal proof. From this sublanguage smaller subsets are derived
+via the notion of expressiveness prices (\ref{sect:ExpressivenessMeasure}). \<close>
 
 theory HML_SRBB
   imports Main HML
@@ -13,9 +12,9 @@ begin
 
 text \<open>
 The mutually recursive data types @{term "hml_srbb"}, @{term "hml_srbb_inner"} and @{term "hml_srbb_conjunct"}
-represent the subset of all @{term "hml"} formulas, which characterize stability respecting branching
-bisimilarity (abbreviated to 'srbb').
-
+represent the subset of all @{term "hml"} formulas, which characterize stability-respecting branching
+bisimilarity (abbreviated to 'SRBB').
+\\\\
 When a parameter is of type @{term "hml_srbb"} we typically use \<open>\<phi>\<close> as a name,
 for type @{term "hml_srbb_inner"} we use \<open>\<chi>\<close> and for type @{term "hml_srbb_conjunct"} we use \<open>\<psi>\<close>.
 
@@ -29,7 +28,7 @@ The data constructors are to be interpreted as follows:
   \end{itemize}
   \item in @{term "hml_srbb_inner"}
   \begin{itemize}
-    \item \<open>(Obs \<alpha> \<phi>)\<close> encodes \<open>(\<alpha>)\<phi>\<close> (Note the difference to \cite{bisping2023lineartimebranchingtime}!)
+    \item \<open>(Obs \<alpha> \<phi>)\<close> encodes \<open>(\<alpha>)\<phi>\<close> (Note the difference to \cite{bisping2023lineartimebranchingtime})
     \item \<open>(Conj I \<psi>s)\<close> encode $\bigwedge\nolimits_{i \in \mathrm{\texttt{I}}} {\psi s}(i)$
     \item \<open>(StableConj I \<psi>s)\<close> encodes $\neg\langle\tau\rangle\top \land \bigwedge\nolimits_{i \in \mathrm{\texttt{I}}} {\psi s}(i)$
     \item \<open>(BranchConj \<alpha> \<phi> I \<psi>s)\<close> encodes $(\alpha)\varphi \land \bigwedge\nolimits_{i \in \mathrm{\texttt{I}}} {\psi s}(i)$
@@ -65,17 +64,16 @@ and
 
 text \<open>
 In the beginning, instead of defining the subset as a new data type,  we considered defining the
-HML-SRBB subset via a predicate on @{term "hml"} like \<open>is_srbb :: "('a,'s) hml \<Rightarrow> bool"\<close>.
+HML$_\text{SRBB}$ subset via a predicate on @{term "hml"} like \<open>is_srbb :: "('a,'s) hml \<Rightarrow> bool"\<close>.
 For a concrete instance of this approach reference \<open>is_trace_formula\<close> in appendix \ref{appndx:weakTraces}.
-We decided against it since we were unable to figure out how to define expressiveness prices
-(c.f. section \ref{sect:ExpressivenessMeasure}) when using this approach.
+We decided not to use this approach because we could not figure out how  define expressiveness prices (see section \ref{sect:ExpressivenessMeasure}) when using this option.
 \<close>
 
 subsection \<open> Semantics of HML$_\text{SRBB}$ Formulas \<close>
 
 text \<open>
-This section describes how semantic meaning is assigned to HML-SRBB formulas in the context of an LTS.
-We define what it means for a process @{term "p"} to satisfy an HML-SRBB formula @{term "\<phi>"} -
+This section describes how semantic meaning is assigned to HML$_\text{SRBB}$ formulas in the context of a LTS.
+We define what it means for a process @{term "p"} to satisfy a HML$_\text{SRBB}$ formula @{term "\<phi>"},
 written as \<open>p \<Turnstile>SRBB \<phi>\<close>, by first translating this formula @{term "\<phi>"} into the corresponding HML formula
 (via @{term "hml_srbb_to_hml"}) and then appealing to HML's models function.
 This is in contrast to defining the function directly by inspecting the transitions possible from @{term "p"}.
@@ -132,29 +130,26 @@ where
     hml_conjunct.Neg (hml.Internal (hml_srbb_inner_to_hml \<chi>))"
 
 text \<open>
-Given this translation we may now note that this HML-SRBB subset diverges significantly from the one
-given in \cite{bisping2023lineartimebranchingtime}. Specifically, Bisping et al allow for true observation
+Given this translation, we may now note that this HML$_\text{SRBB}$ subset diverges significantly from the one
+given in \cite{bisping2023lineartimebranchingtime}. Specifically, Bisping and Jansen allow for true observation
 clauses $\langle \alpha \rangle$ under the non-terminal $\chi$ with the side condition that $\alpha \neq \tau$,
 while we instead opted to allow for 'soft observations' $(\alpha)$ in the corresponding type @{term "hml_srbb_inner"},
 without any constraint on $\alpha$.  We choose to do so, since we are unable to express the side
 condition $\alpha \neq \tau$ at type level. This is rooted in the way in which we defined $\tau$ as
-being a fixed but otherwise arbitrary inhabitant of the label type \<open>'a\<close> (c.f. section \ref{sect:LTS}).
+being a fixed but otherwise arbitrary inhabitant of the label type \<open>'a\<close> (\ref{sect:LTS}).
 For an alternative definition of $\tau$ which allows for type level distinction of $\tau$ from all other
-labels reference appendix \ref{appndx:LTSOptTau}.
-
-One may now wonder if this modification is valid or if it in any way impacts the results of this
-project.  While we do not not formally prove that this modification does not alter the meaning of
-the HML-SRBB subset, we may provide some evidence that the divergence is permitted:
+labels reference appendix \ref{appndx:LTSOptTau}. One may now wonder if this modification is valid or if it in any way impacts the results of this
+project. While we do not not formally prove that this modification does not alter the meaning of
+the HML$_\text{SRBB}$ subset, we may provide some evidence that the divergence is permitted:
 \begin{enumerate}
-  \item The proof that weak trace equivalence is characterized by a specific subset of our HML-SRBB
-    (appendix \ref{appndx:weakTraces}) still works.  If this were not the case, our change would most definitly have
-    been problematic.
-  \item \label{lbl:srbbArgument} One can argue that all occurances of the 'soft' observation
+  \item The proof that weak trace equivalence is characterized by a specific subset of our HML$_\text{SRBB}$
+    (appendix \ref{appndx:weakTraces}) still works. If this had not been the case, our change would certainly have been problematic.
+  \item \label{lbl:srbbArgument} One can argue that all occurrences of the 'soft' observation
     $(\alpha)\varphi$ are equivalent to some formula in \cite{bisping2023lineartimebranchingtime}'s
-    dialect of HML-SRBB.
+    dialect of HML$_\text{SRBB}$.
 \end{enumerate}
 
-Item \ref{lbl:srbbArgument} may be justified by case analysis on the $\alpha$ in $(\alpha)\varphi$:
+The second one (\ref{lbl:srbbArgument}) may be justified by case analysis on the $\alpha$ in $(\alpha)\varphi$:
 \begin{enumerate}
   \item If $\alpha \neq \tau$:\\
     By the definition of $(\alpha)\varphi$ in \ref{SoftPossDef} it follows that $(\alpha)\varphi = \langle \alpha \rangle \varphi$
@@ -171,26 +166,26 @@ Item \ref{lbl:srbbArgument} may be justified by case analysis on the $\alpha$ in
         \begin{enumerate}
           \item $\varphi = \top$:\\
             Here, we know from \ref{equivalenceProofs} that $\langle\varepsilon\rangle\top \Lleftarrow\Rrightarrow \top$, which is in
-            \cite{bisping2023lineartimebranchingtime}'s HML-SRBB.
+            \cite{bisping2023lineartimebranchingtime}'s HML$_\text{SRBB}$.
           \item $\varphi = \langle \varepsilon \rangle \chi$:\\
             Once again, from \ref{equivalenceProofs} we know $\langle\varepsilon\rangle\langle\varepsilon\rangle\chi \Lleftarrow\Rrightarrow \langle\varepsilon\rangle\chi$,
-            which is in \cite{bisping2023lineartimebranchingtime}'s HML-SRBB.
+            which is in \cite{bisping2023lineartimebranchingtime}'s HML$_\text{SRBB}$.
           \item $\varphi = \bigwedge\nolimits_{i \in I} {\psi s}(i)$:\\
             Here, we can observe that $\langle\varepsilon\rangle\bigwedge\nolimits_{i \in I} {\psi s}(i)$ is directly in
-            \cite{bisping2023lineartimebranchingtime}'s HML-SRBB.
+            \cite{bisping2023lineartimebranchingtime}'s HML$_\text{SRBB}$.
         \end{enumerate}
     \end{itemize}
 \end{enumerate}
 While this argument is not a proper proof (inductively moving this argument over the whole formula,
 not just one observation is missing), it provides us with confidence that our adaptation of the
-HML-SRBB language does not impact the results of the project.
+HML$_\text{SRBB}$ language does not impact the results of the project.
 \<close>
 
 subsubsection \<open>Models Relation for HML$_\text{SRBB}$ \<close>
 
 text \<open>
-We say that a process @{term "p"} satisfies an HML-SRBB formula @{term "\<phi>"}, denoted as @{term "p \<Turnstile>SRBB \<phi>"},
-if that process @{term "p"} models the result of translating the HML-SRBB @{term "\<phi>"} formula into a HML formula.
+We say that a process @{term "p"} satisfies an HML$_\text{SRBB}$ formula @{term "\<phi>"}, denoted as @{term "p \<Turnstile>SRBB \<phi>"}
+if that process @{term "p"} models the result of translating the HML$_\text{SRBB}$ @{term "\<phi>"} formula into a HML formula.
 \<close>
 
 fun hml_srbb_models :: "'s \<Rightarrow> ('a, 's) hml_srbb \<Rightarrow> bool" (infix "\<Turnstile>SRBB" 60)where
@@ -206,7 +201,7 @@ fun hml_srbb_conjunct_models :: "('a, 's) hml_srbb_conjunct \<Rightarrow> 's \<R
 subsubsection \<open> Semantic Function for HML$_\text{SRBB}$ \<close>
 
 text \<open>
-We define the meaning of an HML-SRBB formula @{term "\<phi>"} (written \<open>\<lbrakk>\<phi>\<rbrakk>\<close>) to be the set of all processes
+We define the meaning of a HML$_\text{SRBB}$ formula @{term "\<phi>"}, written \<open>\<lbrakk>\<phi>\<rbrakk>\<close>), to be the set of all processes
 that satisfy this formula @{term "\<phi>"}.
 \<close>
 
@@ -222,22 +217,22 @@ abbreviation model_set_conjunct :: "('a, 's) hml_srbb_conjunct \<Rightarrow> 's 
 
 subsection \<open> Different Variants of Verum \<close>
 
-text \<open> \<open>\<top>\<close> is equal to \<open>\<And>{}\<close> \<close>
+text \<open>The formula \<open>\<top>\<close> is equal to \<open>\<And>{}\<close> \<close>
 lemma empty_imm_conj:
   "(state \<Turnstile>SRBB TT) = (state \<Turnstile>SRBB ImmConj {} \<psi>s)"
   by simp
 
-text \<open> \<open>\<top>\<close> is equal to \<open>\<langle>\<epsilon>\<rangle>\<And>{}\<close> \<close>
+text \<open>The formula \<open>\<top>\<close> is equal to \<open>\<langle>\<epsilon>\<rangle>\<And>{}\<close> \<close>
 lemma empty_inner_conj:
   "(state \<Turnstile>SRBB TT) = (hml_srbb_inner_models (Conj {} \<psi>s) state)"
   by simp
 
-text \<open> \<open>\<top>\<close> is equal to \<open>(\<tau>)\<top>\<close> \<close>
+text \<open>The formula \<open>\<top>\<close> is equal to \<open>(\<tau>)\<top>\<close> \<close>
 lemma tau_obs_triv:
   "(state \<Turnstile>SRBB TT) = (hml_srbb_inner_models (Obs \<tau> TT) state)"
   by simp
 
-text \<open> \<open>\<top>\<close> is equal to \<open>\<And>{(\<tau>)\<top>}\<close> \<close>
+text \<open>The formula \<open>\<top>\<close> is equal to \<open>\<And>{(\<tau>)\<top>}\<close> \<close>
 lemma empty_branch_conj_tau:
   "(state \<Turnstile>SRBB TT) = (hml_srbb_inner_models (BranchConj \<tau> TT {} \<psi>s) state)"
   by (smt (verit, del_insts) Inhabited_Tau_LTS.hml_srbb_models.elims(1) Inhabited_Tau_LTS.tau_obs_triv Inhabited_Tau_LTS_axioms LTS_Tau.hml_conjunct_models.simps(1) LTS_Tau.hml_models.simps(1) LTS_Tau.hml_models.simps(5) LTS_Tau.tt_eq_empty_conj hml_srbb_inner_models.simps hml_srbb_inner_to_hml.simps(1) hml_srbb_inner_to_hml.simps(4) hml_srbb_to_hml.simps(1))
@@ -246,29 +241,29 @@ lemma empty_branch_conj_tau:
 subsection \<open> Distinguishing Formulas \<close>
 
 text \<open>
-A formula \<open>\<phi>\<close> is said to \emph{distinguish} a process \<open>p\<close> from another process \<open>q\<close>,
+A formula \<open>\<phi>\<close> is said to 'distinguish' a process \<open>p\<close> from another process \<open>q\<close>,
 if \<open>p\<close> satisfies \<open>\<phi>\<close>, while \<open>q\<close> does not.
 \<close>
 definition distinguishes :: "('a, 's) hml_srbb \<Rightarrow> 's \<Rightarrow> 's \<Rightarrow> bool" where
   "distinguishes \<phi> p q \<equiv> p \<Turnstile>SRBB \<phi> \<and> \<not>(q \<Turnstile>SRBB \<phi>)"
 
 text \<open>
-One may evaluate if an SRBB formula distinguishes two processes by translating the formula
+One may evaluate wheter a HML$_\text{SRBB}$ formula distinguishes two processes by translating the formula
 into a HML formula and then check if this formula distinguishes the two processes.
 \<close>
 lemma dist_srbb_eq_dist_hml:
   "distinguishes \<phi> p q = p <> (hml_srbb_to_hml \<phi>) q"
   by (simp add: distinguishes_def distinguishes_hml_def)
 
-text \<open>Some basic properties of the \<open>distinguishes\<close> predicate: \<close>
+text \<open>Now, we take a look at some basic properties of the \<open>distinguishes\<close> predicate: \<close>
 
-text \<open> \<open>\<top>\<close> can never distinguish two processes.  This is due to the fact that every process
-satisfies \<open>T\<close>, therefore the second part of the definition of \<open>distinguishes\<close> never holds. \<close>
+text \<open> \<open>\<top>\<close> can never distinguish two processes. This is due to the fact that every process
+satisfies \<open>T\<close>. Therefore, the second part of the definition of \<open>distinguishes\<close> never holds. \<close>
 lemma verum_never_distinguishes:
   "\<not> distinguishes TT p q"
   by (simp add: distinguishes_def)
 
-text \<open> A process can never be distinguished from itself, no matter the formula one chooses. \<close>
+text \<open> A process can never be distinguished from itself, regardless of which formula you choose. \<close>
 lemma no_self_distinguishing:
   "\<not> distinguishes \<phi> p p"
   by (simp add: distinguishes_def)
@@ -301,11 +296,11 @@ lemma dist_conjunct_srbb_eq_dist_conjunct_hml:
 
 text \<open>
 We lift this notion of distinguishing formulas to sets of processes on the right hand side.
-We say that a formula @{term "\<phi>"} distinguishes a process @{term "p"} from \emph{a set of processes}
-@{term "Q"} if @{term "p"} satisfies the formula @{term "\<phi>"} while every process in @{term "Q"} does not.
+We say that a formula @{term "\<phi>"} distinguishes a process @{term "p"} from a set of processes
+@{term "Q"} if @{term "p"} satisfies the formula @{term "\<phi>"}, while every process in @{term "Q"} does not.
 Once again we need this slightly stronger notion then the one that one would obtain by naively lifting
-the distinguishing predicate (see @{term "distinguishes_from'"}, c.f. \ref{sect:hmlDist}).
-
+the distinguishing predicate (see @{term "distinguishes_from'"}, \ref{sect:hmlDist}).
+\\\\
 As with the previous definitions, we need to duplicate the definition of each mutually recursive type
 @{term "hml_srbb_inner"} and @{term "hml_srbb_conjunct"}.
 \<close>
@@ -391,8 +386,8 @@ lemma distinguishes_from_conjunct_priming:
 subsubsection \<open> Distinguishing Conjunctions \<close>
 
 text \<open>
-If $\bigwedge\nolimits_{i \in I} {\psi s}(i)$ distinguishes @{term "p"} from @{term "p"},
-then there must be at least one conjunct in this conjunction that distinguishes @{term "p"} from @{term "p"}.
+If $\bigwedge\nolimits_{i \in I} {\psi s}(i)$ distinguishes @{term "p"} from @{term "q"},
+then there must be at least one conjunct in this conjunction that distinguishes @{term "p"} from @{term "q"}.
 \<close>
 lemma srbb_dist_imm_conjunction_implies_dist_conjunct:
   assumes "distinguishes (ImmConj I \<psi>s) p q"
@@ -400,10 +395,10 @@ lemma srbb_dist_imm_conjunction_implies_dist_conjunct:
   using assms distinguishes_conjunct_def distinguishes_def by auto
 
 text \<open>
-If there is one conjunct in that distinguishes @{term "p"} from @{term "p"}
+If there is one conjunct in that distinguishes @{term "p"} from @{term "q"}
 and @{term "p"} satisfies all other conjuncts in a conjunction
 then $\bigwedge\nolimits_{i \in I} {\psi s}(i)$ (where $\psi s$ ranges over the previously mentioned
-conjunctions) distinguishes @{term "p"} from @{term "p"}.
+conjunctions) distinguishes @{term "p"} from @{term "q"}.
 \<close>
 lemma srbb_dist_conjunct_implies_dist_imm_conjunction:
   assumes "i\<in>I"
@@ -413,9 +408,10 @@ lemma srbb_dist_conjunct_implies_dist_imm_conjunction:
   using assms distinguishes_conjunct_def distinguishes_def by auto
 
 text \<open>
-If $\bigwedge\nolimits_{i \in I} {\psi s}(i)$ distinguishes @{term "p"} from @{term "p"},
-then there must be at least one conjunct in this conjunction that distinguishes @{term "p"} from @{term "p"}.
-This differs from \\@{term "srbb_dist_imm_conjunction_implies_dist_conjunct"} in that it addresses
+If $\bigwedge\nolimits_{i \in I} {\psi s}(i)$ distinguishes @{term "p"} from @{term "q"},
+then there must be at least one conjunct in this conjunction that distinguishes @{term "p"} from @{term "q"}.
+
+This differs from @{term "srbb_dist_imm_conjunction_implies_dist_conjunct"} in that it addresses
 simple conjunctions in @{term "hml_srbb_inner"}.
 \<close>
 lemma srbb_dist_conjunction_implies_dist_conjunct:
@@ -424,7 +420,7 @@ lemma srbb_dist_conjunction_implies_dist_conjunct:
   using assms distinguishes_conjunct_def distinguishes_inner_def by auto
 
 text \<open>
-A replication of @{term "srbb_dist_conjunct_implies_dist_imm_conjunction"} for simple conjunctions
+In the following, we replicate @{term "srbb_dist_conjunct_implies_dist_imm_conjunction"} for simple conjunctions
 in @{term "hml_srbb_inner"}.
 \<close>
 lemma srbb_dist_conjunct_implies_dist_conjunction:
@@ -435,9 +431,9 @@ lemma srbb_dist_conjunct_implies_dist_conjunction:
   using assms distinguishes_conjunct_def distinguishes_inner_def by auto
 
 text \<open>
-A replication of @{term "srbb_dist_imm_conjunction_implies_dist_conjunct"} for stable conjunctions
+We also replicate @{term "srbb_dist_imm_conjunction_implies_dist_conjunct"} for stable conjunctions
 $\neg\langle\tau\rangle\top\land\bigwedge\nolimits_{i \in I} {\psi s}(i)$.
-Here, either the stability condition distinguishes @{term "p"} for @{term "q"} or there must be
+Here, either the stability condition distinguishes @{term "p"} from @{term "q"} or there must be
 a distinguishing conjunct.
 \<close>
 lemma srbb_dist_stable_conjunction_implies_dist_conjunct_or_stable:
@@ -455,7 +451,7 @@ lemma srbb_dist_stable_conjunction_implies_dist_conjunct_or_stable:
   by auto
 
 text \<open>
-A replication of @{term "srbb_dist_conjunct_implies_dist_imm_conjunction"} for stable conjunctions
+In the following, we replicate @{term "srbb_dist_conjunct_implies_dist_imm_conjunction"} for stable conjunctions
 in @{term "hml_srbb_inner"}.
 \<close>
 lemma srbb_dist_conjunct_or_stable_implies_dist_stable_conjunction:
@@ -475,9 +471,9 @@ lemma srbb_dist_conjunct_or_stable_implies_dist_stable_conjunction:
   using distinguishes_conjunct_def by auto
 
 text \<open>
-A replication of @{term "srbb_dist_imm_conjunction_implies_dist_conjunct"} for branching conjunctions
+We also replicate @{term "srbb_dist_imm_conjunction_implies_dist_conjunct"} for branching conjunctions
 $(\alpha)\varphi\land\bigwedge\nolimits_{i \in I} {\psi s}(i)$.
-Here, either the branching condition distinguishes @{term "p"} for @{term "q"} or there must be
+Here, either the branching condition distinguishes @{term "p"} from @{term "q"} or there must be
 a distinguishing conjunct.
 \<close>
 lemma srbb_dist_branch_conjunction_implies_dist_conjunct_or_branch:
@@ -493,7 +489,7 @@ lemma srbb_dist_branch_conjunction_implies_dist_conjunct_or_branch:
   using distinguishes_conjunct_def by fastforce
 
 text \<open>
-A replication of @{term "srbb_dist_conjunct_implies_dist_imm_conjunction"} for branching conjunctions
+In the following, we replicate @{term "srbb_dist_conjunct_implies_dist_imm_conjunction"} for branching conjunctions
 in @{term "hml_srbb_inner"}.
 \<close>
 lemma srbb_dist_conjunct_or_branch_implies_dist_branch_conjunction:
@@ -514,10 +510,10 @@ lemma srbb_dist_conjunct_or_branch_implies_dist_branch_conjunction:
 subsubsection \<open> Distinguishing Conjunction Thinning \<close>
 
 text \<open>
-The following four lemmata (dist\_...\_thinn) lift the result
-  [that a conjunction which distinguishes
-   a process p from a set of processes Q may be reduced (thinned) to have at most one conjunct per
-   element of Q while still being able to distinguish p from Q]
+The following four lemmas lift the result
+  that a conjunction which distinguishes
+   a process $p$ from a set of processes $Q$ may be reduced (thinned) to have at most one conjunct per
+   element of $Q$, while still being able to distinguish $p$ from $Q$
   (@{term "dist_conj_thinning"})
 from unrestricted @{term "hml"} to @{term "hml_srbb"}.
 \<close>
@@ -867,9 +863,8 @@ qed
 subsection \<open> HML$_\text{SRBB}$ Implication \<close>
 
 text \<open>
-Same as for \<open>hml\<close>, we define what is means for one \<open>hml_srbb\<close> formula to imply another (denoted as \<open>\<phi>p \<Rrightarrow> \<phi>c\<close>), by
-requiring that if the formula in premiss position holds then the formula in the place of the conclusion
-must be satisfied as well.
+As for our \<open>hml\<close> data type, we define what is means for one \<open>hml_srbb\<close> formula to imply another (denoted as \<open>\<phi>p \<Rrightarrow> \<phi>c\<close>) by
+requiring that if the formula in the premise holds, the formula in the place of the conclusion must be satisfied as well.
 \<close>
 
 definition
@@ -879,7 +874,7 @@ definition
 where
   "\<phi>l \<Rrightarrow> \<phi>r \<equiv> \<forall>p. p \<Turnstile>SRBB \<phi>l \<longrightarrow> p \<Turnstile>SRBB \<phi>r"
 
-text \<open> One may also reduce HML-SRBB implication to HML implication via the translation function. \<close>
+text \<open> One may also reduce HML$_\text{SRBB}$ implication to HML implication via the translation function. \<close>
 lemma srbb_impl_to_hml_impl:
   fixes \<phi>l and \<phi>r :: "('a, 's) hml_srbb"
   assumes "\<phi>l \<Rrightarrow> \<phi>r"
@@ -887,12 +882,12 @@ lemma srbb_impl_to_hml_impl:
   using assms
   by (simp add: LTS_Tau.hml_impl_iffI hml_srbb_impl_def)
 
-text \<open> HML-SRBB impliation is a pre-order. \<close>
+text \<open>HML$_\text{SRBB}$ impliation is a pre-order. \<close>
 lemma hml_srbb_impl_preord:
   shows "reflp (hml_srbb_impl) \<and> transp (hml_srbb_impl)"
   by (metis hml_srbb_impl_def reflpI transpI)
 
-text \<open> Now, these definitions and lemmata need to be repeated for the other mutually recursive
+text \<open> Now, these definitions and lemmas need to be repeated for the other mutually recursive
 data types.
 \<close>
 
@@ -937,8 +932,8 @@ lemma srbb_impl_conjunct_to_hml_impl:
 subsection \<open> HML$_\text{SRBB}$ Equivalence \<close>
 
 text \<open>
-We define HML-SRBB formula equivalence to by appealing to HML-SRBB implication.
-An HML-SRBB formula is equivalent to another formula if both imply each other.
+We define HML$_\text{SRBB}$ formula equivalence to by appealing to HML$_\text{SRBB}$ implication.
+A HML$_\text{SRBB}$ formula is equivalent to another formula if both imply each other.
 \<close>
 
 definition
@@ -948,23 +943,23 @@ definition
 where
   "\<phi>l \<Lleftarrow>srbb\<Rrightarrow> \<phi>r \<equiv> \<phi>l \<Rrightarrow> \<phi>r \<and> \<phi>r \<Rrightarrow> \<phi>l"
 
-text \<open> An HML-SRBB formula is equivalent to another if
+text \<open> A HML$_\text{SRBB}$ formula is equivalent to another if
 satisfaction of either formula implies the satisfaction of the other. \<close>
 lemma hml_srbb_eq_iff:
   shows "\<phi>l \<Lleftarrow>srbb\<Rrightarrow> \<phi>r = (\<forall>p. p \<Turnstile>SRBB \<phi>l \<longleftrightarrow> p \<Turnstile>SRBB \<phi>r)"
   using hml_srbb_eq_def hml_srbb_impl_def by blast
 
-text \<open> We may establish that an HML-SRBB formula is equivalent to another by translating both into
+text \<open> We may establish that a HML$_\text{SRBB}$ formula is equivalent to another by translating both into
 simple HML formulas and testing if those translated formulas are equivalent. \<close>
 lemma srbb_eq_hml_eq:
   shows "\<phi>l \<Lleftarrow>srbb\<Rrightarrow> \<phi>r = (hml_srbb_to_hml \<phi>l \<Lleftarrow>\<Rrightarrow> hml_srbb_to_hml \<phi>r)"
   by (simp add: hml_eq_equality hml_srbb_eq_iff)
 
-text \<open> HML-SRBB equivalence is truly an equivalence relation. \<close>
+text \<open> HML$_\text{SRBB}$ equivalence is an equivalence relation. \<close>
 lemma hml_srbb_eq_equiv: "equivp (\<Lleftarrow>srbb\<Rrightarrow>)"
   by (smt (verit, ccfv_threshold) equivpI hml_srbb_eq_def hml_srbb_impl_preord reflp_on_def sympI transpE transpI)
 
-text \<open> These definitions and lemmata are repeated for each other mutually recursive data type. \<close>
+text \<open> These definitions and lemmas are repeated for the other mutually recursive data types. \<close>
 
 definition
   hml_srbb_eq_inner
@@ -1028,7 +1023,7 @@ lemma internal_srbb_cong:
   using assms
   by (smt (verit) hml_models.simps(3) hml_srbb_inner_models.elims(2) hml_srbb_inner_models.elims(3) hml_srbb_eq_inner_def hml_srbb_eq_def hml_srbb_impl_inner_def hml_srbb_impl_def hml_srbb_models.elims(2) hml_srbb_models.elims(3) hml_srbb_to_hml.simps(2))
 
-text \<open> Wrapping equivalent conjuncts into an otherwise the same conjunction preserves equivalence. \<close>
+text \<open>If equivalent conjuncts are included in an otherwise identical conjunction, the equivalence is preserved.  \<close>
 lemma immconj_cong:
   assumes "\<psi>sl ` I = \<psi>sr ` I"
       and "\<psi>sl s \<Lleftarrow>\<psi>\<Rrightarrow> \<psi>sr s"
@@ -1116,11 +1111,11 @@ lemma obs_srbb_cong:
 
 subsection \<open> Known Equivalence Elements \<close>
 
-text \<open> $(\tau)\top$ is equivalent to $\bigwedge\{\}$ \<close>
+text \<open>The formula $(\tau)\top$ is equivalent to $\bigwedge\{\}$. \<close>
 lemma srbb_obs_\<tau>_is_\<chi>TT: "Obs \<tau> TT \<Lleftarrow>\<chi>\<Rrightarrow> Conj {} \<psi>s"
   by (simp add: hml_srbb_eq_inner_def hml_srbb_impl_inner_def)
 
-text \<open> $(\alpha)\varphi$ is equivalent to $(\alpha)\varphi \land \bigwedge\{\}$ \<close>
+text \<open>The formula $(\alpha)\varphi$ is equivalent to $(\alpha)\varphi \land \bigwedge\{\}$. \<close>
 lemma srbb_obs_is_empty_branch_conj: "Obs \<alpha> \<phi> \<Lleftarrow>\<chi>\<Rrightarrow> BranchConj \<alpha> \<phi> {} \<psi>s"
   unfolding srbb_eq_inner_hml_eq and hml_srbb_inner_to_hml.simps
 proof -
@@ -1148,11 +1143,11 @@ proof -
     by (meson LTS_Tau.hml_eq_equality)
 qed
 
-text \<open> $\top$ is equivalent to $\langle\varepsilon\rangle\bigwedge\{\}$\<close>
+text \<open> The formula $\top$ is equivalent to $\langle\varepsilon\rangle\bigwedge\{\}$.\<close>
 lemma srbb_TT_is_\<chi>TT: "TT \<Lleftarrow>srbb\<Rrightarrow> Internal (Conj {} \<psi>s)"
   using \<epsilon>T_is_T hml_eq_def hml_impl_iffI hml_srbb_eq_def hml_srbb_impl_def by auto
 
-text \<open> $\top$ is equivalent to $\bigwedge\{\}$\<close>
+text \<open> The formula $\top$ is equivalent to $\bigwedge\{\}$.\<close>
 lemma srbb_TT_is_empty_conj: "TT \<Lleftarrow>srbb\<Rrightarrow> ImmConj {} \<psi>s"
   by (simp add: hml_srbb_eq_def hml_srbb_impl_def)
 
@@ -1160,7 +1155,7 @@ lemma srbb_TT_is_empty_conj: "TT \<Lleftarrow>srbb\<Rrightarrow> ImmConj {} \<ps
 subsection \<open> Distinguishing Formulas and Equivalence \<close>
 
 text \<open> If $\varphi$ is equivalent to $\varphi'$ and $\varphi$ distinguishes process @{term "p"} from
-process @{term "q"}, the $\varphi'$ also distinguishes process @{term "p"} from process @{term "q"} \<close>
+process @{term "q"}, the $\varphi'$ also distinguishes process @{term "p"} from process @{term "q"}. \<close>
 lemma dist_equal_dist:
   assumes "\<phi>l \<Lleftarrow>srbb\<Rrightarrow> \<phi>r"
       and "distinguishes \<phi>l p q"
@@ -1171,20 +1166,20 @@ lemma dist_equal_dist:
 
 subsection \<open> HML$_\text{SRBB}$ Formula Set derived Pre-Order on Processes \<close>
 
-text \<open> A set of HML-SRBB formulas preorder two processes @{term "p"} and @{term "q"}, if
+text \<open> A set of HML$_\text{SRBB}$ formulas pre-order two processes @{term "p"} and @{term "q"} if
 for all formulas in this set the fact that @{term "p"} satisfies a formula means that also
 @{term "q"} must satisfy this formula. \<close>
 definition hml_preordered :: "(('a, 's) hml_srbb) set \<Rightarrow> 's \<Rightarrow> 's \<Rightarrow> bool" where
   "hml_preordered \<phi>s p q \<equiv> \<forall>\<phi> \<in> \<phi>s. p \<Turnstile>SRBB \<phi> \<longrightarrow> q \<Turnstile>SRBB \<phi>"
 
 text \<open>
-If a set of formulas preorders two processes @{term "p"} and @{term "q"}, then no formula in that set
+If a set of formulas pre-orders two processes @{term "p"} and @{term "q"}, then no formula in that set
 may distinguish @{term "p"} from @{term "q"}.
 \<close>
 lemma "hml_preordered \<phi>s p q = (\<forall>\<phi> \<in> \<phi>s. \<not>(distinguishes \<phi> p q))"
   by (simp add: distinguishes_def hml_preordered_def)
 
-text \<open> A formula set derived preorder is truly a preorder. \<close>
+text \<open> A formula set derived pre-order is a pre-order. \<close>
 lemma "reflp (hml_preordered \<phi>s) \<and> transp (hml_preordered \<phi>s)"
 proof (rule conjI)
   show "reflp (hml_preordered \<phi>s)" 
@@ -1196,7 +1191,7 @@ qed
 
 subsection \<open>HML$_\text{SRBB}$ Formula Set derived Equivalence of Processes \<close>
 
-text \<open> A set of HML-SRBB formulas equates two processes @{term "p"} and @{term "q"}, if
+text \<open> A set of HML$_\text{SRBB}$ formulas equates two processes @{term "p"} and @{term "q"} if
 this set of formulas preorders these two processes in both directions. \<close>
 definition hml_equivalent :: "(('a, 's) hml_srbb) set \<Rightarrow> 's \<Rightarrow> 's \<Rightarrow> bool" where
   "hml_equivalent \<phi>s p q \<equiv> hml_preordered \<phi>s p q \<and> hml_preordered \<phi>s q p"
@@ -1209,7 +1204,7 @@ lemma "hml_equivalent \<phi>s p q
      = (\<forall>\<phi> \<in> \<phi>s. \<not>(distinguishes \<phi> p q) \<and> \<not>(distinguishes \<phi> q p))"
   using distinguishes_def hml_equivalent_def hml_preordered_def by auto
 
-text \<open> A formula set derived equivalence is truly a equivalence. \<close>
+text \<open> A formula set derived equivalence is an equivalence. \<close>
 lemma "equivp (hml_equivalent \<phi>s)"
 proof (rule equivpI)
   show "reflp (hml_equivalent \<phi>s)" 
