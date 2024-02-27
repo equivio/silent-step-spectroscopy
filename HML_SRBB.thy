@@ -217,22 +217,22 @@ abbreviation model_set_conjunct :: "('a, 's) hml_srbb_conjunct \<Rightarrow> 's 
 
 subsection \<open> Different Variants of Verum \<close>
 
-text \<open>The formula \<open>\<top>\<close> is equal to \<open>\<And>{}\<close> \<close>
+text \<open>The formula \<open>\<top>\<close> is equal to \<open>\<And>{}\<close>. \<close>
 lemma empty_imm_conj:
   "(state \<Turnstile>SRBB TT) = (state \<Turnstile>SRBB ImmConj {} \<psi>s)"
   by simp
 
-text \<open>The formula \<open>\<top>\<close> is equal to \<open>\<langle>\<epsilon>\<rangle>\<And>{}\<close> \<close>
+text \<open>The formula \<open>\<top>\<close> is equal to \<open>\<langle>\<epsilon>\<rangle>\<And>{}\<close>. \<close>
 lemma empty_inner_conj:
   "(state \<Turnstile>SRBB TT) = (hml_srbb_inner_models (Conj {} \<psi>s) state)"
   by simp
 
-text \<open>The formula \<open>\<top>\<close> is equal to \<open>(\<tau>)\<top>\<close> \<close>
+text \<open>The formula \<open>\<top>\<close> is equal to \<open>(\<tau>)\<top>\<close>. \<close>
 lemma tau_obs_triv:
   "(state \<Turnstile>SRBB TT) = (hml_srbb_inner_models (Obs \<tau> TT) state)"
   by simp
 
-text \<open>The formula \<open>\<top>\<close> is equal to \<open>\<And>{(\<tau>)\<top>}\<close> \<close>
+text \<open>The formula \<open>\<top>\<close> is equal to \<open>\<And>{(\<tau>)\<top>}\<close>. \<close>
 lemma empty_branch_conj_tau:
   "(state \<Turnstile>SRBB TT) = (hml_srbb_inner_models (BranchConj \<tau> TT {} \<psi>s) state)"
   by (smt (verit, del_insts) Inhabited_Tau_LTS.hml_srbb_models.elims(1) Inhabited_Tau_LTS.tau_obs_triv Inhabited_Tau_LTS_axioms LTS_Tau.hml_conjunct_models.simps(1) LTS_Tau.hml_models.simps(1) LTS_Tau.hml_models.simps(5) LTS_Tau.tt_eq_empty_conj hml_srbb_inner_models.simps hml_srbb_inner_to_hml.simps(1) hml_srbb_inner_to_hml.simps(4) hml_srbb_to_hml.simps(1))
