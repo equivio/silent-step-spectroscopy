@@ -3,11 +3,11 @@ theory Spectroscopy_Game
   imports Energy_Games Energy LTS
 begin
 
-text \<open>In this theory we define the weak spectroscopy game as a locale.
-This game is an energy game constructed by adding stable and branching conjunctions to a delay bisimulation game that depends on an LTS.
-We play the spectroscopy game to compare the behaviour of processes and analyze which behavioural equivalences apply.
-The moves of a spectroscopy game depend on the transitions of the processes and the available energy.
-So in other words: If the defender wins the spectroscopy game starting with a certain energy, the corresponding behavioral equivalence applies.
+text \<open>In this theory, we define the weak spectroscopy game as a locale.
+This game is an energy game constructed by adding stable and branching conjunctions to a delay bisimulation game that depends on a LTS.
+We play the weak spectroscopy game to compare the behaviour of processes and analyze which behavioural equivalences apply.
+The moves of a weak spectroscopy game depend on the transitions of the processes and the available energy.
+So in other words: If the defender wins the weak spectroscopy game starting with a certain energy, the corresponding behavioural equivalence applies.
 \\ Since we added adding stable and branching conjunctions to a delay bisimulation game, we differentiate the positions accordingly.\<close>
 datatype ('s, 'a) spectroscopy_position = 
          Attacker_Immediate (attacker_state: "'s") (defender_states: "'s set") |
@@ -24,7 +24,7 @@ datatype ('s, 'a) spectroscopy_position =
 context Inhabited_Tau_LTS begin
 
 text\<open>\label{specmoves}\<close>
-text\<open>We also define the moves of the weak spectroscopy game. Their names indicate the respective HML formulas they correspond to. This correspondence will be shown in section \ref{deviation:lemma3} \<close>
+text\<open>We also define the moves of the weak spectroscopy game. Their names indicate the respective HML formulas they correspond to. This correspondence will be shown in section \ref{deviation:lemma3}. \<close>
 fun spectroscopy_moves :: "('s, 'a) spectroscopy_position \<Rightarrow> ('s, 'a) spectroscopy_position \<Rightarrow> energy update option" where 
   delay: 
     "spectroscopy_moves (Attacker_Immediate p Q) (Attacker_Delayed p' Q') 
@@ -105,7 +105,7 @@ fun spectroscopy_defender where
 
 
 text \<open>In the following, we check whether our definitions are compatible with those of energy games.
-For this purpose we show the monotonicity of energy updates and that they are only decreasing.\<close>
+For this purpose, we show the monotonicity of energy updates and that they are only decreasing.\<close>
 
 lemma update_monotonicity: 
   fixes g g' e e'
@@ -336,7 +336,7 @@ qed
 
 end
 
-text \<open>Now we are able to define the weak spectroscopy game on an arbitrary (but inhabited) LTS.\<close>
+text \<open>Now, we are able to define the weak spectroscopy game on an arbitrary (but inhabited) LTS.\<close>
 locale full_spec_game =
   Inhabited_Tau_LTS step left right \<tau>
   + energy_game "spectroscopy_moves" "spectroscopy_defender" "eneg" "less_eq"
