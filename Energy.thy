@@ -2,8 +2,8 @@ section \<open>Energy\<close>
 theory Energy
   imports Main "HOL-Library.Extended_Nat" "HOL-Lattice.Orders"
 begin
-text \<open>Following the paper \cite[p. 5]{bisping2023lineartimebranchingtime} we define energies as
-      eight dimensional vectors of natural numbers extended by @{text "\<infinity>"}.
+text \<open>Following the paper \cite[p. 5]{bisping2023lineartimebranchingtime}, we define energies as
+      eight-dimensional vectors of natural numbers extended by @{text "\<infinity>"}.
       But deviate from \cite{bisping2023lineartimebranchingtime} in also defining
       an energy @{text "eneg"} that represents negative energy. This allows us to
       express energy updates (cf. \cite[p. 8]{bisping2023lineartimebranchingtime}) as total functions\label{deviation:eneg}.\<close>
@@ -11,7 +11,7 @@ datatype energy = E (one: "enat") (two: "enat") (three: "enat") (four: "enat")
                     (five: "enat") (six: "enat") (seven: "enat") (eight: "enat") |
                   eneg
 subsection \<open>Ordering Energies\<close>
-text \<open>In order to define subtraction on energies we first lift the orderings
+text \<open>In order to define subtraction on energies, we first lift the orderings
       @{text "\<le>"} and @{text "<"} from @{type "enat"} to @{type "energy"}.\<close>
 instantiation energy :: order begin
 
@@ -58,8 +58,7 @@ lemma energy_leq_cases:
 end
 
 text \<open>We then use this order to define a predicate that decides if an @{term "e1 :: energy"} 
-      may be subtracted from another @{term "e2 :: energy"} without the result being negative.
-      We encode this by @{term "e1"} being @{text "somewhere_larger"} than @{term "e2"}.\<close>
+      may be subtracted from another @{term "e2 :: energy"} without the result being negative. We encode this by @{term "e1"} being @{text "somewhere_larger"} than @{term "e2"}.\<close>
 
 abbreviation somewhere_larger where "somewhere_larger e1 e2 \<equiv> \<not>(e1 \<ge> e2)"
 
@@ -90,7 +89,7 @@ definition minus_energy_def: "e1 - e2 \<equiv> if somewhere_larger e1 e2 then en
 
 instance ..
 
-text \<open>Afterwards we prove some lemmas to ease the manipulation of expressions 
+text \<open>Afterwards, we prove some lemmas to ease the manipulation of expressions 
   using subtraction on energies.\<close>
 lemma energy_minus:
   assumes "E a1 b1 c1 d1 e1 f1 g1 h1 \<ge> E a2 b2 c2 d2 e2 f2 g2 h2"
@@ -230,11 +229,11 @@ abbreviation "e5 \<equiv> subtract_fn 0 0 0 0 1 0 0 0"
 abbreviation "subtract a b c d e f g h \<equiv> Some (subtract_fn a b c d e f g h)"
 
 subsection \<open>Minimum Updates\<close>
-text \<open>Next we define two energy updates that replace the first component with the minimum of two other components.\<close>
+text \<open>Next, we define two energy updates that replace the first component with the minimum of two other components.\<close>
 definition "min1_6 e \<equiv> case e of E a b c d e f g h \<Rightarrow> E (min a f) b c d e f g h | eneg \<Rightarrow> eneg "
 definition "min1_7 e \<equiv> case e of E a b c d e f g h \<Rightarrow> E (min a g) b c d e f g h | eneg \<Rightarrow> eneg "
 
-text \<open>Again we prove that these updates only decrease energies.\<close>
+text \<open>Again, we prove that these updates only decrease energies.\<close>
 
 lemma min_eneg:
   shows "min1_6 eneg = eneg" "min1_7 eneg = eneg"
