@@ -5,12 +5,10 @@ theory Expressiveness_Price
 begin
 
 text \<open>
-The expressiveness price function assigns a price - an eight element tuple - to a \<open>hml_srbb\<close> formula.
+The expressiveness price function assigns a price - an eight-dimensional vector - to a HML$_\text{SRBB}$ formula.
 This price is supposed to capture the expressiveness power needed to describe a certain property and
-will later be used to select subsets of specific expressiveness power (which is linked to the behavioural
-equivalence characterized by this subset) of the HML-SRBB sublanguage.
-
-
+will later be used to select subsets of specific expressiveness power associated with the behavioural equivalence characterized by that subset of the HML$_\text{SRBB}$ sublanguage.
+\\\\
 The expressiveness price function may be defined as a single function:
 \begin{align*}
   expr(\top) := expr^\varepsilon(\top) :=& 0 \\
@@ -32,8 +30,8 @@ The eight dimensions are intended to measure the following properties of formula
 \begin{enumerate}
   \item Modal depth (of observations $\langle\alpha\rangle$, $(\alpha)$),
   \item Depth of branching conjunctions (with one observation clause not starting with $\langle\varepsilon\rangle$),
-  \item Depth of instable conjunctions (that do not enforce stability by a $\neg\langle\tau\rangle\top$-conjunct),
   \item Depth of stable conjunctions (that do enforce stability by a $\neg\langle\tau\rangle\top$-conjunct),
+  \item Depth of instable conjunctions (that do not enforce stability by a $\neg\langle\tau\rangle\top$-conjunct),
   \item Depth of immediate conjunctions (that are not preceded by $\langle\varepsilon\rangle$),
   \item Maximal modal depth of positive clauses in conjunctions,
   \item Maximal modal depth of negative clauses in conjunctions,
@@ -41,18 +39,16 @@ The eight dimensions are intended to measure the following properties of formula
 \end{enumerate}
 
 Instead of defining the expressiveness price function in one go, we define eight functions (one for each dimension)
-and then use them in combination to build the result tupel.\\
+and then use them in combination to build the the result vector.\\
 
 Note that, since all these functions stem from the above singular function, they all look very similar,
-and differ mostly in where the $1+$ is placed.
+but differ mostly in where the $1+$ is placed.
 \<close>
 
 subsection \<open>Modal Depth\<close>
 
 text \<open>
-(Maximal) Modal depth (of observations $\langle\alpha\rangle$, $(\alpha)$)\\
-
-This counter is increased on each:
+The (maximal) modal depth (of observations $\langle\alpha\rangle$, $(\alpha)$) is increased on each:
 \begin{itemize}
   \item \<open>Obs\<close>
   \item \<open>BranchConj\<close>
@@ -118,14 +114,12 @@ lemma "modal_depth_srbb (ImmConj \<nat> (\<lambda>n. Pos (Obs \<alpha> (observe_
 subsection \<open>Depth of Branching Conjunctions\<close>
 
 text \<open>
-Depth of branching conjunctions (with one observation clause not starting with $\langle\varepsilon\rangle$)\\
-
-This counter is increased on each:
+The depth of branching conjunctions (with one observation clause not starting with $\langle\varepsilon\rangle$) is increased on each:
 \begin{itemize}
   \item \<open>BranchConj\<close> if there are other conjuncts besides the branching conjunct
 \end{itemize}
 
-Note that if the \<open>BranchConj\<close> is empty (i.e. has no other conjuncts),
+Note that, if the \<open>BranchConj\<close> is empty (has no other conjuncts),
 then it is treated like a simple \<open>Obs\<close>.
 \<close>
 
@@ -151,15 +145,14 @@ primrec
 subsection \<open>Depth of Stable Conjunctions\<close>
 
 text \<open>
-Depth of stable conjunctions (that do enforce stability by a $\neg\langle\tau\rangle\top$-conjunct)
-
-This counter is increased on each:
+The depth of stable conjunctions (that do enforce stability by a $\neg\langle\tau\rangle\top$-conjunct)
+is increased on each:
 \begin{itemize}
   \item \<open>StableConj\<close>
 \end{itemize}
 
-Note that if the \<open>StableConj\<close> is empty (i.e. has no other conjuncts),
-it is still counted!
+Note that, if the \<open>StableConj\<close> is empty (has no other conjuncts),
+it is still counted.
 \<close>
 
 primrec
@@ -181,16 +174,15 @@ primrec
 subsection \<open>Depth of Instable Conjunctions\<close>
 
 text \<open>
-Depth of instable conjunctions (that do not enforce stability by a $\neg\langle\tau\rangle\top$-conjunct)
-
-This counter is increased on each:
+The depth of instable conjunctions (that do not enforce stability by a $\neg\langle\tau\rangle\top$-conjunct)
+is increased on each:
 \begin{itemize}
   \item \<open>ImmConj\<close> if there are conjuncts (i.e. $\bigwedge\{\}$ is not counted)
   \item \<open>Conj\<close> if there are conjuncts, (i.e. the conjunction is not empty)
   \item \<open>BranchConj\<close> if there are other conjuncts besides the branching conjunct
 \end{itemize}
 
-Note that if the \<open>BranchConj\<close> is empty (i.e. has no other conjuncts),
+Note that, if the \<open>BranchConj\<close> is empty (has no other conjuncts),
 then it is treated like a simple \<open>Obs\<close>.
 \<close>
 
@@ -222,9 +214,8 @@ primrec
 subsection \<open>Depth of Immediate Conjunctions\<close>
 
 text \<open>
-Depth of immediate conjunctions (that are not preceded by $\langle\varepsilon\rangle$)
-
-This counter is increased on each:
+The depth of immediate conjunctions (that are not preceded by $\langle\varepsilon\rangle$)
+is increased on each:
 \begin{itemize}
   \item \<open>ImmConj\<close> if there are conjuncts (i.e. $\bigwedge\{\}$ is not counted)
 \end{itemize}
@@ -253,7 +244,7 @@ primrec
 subsection \<open>Maximal Modal Depth of Positive Clauses in Conjunctions\<close>
 
 text \<open>
-Maximal modal depth of positive clauses in conjunctions.
+Now, we take a look at the maximal modal depth of positive clauses in conjunctions.
 
 This counter calculates the modal depth for every positive clause in a conjunction (\<open>Pos \<chi>\<close>).
 \<close>
@@ -277,7 +268,7 @@ primrec
 subsection \<open>Maximal Modal Depth of Negative Clauses in Conjunctions\<close>
 
 text \<open>
-Maximal modal depth of negative clauses in conjunctions.
+We take a look at the maximal modal depth of negative clauses in conjunctions.
 
 This counter calculates the modal depth for every negative clause in a conjunction (\<open>Neg \<chi>\<close>).
 \<close>
@@ -301,9 +292,7 @@ primrec
 subsection \<open>Depth of Negations\<close>
 
 text \<open>
-Depth of negations (occurences of \<open>Neg \<chi>\<close> on a path of the syntax tree).
-
-This counter is increased on each:
+The depth of negations (occurrences of \<open>Neg \<chi>\<close> on a path of the syntax tree) is increased on each:
 \begin{itemize}
   \item \<open>Neg \<chi>\<close>
 \end{itemize}
@@ -327,7 +316,7 @@ primrec
 
 subsection \<open>Expressiveness Price Function\<close>
 
-text \<open>This combines the eight functions to the @{term "expressiveness_price"} function mentioned above.\<close>
+text \<open>The @{term "expressiveness_price"} function combines the eight functions into one.\<close>
 
 fun expressiveness_price :: "('a, 's) hml_srbb \<Rightarrow> energy" where
   "expressiveness_price \<phi> = E (modal_depth_srbb            \<phi>)
@@ -339,7 +328,7 @@ fun expressiveness_price :: "('a, 's) hml_srbb \<Rightarrow> energy" where
                               (max_negative_conjunct_depth \<phi>)
                               (negation_depth              \<phi>)"
 
-text \<open>Here we can see the decomposed price of an immediate conjunction.\<close>
+text \<open>Here, we can see the decomposed price of an immediate conjunction:\<close>
 lemma expressiveness_price_ImmConj_def:
   shows "expressiveness_price (ImmConj I \<psi>s) = E 
     (Sup ((modal_depth_srbb_conjunct \<circ> \<psi>s) ` I))
@@ -372,7 +361,7 @@ text \<open>The price of a formula cannot be negative.\<close>
 lemma srbb_price_never_neg : "expressiveness_price \<phi> \<noteq> eneg"
   by simp
 
-text \<open>We can now define a sublanguage of Hennessy--Milner logic @{term "\<O>"} by the set of formulas with prices below an energy coordinate.\<close>
+text \<open>We can now define a sublanguage of Hennessy-Milner Logic @{term "\<O>"} by the set of formulas with prices below an energy coordinate.\<close>
 definition \<O> :: "energy \<Rightarrow> (('a, 's) hml_srbb) set" where
   "\<O> energy \<equiv> {\<phi> . expressiveness_price \<phi> \<le> energy}"
 
@@ -414,13 +403,13 @@ definition \<O>_conjunct :: "energy \<Rightarrow> (('a, 's) hml_srbb_conjunct) s
 subsection \<open>Prices of Certain Formulas\<close>
 
 text \<open>
-We demonstrate the pricing mechanisms for various formulas. These proofs operate under the assumption of an expressiveness price \<open>e\<close> for a given formula \<open>\<chi>\<close> and proceed to determine the price of a derived formula, such as \<open>Pos \<chi>\<close>. 
-The proofs all are of a similar nature. They break down the expression function(s) into their constituent parts and apply their definitions to the constructed formula (\<open>(Pos \<chi>)\<close>).\<close>
+We demonstrate the pricing mechanisms for various formulas. These proofs operate under the assumption of an expressiveness price \<open>e\<close> for a given formula \<open>\<chi>\<close> and proceed to determine the price of a derived formula such as \<open>Pos \<chi>\<close>. 
+The proofs all are of a similar nature. They decompose the expression function(s) into their constituent parts and apply their definitions to the constructed formula (\<open>(Pos \<chi>)\<close>).\<close>
 
 context full_spec_game
 begin
 
-text \<open>For example, here we establish that the expressiveness price of \<open>Internal \<chi>\<close> is equal to the expressiveness price of \<open>\<chi>\<close>.\<close>
+text \<open>For example, here, we establish that the expressiveness price of \<open>Internal \<chi>\<close> is equal to the expressiveness price of \<open>\<chi>\<close>.\<close>
 
 lemma expr_internal_eq:
   shows "expressiveness_price (Internal \<chi>) = expr_pr_inner \<chi>"
@@ -999,7 +988,7 @@ lemma expressiveness_price_ImmConj_geq_parts':
 
 end (* full_spec_game *)
 
-text \<open>Here we show the prices for some specific formulas.\<close>
+text \<open>Here, we show the prices for some specific formulas.\<close>
 context Inhabited_LTS
 begin
 
@@ -1061,11 +1050,11 @@ subsection \<open>Characterizing Equivalence by Energy Coordinates\<close>
 context Inhabited_Tau_LTS
 begin
 
-text \<open>A state \<open>p\<close> preorders another state \<open>q\<close> with respect to some energy \<open>e\<close> iff \<open>p\<close> HML preorders \<open>q\<close> with respect to the HML sublanguage @{term "\<O>"} derived from \<open>e\<close>\<close>
+text \<open>A state \<open>p\<close> pre-orders another state \<open>q\<close> with respect to some energy \<open>e\<close> if and only if \<open>p\<close> HML pre-orders \<open>q\<close> with respect to the HML sublanguage @{term "\<O>"} derived from \<open>e\<close>.\<close>
 definition expr_preord :: "'s \<Rightarrow> energy \<Rightarrow> 's \<Rightarrow> bool" ("_ \<preceq> _ _" 60) where
   "(p \<preceq> e q) \<equiv> hml_preordered (\<O> e) p q"
 
-text \<open>Conversely, \<open>p\<close> and \<open>q\<close> are equivalent with respect to \<open>e\<close> iff they are equivalent with respect to that HML sublanguage @{term "\<O>"}.\<close>
+text \<open>Conversely, \<open>p\<close> and \<open>q\<close> are equivalent with respect to \<open>e\<close> if and only if they are equivalent with respect to that HML sublanguage @{term "\<O>"}.\<close>
 definition expr_equiv :: "'s \<Rightarrow> energy \<Rightarrow> 's \<Rightarrow> bool" ("_ \<sim> _ _" 60) where
   "(p \<sim> e q) \<equiv> hml_equivalent (\<O> e) p q"
 
