@@ -2,10 +2,9 @@ section \<open>HML Contexts\<close>
 
 text \<open>
 This section contains definitions for context based definitions of substitution and congruence.
-These are not used in the remainder of the project, since handing a set of lemmata which handle
+These are not used in the project, since handing a set of lemmas which handle
 substitution or congruence under a single prefix to automatic proof search proved to be more convenient
 then manually specifying where exactly in the formula substitution ought to occur.
-
 The added control provided by the mechanisms in this section was never needed and thereby never justified
 manually constructing a context term.
 We keep this section for the amusement of the interested reader.
@@ -30,7 +29,7 @@ text \<open> Given a context and a formula, one may place the formula into the h
 generate a new formula. Usually, the resulting formula is the one in which one want to substitute
 a subformula, while the argument formula is the formula to be substituted.
 
-Note that this definition of data type and filling function ensures that one can never substitute under a negated
+Note that, this definition of data type and filling function ensures that one can never substitute under a negated
 conjunct.\<close>
 
 primrec 
@@ -68,7 +67,8 @@ datatype
     ObsC 'act "('act, 'i) hml_context" |
     InternalC "('act, 'i) hml_context" |
     SilentC "('act, 'i) hml_context" |
-    ConjC "'i set" "'i \<Rightarrow> ('act, 'i) hml_conjunct" "'i set" "'i \<Rightarrow> ('act, 'i) hml_conjunct_context"
+    ConjC "'i set" "'i \<Rightarrow> ('act, 'i) hml_conjunct" "'i set" "'i 
+    \<Rightarrow> ('act, 'i) hml_conjunct_context"
 and
   ('act, 'i) hml_conjunct_context =
     PosC "('act, 'i) hml_context" |
@@ -91,7 +91,7 @@ primrec
   "fill_conjunct \<phi> (PosC \<phi>') = (Pos (fill \<phi> \<phi>'))" |
   "fill_conjunct \<phi> (NegC \<phi>') = (Neg (fill \<phi> \<phi>'))"
 
-text \<open> One may note that here both the context definition as well as the filling function mirror the
+text \<open> One may note that, here both the context definition as well as the filling function mirror the
 structure of the underlying formula data type exactly. \<close>
 
 
@@ -192,7 +192,7 @@ proof -
   qed
 qed
 
-text \<open> Substituting an equivalence somewhere in a formula preserves equivalence. \<close>
+text \<open> If you substitute an equivalence somewhere in a formula, the equivalence is preserved. \<close>
 lemma hml_cong: "\<forall>\<phi>l \<phi>r. \<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r \<longrightarrow> fill \<phi>l C \<Lleftarrow>\<Rrightarrow> fill \<phi>r C"
   and hml_conj_cong: "\<forall>\<phi>l \<phi>r. \<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r \<longrightarrow> fill_conjunct \<phi>l C' \<Lleftarrow>\<and>\<Rrightarrow> fill_conjunct \<phi>r C'"
   apply (induct C and C')
