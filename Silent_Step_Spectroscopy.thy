@@ -1,3 +1,4 @@
+text \<open>\newpage\<close>
 section \<open>Correctness\<close>
 
 theory Silent_Step_Spectroscopy

@@ -1,5 +1,7 @@
 section \<open>HML Contexts\<close>
-
+theory HML_Context
+  imports Main HML
+begin
 text \<open>
 This section contains definitions for context based definitions of substitution and congruence.
 These are not used in the project, since handing a set of lemmas which handle
@@ -9,10 +11,6 @@ The added control provided by the mechanisms in this section was never needed an
 manually constructing a context term.
 We keep this section for the amusement of the interested reader.
 \<close>
-
-theory HML_Context
-  imports Main HML
-begin
 
 text \<open> The data type @{term "hml_precontext"} specifies where within a formula one may substitute
 an implication leading to a new implication. \<close>

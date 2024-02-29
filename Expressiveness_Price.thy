@@ -1,3 +1,4 @@
+text \<open>\newpage\<close>
 section \<open>Expressiveness Price Function \label{sect:ExpressivenessMeasure}\<close>
 
 theory Expressiveness_Price

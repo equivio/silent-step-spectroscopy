@@ -1,14 +1,14 @@
+text \<open>\newpage\<close>
 section \<open> Stability-Respecting Branching Bisimilarity (HML$_\text{SRBB}$) \label{sect:hmlSRBB} \<close>
-text \<open> This section describes the largest subset of the full HML language in section \ref{sect:HML} that we are
+theory HML_SRBB
+  imports Main HML
+begin
+text \<open>This section describes the largest subset of the full HML language in section \ref{sect:HML} that we are
 using for purposes of silent step spectroscopy. It is supposed to characterize the most fine grained
 behavioural equivalence that we may decide: Stability-Respecting Branching Bisimilarity (SRBB). While
 there are good reasons to believe that this subset truly characterizes SRBB (c.f.\cite{bisping2023lineartimebranchingtime}),
 we do not provide a formal proof. From this sublanguage smaller subsets are derived
 via the notion of expressiveness prices (\ref{sect:ExpressivenessMeasure}). \<close>
-
-theory HML_SRBB
-  imports Main HML
-begin
 
 text \<open>
 The mutually recursive data types @{term "hml_srbb"}, @{term "hml_srbb_inner"} and @{term "hml_srbb_conjunct"}

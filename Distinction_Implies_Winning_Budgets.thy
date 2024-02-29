@@ -1,3 +1,4 @@
+text \<open>\newpage\<close>
 section \<open>Distinction Implies Winning Budgets\<close>
 theory Distinction_Implies_Winning_Budgets
   imports Spectroscopy_Game Expressiveness_Price
@@ -66,7 +67,7 @@ text \<open>Next, we show the statement for the case that @{term "Q \<noteq> {}"
       \item[3.] \<open>\<forall>p q. distinguishes_conjunct \<psi> p q\<close>\\
                 \<open>\<longrightarrow> in_wina (expr_pr_conjunct \<psi>) (Attacker_Clause p q)\<close>
       \end{itemize}
-    Note that, the sixth case differs from the paper in the assumption that @{term "Q_\<alpha> \<noteq> {}"}.
+    Note that the sixth case differs from the paper in the assumption that @{term "Q_\<alpha> \<noteq> {}"}.
     Strictly speaking this case is covered by the previous lemma, the case that @{term "Q = {}"},
     since using @{term "Q \<inter> model_set_inner (Conj \<Psi>_I \<Psi>) \<subseteq> Q_\<alpha>"} and @{term "Q_\<alpha> = {}"}
     we can conclude that @{term "Q = {}"}.

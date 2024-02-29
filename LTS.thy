@@ -1,3 +1,4 @@
+text \<open>\newpage\<close>
 section \<open>LTS \label{sect:LTS}\<close>
 theory LTS
   imports Main

@@ -1,3 +1,4 @@
+text \<open>\newpage\<close>
 section \<open> Hennessy-Milner Logic (HML) \label{sect:HML}\<close>
 theory HML
   imports Main LTS
@@ -344,9 +345,9 @@ subsubsection \<open> Pre-Substitution \<close>
 text \<open>
 The following lemmas provide means to manipulate a HML implication
 by substituting other HML implications into it. This substitution may only occur on the right hand side of the implication.
-A notable exception is @{term "neg_pre_subst"}, so when substituting into a negation where one may only
+A notable exception is @{term "neg_pre_subst"}, i.e. when substituting into a negation where one may only
 substitute on the left hand side of the implication.
-The lemmas differ in the choice of context, so what formula is substituted into.
+The lemmas differ in the choice of context, i.e. what formula is substituted into.
 \<close>
 
 text \<open> From \<open>\<phi>' \<Rrightarrow> \<phi>''\<close> and \<open>\<phi> \<Rrightarrow> \<langle>\<alpha>\<rangle>\<phi>'\<close> follows \<open>\<phi> \<Rrightarrow> \<langle>\<alpha>\<rangle>\<phi>''\<close>. \<close>
@@ -437,7 +438,7 @@ text \<open>
 The following lemmas provide means to manipulate a HML implication
 by wrapping both sides of the implication in the same HML formula context.
 
-The lemmas differ in the choice of context, so how both sides are extended.
+The lemmas differ in the choice of context, i.e. how both sides are extended.
 \<close>
 
 context LTS_Tau
@@ -598,7 +599,7 @@ text \<open>
 The following lemmas provide means to manipulate a HML equivalence
 by substituting other HML equivalence into it. While one may substitute on both sides of the equivalence, only substitutions on the left hand side
 are shown. If one needs a substitution on the other side, one can use @{term "hml_eq_equiv"}.
-The lemmas differ in the choice of context, so what formula is substituted into.
+The lemmas differ in the choice of context, i.e. what formula is substituted into.
 \<close>
 
 lemma obs_subst:
