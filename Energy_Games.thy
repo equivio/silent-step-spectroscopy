@@ -20,7 +20,7 @@ text\<open>When considering finite plays, they are represented as a list of stat
 
 type_synonym 'gstate fplay = "'gstate list"
 
-text\<open>An energy game is played by two players on a directed graph labeled by energy updates. 
+text\<open>An energy game is played by two players on a directed graph labelled by energy updates. 
 These updates represent the costs of choosing a certain move.
 Since we will only consider cases in which the attacker's moves may actually have non-zero costs, only they can run 
 out of energy. This is the case when the energy level reaches the \<open>defender_win_level\<close>.

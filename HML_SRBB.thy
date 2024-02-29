@@ -64,7 +64,7 @@ and
 
 text \<open>
 In the beginning, instead of defining the subset as a new data type,  we considered defining the
-HML$_\text{SRBB}$ subset via a predicate on @{term "hml"} like \<open>is_srbb :: "('a,'s) hml \<Rightarrow> bool"\<close>.
+HML$_\text{SRBB}$ subset via a predicate on HML like \<open>is_srbb :: "('a,'s) hml \<Rightarrow> bool"\<close>.
 For a concrete instance of this approach reference \<open>is_trace_formula\<close> in appendix \ref{appndx:weakTraces}.
 We decided not to use this approach because we could not figure out how  define expressiveness prices (see section \ref{sect:ExpressivenessMeasure}) when using this option.
 \<close>
@@ -77,16 +77,16 @@ We define what it means for a process @{term "p"} to satisfy a HML$_\text{SRBB}$
 written as \<open>p \<Turnstile>SRBB \<phi>\<close>, by first translating this formula @{term "\<phi>"} into the corresponding HML formula
 (via @{term "hml_srbb_to_hml"}) and then appealing to HML's models function.
 This is in contrast to defining the function directly by inspecting the transitions possible from @{term "p"}.
-Defining it via translation to @{term "hml"} allows (and forces) us to reuse the definitions and
-properties of @{term "hml"}.
+Defining it via translation to HML allows (and forces) us to reuse the definitions and
+properties of HML.
 \<close>
 
 subsubsection \<open> Mapping HML$_\text{SRBB}$ to HML \<close>
 
 text \<open>
-We ensure that @{term "hml_srbb"} is a subset of @{term "hml"} by mapping each constructor of
-@{term "hml_srbb"} to a composition of constructors of @{term "hml"}.  This mapping is straight
-forward when viewing above interpretation of the data constructors of @{term "hml_srbb"}. The only
+We ensure that HML$_\text{SRBB}$ is a subset of HML by mapping each constructor of
+HML$_\text{SRBB}$ to a composition of constructors of HML.  This mapping is straight
+forward when viewing above interpretation of the data constructors of HML$_\text{SRBB}$. The only
 clause of note is the translation of the @{term "Obs"} data constructor of type @{term "hml_srbb_inner"}.
 \<close>
 
@@ -159,7 +159,7 @@ The second one (\ref{lbl:srbbArgument}) may be justified by case analysis on the
       \item By the definition of $(\alpha)\varphi$ in \ref{SoftPossDef} it follows that $(\alpha)\varphi = (\tau) \varphi$.
       \item When closely inspecting the definitions of the data types @{term "hml_srbb"}, @{term "hml_srbb_inner"} and
         @{term "hml_srbb_conjunct"} as well as the corresponding translation functions, one can observe that
-        the @{term "Obs"} in question must be preceeded by an @{term "hml.Internal"}, so we may inspect:
+        the @{term "Obs"} in question must be preceeded by a @{term "hml.Internal"}, so we may inspect:
         $\langle\varepsilon\rangle(\tau)\varphi$
       \item From \ref{equivalenceProofs} we know $\langle \varepsilon \rangle (\tau) \varphi \Lleftarrow\Rrightarrow \langle\varepsilon\rangle\varphi$
       \item Next we do a case analysis on the $\varphi$ (in our encoding the type @{term "hml_srbb"}) in $\langle\varepsilon\rangle\varphi$:
@@ -184,7 +184,7 @@ HML$_\text{SRBB}$ language does not impact the results of the project.
 subsubsection \<open>Models Relation for HML$_\text{SRBB}$ \<close>
 
 text \<open>
-We say that a process @{term "p"} satisfies an HML$_\text{SRBB}$ formula @{term "\<phi>"}, denoted as @{term "p \<Turnstile>SRBB \<phi>"}
+We say that a process @{term "p"} satisfies a HML$_\text{SRBB}$ formula @{term "\<phi>"}, denoted as @{term "p \<Turnstile>SRBB \<phi>"}
 if that process @{term "p"} models the result of translating the HML$_\text{SRBB}$ @{term "\<phi>"} formula into a HML formula.
 \<close>
 
@@ -515,7 +515,7 @@ The following four lemmas lift the result
    a process $p$ from a set of processes $Q$ may be reduced (thinned) to have at most one conjunct per
    element of $Q$, while still being able to distinguish $p$ from $Q$
   (@{term "dist_conj_thinning"})
-from unrestricted @{term "hml"} to @{term "hml_srbb"}.
+from unrestricted HML to HML$_\text{SRBB}$.
 \<close>
 
 lemma extract_converter:
@@ -863,7 +863,7 @@ qed
 subsection \<open> HML$_\text{SRBB}$ Implication \<close>
 
 text \<open>
-As for our \<open>hml\<close> data type, we define what is means for one \<open>hml_srbb\<close> formula to imply another (denoted as \<open>\<phi>p \<Rrightarrow> \<phi>c\<close>) by
+As for our \<open>hml\<close> data type, we define what is means for one HML$_\text{SRBB}$ formula to imply another (denoted as \<open>\<phi>p \<Rrightarrow> \<phi>c\<close>) by
 requiring that if the formula in the premise holds, the formula in the place of the conclusion must be satisfied as well.
 \<close>
 
@@ -1192,7 +1192,7 @@ qed
 subsection \<open>HML$_\text{SRBB}$ Formula Set derived Equivalence of Processes \<close>
 
 text \<open> A set of HML$_\text{SRBB}$ formulas equates two processes @{term "p"} and @{term "q"} if
-this set of formulas preorders these two processes in both directions. \<close>
+this set of formulas pre-orders these two processes in both directions. \<close>
 definition hml_equivalent :: "(('a, 's) hml_srbb) set \<Rightarrow> 's \<Rightarrow> 's \<Rightarrow> bool" where
   "hml_equivalent \<phi>s p q \<equiv> hml_preordered \<phi>s p q \<and> hml_preordered \<phi>s q p"
 

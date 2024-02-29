@@ -41,7 +41,7 @@ The eight dimensions are intended to measure the following properties of formula
 Instead of defining the expressiveness price function in one go, we define eight functions (one for each dimension)
 and then use them in combination to build the the result vector.\\
 
-Note that, since all these functions stem from the above singular function, they all look very similar,
+Note that since all these functions stem from the above singular function, they all look very similar,
 but differ mostly in where the $1+$ is placed.
 \<close>
 
@@ -119,7 +119,7 @@ The depth of branching conjunctions (with one observation clause not starting wi
   \item \<open>BranchConj\<close> if there are other conjuncts besides the branching conjunct
 \end{itemize}
 
-Note that, if the \<open>BranchConj\<close> is empty (has no other conjuncts),
+Note that if the \<open>BranchConj\<close> is empty (has no other conjuncts),
 then it is treated like a simple \<open>Obs\<close>.
 \<close>
 
@@ -151,7 +151,7 @@ is increased on each:
   \item \<open>StableConj\<close>
 \end{itemize}
 
-Note that, if the \<open>StableConj\<close> is empty (has no other conjuncts),
+Note that if the \<open>StableConj\<close> is empty (has no other conjuncts),
 it is still counted.
 \<close>
 
@@ -182,7 +182,7 @@ is increased on each:
   \item \<open>BranchConj\<close> if there are other conjuncts besides the branching conjunct
 \end{itemize}
 
-Note that, if the \<open>BranchConj\<close> is empty (has no other conjuncts),
+Note that if the \<open>BranchConj\<close> is empty (has no other conjuncts),
 then it is treated like a simple \<open>Obs\<close>.
 \<close>
 

@@ -29,7 +29,7 @@ text \<open> Given a context and a formula, one may place the formula into the h
 generate a new formula. Usually, the resulting formula is the one in which one want to substitute
 a subformula, while the argument formula is the formula to be substituted.
 
-Note that, this definition of data type and filling function ensures that one can never substitute under a negated
+Note that this definition of data type and filling function ensures that one can never substitute under a negated
 conjunct.\<close>
 
 primrec 
@@ -91,7 +91,7 @@ primrec
   "fill_conjunct \<phi> (PosC \<phi>') = (Pos (fill \<phi> \<phi>'))" |
   "fill_conjunct \<phi> (NegC \<phi>') = (Neg (fill \<phi> \<phi>'))"
 
-text \<open> One may note that, here both the context definition as well as the filling function mirror the
+text \<open> One may note that here both the context definition as well as the filling function mirror the
 structure of the underlying formula data type exactly. \<close>
 
 

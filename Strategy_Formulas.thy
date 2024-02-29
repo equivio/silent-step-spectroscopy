@@ -1084,7 +1084,7 @@ If \<open>\<phi>\<close> is a strategy formula for \<open>Attacker_Immediate p Q
 \<open>p\<close> from \<open>Q\<close>. 
 \\
 \\
-We prove a more detailed result for all possible game positions \<open>g\<close> by induction. Note that, the 
+We prove a more detailed result for all possible game positions \<open>g\<close> by induction. Note that the 
 case of \<open>g\<close> being an attacker branching position is not explicitly needed as part of the induction
 hypothesis but is proven as a part of case \<open>branch_conj\<close>. The induction relies on the inductive 
 structure of strategy formulas. 

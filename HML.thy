@@ -59,7 +59,7 @@ When a variable is of type @{term "hml"} then @{term "\<phi>"} is used in most c
 In case a variable is of type @{term "hml_conjunct"} then @{term "\<psi>"} is used.
 \\
 \\
-Note that, in canonical definitions of HML @{term "TT"} is not usually part of the syntax, but is instead synonymous to \<open>\<And>{}\<close>.
+Note that in canonical definitions of HML @{term "TT"} is not usually part of the syntax, but is instead synonymous to \<open>\<And>{}\<close>.
 We include @{term "TT"} in the definition to enable Isabelle to infer via syntax only
 that the types @{term "hml"} and @{term "hml_srbb"} are non-empty.
 Isabelle is unable to show that the types are non-empty if the @{term "TT"} data constructor is not
@@ -81,10 +81,10 @@ in brackets $n$ times.}
 Using this function we are now able to formalize $\bigwedge\nolimits_{i \in \mathbb{N}} [\langle \alpha \rangle]^i \top$:
 We define the formula @{term "arbitrarily_many_\<alpha>s"} as being a conjunction which has the full
 set of natural numbers $\mathbb{N}$ as index set and then using the function @{term "n_times_\<alpha>_then"}
-as mapping from index to conjunct formula.  Note that, \<open>Pos \<circ>\<close> is needed to satisfy the type checker.
+as mapping from index to conjunct formula.  Note that \<open>Pos \<circ>\<close> is needed to satisfy the type checker.
 For an example LTS where each process satisfies this formula consider $(\mathbb{N},\{()\}, \Delta(\mathbb{N}, ()))$,
 where $\Delta(\mathbb{N}, ())$ stands for the diagonal relation on $\mathbb{N}$ where each element is
-additionally labeled with $()$.
+additionally labelled with $()$.
 \<close>
 
 fun n_times_\<alpha>_then :: "'act \<Rightarrow> ('act, 'i) hml \<Rightarrow> nat \<Rightarrow> ('act, 'i) hml" where
@@ -311,7 +311,7 @@ begin
 
 subsection \<open> Pre-Order \label{sect:hmlImpl}\<close>
 
-text \<open> An HML formula \<open>\<phi>l\<close> implies another (\<open>\<phi>r\<close>) if the fact that some process \<open>p\<close> satisfies \<open>\<phi>l\<close>
+text \<open> A HML formula \<open>\<phi>l\<close> implies another (\<open>\<phi>r\<close>) if the fact that some process \<open>p\<close> satisfies \<open>\<phi>l\<close>
 implies that \<open>p\<close> must also satisfy \<open>\<phi>r\<close>, regardless of the process \<open>p\<close>. \<close>
 definition hml_impl :: "('a, 's) hml \<Rightarrow> ('a, 's) hml \<Rightarrow> bool" (infix "\<Rrightarrow>" 60)  where
   "\<phi>l \<Rrightarrow> \<phi>r \<equiv> (\<forall>p. (p \<Turnstile> \<phi>l) \<longrightarrow> (p \<Turnstile> \<phi>r))"
@@ -342,7 +342,7 @@ lemma hml_conjunct_impl_preord: "reflp (\<and>\<Rrightarrow>) \<and> transp (\<a
 subsubsection \<open> Pre-Substitution \<close>
 
 text \<open>
-The following lemmas provide means to manipulate an HML implication
+The following lemmas provide means to manipulate a HML implication
 by substituting other HML implications into it. This substitution may only occur on the right hand side of the implication.
 A notable exception is @{term "neg_pre_subst"}, so when substituting into a negation where one may only
 substitute on the left hand side of the implication.
@@ -387,7 +387,7 @@ lemma pos_pre_subst:
   using assms by (simp add: hml_conjunct_impl_def hml_impl_iffI)
 
 text \<open> From \<open>\<phi>' \<Rrightarrow> \<phi>''\<close> and \<open>\<not>\<phi>' \<Rrightarrow> \<phi>\<close> follows \<open>\<not>\<phi>'' \<Rrightarrow> \<phi>\<close>.
-Note that, the substitution here occurs on the left hand side.\<close>
+Note that the substitution here occurs on the left hand side.\<close>
 lemma neg_pre_subst: 
   assumes "\<phi>l \<Rrightarrow> \<phi>r"
       and "(Neg \<phi>l) \<and>\<Rrightarrow> \<psi>" 
@@ -421,7 +421,7 @@ lemma hml_and_right_pre_subst:
   using assms hml_conjunct_impl_iffI hml_impl_iffI by auto
 
 text \<open> From \<open>\<phi>' \<Rrightarrow> \<phi>''\<close> and \<open>\<not>\<phi>' \<Rrightarrow> \<phi>\<close> follows \<open>\<not>\<phi>'' \<Rrightarrow> \<phi>\<close>.
-Note that, the substitution here occurs on the left hand side.\<close>
+Note that the substitution here occurs on the left hand side.\<close>
 lemma not_pre_subst:
   assumes "\<phi>l \<Rrightarrow> \<phi>r"
     and "HML_not \<phi>l \<Rrightarrow> \<phi>"
@@ -434,7 +434,7 @@ end (* Inhabited_Tau_LTS *)
 subsubsection \<open> Pre-Congruence\<close>
 
 text \<open>
-The following lemmas provide means to manipulate an HML implication
+The following lemmas provide means to manipulate a HML implication
 by wrapping both sides of the implication in the same HML formula context.
 
 The lemmas differ in the choice of context, so how both sides are extended.
@@ -491,7 +491,7 @@ lemma pos_pre_cong:
   by (simp add: hml_conjunct_impl_def hml_impl_iffI)
 
 text \<open> Turning both sides of an implication into a negated conjunct will invert the implication direction.
-Note that, \<open>\<phi>l\<close> and \<open>\<phi>r\<close> switch sides in the conclusion.\<close>
+Note that \<open>\<phi>l\<close> and \<open>\<phi>r\<close> switch sides in the conclusion.\<close>
 lemma neg_pre_cong:
   assumes "\<phi>l \<Rrightarrow> \<phi>r"
   shows "Neg \<phi>r \<and>\<Rrightarrow> Neg \<phi>l"
@@ -595,7 +595,7 @@ lemma hml_conjunct_eq_equality: "(\<psi>l \<Lleftarrow>\<and>\<Rrightarrow> \<ps
 subsubsection \<open> Substitution \<close>
 
 text \<open>
-The following lemmas provide means to manipulate an HML equivalence
+The following lemmas provide means to manipulate a HML equivalence
 by substituting other HML equivalence into it. While one may substitute on both sides of the equivalence, only substitutions on the left hand side
 are shown. If one needs a substitution on the other side, one can use @{term "hml_eq_equiv"}.
 The lemmas differ in the choice of context, so what formula is substituted into.
@@ -914,7 +914,7 @@ subsection \<open> HML Equivalence and HML Pre-Order \<close>
 text \<open>
 These lemmas provide means to substitute HML equivalences and implications into each other,
 thereby providing further support for equational reasoning on HML formulas.
-Note that, this always yields an HML implication.
+Note that this always yields a HML implication.
 \<close>
 
 subsubsection \<open> Observations \<close>
@@ -937,7 +937,7 @@ lemma obs_equal_subst_impl:
     shows "\<phi> \<Rrightarrow> (Obs \<alpha> \<phi>r)"
   using assms by (simp add: hml_eq_def obs_pre_subst)
 
-subsubsection \<open> Internal Behavior \<close>
+subsubsection \<open> Internal Behaviour \<close>
 
 lemma internal_left_impl_subst_equal:
   assumes "\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r"
@@ -1288,7 +1288,7 @@ The strategy for picking the conjuncts -- defined as @{term "distinguishing_conj
 is robust against original conjunctions with empty index sets or that do not contain distinguishing
 conjuncts for some elements of \<open>Q\<close>. While these cases are impossible for normal distinguishing 
 conjunctions in HML (how can an empty conjunction distinguish anything: A distinguishing conjunction
-must have a subformula that actually distinguishes), in our formalisation of @{term "hml_srbb"} these cases
+must have a subformula that actually distinguishes), in our formalisation of HML$_\text{SRBB}$ these cases
 are relevant and in particular, it is important that well defined conjuncts be present in such cases.
 So the strategy works as follows: If $I$ is empty, just pick \<open>\<top>\<close> (encoded in different ways).
 If there is no distinguishing conjunct, just pick any conjunct for the original conjunction.

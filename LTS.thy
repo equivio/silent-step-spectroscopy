@@ -228,7 +228,7 @@ proof -
 qed
 
 text \<open>One of the behavioural pre-orders/equivalences that we talk about is trace pre-order/equivalence.
-This is the modal characterization for "one state is weakly trace preordered to the other", @{term "weakly_trace_preordered"}
+This is the modal characterization for "one state is weakly trace pre-ordered to the other", @{term "weakly_trace_preordered"}
 denoted by \<open>\<lesssim>WT\<close>, and "two states are weakly trace equivalent", @{term "weakly_trace_equivalent"} denoted \<open>\<simeq>WT\<close>.\<close>
 definition weakly_trace_preordered (infix "\<lesssim>WT" 60) where
   "p \<lesssim>WT q \<equiv> weak_traces p \<subseteq> weak_traces q"
@@ -320,7 +320,7 @@ end (* locale LTS_Tau *)
 text \<open>@{term "Inhabited_LTS"} and @{term "Inhabited_Tau_LTS"} are extensions of @{term "LTS"} and @{term "LTS_Tau"} respectively.
 They ensure that the corresponding labelled transition systems have at least two states by fixing two different type variables, \<open>left\<close> and \<open>right\<close>.
 This ensures that the type \<open>'s\<close> has at least two distinct elements.
-We later use them in the formalization of binary Hennessy-Milner logic conjunctions (\<open>\<and>\<close>), to ensure that the index set has at least two indices.\<close> 
+We later use them in the formalization of binary Hennessy-Milner Logic conjunctions (\<open>\<and>\<close>), to ensure that the index set has at least two indices.\<close> 
 locale Inhabited_LTS = LTS step
   for step :: "'s \<Rightarrow> 'a \<Rightarrow> 's \<Rightarrow> bool" ("_ \<mapsto> _ _" [70,70,70] 80) +
   fixes left :: 's
