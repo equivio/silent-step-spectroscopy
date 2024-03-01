@@ -229,8 +229,8 @@ proof -
 qed
 
 text \<open>One of the behavioural pre-orders/equivalences that we talk about is trace pre-order/equivalence.
-This is the modal characterization for "one state is weakly trace pre-ordered to the other", @{term "weakly_trace_preordered"}
-denoted by \<open>\<lesssim>WT\<close>, and "two states are weakly trace equivalent", @{term "weakly_trace_equivalent"} denoted \<open>\<simeq>WT\<close>.\<close>
+This is the modal characterization for one state is weakly trace pre-ordered to the other, @{term "weakly_trace_preordered"}
+denoted by \<open>\<lesssim>WT\<close>, and two states are weakly trace equivalent, @{term "weakly_trace_equivalent"} denoted \<open>\<simeq>WT\<close>.\<close>
 definition weakly_trace_preordered (infix "\<lesssim>WT" 60) where
   "p \<lesssim>WT q \<equiv> weak_traces p \<subseteq> weak_traces q"
 
