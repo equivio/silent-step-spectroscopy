@@ -7,7 +7,7 @@ begin
 
 text\<open>In this theory, we introduce energy games and give basic definitions such as (winning) plays. 
 Energy games are the foundation for the later introduced weak spectroscopy game, which is an 
-energy game itself, characterizing equivalence problems.\<close>
+energy game itself, characterizing equivalence problems. \label{energy games}\<close>
 
 subsection \<open>Fundamentals\<close>
 text\<open>We use an abstract concept of energies and only later consider eight-dimensional energy games. 

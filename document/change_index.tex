@@ -1,24 +1,24 @@
 \section{Index of Changes} \label{index}
 \begin{itemize}
-    \item In the definition of HML$_\text{SRBB}$ (in section \ref{sect:hmlSRBB}), we change the inner observation from
+    \item In the definition of HML$_\text{SRBB}$ in section \ref{sect:hmlSRBB}, we change the inner observation from
     $\langle\alpha\rangle\varphi$ with side condition $\alpha \neq \tau$ to $(\alpha)\varphi$.
     This was done due to an inability to exclude $\tau$ from the label type, while defining HML$_\text{SRBB}$. 
     
     \item In section \ref{deviation:eneg} energies are extended to include a negative inhabitant. 
     
     \item Since a formalization of infinite plays was not needed, we did not include one. While the 
-    same could be said about finite plays we formalized those to check our definition of energy games.
+    same could be said about finite plays we formalized those in section \ref{energy games} to check our definition of energy games.
     
-    \item We omitted a definition of winning a game and instead we only made statements about winning budgets. 
+    \item In section \ref{energy games} we omitted a definition of winning a game and instead we only made statements about winning budgets. 
     (By declaring all infinite plays to be won by the defender as done in \cite{bisping2023lineartimebranchingtime}, 
     there always exists a winner and the attacker wins a game if and only if the starting energy is in the winning budget of the starting position.)
     
     \item In \cite{bisping2023lineartimebranchingtime} the winning budget of a state in an energy game 
     is defined as the set of all starting energies such that there exists a winning strategy for the attacker 
     when starting from that state. Our formalization does not define attacker-winning strategies and instead 
-    uses the characterization by proposition $2$ \cite[p. 9]{bisping2023lineartimebranchingtime} as the definition of winning budgets.
+    uses the characterization by proposition $2$ \cite[p. 9]{bisping2023lineartimebranchingtime} as the definition of winning budgets in section \ref{energy games}.
     
-    \item In our definition of the weak spectroscopy game we changed the conditions of the observation move. 
+    \item In our definition of the weak spectroscopy game in section \ref{specmoves} we changed the conditions of the observation move. 
     Instead of $p \overset{\alpha}{\longrightarrow}p'$, $Q \overset{\alpha}{\longrightarrow} Q'$ and $\alpha \neq \tau$
     we allow an observation move if  $p \overset{(\alpha)}{\longrightarrow}p'$, $Q \overset{(\alpha)}{\longrightarrow} Q'$.
     This is necessary due to our formalization of $HML_{SRBB}$. We believe this to have the same distinguishing power 
