@@ -1,15 +1,16 @@
+text \<open>\newpage\<close>
 section \<open>LTS \label{sect:LTS}\<close>
 theory LTS
   imports Main
 begin
 
-subsection \<open>Labeled Transition Systems\<close>
+subsection \<open>Labelled Transition Systems\<close>
 
 text \<open>
-The locale @{term "LTS"} represents a labeled transition system (cf. \cite[defintion 1]{bisping2023lineartimebranchingtime}) consisting of a set of states $\mathcal{P}$, 
-a set of actions $\Sigma$, and a transition relation $\cdot\xrightarrow{\cdot}\cdot \subseteq \mathcal{P}\times\Sigma\times\mathcal{P}$. 
-We formalise the sets of states and actions by the type variables \<open>'s\<close> and \<open>'a\<close>. An LTS is then determined by the transition relation @{term "step"}. 
-Due to thecnical limitations we use the notation \<open>p \<mapsto>\<alpha> p'\<close> which has same meaing as $p \xrightarrow{\alpha} p'$ has in \cite{bisping2023lineartimebranchingtime}.
+The locale @{term "LTS"} represents a labelled transition system consisting of a set of states $\mathcal{P}$, 
+a set of actions $\Sigma$, and a transition relation $\mapsto \subseteq \mathcal{P}\times\Sigma\times\mathcal{P}$ (cf. \cite[defintion 1]{bisping2023lineartimebranchingtime}). 
+We formalize the sets of states and actions by the type variables \<open>'s\<close> and \<open>'a\<close>. An LTS is then determined by the transition relation @{term "step"}. 
+Due to technical limitations we use the notation \<open>p \<mapsto>\<alpha> p'\<close> which has same meaing as $p \xrightarrow{\alpha} p'$ has in \cite{bisping2023lineartimebranchingtime}.
 
 \<close>
 
@@ -17,8 +18,8 @@ locale LTS =
   fixes step :: "'s \<Rightarrow> 'a \<Rightarrow> 's \<Rightarrow> bool" ("_ \<mapsto> _ _" [70,70,70] 80)
 begin
 
-text \<open>One may lift @{term "step"} to sets of states, written as \<open>P \<mapsto>S \<alpha> Q\<close>. We define \<open>P \<mapsto>S \<alpha> Q\<close> to be true iff for all states \<open>q\<close> in \<open>Q\<close> there exists
-a state \<open>p\<close> in \<open>P\<close> such that \<open>p \<mapsto> \<alpha> q\<close> and for all \<open>p\<close> in P and for all \<open>q\<close>, if \<open>p \<mapsto> \<alpha> q\<close> then \<open>q\<close> is in \<open>Q\<close>.\<close>
+text \<open>One may lift @{term "step"} to sets of states, written as \<open>P \<mapsto>S \<alpha> Q\<close>. We define \<open>P \<mapsto>S \<alpha> Q\<close> to be true if and only if for all states \<open>q\<close> in \<open>Q\<close> there exists
+a state \<open>p\<close> in \<open>P\<close> such that \<open>p \<mapsto> \<alpha> q\<close> and for all \<open>p\<close> in \<open>P\<close> and for all \<open>q\<close>, if \<open>p \<mapsto> \<alpha> q\<close> then \<open>q\<close> is in \<open>Q\<close>.\<close>
 abbreviation step_setp ("_ \<mapsto>S _ _" [70,70,70] 80) where
   "P \<mapsto>S \<alpha> Q \<equiv> (\<forall>q \<in> Q. \<exists>p \<in> P. p \<mapsto> \<alpha> q) \<and> (\<forall>p \<in> P. \<forall>q. p \<mapsto> \<alpha> q \<longrightarrow> q \<in> Q)"
 
@@ -49,10 +50,10 @@ lemma step_set_eq:
 
 end (*<*) (* locale LTS *) (*>*)
 
-subsection \<open>Labeled Transition Systems with Silent Steps\<close>
+subsection \<open>Labelled Transition Systems with Silent Steps\<close>
 
-text \<open>We formalize transition systems with \textit{silent steps} as an extension of ordinary transition systems
-with a fixed \textit{silent action} \<open>\<tau>\<close>.\<close>
+text \<open>We formalize labelled transition systems with silent steps as an extension of ordinary labelled transition systems
+with a fixed silent action \<open>\<tau>\<close>.\<close>
 
 locale LTS_Tau =
   LTS step
@@ -72,12 +73,12 @@ inductive silent_reachable :: "'s \<Rightarrow> 's \<Rightarrow> bool"  (infix "
     "p \<Zsurj> p" |
     "p \<Zsurj> p''" if "p \<mapsto> \<tau> p'" and "p' \<Zsurj> p''"
 
-text \<open>If \<open>p'\<close> is silent reachable from \<open>p\<close> and there is a \<open>\<tau>\<close>-transition from \<open>p'\<close> to \<open>p''\<close> then \<open>p''\<close> is silent reachable from \<open>p\<close>\<close>
+text \<open>If \<open>p'\<close> is silent reachable from \<open>p\<close> and there is a \<open>\<tau>\<close>-transition from \<open>p'\<close> to \<open>p''\<close> then \<open>p''\<close> is silent reachable from \<open>p\<close>.\<close>
 lemma silent_reachable_append_\<tau>: "p \<Zsurj> p' \<Longrightarrow> p' \<mapsto> \<tau> p'' \<Longrightarrow> p \<Zsurj> p''"
   apply (induct rule: silent_reachable.induct)
   using silent_reachable.intros by blast+
 
-text \<open>@{term "silent_reachable"} is transitive.\<close>
+text \<open>The relation @{term "silent_reachable"} is transitive.\<close>
 lemma silent_reachable_trans:
   assumes
     \<open>p \<Zsurj> p'\<close>
@@ -87,7 +88,7 @@ lemma silent_reachable_trans:
 using assms silent_reachable.intros(2)
   by (induct, blast+)
 
-text \<open>@{term "silent_reachable_loopless"} is a variation of @{term "silent_reachable"} that does not use self-loops.\<close>
+text \<open>The relation @{term "silent_reachable_loopless"} is a variation of @{term "silent_reachable"} that does not use self-loops.\<close>
 inductive silent_reachable_loopless :: "'s \<Rightarrow> 's \<Rightarrow> bool"  (infix "\<Zsurj>L" 80)
   where
     "p \<Zsurj>L p" |
@@ -111,7 +112,7 @@ next
   qed
 qed
 
-text \<open>@{term "weak_step"} defines a new notion of transition relation between states. A state \<open>p\<close> can reach
+text \<open>In the following, we define @{term "weak_step"} as a new notion of transition relation between states. A state \<open>p\<close> can reach
 \<open>p'\<close> by performing an \<open>\<alpha>\<close>-transition, possibly proceeded and followed by any number of \<open>\<tau>\<close>-transitions.\<close>
 definition weak_step ("_ \<Zsurj>\<mapsto>\<Zsurj> _ _" [70, 70, 70] 80) where
   "p  \<Zsurj>\<mapsto>\<Zsurj> \<alpha> p' \<equiv> if \<alpha> = \<tau> 
@@ -164,8 +165,8 @@ lemma weak_step_sequence_trans:
   apply (smt (verit) LTS_Tau.weak_step_sequence.simps append_Nil silent_reachable_trans)
   by force
 
-text \<open>@{term "weak_traces"} of a state or all possible sequences of weak transitions that can be performed.
-In the context of labeled transition systems, weak traces captures the observable behavior of a state.\<close>
+text \<open>The weak traces of a state or all possible sequences of weak transitions that can be performed.
+In the context of labelled transition systems, weak traces capture the observable behaviour of a state.\<close>
 abbreviation weak_traces :: "'s \<Rightarrow> 'a list set"
   where "weak_traces p \<equiv> {tr. \<exists>p'. p \<Zsurj>\<mapsto>\<Zsurj>$ tr p'}"
 
@@ -175,7 +176,7 @@ lemma empty_trace_allways_weak_trace:
   using silent_reachable.intros(1) weak_step_sequence.intros(1) by fastforce
 
 text \<open>Since @{term "weak_step"}'s can be proceeded and followed by any number \<open>\<tau>\<close>-transitions and the empty
-@{term "weak_step_sequence"} also allows for \<open>\<tau>\<close>-transitions, a \<open>\<tau>\<close> can be prepended to a weak trace of a state.\<close>
+@{term "weak_step_sequence"} also allows \<open>\<tau>\<close>-transitions, \<open>\<tau>\<close> can be prepended to a weak trace of a state.\<close>
 lemma prepend_\<tau>_weak_trace:
   assumes "tr \<in> weak_traces p"
   shows "(\<tau> # tr) \<in> weak_traces p"
@@ -186,7 +187,7 @@ lemma prepend_\<tau>_weak_trace:
     and weak_step_sequence.intros(2)
   by fastforce
 
-text \<open>If state \<open>p'\<close> is reachable from state \<open>p\<close> via a sequence of \<open>\<tau>\<close>-transitions, and there exists a weak trace \<open>tr\<close> starting from \<open>p'\<close>,
+text \<open>If state \<open>p'\<close> is reachable from state \<open>p\<close> via a sequence of \<open>\<tau>\<close>-transitions and there exists a weak trace \<open>tr\<close> starting from \<open>p'\<close>,
 then \<open>tr\<close> is also a weak trace starting from \<open>p\<close>.\<close>
 lemma silent_prepend_weak_traces:
   assumes "p \<Zsurj> p'"
@@ -227,9 +228,9 @@ proof -
   then show "(\<alpha> # tr) \<in> weak_traces p" by auto
 qed
 
-text \<open>One of the behavioral preorders/-equivalences that we talk about is trace preorder/-equivalence.
-This is the modal characterization for "one state is weakly trace preordered to the other", @{term "weakly_trace_preordered"}
-denoted by \<open>\<lesssim>WT\<close>, and "two states are weakly trace equivalent", @{term "weakly_trace_equivalent"} denoted \<open>\<simeq>WT\<close>.\<close>
+text \<open>One of the behavioural pre-orders/equivalences that we talk about is trace pre-order/equivalence.
+This is the modal characterization for one state is weakly trace pre-ordered to the other, @{term "weakly_trace_preordered"}
+denoted by \<open>\<lesssim>WT\<close>, and two states are weakly trace equivalent, @{term "weakly_trace_equivalent"} denoted \<open>\<simeq>WT\<close>.\<close>
 definition weakly_trace_preordered (infix "\<lesssim>WT" 60) where
   "p \<lesssim>WT q \<equiv> weak_traces p \<subseteq> weak_traces q"
 
@@ -318,9 +319,9 @@ lemma soft_step_set_eq:
 end (* locale LTS_Tau *)
 
 text \<open>@{term "Inhabited_LTS"} and @{term "Inhabited_Tau_LTS"} are extensions of @{term "LTS"} and @{term "LTS_Tau"} respectively.
-They ensure that the corresponding transition systems have at least two states by fixing two different type variables, \<open>left\<close> and \<open>right\<close>.
-This ensures that the type \<open>'s\<close> has atleast two distinct elements.
-We later use them in the formalization of binary Hennesy-Milner logic conjunctions (\<open>\<and>\<close>), to ensure that the index set has at least two indices.\<close> 
+They ensure that the corresponding labelled transition systems have at least two states by fixing two different type variables, \<open>left\<close> and \<open>right\<close>.
+This ensures that the type \<open>'s\<close> has at least two distinct elements.
+We later use them in the formalization of binary Hennessy-Milner Logic conjunctions (\<open>\<and>\<close>), to ensure that the index set has at least two indices.\<close> 
 locale Inhabited_LTS = LTS step
   for step :: "'s \<Rightarrow> 'a \<Rightarrow> 's \<Rightarrow> bool" ("_ \<mapsto> _ _" [70,70,70] 80) +
   fixes left :: 's

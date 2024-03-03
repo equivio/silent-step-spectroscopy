@@ -1,8 +1,8 @@
 \newpage
-\section{Introduction} %todo reference to expose
+\section{Introduction} 
 Verification and asking wether a model fulfills its specification or if a program can be replaced with one that has the same behaviour are core problems of reactive systems and programming.
-For this we have to get an idea of what same behavior for processes actually means and consider different behavioural equivalences.
-One possibility for this consideration are games where one player winning the game corresponds to the behavioural equivalence of processes.
+For this we have to get an idea of what same behaviour for processes actually means and consider different behavioural equivalences.
+One possibility for this consideration are games where one player winning the game corresponds to the behavioural equivalences of processes.
 Alternatively, we could use a modal logic, known as Hennessy-Milner Logic (HML), not only to express the specification but also to build formulas that distinguish processes and 
 thereby characterize behavioural equivalences.
 These techniques for checking whether two processes have the same behaviour may also be combined.
@@ -12,23 +12,23 @@ Therefore, Bisping and Jansen \cite{bisping2023lineartimebranchingtime} included
 These vectors are added as costs to the moves of an extended delay bisimulation game such that the following property is obtained: 
 The attacker wins a play with a certain initial energy $e$ if and only if there is a formula that distinguishes the corresponding processes with a price less than or equal to $e$.
 Then the initial energy and the price of a formula encode the satisfied behavioural equivalences.
-Therefore it is possible to decide for a whole spectrum of behavioural equivalences at the same time which of them apply.
+It is therefore possible to decide for a whole spectrum of behavioural equivalences at the same time which of them apply \cite{bisping2023lineartimebranchingtime}.
 \\\\
 We formalize the eight-dimensional weak spectroscopy game, 
-which ``can be used to decide a wide array of behavioral equivalences between stability-respecting branching bisimilarity and weak trace equivalence in one go''\cite{bisping2023lineartimebranchingtime}.
-We then outline the proof of the correspondence between ``attacker-winning energy budgets and distinguishing sublanguages of Hennessy-Milner logic characterized by eight dimensions of formula expressiveness''.
-With our formalization, we try to follow \cite{bisping2023lineartimebranchingtime} as closely as possible in how we formalize the spectroscopy game, HML and their correspondence.
-In doing so, we point out deviations in our formalization from and small corrections of the paper. This report documents the outcome of a project supervised by Benjamin Bisping at the Technical University Berlin. 
+which ``can be used to decide a wide array of behavi[ou]ral equivalences between stability-respecting branching bisimilarity and weak trace equivalence in one go''\cite[Abstract]{bisping2023lineartimebranchingtime}.
+We then outline the proof of the correspondence between ``attacker-winning energy budgets and distinguishing sublanguages of Hennessy-Milner [L]ogic characterized by eight dimensions of formula expressiveness''\cite[Abstract]{bisping2023lineartimebranchingtime}.
+With our formalization we try to follow \cite{bisping2023lineartimebranchingtime} as closely as possible in how we formalize the weak spectroscopy game, HML and their correspondence.
+In doing so, we point out deviations in our formalization from and small corrections of the paper. This report documents the outcome of a project supervised by Benjamin Bisping at the Technical University of Berlin. 
 \\\\
-First, we formalize labeled transition systems with special handeling of $\tau$-transitions.
+First, we formalize labelled transition systems with special handeling of $\tau$-transitions.
 Afterwards, we describe our formalization of HML and a subset of HML, which we denote HML$_\text{SRBB}$.
 Within these HML sections, we define the semantics of such formulas and based on this prove several implications and equivalences on HML formulas.
 Additionally, we treat the notion of distinguishing formulas and especially distinguishing conjunctions.
 In the following sections, we present our formalization of energies as a data type and a price function for formulas.
 Before we formalize the weak spectroscopy game, we do the same for its basis in the form of energy games and define winning budgets on them.
-Following these fundamentals, we state our formalization of the theorem $1$ of \cite{bisping2023lineartimebranchingtime}, that ``relates attacker-winning energy budgets and distinguishing sublanguages of Hennessy-Milner logic''. 
+Following these fundamentals, we state our formalization of the theorem $1$ of \cite{bisping2023lineartimebranchingtime}, that ``relate[s] attacker-winning energy budgets and distinguishing sublanguages of Hennessy-Milner [L]ogic''\cite[Abstract]{bisping2023lineartimebranchingtime}. 
 Based on the proof in \cite{bisping2023lineartimebranchingtime} we outline a proof for this theorem through three lemmas. 
-The first lemma states that given a distinguishing formula, the attacker is able to win the corresponding spectroscopy game.
-After introducing strategy formulas we use induction to prove the second lemma, which claimes that if the attacker wins the weak spectroscopy game with an initial energy $e$, then there exists a (strategy) formula with a price less than or equal to $e$.
+The first lemma states that given a distinguishing formula, the attacker is able to win the corresponding weak spectroscopy game.
+After introducing strategy formulas, we use induction to prove the second lemma, which claimes that if the attacker wins the weak spectroscopy game with an initial energy $e$, then there exists a (strategy) formula with a price less than or equal to $e$.
 Afterwards, the third lemma completes this cycle by stating that if there is a (strategy) formula, then it is a distingushing formula.
 Finally, we discuss the minor issues we found in the paper and thus present our contributions to \cite{bisping2023lineartimebranchingtime} and end this report with a conclusion.

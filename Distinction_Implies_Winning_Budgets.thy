@@ -1,3 +1,4 @@
+text \<open>\newpage\<close>
 section \<open>Distinction Implies Winning Budgets\<close>
 theory Distinction_Implies_Winning_Budgets
   imports Spectroscopy_Game Expressiveness_Price
@@ -6,15 +7,15 @@ begin
 context full_spec_game
 begin
 
-text \<open>In this section we prove that the if a formula distinguishes a process @{term "p"}
-      from a set of process @{term "Q"} then the price of this formula is in the attackers winning
-      budget. This is the same statement as that of lemma 1 in the paper \cite[p. 20]{bisping2023lineartimebranchingtime}.
+text \<open>In this section, we prove that if a formula distinguishes a process @{term "p"}
+      from a set of process @{term "Q"}, then the price of this formula is in the attackers-winning
+      budget. This is the same statement as that of lemma $1$ in the paper \cite[p. 20]{bisping2023lineartimebranchingtime}.
       We likewise also prove it in the same manner.
-
-      First we show that the statement holds if @{term "Q = {}"}. This is the case, as the
+      
+      First, we show that the statement holds if @{term "Q = {}"}. This is the case, as the
       attacker can move, at no cost, from the starting position, @{term "Attacker_Immediate p {}"}, 
       to the defender position @{term "Defender_Conj p {}"}. In this position the defender is then
-      unable to make any further moves. Hence the attacker wins the game with any budget.\<close>
+      unable to make any further moves. Hence, the attacker wins the game with any budget.\<close>
 
 lemma distinction_implies_winning_budgets_empty_Q:
   assumes "distinguishes_from \<phi> p {}"
@@ -39,8 +40,8 @@ proof-
     by (metis conj_win id_apply in_wina.intros(2) not_neg option.distinct(1) option.sel spectroscopy_defender.simps(4))
 qed
 
-text \<open>Next we show the statement for the case that @{term "Q \<noteq> {}"}. Following the proof of
-      \cite[p. 20]{bisping2023lineartimebranchingtime} we do this by induction on a more
+text \<open>Next, we show the statement for the case that @{term "Q \<noteq> {}"}. Following the proof of
+      \cite[p. 20]{bisping2023lineartimebranchingtime}, we do this by induction on a more
       complex property. We formalize this property as follows (keeping the labels from the paper):
       \begin{itemize}
       \item [1.] \<open>\<forall>Q p. Q \<noteq> {} \<longrightarrow> distinguishes_from \<phi> p Q\<close>\\
@@ -66,16 +67,16 @@ text \<open>Next we show the statement for the case that @{term "Q \<noteq> {}"}
       \item[3.] \<open>\<forall>p q. distinguishes_conjunct \<psi> p q\<close>\\
                 \<open>\<longrightarrow> in_wina (expr_pr_conjunct \<psi>) (Attacker_Clause p q)\<close>
       \end{itemize}
-    Note, that the sixth case differs from the paper in the assumption that @{term "Q_\<alpha> \<noteq> {}"}.
+    Note that the sixth case differs from the paper in the assumption that @{term "Q_\<alpha> \<noteq> {}"}.
     Strictly speaking this case is covered by the previous lemma, the case that @{term "Q = {}"},
     since using @{term "Q \<inter> model_set_inner (Conj \<Psi>_I \<Psi>) \<subseteq> Q_\<alpha>"} and @{term "Q_\<alpha> = {}"}
     we can conclude that @{term "Q = {}"}.
     But adding this assumption allows us to directly apply the induction hypothesis. Without
     further having to do this case distinction.\label{deviation:lemma1_Q_a}
-    The induction itself is then done via the rule \<open>induct\<close> on\\\<open>hml_srbb_hml_srbb_inner_hml_srbb_conjunct\<close>.
+    The induction itself is then done via the rule \<open>induct\<close> on \<open>hml_srbb_hml_srbb_inner_hml_srbb_conjunct\<close>.
     The parts of this proof that are completed work as described in the paper.
-    A notable exceptions to this is that we also have to prove the statement for the 
-    formula @{term "TT"}\label{deviation:lemma1TT}. This holds trivialy as @{term "TT"} does not distinguishes any @{term "p"} from any
+    A notable exception to this is that we also have to prove the statement for the 
+    formula @{term "TT"}\label{deviation:lemma1TT}. This holds trivially as @{term "TT"} does not distinguishes any @{term "p"} from any
     non-empty @{term "Q"}. 
   \<close>
 lemma distinction_implies_winning_budgets:

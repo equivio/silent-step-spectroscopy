@@ -1,16 +1,17 @@
+text \<open>\newpage\<close>
 section \<open>Energy Games\<close>
 
 theory Energy_Games
   imports Main Misc
 begin
 
-text\<open>In this theory we introduce energy games and give basic definitions such as (winning) plays. 
-Energy games are the foundation for the later introduced full spectroscopy game, which is an 
+text\<open>In this theory, we introduce energy games and give basic definitions such as (winning) plays. 
+Energy games are the foundation for the later introduced weak spectroscopy game, which is an 
 energy game itself, characterizing equivalence problems.\<close>
 
 subsection \<open>Fundamentals\<close>
-text\<open>We use an abstract concept of energies and only later consider 8-dimensional energy games. 
-Through our later given definition of energies as a data type we obtain certain 
+text\<open>We use an abstract concept of energies and only later consider eight-dimensional energy games. 
+Through our later given definition of energies as a data type, we obtain certain 
 properties that we enforce for all energy games. We therefore assume that an energy game 
 has a partial order on energies such that all updates are monotonic and never increase.\<close>
 
@@ -20,10 +21,10 @@ text\<open>When considering finite plays, they are represented as a list of stat
 
 type_synonym 'gstate fplay = "'gstate list"
 
-text\<open>An energy game is played by two players on a directed graph labeled by energy updates. 
-These energy updates represent the costs of choosing a certain move.
-Since we will only consider cases in which the attacker's moves may actually have nonzero costs, only they can run 
-out of energy. This is the case, when the energy level reaches the \<open>defender_win_level\<close>.
+text\<open>An energy game is played by two players on a directed graph labelled by energy updates. 
+These updates represent the costs of choosing a certain move.
+Since we will only consider cases in which the attacker's moves may actually have non-zero costs, only they can run 
+out of energy. This is the case when the energy level reaches the \<open>defender_win_level\<close>.
 In contrast to other definitions of games, we do not fix a starting position.\<close>
 locale energy_game =
   fixes weight_opt :: "'gstate \<Rightarrow> 'gstate \<Rightarrow> 'energy update option" and
@@ -38,7 +39,7 @@ locale energy_game =
           update_gets_smaller: "\<And>g g' e. ((weight_opt g g') \<noteq> None) \<Longrightarrow> (ord (the (weight_opt g g')e) e)"
 begin
 
-text\<open>In the following we introduce some abbreviations for attacker positions and moves.\<close>
+text\<open>In the following, we introduce some abbreviations for attacker positions and moves.\<close>
 
 abbreviation attacker :: "'gstate \<Rightarrow> bool" ("Ga") where "Ga p \<equiv> \<not> Gd p" 
 
@@ -48,8 +49,6 @@ abbreviation weighted_move :: "'gstate \<Rightarrow> 'energy update \<Rightarrow
   "weighted_move g1 u g2 \<equiv> g1 \<Zinj> g2 \<and> (the (weight_opt g1 g2) = u)"
 
 abbreviation "weight g1 g2 \<equiv> the (weight_opt g1 g2)"
-
-subsubsection \<open>Finite Plays\<close>
 
 text\<open>A valid finite play is a lists of states where there is a move from one state to the next in the list.\<close>
 
@@ -224,7 +223,7 @@ text\<open>There is no winner of a finite play if the play is not yet stuck.\<cl
 abbreviation no_winner:: "'gstate \<Rightarrow> 'energy \<Rightarrow> 'gstate fplay \<Rightarrow> bool" where
   "no_winner g0 e0 p \<equiv> \<not>no_move g0 p \<and> (energy_level g0 e0 p \<noteq> defender_win_level)"
 
-text\<open>Now we prove that exactly one of our three cases is always true. In particular, if there is a winner, that winner is unique. \<close>
+text\<open>Now, we prove that exactly one of our three cases is always true. In particular, if there is a winner that winner is unique. \<close>
 lemma play_won_cases:
   shows "won_by_defender g0 e0 p \<or> won_by_attacker g0 e0 p \<or> no_winner g0 e0 p"
   unfolding won_by_attacker_def won_by_defender_def by blast
@@ -240,13 +239,17 @@ subsubsection \<open>Winning Budgets\<close>
 text\<open>The attacker wins a game if and only if they manage to force the defender to get stuck before 
 running out of energy. The needed amount of energy is described by winning budgets: \<open>e\<close> is in the 
 winning budget of \<open>g\<close> if and only if there exists a winning strategy for the attacker when starting in \<open>g\<close> 
-with energy \<open>e\<close>. In more detail this yields the following definition: \\
-- If \<open>g\<close> is an attacker position and \<open>e\<close> is not the \<open>defender_win_level\<close> then \<open>e\<close> is in the winning budget 
-of \<open>g\<close> if and only if there exists a position \<open>g'\<close> the attacker can move to. In other words, if the updated energy 
-level is in the winning budget of \<open>g'\<close>. (This corresponds to the second case of the following definition.) \\
-- If \<open>g\<close> is a defender position and \<open>e\<close> is not the \<open>defender_win_level\<close> then \<open>e\<close> is in the winning budget 
-of \<open>g\<close> if and only if for all successors \<open>g'\<close> the accordingly updated energy is in the winning 
-budget of \<open>g'\<close>. In other words, if the attacker will win from every successor the defender can move to. (In the following definition this is split into cases one and three.)\<close>
+with energy \<open>e\<close>. In more detail, this yields the following definition: 
+
+\begin{itemize}
+  \item If \<open>g\<close> is an attacker position and \<open>e\<close> is not the \<open>defender_win_level\<close> then \<open>e\<close> is in the winning budget 
+  of \<open>g\<close> if and only if there exists a position \<open>g'\<close> the attacker can move to. In other words, if the updated energy 
+  level is in the winning budget of \<open>g'\<close>. (This corresponds to the second case of the following definition.)
+  \item  If \<open>g\<close> is a defender position and \<open>e\<close> is not the \<open>defender_win_level\<close> then \<open>e\<close> is in the winning budget 
+   of \<open>g\<close> if and only if for all successors \<open>g'\<close> the accordingly updated energy is in the winning 
+   budget of \<open>g'\<close>. In other words, if the attacker will win from every successor the defender can move to. (In the following definition this is split into cases one and three.)
+\end{itemize}
+\<close>
 
 inductive in_wina:: "'energy \<Rightarrow> 'gstate \<Rightarrow> bool " where
  "in_wina e g" if "(Gd g) \<and> (\<forall>g'. \<not>(g \<Zinj> g')) \<and> (e \<noteq> defender_win_level)" |

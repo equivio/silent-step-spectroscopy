@@ -1,12 +1,12 @@
-\section{Index of Changes}
+\section{Index of Changes} \label{index}
 \begin{itemize}
-    \item In the definition of \texttt{hml\_srbb} (in section \ref{sect:hmlSRBB}), we change the inner observation from
+    \item In the definition of HML$_\text{SRBB}$ (in section \ref{sect:hmlSRBB}), we change the inner observation from
     $\langle\alpha\rangle\varphi$ with side condition $\alpha \neq \tau$ to $(\alpha)\varphi$.
-    This was done due to an inability to exclude $\tau$ from the label type while defining \texttt{hml\_srbb}. 
+    This was done due to an inability to exclude $\tau$ from the label type, while defining HML$_\text{SRBB}$. 
     
     \item In section \ref{deviation:eneg} energies are extended to include a negative inhabitant. 
     
-    \item Since a formalization of infinite plays was not needed we did not include one. While the 
+    \item Since a formalization of infinite plays was not needed, we did not include one. While the 
     same could be said about finite plays we formalized those to check our definition of energy games.
     
     \item We omitted a definition of winning a game and instead we only made statements about winning budgets. 
@@ -15,27 +15,28 @@
     
     \item In \cite{bisping2023lineartimebranchingtime} the winning budget of a state in an energy game 
     is defined as the set of all starting energies such that there exists a winning strategy for the attacker 
-    when starting from that state. Our formalization does not define attacker winning strategies and instead 
-    uses the characterization by proposition 2 \cite[p. 9]{bisping2023lineartimebranchingtime} as the definition of winning budgets.
+    when starting from that state. Our formalization does not define attacker-winning strategies and instead 
+    uses the characterization by proposition $2$ \cite[p. 9]{bisping2023lineartimebranchingtime} as the definition of winning budgets.
     
-    \item In our definition of the spectroscopy game we changed the conditions of the observation move. 
+    \item In our definition of the weak spectroscopy game we changed the conditions of the observation move. 
     Instead of $p \overset{\alpha}{\longrightarrow}p'$, $Q \overset{\alpha}{\longrightarrow} Q'$ and $\alpha \neq \tau$
     we allow an observation move if  $p \overset{(\alpha)}{\longrightarrow}p'$, $Q \overset{(\alpha)}{\longrightarrow} Q'$.
     This is necessary due to our formalization of $HML_{SRBB}$. We believe this to have the same distinguishing power 
-    since observations only occur after internal behavior. However, we omitted a proof. 
+    since observations only occur after internal behaviour. However, we omitted a proof. 
     
-    \item In section \ref{deviation:lemma1TT} the proof of lemma 1 has to deal with formulas of the form \texttt{TT}. 
+    \item In section \ref{deviation:lemma1TT} the proof of lemma $1$ has to deal with formulas of the form \texttt{TT}. 
     
     \item Since in our HML we distinguish between a conjunction and an immediate conjunction, in section \ref{stratFormula} 
     we added a new strategy formula for immediate conjunction to the definition.
     
     \item In lemma \texttt{winning\_budget\_implies\_strategy\_formula} in section \ref{deviation:lemma2} a different kind of induction is used compared to the paper 
-    where we only look at direct successors and therefore added the not too interesting case of g being an 
+    where we only look at direct successors and therefore added the not too interesting case of $g$ being an 
     attacker branching position which was omitted in the paper.
     
-    \item In lemma \texttt{strategy\_formulas\_distinguish} in section \ref{deviation:lemma3} we added a case to account for the difference between 
-    conjunctions and immediate conjunctions. And due to our formalization when considering a
-    defender branching position $g=(p,\alpha ,p', Q \ Q\alpha, Q\alpha)_d^\eta$ the condition 
+    \item In lemma \texttt{strategy\_formulas\_distinguish} in section \ref{deviation:lemma3}, we added a case to account for the difference between 
+    conjunctions and immediate conjunctions. 
+    
+    Due to our formalization when considering a defender branching position $g=(p,\alpha ,p', Q \ Q\alpha, Q\alpha)_d^\eta$ the condition 
     $Q \alpha \subseteq Q$ is implicitly given.
     This results in a similar change of the corresponding derivation rule for strategy formulas.
 \end{itemize}

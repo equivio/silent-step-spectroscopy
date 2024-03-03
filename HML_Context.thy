@@ -1,19 +1,16 @@
 section \<open>HML Contexts\<close>
-
+theory HML_Context
+  imports Main HML
+begin
 text \<open>
 This section contains definitions for context based definitions of substitution and congruence.
-These are not used in the remainder of the project, since handing a set of lemmata which handle
+These are not used in the project, since handing a set of lemmas which handle
 substitution or congruence under a single prefix to automatic proof search proved to be more convenient
 then manually specifying where exactly in the formula substitution ought to occur.
-
 The added control provided by the mechanisms in this section was never needed and thereby never justified
 manually constructing a context term.
 We keep this section for the amusement of the interested reader.
 \<close>
-
-theory HML_Context
-  imports Main HML
-begin
 
 text \<open> The data type @{term "hml_precontext"} specifies where within a formula one may substitute
 an implication leading to a new implication. \<close>
@@ -68,7 +65,8 @@ datatype
     ObsC 'act "('act, 'i) hml_context" |
     InternalC "('act, 'i) hml_context" |
     SilentC "('act, 'i) hml_context" |
-    ConjC "'i set" "'i \<Rightarrow> ('act, 'i) hml_conjunct" "'i set" "'i \<Rightarrow> ('act, 'i) hml_conjunct_context"
+    ConjC "'i set" "'i \<Rightarrow> ('act, 'i) hml_conjunct" "'i set" "'i 
+    \<Rightarrow> ('act, 'i) hml_conjunct_context"
 and
   ('act, 'i) hml_conjunct_context =
     PosC "('act, 'i) hml_context" |
@@ -192,7 +190,7 @@ proof -
   qed
 qed
 
-text \<open> Substituting an equivalence somewhere in a formula preserves equivalence. \<close>
+text \<open> If you substitute an equivalence somewhere in a formula, the equivalence is preserved. \<close>
 lemma hml_cong: "\<forall>\<phi>l \<phi>r. \<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r \<longrightarrow> fill \<phi>l C \<Lleftarrow>\<Rrightarrow> fill \<phi>r C"
   and hml_conj_cong: "\<forall>\<phi>l \<phi>r. \<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r \<longrightarrow> fill_conjunct \<phi>l C' \<Lleftarrow>\<and>\<Rrightarrow> fill_conjunct \<phi>r C'"
   apply (induct C and C')

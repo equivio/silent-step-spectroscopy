@@ -3,11 +3,11 @@ section\<open>Instantiation of an Energy Game\<close>
 theory Example_Instantiation
   imports Energy_Games "HOL-Library.Extended_Nat"
 begin
-text \<open>In this theory we create an instantiation of a two-dimensional energy game to test our definitions.\<close>
+text \<open>In this theory, we create an instantiation of a two-dimensional energy game to test our definitions.\<close>
 
-subsection\<open>Two-dimensional Energies\<close>
+subsection\<open>Two-Dimensional Energies\<close>
 
-text \<open>We first define energies in a similar manner to our definition of energies with eight dimensions: 
+text \<open>We first define energies in a similar manner to our definition of energies with eight dimensions.
 We use \<open>eneg\<close> when the energy level is equal to or lower than the \<open>defender_win_level\<close>. We define 
 component-wise subtraction and the update \<open>min_update\<close> where the first component is replaced by the minimum of both entries.\<close>
 
@@ -37,7 +37,7 @@ lemma min_update[simp]:
 
 subsection\<open>Energy Game Example\<close>
 
-text \<open>In preparation for our instantiation we define our states, the updates for our energy levels and which states are defender positions.\<close>
+text \<open>In preparation for our instantiation, we define our states, the updates for our energy levels and which states are defender positions.\<close>
 datatype state = a | b1 | b2 | c | d1 | d2 | e
 
 fun weight_opt :: "state \<Rightarrow> state \<Rightarrow> energy update option" where
@@ -60,7 +60,7 @@ fun defender :: "state \<Rightarrow> bool" where
   "defender e = True" |
   "defender _ = False"
 
-text\<open>Now we can state our energy game example:\<close>
+text\<open>Now, we can state our energy game example.\<close>
 
 interpretation Game: energy_game "weight_opt" "defender" "eneg" "order" 
 proof
@@ -180,8 +180,8 @@ lemma moves:
 
 subsection\<open>Checking Definitions\<close>
 
-text\<open>Now we check our definition of finite plays with two examples: one that is a finite play and one that is not.
-Afterwards we check the "behavior" of our definition when changing the starting position.\<close>
+text\<open>Now, we check our definition of finite plays with two examples: One that is a finite play and one that is not.
+Afterwards, we check the 'behaviour' of our definition when changing the starting position.\<close>
 lemma finite_play_example:
   shows "finite_play a [a, b2, c, d1, e]"
 proof-
@@ -213,7 +213,7 @@ proof (rule notI)
   from A1 A3 show "False" by simp
 qed
 
-text \<open>To check our calculation of energy levels, we look at different plays and their energy levels using the following lemmas.\<close>
+text \<open>To check our calculation of energy levels we look at different plays and their energy levels using the following lemmas.\<close>
 
 abbreviation "energy_level \<equiv> Game.energy_level"
 
@@ -249,7 +249,7 @@ lemma energy_level_example_4:
   using Game.energy_level.elims Game.energy_level.pelims by simp
 
 text \<open>We also take a look at our definition of \<open>no_move\<close> using different examples of plays.
-In particular we check our definition regarding invalid plays.\<close>
+In particular, we check our definition regarding invalid plays.\<close>
 
 lemma no_move_example:
   shows "Game.no_move a [a, b2, c, d1, e]"
@@ -270,7 +270,7 @@ lemma no_move_invalid_game_1:
   shows "\<not>Game.no_move a [a, b2, b1]"
   by (metis Game.finite_play.cases butlast.simps(2) butlast_snoc last.simps last_snoc list.discI weight_opt.simps(16))
 
-text \<open>In the following we look at examples of plays and check who wins.\<close>
+text \<open>In the following, we look at examples of plays and check who wins.\<close>
 
 lemma attacker_wins_example:
   shows "Game.won_by_attacker a (E 10 10) [a, b2, c, d1, e]"
@@ -292,7 +292,7 @@ using assms proof -
   thus "\<not>Game.no_move a p" by simp
 qed
 
-text \<open>Finally, we verify our definition of wining budgets.\<close>
+text \<open>Finally, we verify our definition of winning budgets.\<close>
 
 lemma wina_of_e:
   shows "Game.in_wina (E 9 8) e"
