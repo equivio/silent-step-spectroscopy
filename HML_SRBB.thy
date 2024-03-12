@@ -1157,7 +1157,7 @@ text \<open> The formula $\top$ is equivalent to $\bigwedge\{\}$.\<close>
 lemma srbb_TT_is_empty_conj: "TT \<Lleftarrow>srbb\<Rrightarrow> ImmConj {} \<psi>s"
   by (simp add: hml_srbb_eq_def hml_srbb_impl_def)
 
-text \<open>Positive conjuncts in stable conjuctions can be replaced by negative ones.\<close>
+text \<open>Positive conjuncts in stable conjunctions can be replaced by negative ones.\<close>
 lemma srbb_stable_Neg_normalizable:
   assumes
     \<open>i \<in> I\<close> \<open>\<Psi> i = Pos \<chi>\<close>
