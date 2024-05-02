@@ -323,4 +323,35 @@ next
     using min_1_7_simps min_less_iff_conj somewhere_larger_eq by fastforce
 qed
 
+instantiation energy :: Sup
+begin
+
+definition "Sup ee \<equiv> E (Sup (one ` (ee - {eneg}))) (Sup (two ` (ee - {eneg}))) (Sup (three ` (ee - {eneg}))) (Sup (four ` (ee - {eneg})))
+  (Sup (five ` (ee - {eneg}))) (Sup (six ` (ee - {eneg}))) (Sup (seven ` (ee - {eneg}))) (Sup (eight ` (ee - {eneg})))"
+
+instance ..
+
+end
+
+(*
+instantiation energy :: ccpo
+begin
+
+
+instance proof
+  fix EE and e::energy
+  assume \<open>Complete_Partial_Order.chain (\<le>) EE\<close> \<open>e \<in> EE\<close>
+  thus \<open>e \<le> Sup EE\<close>
+    by (simp add: SUP_upper Sup_energy_def energy.case_eq_if less_eq_energy_def)
+next
+  fix EE and e'::energy
+  assume
+    \<open>Complete_Partial_Order.chain (\<le>) EE\<close>
+    \<open>\<And>e. e \<in> EE \<Longrightarrow> e \<le> e'\<close>
+  thus \<open>Sup EE \<le> e'\<close>
+    unfolding Sup_energy_def less_eq_energy_def nitpick
+  
+end
+*)
+
 end
