@@ -261,7 +261,7 @@ primrec
   "max_pos_conj_depth_inner (Obs _ \<phi>) = max_positive_conjunct_depth \<phi>" |
   "max_pos_conj_depth_inner (Conj I \<psi>s) = Sup ((max_pos_conj_depth_conjunct \<circ> \<psi>s) ` I)" |
   "max_pos_conj_depth_inner (StableConj I \<psi>s) = Sup ((max_pos_conj_depth_conjunct \<circ> \<psi>s) ` I)" |
-  "max_pos_conj_depth_inner (BranchConj _ \<phi> I \<psi>s) = Sup ({max_positive_conjunct_depth \<phi>} \<union> ((max_pos_conj_depth_conjunct \<circ> \<psi>s) ` I))" |
+  "max_pos_conj_depth_inner (BranchConj _ \<phi> I \<psi>s) = Sup ({1 + modal_depth_srbb \<phi>, max_positive_conjunct_depth \<phi>} \<union> ((max_pos_conj_depth_conjunct \<circ> \<psi>s) ` I))" |
 
   "max_pos_conj_depth_conjunct (Pos \<chi>) = modal_depth_srbb_inner \<chi>" |
   "max_pos_conj_depth_conjunct (Neg \<chi>) = max_pos_conj_depth_inner \<chi>"
@@ -814,6 +814,8 @@ lemma expr_br_conj:
   assumes "expressiveness_price \<phi> \<le> ((min1_6 (e - E 0 1 1 0 0 0 0 0)) - (E 1 0 0 0 0 0 0 0))" and
      "\<forall>q \<in> Q. expr_pr_conjunct (\<Phi> q) \<le> (e - (E 0 1 1 0 0 0 0 0))"
    shows "expr_pr_inner (BranchConj \<alpha> \<phi> Q \<Phi>) \<le> e"
+  oops
+(*
 proof-
     obtain e1 e2 e3 e4 e5 e6 e7 e8 where "e = E e1 e2 e3 e4 e5 e6 e7 e8"
       by (smt (z3) \<psi>_price_never_neg assms(1) dual_order.trans eneg_leq energy.exhaust expr_obs expr_pos gets_smaller order_antisym_conv)
@@ -955,7 +957,7 @@ proof-
         thus "expr_pr_inner (BranchConj \<alpha> \<phi> Q \<Phi>) \<le> e" using expr e3_le e2_le e1_le 
           by (smt (verit, del_insts) Sup_insert Sup_union_distrib \<open>e = E e1 e2 e3 e4 e5 e6 e7 e8\<close> ccpo_Sup_singleton dual_order.trans energy.distinct(1) energy.sel(1) energy.sel(2) energy.sel(3) energy.sel(4) energy.sel(5) energy.sel(6) energy.sel(7) energy.sel(8) ile_eSuc image_empty linorder_not_less plus_1_eSuc(1) somewhere_larger_eq)
       qed
-    qed
+    qed *)
 
 lemma expressiveness_price_ImmConj_geq_parts:
   assumes "i \<in> I" "I \<noteq> {}"
@@ -1037,7 +1039,7 @@ lemma "expressiveness_price (ImmConj {} \<psi>s) = E 0 0 0 0 0 0 0 0"
 lemma "expressiveness_price (Internal (Conj {} \<psi>s)) = E 0 0 0 0 0 0 0 0"
   by (simp add: Sup_enat_def)
 
-lemma "expressiveness_price (Internal (BranchConj \<alpha> TT {} \<psi>s)) = E 1 0 0 0 0 0 0 0"
+lemma "expressiveness_price (Internal (BranchConj \<alpha> TT {} \<psi>s)) = E 1 0 0 0 0 1 0 0"
   by (simp add: Sup_enat_def)
 
 lemma expr_obs_phi:
