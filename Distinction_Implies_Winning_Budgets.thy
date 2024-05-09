@@ -679,10 +679,9 @@ proof-
         have no_q_way: \<open>\<forall>q\<in>Q_\<alpha>. \<nexists>q'. q \<mapsto> \<alpha> q' \<and> hml_srbb_models q' \<phi>\<close>
           using case_assms(6)
           by fastforce
-        obtain Q' where \<open>Q_\<alpha> \<mapsto>aS \<alpha> Q'\<close>
-          by (metis exactly_one_soft_step_set)
+        define Q' where \<open>Q' \<equiv> (soft_step_set Q_\<alpha> \<alpha>)\<close>
         hence \<open>distinguishes_from \<phi> p' Q'\<close>
-          using case_assms(2,3,6) no_q_way 
+          using case_assms(2,3,6) no_q_way  mem_Collect_eq soft_step_set_is_soft_step_set
           unfolding distinguishes_from_inner_def distinguishes_from_def
           by fastforce
         with BranchConj have win_a_branch: \<open>in_wina (expressiveness_price \<phi>) (Attacker_Immediate p' Q')\<close>
@@ -717,7 +716,7 @@ proof-
         have depths: \<open>1 + modal_depth_srbb \<phi> = one (expr_pr_inner (Obs \<alpha> \<phi>))\<close> by simp
         have \<open>e' \<noteq> eneg\<close>
           using e'_def by force
-        have \<open>in_wina (min1_6 e') (Attacker_Branch p' Q')\<close> sorry
+        have obs_win: \<open>in_wina (min1_6 e') (Attacker_Branch p' Q')\<close> sorry
 
         define e where \<open>e = E
           (one e')
@@ -743,9 +742,9 @@ proof-
             \<open>e' = (subtract_fn 0 1 1 0 0 0 0 0) (expr_pr_inner (BranchConj \<alpha> \<phi> I \<psi>s))\<close>
           using direct_minus_eq by presburger
 
-        have \<open>\<forall>g'. spectroscopy_moves (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>) g' \<noteq> None
-        \<longrightarrow> (((\<exists>Q'. (Q_\<alpha> \<mapsto>aS \<alpha> Q') \<and> (Attacker_Branch p' Q' = g')
-            \<and> (spectroscopy_moves (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>) g' = Some (min1_6 \<circ> (\<lambda>x. x - E 0 1 1 0 0 0 0 0)))))
+        have moves: \<open>\<forall>g'. spectroscopy_moves (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>) g' \<noteq> None
+        \<longrightarrow> (((Attacker_Branch p' Q' = g')
+            \<and> (spectroscopy_moves (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>) g' = Some (min1_6 \<circ> (\<lambda>x. x - E 0 1 1 0 0 0 0 0))))
           \<or> ((\<exists>q\<in>(Q - Q_\<alpha>). Attacker_Clause p q = g'
             \<and> spectroscopy_moves (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>) g' = (subtract 0 1 1 0 0 0 0 0))))\<close>
         proof clarify
@@ -753,23 +752,59 @@ proof-
           assume
             \<open>spectroscopy_moves (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>) g' = Some u\<close>
             \<open>\<not> (\<exists>q\<in>Q - Q_\<alpha>. Attacker_Clause p q = g' \<and> spectroscopy_moves (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>) g' = subtract 0 1 1 0 0 0 0 0)\<close>
-          thus \<open>\<exists>Q'. Q_\<alpha> \<mapsto>aS \<alpha> Q' \<and> Attacker_Branch p' Q' = g' \<and>
-            spectroscopy_moves (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>) g' = Some (min1_6 \<circ> subtract_fn 0 1 1 0 0 0 0 0)\<close>
+          thus \<open>Attacker_Branch p' Q' = g' \<and> spectroscopy_moves (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>) g' = Some (min1_6 \<circ> subtract_fn 0 1 1 0 0 0 0 0)\<close>
+            unfolding Q'_def using soft_step_set_is_soft_step_set
             by (induct g', auto) (metis option.discI option.inject)+
         qed
 
-        hence moves: "\<forall>g'. spectroscopy_moves (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>) g' \<noteq> None
+        have \<open>\<forall>q\<in>Q. q \<notin> model_set_inner (Obs \<alpha> \<phi>) \<longrightarrow> q \<in> Q_\<alpha>\<close> sorry
+        hence Q_subsets: \<open>Q - Q_\<alpha> \<subseteq> Q \<inter> model_set_inner (Obs \<alpha> \<phi>)\<close> by blast
+
+        have obs_e: \<open>in_wina ((min1_6 \<circ> (\<lambda>x. x - E 0 1 1 0 0 0 0 0)) e) (Attacker_Branch p' Q')\<close>
+          using obs_win \<open>e' = subtract_fn 0 1 1 0 0 0 0 0 e\<close> by force
+        have \<open>\<forall>q\<in>(Q - Q_\<alpha>). spectroscopy_moves (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>) (Attacker_Clause p q) = (subtract 0 1 1 0 0 0 0 0)
+          \<longrightarrow> in_wina e'0 (Attacker_Clause p q)\<close>
+          using conj_wins \<open>eu'0 \<le> e'\<close> Q_subsets by blast
+        with obs_e moves have move_wins: "\<forall>g'. spectroscopy_moves (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>) g' \<noteq> None
           \<longrightarrow> in_wina ((the (spectroscopy_moves (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>) g')) e) g'"
-          using conj_wins \<open>e' = (subtract_fn 0 1 1 0 0 0 0 0) e\<close> e_def sorry
+          using  \<open>eu'0 \<le> e'\<close> \<open>e' = subtract_fn 0 1 1 0 0 0 0 0 e\<close> \<open>e'0 \<le> eu'0\<close> win_a_upwards_closure
+          by (smt (verit, ccfv_SIG) option.sel)
         moreover have \<open>expr_pr_inner (BranchConj \<alpha> \<phi> I \<psi>s) = e\<close>
           using e'_characterization e'_minus unfolding e_def by force
         ultimately show \<open>in_wina (expr_pr_inner (BranchConj \<alpha> \<phi> I \<psi>s)) (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>)\<close>
         using \<chi>_price_never_neg in_wina.intros(3) spectroscopy_defender.simps(5)
           by metis
-      qed
+      qed 
       moreover have
         "\<forall>p Q. Q \<noteq> {} \<longrightarrow> distinguishes_from_inner (BranchConj \<alpha> \<phi> I \<psi>s) p Q \<longrightarrow> Q \<Zsurj>S Q
-             \<longrightarrow> in_wina (expr_pr_inner (BranchConj \<alpha> \<phi> I \<psi>s)) (Attacker_Delayed p Q)" sorry
+             \<longrightarrow> in_wina (expr_pr_inner (BranchConj \<alpha> \<phi> I \<psi>s)) (Attacker_Delayed p Q)"
+      proof clarify
+        fix p Q
+        assume case_assms:
+          \<open>distinguishes_from_inner (BranchConj \<alpha> \<phi> I \<psi>s) p Q\<close>
+          \<open>\<forall>q\<in>Q. \<exists>p\<in>Q. p \<Zsurj> q\<close>
+          \<open>\<forall>p\<in>Q. \<forall>q. p \<Zsurj> q \<longrightarrow> q \<in> Q\<close>
+        from case_assms(1) obtain p' where p'_spec: \<open>((\<alpha> = \<tau> \<and> p' = p) \<or> p \<mapsto>\<alpha> p') \<and> p' \<Turnstile>SRBB \<phi>\<close> 
+          unfolding distinguishes_from_inner_def
+              and distinguishes_def
+          using soft_poss_to_or hml_models.simps(2) by (auto) (blast)
+        from case_assms(1) obtain Q_\<alpha> where Q\<alpha>_spec:
+          \<open>Q_\<alpha> \<noteq> {}\<close>
+          \<open>Q \<inter> model_set_inner (hml_srbb_inner.Conj I \<psi>s) \<subseteq> Q_\<alpha>\<close>
+          \<open>Q_\<alpha> \<subseteq> Q - model_set_inner (hml_srbb_inner.Obs \<alpha> \<phi>)\<close> sorry
+        have \<open>in_wina (expr_pr_inner (BranchConj \<alpha> \<phi> I \<psi>s)) (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>)\<close>
+        proof (cases \<open>\<alpha> = \<tau>\<close>)
+          case True
+          then show ?thesis 
+            using main_case case_assms(1) p'_spec Q\<alpha>_spec sorry (*Likely TODO: Change main_case!*)
+        next
+          case False
+          then show ?thesis 
+            using main_case case_assms(1) p'_spec Q\<alpha>_spec by blast
+        qed
+        thus \<open>in_wina (expr_pr_inner (BranchConj \<alpha> \<phi> I \<psi>s)) (Attacker_Delayed p Q)\<close>
+          using main_case p'_spec oops
+      qed
       ultimately show ?case by blast
     next
       case (Pos \<chi>)
