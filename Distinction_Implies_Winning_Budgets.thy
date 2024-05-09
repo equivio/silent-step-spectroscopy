@@ -717,21 +717,9 @@ proof-
         have depths: \<open>1 + modal_depth_srbb \<phi> = one (expr_pr_inner (Obs \<alpha> \<phi>))\<close> by simp
         have \<open>e' \<noteq> eneg\<close>
           using e'_def by force
-        hence \<open>(min1_6 e') = e'\<close> unfolding min1_6_def e'_def depths apply auto 
+        have \<open>in_wina (min1_6 e') (Attacker_Branch p' Q')\<close> sorry
 
-
-
-
-
-
-
-
-
-
-
-
-
-       define e where \<open>e = E
+        define e where \<open>e = E
           (one e')
           (1 + two e')
           (1 + three e')
@@ -744,14 +732,15 @@ proof-
         hence \<open>e' = (subtract_fn 0 1 1 0 0 0 0 0) e\<close>
           by (auto, smt (verit) add_increasing2 direct_minus_eq e_def
             energy.distinct(1) energy.sel energy_leq_cases i0_lb le_numeral_extra(4))
-        have expr_lower: \<open>I \<noteq> {} \<Longrightarrow> (E 0 1 1 0 0 0 0 0) \<le> expr_pr_inner (BranchConj \<alpha> \<phi> I \<psi>s)\<close>
+        have expr_lower: \<open>(E 0 1 1 0 0 0 0 0) \<le> expr_pr_inner (BranchConj \<alpha> \<phi> I \<psi>s)\<close>
           using case_assms leq_not_eneg subset_form by auto
-        have \<open>I \<noteq> {} \<Longrightarrow> e' = direct_minus (expr_pr_inner (BranchConj \<alpha> \<phi> I \<psi>s)) (E 0 1 1 0 0 0 0 0)\<close>
+        have e'_minus: \<open>e' = direct_minus (expr_pr_inner (BranchConj \<alpha> \<phi> I \<psi>s)) (E 0 1 1 0 0 0 0 0)\<close>
           unfolding e'_def 
           by (auto simp add: bot_enat_def sup.left_commute)
              (metis (no_types, lifting) SUP_cong energy.sel image_image)+
 
-        with expr_lower have e'_characterization: \<open>I \<noteq> {} \<Longrightarrow> e' = (subtract_fn 0 1 1 0 0 0 0 0) (expr_pr_inner (BranchConj \<alpha> \<phi> I \<psi>s))\<close>
+        with expr_lower have e'_characterization:
+            \<open>e' = (subtract_fn 0 1 1 0 0 0 0 0) (expr_pr_inner (BranchConj \<alpha> \<phi> I \<psi>s))\<close>
           using direct_minus_eq by presburger
 
         have \<open>\<forall>g'. spectroscopy_moves (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>) g' \<noteq> None
@@ -769,24 +758,14 @@ proof-
             by (induct g', auto) (metis option.discI option.inject)+
         qed
 
-
-        hence "\<forall>g'. spectroscopy_moves (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>) g' \<noteq> None
+        hence moves: "\<forall>g'. spectroscopy_moves (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>) g' \<noteq> None
           \<longrightarrow> in_wina ((the (spectroscopy_moves (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>) g')) e) g'"
-          using conj_wins \<open>e' = (subtract_fn 0 1 1 0 0 0 0 0) e\<close> e_def oops
-        hence \<open>in_wina e (Defender_Stable_Conj p Q)\<close>
-          unfolding e_def
-          by (auto simp add: in_wina.intros(3))
-        moreover have \<open>e \<le> expr_pr_inner (StableConj I \<psi>s)\<close>
-          using \<open>e' \<le> eu'\<close> eu'_characterization \<open>e' = (subtract_fn 0 0 0 1 0 0 0 0) e\<close> expr_lower case_assms(1) subset_form
-          by (auto)
-             (smt (z3) add_diff_cancel_enat comp_apply e'_def e_def empty_iff
-               enat_add_left_cancel_le energy.distinct(1) energy.sel energy_minus idiff_0_right
-               image_cong leq_not_eneg)
-       ultimately show \<open>in_wina (expr_pr_inner (StableConj I \<psi>s)) (Defender_Stable_Conj p Q)\<close>
-         using win_a_upwards_closure by blast
-
-        thus \<open>in_wina (expr_pr_inner (BranchConj \<alpha> \<phi> I \<psi>s)) (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>)\<close>
-        
+          using conj_wins \<open>e' = (subtract_fn 0 1 1 0 0 0 0 0) e\<close> e_def sorry
+        moreover have \<open>expr_pr_inner (BranchConj \<alpha> \<phi> I \<psi>s) = e\<close>
+          using e'_characterization e'_minus unfolding e_def by force
+        ultimately show \<open>in_wina (expr_pr_inner (BranchConj \<alpha> \<phi> I \<psi>s)) (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>)\<close>
+        using \<chi>_price_never_neg in_wina.intros(3) spectroscopy_defender.simps(5)
+          by metis
       qed
       moreover have
         "\<forall>p Q. Q \<noteq> {} \<longrightarrow> distinguishes_from_inner (BranchConj \<alpha> \<phi> I \<psi>s) p Q \<longrightarrow> Q \<Zsurj>S Q

@@ -136,9 +136,7 @@ primrec
   "branch_conj_depth_inner (Conj I \<psi>s) = Sup ((branch_conj_depth_conjunct \<circ> \<psi>s) ` I)" |
   "branch_conj_depth_inner (StableConj I \<psi>s) = Sup ((branch_conj_depth_conjunct \<circ> \<psi>s) ` I)" |
   "branch_conj_depth_inner (BranchConj _ \<phi> I \<psi>s) =
-    (if I = {}
-     then branching_conjunction_depth \<phi>
-     else 1 + Sup ({branching_conjunction_depth \<phi>} \<union> ((branch_conj_depth_conjunct \<circ> \<psi>s) ` I)))" |
+     1 + Sup ({branching_conjunction_depth \<phi>} \<union> ((branch_conj_depth_conjunct \<circ> \<psi>s) ` I))" |
 
   "branch_conj_depth_conjunct (Pos \<chi>) = branch_conj_depth_inner \<chi>" |
   "branch_conj_depth_conjunct (Neg \<chi>) = branch_conj_depth_inner \<chi>" 
@@ -205,9 +203,7 @@ primrec
      else 1 + Sup ((inst_conj_depth_conjunct \<circ> \<psi>s) ` I))" |
   "inst_conj_depth_inner (StableConj I \<psi>s) = Sup ((inst_conj_depth_conjunct \<circ> \<psi>s) ` I)" |
   "inst_conj_depth_inner (BranchConj _ \<phi> I \<psi>s) =
-    (if I = {}
-     then instable_conjunction_depth \<phi>
-     else 1 + Sup ({instable_conjunction_depth \<phi>} \<union> ((inst_conj_depth_conjunct \<circ> \<psi>s) ` I)))" |
+    1 + Sup ({instable_conjunction_depth \<phi>} \<union> ((inst_conj_depth_conjunct \<circ> \<psi>s) ` I))" |
 
   "inst_conj_depth_conjunct (Pos \<chi>) = inst_conj_depth_inner \<chi>" |
   "inst_conj_depth_conjunct (Neg \<chi>) = inst_conj_depth_inner \<chi>" 
@@ -811,11 +807,11 @@ qed
 qed
 
 lemma expr_br_conj:
-  assumes "expressiveness_price \<phi> \<le> ((min1_6 (e - E 0 1 1 0 0 0 0 0)) - (E 1 0 0 0 0 0 0 0))" and
-     "\<forall>q \<in> Q. expr_pr_conjunct (\<Phi> q) \<le> (e - (E 0 1 1 0 0 0 0 0))"
-   shows "expr_pr_inner (BranchConj \<alpha> \<phi> Q \<Phi>) \<le> e"
-  oops
-(*
+  assumes
+    "expressiveness_price \<phi> \<le> ((min1_6 (e - E 0 1 1 0 0 0 0 0)) - (E 1 0 0 0 0 0 0 0))"
+    "\<forall>q \<in> Q. expr_pr_conjunct (\<Phi> q) \<le> (e - (E 0 1 1 0 0 0 0 0))"
+    "1 + modal_depth_srbb \<phi> \<le> six e"
+  shows "expr_pr_inner (BranchConj \<alpha> \<phi> Q \<Phi>) \<le> e"
 proof-
     obtain e1 e2 e3 e4 e5 e6 e7 e8 where "e = E e1 e2 e3 e4 e5 e6 e7 e8"
       by (smt (z3) \<psi>_price_never_neg assms(1) dual_order.trans eneg_leq energy.exhaust expr_obs expr_pos gets_smaller order_antisym_conv)
@@ -868,9 +864,9 @@ proof-
         using min_less_iff_conj by blast
       hence "1 + modal_depth_srbb \<phi> \<le> (min e1 e6)" using conj_single add.commute add_diff_assoc_enat add_diff_cancel_enat add_right_mono conj_single(2) i1_ne_infinity ileI1 one_eSuc
         by (metis (no_types, lifting))
-      hence "1 + modal_depth_srbb \<phi> \<le> e1" 
-        using min.bounded_iff by blast
-      from conj have "1 + branching_conjunction_depth \<phi> \<le> e2" 
+      hence "1 + modal_depth_srbb \<phi> \<le> e1" "1 + modal_depth_srbb \<phi> \<le> e6"
+        using min.bounded_iff by blast+
+      from conj have "1 + branching_conjunction_depth \<phi> \<le> e2"
         by (metis \<open>0 < e2\<close> add.commute add_diff_assoc_enat add_diff_cancel_enat add_right_mono conj_single(2) i1_ne_infinity ileI1 one_eSuc)
       from conj_single have "1 + instable_conjunction_depth \<phi> \<le> e3" using \<open>e3>0\<close> add.commute add_diff_assoc_enat add_diff_cancel_enat add_right_mono conj_single(2) i1_ne_infinity ileI1 one_eSuc
         by (metis (no_types, lifting))
@@ -900,7 +896,6 @@ proof-
         using \<open>e3>0\<close>
         by (metis add.commute add_diff_assoc_enat add_diff_cancel_enat add_right_mono i1_ne_infinity ileI1 one_eSuc)
 
-
       have "expr_pr_inner (BranchConj \<alpha> \<phi> Q \<Phi>) =  E (modal_depth_srbb_inner (BranchConj \<alpha> \<phi> Q \<Phi>))
                  (branch_conj_depth_inner (BranchConj \<alpha> \<phi> Q \<Phi>))
                  (inst_conj_depth_inner (BranchConj \<alpha> \<phi> Q \<Phi>))
@@ -911,20 +906,16 @@ proof-
                  (neg_depth_inner (BranchConj \<alpha> \<phi> Q \<Phi>))" by simp
 
       hence expr: "expr_pr_inner (BranchConj \<alpha> \<phi> Q \<Phi>) =  E (Sup ({1 + modal_depth_srbb \<phi>} \<union> ((modal_depth_srbb_conjunct \<circ> \<Phi>) ` Q)))
-                 ((if Q = {}
-                  then branching_conjunction_depth \<phi>
-                  else 1 + Sup ({branching_conjunction_depth \<phi>} \<union> ((branch_conj_depth_conjunct \<circ> \<Phi>) ` Q))))
-                 (if Q = {}
-                  then instable_conjunction_depth \<phi>
-                  else 1 + Sup ({instable_conjunction_depth \<phi>} \<union> ((inst_conj_depth_conjunct \<circ> \<Phi>) ` Q)))
+                 (1 + Sup ({branching_conjunction_depth \<phi>} \<union> ((branch_conj_depth_conjunct \<circ> \<Phi>) ` Q)))
+                 (1 + Sup ({instable_conjunction_depth \<phi>} \<union> ((inst_conj_depth_conjunct \<circ> \<Phi>) ` Q)))
                  (Sup ({stable_conjunction_depth \<phi>} \<union> ((st_conj_depth_conjunct \<circ> \<Phi>) ` Q)))
                  (Sup ({immediate_conjunction_depth \<phi>} \<union> ((imm_conj_depth_conjunct \<circ> \<Phi>) ` Q)))
-                 (Sup ({max_positive_conjunct_depth \<phi>} \<union> ((max_pos_conj_depth_conjunct \<circ> \<Phi>) ` Q)))
+                 (Sup ({1 + modal_depth_srbb \<phi>, max_positive_conjunct_depth \<phi>} \<union> ((max_pos_conj_depth_conjunct \<circ> \<Phi>) ` Q)))
                  (Sup ({max_negative_conjunct_depth \<phi>} \<union> ((max_neg_conj_depth_conjunct \<circ> \<Phi>) ` Q)))
-                 (Sup ({negation_depth \<phi>} \<union> ((neg_depth_conjunct \<circ> \<Phi>) ` Q)))" by simp
+                 (Sup ({negation_depth \<phi>} \<union> ((neg_depth_conjunct \<circ> \<Phi>) ` Q)))" by auto
 
       from branch_single \<open>1 + modal_depth_srbb \<phi> \<le> e1\<close> 
-      have "\<forall>x \<in> ({1 + modal_depth_srbb \<phi>} \<union> ((modal_depth_srbb_conjunct \<circ> \<Phi>) ` Q)). x \<le> e1"
+        have "\<forall>x \<in> ({1 + modal_depth_srbb \<phi>} \<union> ((modal_depth_srbb_conjunct \<circ> \<Phi>) ` Q)). x \<le> e1"
         by fastforce
       hence e1_le: "(Sup ({1 + modal_depth_srbb \<phi>} \<union> ((modal_depth_srbb_conjunct \<circ> \<Phi>) ` Q))) \<le> e1"
         using Sup_least by blast
@@ -942,22 +933,22 @@ proof-
       by (metis Sup_least)
     have fa: "\<forall>x \<in> ({stable_conjunction_depth \<phi>} \<union> ((st_conj_depth_conjunct \<circ> \<Phi>) ` Q)). x \<le> e4"
     "\<forall>x \<in> ({immediate_conjunction_depth \<phi>} \<union> ((imm_conj_depth_conjunct \<circ> \<Phi>) ` Q)). x \<le> e5"
-    "\<forall>x \<in> ({max_positive_conjunct_depth \<phi>} \<union> ((max_pos_conj_depth_conjunct \<circ> \<Phi>) ` Q)). x \<le> e6"
+    "\<forall>x \<in> ({1 + modal_depth_srbb \<phi>, max_positive_conjunct_depth \<phi>} \<union> ((max_pos_conj_depth_conjunct \<circ> \<Phi>) ` Q)). x \<le> e6"
     "\<forall>x \<in> ({max_negative_conjunct_depth \<phi>} \<union> ((max_neg_conj_depth_conjunct \<circ> \<Phi>) ` Q)). x \<le> e7"
     "\<forall>x \<in> ({negation_depth \<phi>} \<union> ((neg_depth_conjunct \<circ> \<Phi>) ` Q)). x \<le> e8"
-      using conj_single branch_single 
-      by fastforce+
+      using conj_single branch_single \<open>1 + modal_depth_srbb \<phi> \<le> e6\<close> by auto
     hence "(Sup ({stable_conjunction_depth \<phi>} \<union> ((st_conj_depth_conjunct \<circ> \<Phi>) ` Q))) \<le> e4"
     "(Sup ({immediate_conjunction_depth \<phi>} \<union> ((imm_conj_depth_conjunct \<circ> \<Phi>) ` Q))) \<le> e5"
-    "(Sup ({max_positive_conjunct_depth \<phi>} \<union> ((max_pos_conj_depth_conjunct \<circ> \<Phi>) ` Q))) \<le> e6"
+    "(Sup ({1 + modal_depth_srbb \<phi>, max_positive_conjunct_depth \<phi>} \<union> ((max_pos_conj_depth_conjunct \<circ> \<Phi>) ` Q))) \<le> e6"
     "(Sup ({max_negative_conjunct_depth \<phi>} \<union> ((max_neg_conj_depth_conjunct \<circ> \<Phi>) ` Q))) \<le> e7"
     "(Sup ({negation_depth \<phi>} \<union> ((neg_depth_conjunct \<circ> \<Phi>) ` Q))) \<le> e8"
       using Sup_least 
       by metis+
-        thus "expr_pr_inner (BranchConj \<alpha> \<phi> Q \<Phi>) \<le> e" using expr e3_le e2_le e1_le 
-          by (smt (verit, del_insts) Sup_insert Sup_union_distrib \<open>e = E e1 e2 e3 e4 e5 e6 e7 e8\<close> ccpo_Sup_singleton dual_order.trans energy.distinct(1) energy.sel(1) energy.sel(2) energy.sel(3) energy.sel(4) energy.sel(5) energy.sel(6) energy.sel(7) energy.sel(8) ile_eSuc image_empty linorder_not_less plus_1_eSuc(1) somewhere_larger_eq)
-      qed
-    qed *)
+    thus "expr_pr_inner (BranchConj \<alpha> \<phi> Q \<Phi>) \<le> e" using expr e3_le e2_le e1_le 
+      Sup_insert Sup_union_distrib \<open>e = E e1 e2 e3 e4 e5 e6 e7 e8\<close> ccpo_Sup_singleton dual_order.trans energy.distinct(1) energy.sel(1) energy.sel(2) energy.sel(3) energy.sel(4) energy.sel(5) energy.sel(6) energy.sel(7) energy.sel(8) ile_eSuc image_empty linorder_not_less plus_1_eSuc(1) somewhere_larger_eq
+      by (smt (verit, best))
+    qed
+  qed
 
 lemma expressiveness_price_ImmConj_geq_parts:
   assumes "i \<in> I" "I \<noteq> {}"
@@ -1039,7 +1030,7 @@ lemma "expressiveness_price (ImmConj {} \<psi>s) = E 0 0 0 0 0 0 0 0"
 lemma "expressiveness_price (Internal (Conj {} \<psi>s)) = E 0 0 0 0 0 0 0 0"
   by (simp add: Sup_enat_def)
 
-lemma "expressiveness_price (Internal (BranchConj \<alpha> TT {} \<psi>s)) = E 1 0 0 0 0 1 0 0"
+lemma "expressiveness_price (Internal (BranchConj \<alpha> TT {} \<psi>s)) = E 1 1 1 0 0 1 0 0"
   by (simp add: Sup_enat_def)
 
 lemma expr_obs_phi:

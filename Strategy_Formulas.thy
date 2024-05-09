@@ -984,7 +984,6 @@ next
       hence F: "strategy_formula_conjunct (Attacker_Clause p q) (e - (E 0 1 1 0 0 0 0 0)) \<phi> \<and> expr_pr_conjunct \<phi> \<le> (e - (E 0 1 1 0 0 0 0 0))" using M \<open>q\<in> Q\<close>
         using \<open>g = Defender_Branch p \<alpha> p' Q Qa\<close> option.sel by auto
 
-
       from M have "in_wina (e - (E 0 1 1 0 0 0 0 0)) (Attacker_Clause p q)" using assms \<open>q\<in> Q\<close>
         by (metis "3" \<open>g = Defender_Branch p \<alpha> p' Q Qa\<close> option.distinct(1) option.sel) 
       hence  "spectroscopy_moves (Defender_Branch p \<alpha> p' Q Qa) (Attacker_Clause p q) 
@@ -1033,7 +1032,7 @@ next
 
     have A2: "spectroscopy_moves (Attacker_Branch p' (soft_step_set Qa \<alpha>)) (Attacker_Immediate p' (soft_step_set Qa \<alpha>)) = (subtract 1 0 0 0 0 0 0 0)" by simp
 
-    from M have "in_wina ((min1_6 (e - E 0 1 1 0 0 0 0 0))) (Attacker_Branch p' (soft_step_set Qa \<alpha>))" using assms
+    from M have win_branch: "in_wina ((min1_6 (e - E 0 1 1 0 0 0 0 0))) (Attacker_Branch p' (soft_step_set Qa \<alpha>))" using assms
       by (metis "3" E \<open>g = Defender_Branch p \<alpha> p' Q Qa\<close> bot_enat_def comp_apply option.distinct(1) option.sel)
     hence "\<exists>g''. ((spectroscopy_moves (Attacker_Branch p' (soft_step_set Qa \<alpha>)) g'' \<noteq> None) \<and> (in_wina ((weight (Attacker_Branch p' (soft_step_set Qa \<alpha>)) g'') (min1_6 (e - E 0 1 1 0 0 0 0 0))) g''))" 
       using in_wina.simps
@@ -1041,7 +1040,7 @@ next
     then obtain g'' where X: "((spectroscopy_moves (Attacker_Branch p' (soft_step_set Qa \<alpha>)) g'' \<noteq> None) \<and> (in_wina ((weight (Attacker_Branch p' (soft_step_set Qa \<alpha>)) g'') (min1_6 (e - E 0 1 1 0 0 0 0 0))) g''))" by auto
     hence "g''= (Attacker_Immediate p' (soft_step_set Qa \<alpha>))" using br_acct
       by (metis (no_types, lifting) spectroscopy_defender.elims(2) spectroscopy_defender.elims(3) spectroscopy_moves.simps(17) spectroscopy_moves.simps(51) spectroscopy_moves.simps(57) spectroscopy_moves.simps(61) spectroscopy_moves.simps(66) spectroscopy_moves.simps(71)) 
-    hence "(in_wina ((min1_6 (e - E 0 1 1 0 0 0 0 0)) - (E 1 0 0 0 0 0 0 0))
+    hence win_immediate: "(in_wina ((min1_6 (e - E 0 1 1 0 0 0 0 0)) - (E 1 0 0 0 0 0 0 0))
                   (Attacker_Immediate p' (soft_step_set Qa \<alpha>)))" using X A1
       by (simp add: A2 option.sel)
 
@@ -1062,14 +1061,23 @@ next
       by blast 
     
     hence S: "strategy_formula_inner g e (BranchConj \<alpha> \<phi> Q \<Phi>)" using A E branch_conj
-      by (simp add: \<open>g = Defender_Branch p \<alpha> p' Q Qa\<close>) 
+      by (simp add: \<open>g = Defender_Branch p \<alpha> p' Q Qa\<close>)
+
+    have above_one: \<open>0 < min (one e) (six e)\<close>
+      using win_immediate win_branch
+      by (metis  energy.distinct(1) energy.sel(1,6) gr_zeroI idiff_0_right in_wina.simps
+          leq_not_eneg min_1_6_simps(1) min_eneg(1) minus_energy_def not_one_le_zero)
 
     from A have "\<forall>q \<in> Q. expr_pr_conjunct (\<Phi> q) \<le> (e - (E 0 1 1 0 0 0 0 0))" by auto
-    from A0 have "expressiveness_price \<phi> \<le> ((min1_6 (e - E 0 1 1 0 0 0 0 0)) - (E 1 0 0 0 0 0 0 0))" by simp
-
-    hence "expr_pr_inner (BranchConj \<alpha> \<phi> Q \<Phi>) \<le> e" using expr_br_conj \<open>\<forall>q \<in> Q. expr_pr_conjunct (\<Phi> q) \<le> (e - (E 0 1 1 0 0 0 0 0))\<close>
+    moreover from A0 have "expressiveness_price \<phi> \<le> ((min1_6 (e - E 0 1 1 0 0 0 0 0)) - (E 1 0 0 0 0 0 0 0))" by simp
+    moreover hence \<open>modal_depth_srbb \<phi> \<le> min (one e) (six e) - 1\<close>
+      by (auto, smt (verit, best) antisim eneg_leq energy.distinct(1) energy.sel(1) energy.sel(6) idiff_0_right leq_not_eneg min_1_6_simps(1) min_eneg(1) minus_energy_def)
+    hence \<open>1 + modal_depth_srbb \<phi> \<le> min (one e) (six e)\<close> using above_one
+      by (metis add.right_neutral add_diff_cancel_enat add_mono_thms_linordered_semiring(1) enat.simps(3) enat_defs(2) ileI1 le_iff_add plus_1_eSuc(1)) 
+    moreover hence \<open>1 + modal_depth_srbb \<phi> \<le> six e\<close> by simp
+    ultimately have "expr_pr_inner (BranchConj \<alpha> \<phi> Q \<Phi>) \<le> e"
+      using expr_br_conj
       by metis
-
     then show ?case using S by blast
   next
     case 7
