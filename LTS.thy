@@ -239,7 +239,7 @@ definition weakly_trace_equivalent (infix "\<simeq>WT" 60) where
 
 text \<open>Just like @{term"step_setp"}, one can lift @{term "silent_reachable"} to sets of states.\<close>
 abbreviation silent_reachable_setp (infix "\<Zsurj>S" 80) where
-  "P \<Zsurj>S Q \<equiv> ((\<forall>q \<in> Q. \<exists>p \<in> P. p \<Zsurj> q) \<and> (\<forall>p \<in> P. \<forall>q. p \<Zsurj> q \<longrightarrow> q \<in> Q))"
+  "P \<Zsurj>S P' \<equiv> ((\<forall>p' \<in> P'. \<exists>p \<in> P. p \<Zsurj> p') \<and> (\<forall>p \<in> P. \<forall>p'. p \<Zsurj> p' \<longrightarrow> p' \<in> P'))"
 
 definition silent_reachable_set :: "'s set \<Rightarrow> 's set" where
   "silent_reachable_set P \<equiv> { q . \<exists>p \<in> P. p \<Zsurj> q }"

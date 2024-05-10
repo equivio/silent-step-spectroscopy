@@ -96,7 +96,7 @@ proof-
             Q \<noteq> {} \<longrightarrow> distinguishes_from_inner \<chi> p Q \<longrightarrow> (\<forall>q \<in> Q. \<nexists>q'. q \<mapsto> \<tau> q')
             \<longrightarrow> in_wina (expr_pr_inner \<chi>) (Defender_Stable_Conj p Q))
         \<and> (\<forall>\<Psi>_I \<Psi> \<alpha> \<phi> p Q p' Q_\<alpha>. \<chi> = BranchConj \<alpha> \<phi> \<Psi>_I \<Psi> \<longrightarrow>
-            distinguishes_from_inner \<chi> p Q \<longrightarrow> p \<mapsto>\<alpha> p' \<longrightarrow> p' \<Turnstile>SRBB \<phi> \<longrightarrow>
+            distinguishes_from_inner \<chi> p Q \<longrightarrow> p \<mapsto>a \<alpha> p' \<longrightarrow> p' \<Turnstile>SRBB \<phi> \<longrightarrow>
             Q_\<alpha> \<noteq> {} \<longrightarrow> Q \<inter> model_set_inner (Conj \<Psi>_I \<Psi>) \<subseteq> Q_\<alpha> \<longrightarrow> Q_\<alpha> \<subseteq> Q - model_set_inner (Obs \<alpha> \<phi>)
             \<longrightarrow> in_wina (expr_pr_inner \<chi>) (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>)))
       \<and>
@@ -116,7 +116,7 @@ proof-
             Q \<noteq> {} \<longrightarrow> distinguishes_from_inner \<chi> p Q \<longrightarrow> (\<forall>q \<in> Q. \<nexists>q'. q \<mapsto> \<tau> q')
             \<longrightarrow> in_wina (expr_pr_inner \<chi>) (Defender_Stable_Conj p Q))
         \<and> (\<forall>\<Psi>_I \<Psi> \<alpha> \<phi> p Q p' Q_\<alpha>. \<chi> = BranchConj \<alpha> \<phi> \<Psi>_I \<Psi> \<longrightarrow>
-            distinguishes_from_inner \<chi> p Q \<longrightarrow> p \<mapsto>\<alpha> p' \<longrightarrow> p' \<Turnstile>SRBB \<phi> \<longrightarrow>
+            distinguishes_from_inner \<chi> p Q \<longrightarrow> p \<mapsto>a \<alpha> p' \<longrightarrow> p' \<Turnstile>SRBB \<phi> \<longrightarrow>
             Q_\<alpha> \<noteq> {} \<longrightarrow> Q \<inter> model_set_inner (Conj \<Psi>_I \<Psi>) \<subseteq> Q_\<alpha> \<longrightarrow> Q_\<alpha> \<subseteq> Q - model_set_inner (Obs \<alpha> \<phi>)
             \<longrightarrow> in_wina (expr_pr_inner \<chi>) (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>)))
       \<and>
@@ -615,7 +615,7 @@ proof-
       case (BranchConj \<alpha> \<phi> I \<psi>s)
       have main_case:
         "\<forall>p Q p' Q_\<alpha>.
-             distinguishes_from_inner (BranchConj \<alpha> \<phi> I \<psi>s) p Q \<longrightarrow> p \<mapsto>\<alpha> p' \<longrightarrow> p' \<Turnstile>SRBB \<phi> \<longrightarrow>
+             distinguishes_from_inner (BranchConj \<alpha> \<phi> I \<psi>s) p Q \<longrightarrow> p \<mapsto>a \<alpha> p' \<longrightarrow> p' \<Turnstile>SRBB \<phi> \<longrightarrow>
              Q_\<alpha> \<noteq> {} \<longrightarrow> Q \<inter> model_set_inner (Conj I \<psi>s) \<subseteq> Q_\<alpha> \<longrightarrow>
              Q_\<alpha> \<subseteq> Q - model_set_inner (Obs \<alpha> \<phi>)
              \<longrightarrow> in_wina (expr_pr_inner (BranchConj \<alpha> \<phi> I \<psi>s)) (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>)"
@@ -623,7 +623,7 @@ proof-
         fix p Q p' Q_\<alpha>
         assume case_assms:
           \<open>distinguishes_from_inner (BranchConj \<alpha> \<phi> I \<psi>s) p Q\<close>
-          \<open>p \<mapsto>\<alpha> p'\<close>
+          \<open>p \<mapsto>a \<alpha> p'\<close>
           \<open>p' \<Turnstile>SRBB \<phi>\<close>
           \<open>Q_\<alpha> \<noteq> {}\<close>
           \<open>Q \<inter> model_set_inner (Conj I \<psi>s) \<subseteq> Q_\<alpha>\<close>
@@ -782,9 +782,9 @@ proof-
         fix p Q
         assume case_assms:
           \<open>distinguishes_from_inner (BranchConj \<alpha> \<phi> I \<psi>s) p Q\<close>
-          \<open>\<forall>q\<in>Q. \<exists>p\<in>Q. p \<Zsurj> q\<close>
+          \<open>\<forall>q'\<in>Q. \<exists>q\<in>Q. q \<Zsurj> q'\<close>
           \<open>\<forall>p\<in>Q. \<forall>q. p \<Zsurj> q \<longrightarrow> q \<in> Q\<close>
-        from case_assms(1) obtain p' where p'_spec: \<open>((\<alpha> = \<tau> \<and> p' = p) \<or> p \<mapsto>\<alpha> p') \<and> p' \<Turnstile>SRBB \<phi>\<close> 
+        from case_assms(1) obtain p' where p'_spec: \<open>p \<mapsto>a \<alpha> p'\<close> \<open>p' \<Turnstile>SRBB \<phi>\<close> 
           unfolding distinguishes_from_inner_def
               and distinguishes_def
           using soft_poss_to_or hml_models.simps(2) by (auto) (blast)
@@ -793,17 +793,11 @@ proof-
           \<open>Q \<inter> model_set_inner (hml_srbb_inner.Conj I \<psi>s) \<subseteq> Q_\<alpha>\<close>
           \<open>Q_\<alpha> \<subseteq> Q - model_set_inner (hml_srbb_inner.Obs \<alpha> \<phi>)\<close> sorry
         have \<open>in_wina (expr_pr_inner (BranchConj \<alpha> \<phi> I \<psi>s)) (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>)\<close>
-        proof (cases \<open>\<alpha> = \<tau>\<close>)
-          case True
-          then show ?thesis 
-            using main_case case_assms(1) p'_spec Q\<alpha>_spec sorry (*Likely TODO: Change main_case!*)
-        next
-          case False
-          then show ?thesis 
-            using main_case case_assms(1) p'_spec Q\<alpha>_spec by blast
-        qed
-        thus \<open>in_wina (expr_pr_inner (BranchConj \<alpha> \<phi> I \<psi>s)) (Attacker_Delayed p Q)\<close>
-          using main_case p'_spec oops
+          using main_case case_assms(1) p'_spec Q\<alpha>_spec by blast
+        moreover have \<open>spectroscopy_moves (Attacker_Delayed p Q) (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>) = Some id\<close>
+          using p'_spec Q\<alpha>_spec by auto
+        ultimately show \<open>in_wina (expr_pr_inner (BranchConj \<alpha> \<phi> I \<psi>s)) (Attacker_Delayed p Q)\<close>
+          using in_wina_Ga_with_id_step by auto
       qed
       ultimately show ?case by blast
     next
