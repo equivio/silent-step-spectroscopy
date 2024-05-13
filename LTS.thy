@@ -316,6 +316,13 @@ lemma soft_step_set_eq:
   using exactly_one_soft_step_set soft_step_set_is_soft_step_set assms 
   by fastforce
 
+abbreviation \<open>stable_state p \<equiv> \<forall>p'. \<not>(p \<mapsto> \<tau> p')\<close>
+
+lemma stable_state_stable:
+  assumes \<open>stable_state p\<close> \<open>p \<Zsurj> p'\<close>
+  shows \<open>p = p'\<close>
+  using assms(2,1) by (cases, blast+)
+
 end (* locale LTS_Tau *)
 
 text \<open>@{term "Inhabited_LTS"} and @{term "Inhabited_Tau_LTS"} are extensions of @{term "LTS"} and @{term "LTS_Tau"} respectively.
@@ -326,7 +333,7 @@ locale Inhabited_LTS = LTS step
   for step :: "'s \<Rightarrow> 'a \<Rightarrow> 's \<Rightarrow> bool" ("_ \<mapsto> _ _" [70,70,70] 80) +
   fixes left :: 's
     and right :: 's
-  assumes "(left::'s) \<noteq> (right::'s)"
+  assumes left_right_distinct: "(left::'s) \<noteq> (right::'s)"
 
 locale Inhabited_Tau_LTS = Inhabited_LTS step left right + LTS_Tau step \<tau>
   for step :: "'s \<Rightarrow> 'a \<Rightarrow> 's \<Rightarrow> bool" ("_ \<mapsto> _ _" [70,70,70] 80)
