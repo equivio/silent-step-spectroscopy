@@ -301,6 +301,23 @@ primrec
   "max_neg_conj_depth_conjunct (Pos \<chi>) = max_neg_conj_depth_inner \<chi>" |
   "max_neg_conj_depth_conjunct (Neg \<chi>) = modal_depth_srbb_inner \<chi>"
 
+
+
+lemma modal_depth_domiantes_neg_conjuncts:
+  fixes
+    \<phi>::\<open>('a, 's) hml_srbb\<close> and
+    \<chi>::\<open>('a, 's) hml_srbb_inner\<close> and
+    \<psi>::\<open>('a, 's) hml_srbb_conjunct\<close>
+  shows
+    \<open>(max_negative_conjunct_depth \<phi> \<le> modal_depth_srbb \<phi>)
+    \<and> (max_neg_conj_depth_inner \<chi> \<le> modal_depth_srbb_inner \<chi>)
+    \<and> (max_neg_conj_depth_conjunct \<psi> \<le> modal_depth_srbb_conjunct \<psi>)\<close>
+  using hml_srbb_hml_srbb_inner_hml_srbb_conjunct.induct[of
+        \<open>\<lambda>\<phi>::('a, 's) hml_srbb. max_negative_conjunct_depth \<phi> \<le> modal_depth_srbb \<phi>\<close>
+        \<open>\<lambda>\<chi>. max_neg_conj_depth_inner \<chi> \<le> modal_depth_srbb_inner \<chi>\<close>
+        \<open>\<lambda>\<psi>. max_neg_conj_depth_conjunct \<psi> \<le> modal_depth_srbb_conjunct \<psi>\<close>]
+  by (auto simp add: SUP_mono' add_increasing sup.coboundedI1 sup.coboundedI2)
+
 subsection \<open>Depth of Negations\<close>
 
 text \<open>

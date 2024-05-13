@@ -36,7 +36,7 @@ next
     have "\<exists>\<phi>. strategy_formula (Attacker_Immediate p Q) e \<phi> \<and> expressiveness_price \<phi> \<le> e" by force
   hence "\<exists>\<phi>. strategy_formula (Attacker_Immediate p Q) e \<phi> \<and> expressiveness_price \<phi> \<le> e" unfolding \<O>_def by blast
   thus "\<exists>\<phi>. distinguishes_from \<phi> p Q \<and> expressiveness_price \<phi> \<le> e"
-    using strategy_formulas_distinguish by fastforce 
+    using strategy_formulas_distinguish by fastforce
 qed
 
 end (* context full_spec_game *)

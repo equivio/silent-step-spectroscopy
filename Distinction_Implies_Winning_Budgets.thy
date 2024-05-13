@@ -794,19 +794,17 @@ proof-
           by metis
       qed 
       moreover have
-        "\<forall>p Q. Q \<noteq> {} \<longrightarrow> distinguishes_from_inner (BranchConj \<alpha> \<phi> I \<psi>s) p Q \<longrightarrow> Q \<Zsurj>S Q
+        "\<forall>p Q. Q \<noteq> {} \<longrightarrow> distinguishes_from_inner (BranchConj \<alpha> \<phi> I \<psi>s) p Q
              \<longrightarrow> in_wina (expr_pr_inner (BranchConj \<alpha> \<phi> I \<psi>s)) (Attacker_Delayed p Q)"
       proof clarify
         fix p Q
         assume case_assms:
           \<open>distinguishes_from_inner (BranchConj \<alpha> \<phi> I \<psi>s) p Q\<close>
-          \<open>\<forall>q'\<in>Q. \<exists>q\<in>Q. q \<Zsurj> q'\<close>
-          \<open>\<forall>p\<in>Q. \<forall>q. p \<Zsurj> q \<longrightarrow> q \<in> Q\<close>
         from case_assms(1) obtain p' where p'_spec: \<open>p \<mapsto>a \<alpha> p'\<close> \<open>p' \<Turnstile>SRBB \<phi>\<close> 
           unfolding distinguishes_from_inner_def
               and distinguishes_def
           using soft_poss_to_or hml_models.simps(2) by (auto) (blast)
-        define Q_\<alpha> where \<open>Q_\<alpha> = Q - model_set_inner (hml_srbb_inner.Obs \<alpha> \<phi>)\<close>
+        define Q_\<alpha> where \<open>Q_\<alpha> = Q - model_set_inner (Obs \<alpha> \<phi>)\<close>
         have \<open>in_wina (expr_pr_inner (BranchConj \<alpha> \<phi> I \<psi>s)) (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>)\<close>
           using main_case case_assms(1) p'_spec Q_\<alpha>_def by blast
         moreover have \<open>spectroscopy_moves (Attacker_Delayed p Q) (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>) = Some id\<close>
@@ -817,10 +815,71 @@ proof-
       ultimately show ?case by blast
     next
       case (Pos \<chi>)
-      then show ?case sorry
+      show ?case
+      proof clarify
+        fix p q
+        assume case_assms: \<open>distinguishes_conjunct (Pos \<chi>) p q\<close>
+        then obtain p' where p'_spec: \<open>p \<Zsurj> p'\<close> \<open>p' \<in> model_set_inner \<chi>\<close>
+          unfolding distinguishes_conjunct_def by auto
+        moreover have q_reach: \<open>silent_reachable_set {q} \<inter> model_set_inner \<chi> = {}\<close>
+          using case_assms sreachable_set_is_sreachable
+          unfolding distinguishes_conjunct_def by force
+        ultimately have distinction: \<open>distinguishes_from_inner \<chi> p' (silent_reachable_set {q})\<close>
+          unfolding distinguishes_from_inner_def by auto
+        have q_reach_nonempty:
+            \<open>silent_reachable_set {q} \<noteq> {}\<close>
+            \<open>silent_reachable_set {q} \<Zsurj>S silent_reachable_set {q} \<close>
+          unfolding silent_reachable_set_def
+          using silent_reachable.intros(1) silent_reachable_trans by auto
+        hence \<open>in_wina (expr_pr_inner \<chi>) (Attacker_Delayed p' (silent_reachable_set {q}))\<close>
+          using distinction Pos by blast
+        from p'_spec(1) this have \<open>in_wina (expr_pr_inner \<chi>) (Attacker_Delayed p (silent_reachable_set {q}))\<close>
+          by (induct, auto,
+              metis in_wina_Ga_with_id_step local.procrastination option.distinct(1) option.sel spectroscopy_defender.simps(4))
+        moreover have \<open>spectroscopy_moves (Attacker_Clause p q) (Attacker_Delayed p (silent_reachable_set {q})) = Some min1_6\<close>
+          using q_reach_nonempty sreachable_set_is_sreachable by fastforce
+        moreover have \<open>min1_6 (expr_pr_conjunct (Pos \<chi>)) \<ge> (expr_pr_inner \<chi>)\<close>
+          unfolding min1_6_def by (auto simp add: energy_leq_cases modal_depth_domiantes_pos_conjuncts)
+        ultimately show \<open>in_wina (expr_pr_conjunct (Pos \<chi>)) (Attacker_Clause p q)\<close>
+          using in_wina_Ga win_a_upwards_closure spectroscopy_defender.simps(3)
+          by (metis option.discI option.sel)
+      qed
     next
       case (Neg \<chi>)
-      then show ?case sorry
+      show ?case
+      proof clarify
+        fix p q
+        assume case_assms: \<open>distinguishes_conjunct (Neg \<chi>) p q\<close>
+        then obtain q' where q'_spec: \<open>q \<Zsurj> q'\<close> \<open>q' \<in> model_set_inner \<chi>\<close>
+          unfolding distinguishes_conjunct_def by auto
+        moreover have p_reach: \<open>silent_reachable_set {p} \<inter> model_set_inner \<chi> = {}\<close>
+          using case_assms sreachable_set_is_sreachable
+          unfolding distinguishes_conjunct_def by force
+        ultimately have distinction: \<open>distinguishes_from_inner \<chi> q' (silent_reachable_set {p})\<close>
+          unfolding distinguishes_from_inner_def by auto
+        have \<open>p \<noteq> q\<close> using case_assms unfolding distinguishes_conjunct_def by auto
+        have p_reach_nonempty:
+            \<open>silent_reachable_set {p} \<noteq> {}\<close>
+            \<open>silent_reachable_set {p} \<Zsurj>S silent_reachable_set {p} \<close>
+          unfolding silent_reachable_set_def
+          using silent_reachable.intros(1) silent_reachable_trans by auto
+        hence \<open>in_wina (expr_pr_inner \<chi>) (Attacker_Delayed q' (silent_reachable_set {p}))\<close>
+          using distinction Neg by blast
+        from q'_spec(1) this have \<open>in_wina (expr_pr_inner \<chi>) (Attacker_Delayed q (silent_reachable_set {p}))\<close>
+          by (induct, auto,
+              metis in_wina_Ga_with_id_step local.procrastination option.distinct(1) option.sel spectroscopy_defender.simps(4))
+        moreover have \<open>spectroscopy_moves (Attacker_Clause p q) (Attacker_Delayed q (silent_reachable_set {p}))
+             = Some (min1_7 \<circ> (\<lambda>x. x - E 0 0 0 0 0 0 0 1))\<close>
+          using p_reach_nonempty sreachable_set_is_sreachable \<open>p \<noteq> q\<close> by fastforce
+        moreover have \<open>(min1_7 (expr_pr_conjunct (Neg \<chi>) - E 0 0 0 0 0 0 0 1)) \<ge> (expr_pr_inner \<chi>)\<close>
+          using min1_7_def energy_leq_cases 
+          by (simp add: minus_energy_def modal_depth_domiantes_neg_conjuncts)
+        moreover from this have \<open>(min1_7 \<circ> (\<lambda>x. x - E 0 0 0 0 0 0 0 1)) (expr_pr_conjunct (Neg \<chi>)) \<ge> (expr_pr_inner \<chi>)\<close>
+          by auto
+        ultimately show \<open>in_wina (expr_pr_conjunct (Neg \<chi>)) (Attacker_Clause p q)\<close>
+          using in_wina_Ga win_a_upwards_closure spectroscopy_defender.simps(3)
+          by (metis option.discI option.sel)
+      qed
     qed
   qed
   thus ?thesis
