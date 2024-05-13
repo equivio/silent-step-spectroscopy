@@ -704,7 +704,7 @@ proof-
           by (auto, meson sup.cobounded2 sup.coboundedI2)
 
         have \<open>spectroscopy_moves (Attacker_Branch p' Q') (Attacker_Immediate p' Q') = Some e1\<close> by simp
-        with win_a_step in_wina_Ga have \<open>in_wina (expr_pr_inner (Obs \<alpha> \<phi>)) (Attacker_Branch p' Q')\<close>
+        with win_a_step in_wina_Ga have obs_later_win: \<open>in_wina (expr_pr_inner (Obs \<alpha> \<phi>)) (Attacker_Branch p' Q')\<close>
           by (metis option.distinct(1) option.sel spectroscopy_defender.simps(2))
         hence e'_win: \<open>in_wina e' (Attacker_Branch p' Q')\<close> 
           unfolding  e'_def
@@ -713,7 +713,31 @@ proof-
         have depths: \<open>1 + modal_depth_srbb \<phi> = one (expr_pr_inner (Obs \<alpha> \<phi>))\<close> by simp
         have \<open>e' \<noteq> eneg\<close>
           using e'_def by force
-        have obs_win: \<open>in_wina (min1_6 e') (Attacker_Branch p' Q')\<close> sorry
+        have six_e': \<open>six e' = Sup ({1 + modal_depth_srbb \<phi>} \<union> (six ` ({expr_pr_inner (Obs \<alpha> \<phi>)} \<union> (expr_pr_conjunct ` (\<psi>s ` I)))))\<close>
+          using energy.sel(6) unfolding e'_def by blast
+        (* have \<open>one e' \<le> six e'\<close> unfolding six_e' unfolding e'_def using depths sorry *)
+        hence six_e'_simp: \<open>six e' = Sup ({1 + modal_depth_srbb \<phi>} \<union> (six ` (expr_pr_conjunct ` (\<psi>s ` I))))\<close>
+          by (auto simp add: modal_depth_domiantes_pos_conjuncts add_increasing  sup.absorb2 sup.coboundedI1)
+        hence \<open>six e' \<le> one e'\<close>
+          using modal_depth_domiantes_pos_conjuncts
+          unfolding e'_def
+          by (auto, smt (verit) SUP_mono energy.sel(1) energy.sel(6) image_iff modal_depth_domiantes_pos_conjuncts sup.coboundedI2)
+        hence \<open>one (min1_6 e') = (six e')\<close>
+          by (simp add: \<open>e' \<noteq> eneg\<close>)
+        with six_e' have min_e'_def: \<open>min1_6 e' = E
+          (Sup ({1 + modal_depth_srbb \<phi>} \<union> six ` (expr_pr_conjunct ` (\<psi>s ` I))))
+          (Sup (two   ` ({expr_pr_inner (Obs \<alpha> \<phi>)} \<union> (expr_pr_conjunct ` (\<psi>s ` I)))))
+          (Sup (three ` ({expr_pr_inner (Obs \<alpha> \<phi>)} \<union> (expr_pr_conjunct ` (\<psi>s ` I)))))
+          (Sup (four  ` ({expr_pr_inner (Obs \<alpha> \<phi>)} \<union> (expr_pr_conjunct ` (\<psi>s ` I)))))
+          (Sup (five  ` ({expr_pr_inner (Obs \<alpha> \<phi>)} \<union> (expr_pr_conjunct ` (\<psi>s ` I)))))
+          (Sup ({1 + modal_depth_srbb \<phi>} \<union> (six ` ({expr_pr_inner (Obs \<alpha> \<phi>)} \<union> (expr_pr_conjunct ` (\<psi>s ` I))))))
+          (Sup (seven ` ({expr_pr_inner (Obs \<alpha> \<phi>)} \<union> (expr_pr_conjunct ` (\<psi>s ` I)))))
+          (Sup (eight ` ({expr_pr_inner (Obs \<alpha> \<phi>)} \<union> (expr_pr_conjunct ` (\<psi>s ` I)))))\<close>
+          using e'_def \<open>e' \<noteq> eneg\<close> min1_6_def six_e'_simp by auto
+        hence \<open>expr_pr_inner (Obs \<alpha> \<phi>) \<le> min1_6 e'\<close>
+          using leq_not_eneg by force
+        hence obs_win: \<open>in_wina (min1_6 e') (Attacker_Branch p' Q')\<close>
+          using obs_later_win win_a_upwards_closure by blast
 
         define e where \<open>e = E
           (one e')
@@ -754,13 +778,11 @@ proof-
             by (induct g', auto) (metis option.discI option.inject)+
         qed
 
-        have Q_subsets: \<open>Q - Q_\<alpha> \<subseteq> Q \<inter> model_set_inner (Obs \<alpha> \<phi>)\<close> using case_assms(4) by blast
-
         have obs_e: \<open>in_wina ((min1_6 \<circ> (\<lambda>x. x - E 0 1 1 0 0 0 0 0)) e) (Attacker_Branch p' Q')\<close>
-          using obs_win \<open>e' = subtract_fn 0 1 1 0 0 0 0 0 e\<close> by force
+          using obs_win \<open>e' = subtract_fn 0 1 1 0 0 0 0 0 e\<close> min_e'_def by force
         have \<open>\<forall>q\<in>(Q - Q_\<alpha>). spectroscopy_moves (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>) (Attacker_Clause p q) = (subtract 0 1 1 0 0 0 0 0)
           \<longrightarrow> in_wina e'0 (Attacker_Clause p q)\<close>
-          using conj_wins \<open>eu'0 \<le> e'\<close> Q_subsets by blast
+          using conj_wins \<open>eu'0 \<le> e'\<close> case_assms(4) by blast
         with obs_e moves have move_wins: "\<forall>g'. spectroscopy_moves (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>) g' \<noteq> None
           \<longrightarrow> in_wina ((the (spectroscopy_moves (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>) g')) e) g'"
           using  \<open>eu'0 \<le> e'\<close> \<open>e' = subtract_fn 0 1 1 0 0 0 0 0 e\<close> \<open>e'0 \<le> eu'0\<close> win_a_upwards_closure

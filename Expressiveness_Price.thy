@@ -262,6 +262,21 @@ primrec
   "max_pos_conj_depth_conjunct (Pos \<chi>) = modal_depth_srbb_inner \<chi>" |
   "max_pos_conj_depth_conjunct (Neg \<chi>) = max_pos_conj_depth_inner \<chi>"
 
+lemma modal_depth_domiantes_pos_conjuncts:
+  fixes
+    \<phi>::\<open>('a, 's) hml_srbb\<close> and
+    \<chi>::\<open>('a, 's) hml_srbb_inner\<close> and
+    \<psi>::\<open>('a, 's) hml_srbb_conjunct\<close>
+  shows
+    \<open>(max_positive_conjunct_depth \<phi> \<le> modal_depth_srbb \<phi>)
+    \<and> (max_pos_conj_depth_inner \<chi> \<le> modal_depth_srbb_inner \<chi>)
+    \<and> (max_pos_conj_depth_conjunct \<psi> \<le> modal_depth_srbb_conjunct \<psi>)\<close>
+  using hml_srbb_hml_srbb_inner_hml_srbb_conjunct.induct[of
+        \<open>\<lambda>\<phi>::('a, 's) hml_srbb. max_positive_conjunct_depth \<phi> \<le> modal_depth_srbb \<phi>\<close>
+        \<open>\<lambda>\<chi>. max_pos_conj_depth_inner \<chi> \<le> modal_depth_srbb_inner \<chi>\<close>
+        \<open>\<lambda>\<psi>. max_pos_conj_depth_conjunct \<psi> \<le> modal_depth_srbb_conjunct \<psi>\<close>]
+  by (auto simp add: SUP_mono' add_increasing sup.coboundedI1 sup.coboundedI2)
+
 subsection \<open>Maximal Modal Depth of Negative Clauses in Conjunctions\<close>
 
 text \<open>
