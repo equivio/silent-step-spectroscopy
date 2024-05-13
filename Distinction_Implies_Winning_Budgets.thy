@@ -455,7 +455,7 @@ proof-
       ultimately show ?case by fastforce
     next
       case (StableConj I \<psi>s)
-      \<comment>\<open>The following proof is virtually the same as for (Conj I \<psi>s)\<close>
+      \<comment>\<open>The following proof is virtually the same as for \<open>Conj I \<psi>s\<close>\<close>
       have main_case: "(\<forall>\<Psi>_I \<Psi> p Q. StableConj I \<psi>s = StableConj \<Psi>_I \<Psi> \<longrightarrow>
              Q \<noteq> {} \<longrightarrow> distinguishes_from_inner (StableConj I \<psi>s) p Q \<longrightarrow> (\<forall>q\<in>Q. \<nexists>q'. q \<mapsto>\<tau> q')
              \<longrightarrow> in_wina (expr_pr_inner (StableConj I \<psi>s)) (Defender_Stable_Conj p Q))" 
@@ -715,7 +715,6 @@ proof-
           using e'_def by force
         have six_e': \<open>six e' = Sup ({1 + modal_depth_srbb \<phi>} \<union> (six ` ({expr_pr_inner (Obs \<alpha> \<phi>)} \<union> (expr_pr_conjunct ` (\<psi>s ` I)))))\<close>
           using energy.sel(6) unfolding e'_def by blast
-        (* have \<open>one e' \<le> six e'\<close> unfolding six_e' unfolding e'_def using depths sorry *)
         hence six_e'_simp: \<open>six e' = Sup ({1 + modal_depth_srbb \<phi>} \<union> (six ` (expr_pr_conjunct ` (\<psi>s ` I))))\<close>
           by (auto simp add: modal_depth_domiantes_pos_conjuncts add_increasing  sup.absorb2 sup.coboundedI1)
         hence \<open>six e' \<le> one e'\<close>
