@@ -785,27 +785,12 @@ proof-
               and distinguishes_def
           using soft_poss_to_or hml_models.simps(2) by (auto) (blast)
         define Q_\<alpha> where \<open>Q_\<alpha> = Q - model_set_inner (hml_srbb_inner.Obs \<alpha> \<phi>)\<close>
-        show  \<open>in_wina (expr_pr_inner (BranchConj \<alpha> \<phi> I \<psi>s)) (Attacker_Delayed p Q)\<close>
-        proof (cases \<open>Q_\<alpha> = {}\<close>)
-          case True
-          hence \<open>Q \<subseteq>  model_set_inner (Obs \<alpha> \<phi>)\<close> using Q_\<alpha>_def by blast
-          hence Q_not_\<alpha>_dist: \<open>distinguishes_from_hml p (HML_soft_poss \<alpha> (hml_srbb_to_hml \<phi>)) Q\<close>
-            using p'_spec case_assms
-            unfolding distinguishes_from_hml_def
-            sorry
-          with case_assms(1)
-            have \<open>distinguishes_from_hml p (hml.Conj I (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s)) Q\<close>
-              sorry (* TODO: maybe rather change game def as well *)
-          then show ?thesis sorry
-        next
-          case False
-          have \<open>in_wina (expr_pr_inner (BranchConj \<alpha> \<phi> I \<psi>s)) (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>)\<close>
-            using main_case case_assms(1) p'_spec Q_\<alpha>_def by blast
-          moreover have \<open>spectroscopy_moves (Attacker_Delayed p Q) (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>) = Some id\<close>
-            using p'_spec Q_\<alpha>_def False by auto
-          ultimately show \<open>in_wina (expr_pr_inner (BranchConj \<alpha> \<phi> I \<psi>s)) (Attacker_Delayed p Q)\<close>
-            using in_wina_Ga_with_id_step by auto
-        qed
+        have \<open>in_wina (expr_pr_inner (BranchConj \<alpha> \<phi> I \<psi>s)) (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>)\<close>
+          using main_case case_assms(1) p'_spec Q_\<alpha>_def by blast
+        moreover have \<open>spectroscopy_moves (Attacker_Delayed p Q) (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>) = Some id\<close>
+          using p'_spec Q_\<alpha>_def by auto
+        ultimately show \<open>in_wina (expr_pr_inner (BranchConj \<alpha> \<phi> I \<psi>s)) (Attacker_Delayed p Q)\<close>
+          using in_wina_Ga_with_id_step by auto
       qed
       ultimately show ?case by blast
     next
