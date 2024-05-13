@@ -716,11 +716,11 @@ proof-
         have six_e': \<open>six e' = Sup ({1 + modal_depth_srbb \<phi>} \<union> (six ` ({expr_pr_inner (Obs \<alpha> \<phi>)} \<union> (expr_pr_conjunct ` (\<psi>s ` I)))))\<close>
           using energy.sel(6) unfolding e'_def by blast
         hence six_e'_simp: \<open>six e' = Sup ({1 + modal_depth_srbb \<phi>} \<union> (six ` (expr_pr_conjunct ` (\<psi>s ` I))))\<close>
-          by (auto simp add: modal_depth_domiantes_pos_conjuncts add_increasing  sup.absorb2 sup.coboundedI1)
+          by (auto simp add: modal_depth_dominates_pos_conjuncts add_increasing  sup.absorb2 sup.coboundedI1)
         hence \<open>six e' \<le> one e'\<close>
-          using modal_depth_domiantes_pos_conjuncts
+          using modal_depth_dominates_pos_conjuncts
           unfolding e'_def
-          by (auto, smt (verit) SUP_mono energy.sel(1) energy.sel(6) image_iff modal_depth_domiantes_pos_conjuncts sup.coboundedI2)
+          by (auto, smt (verit) SUP_mono energy.sel(1) energy.sel(6) image_iff modal_depth_dominates_pos_conjuncts sup.coboundedI2)
         hence \<open>one (min1_6 e') = (six e')\<close>
           by (simp add: \<open>e' \<noteq> eneg\<close>)
         with six_e' have min_e'_def: \<open>min1_6 e' = E
@@ -838,7 +838,7 @@ proof-
         moreover have \<open>spectroscopy_moves (Attacker_Clause p q) (Attacker_Delayed p (silent_reachable_set {q})) = Some min1_6\<close>
           using q_reach_nonempty sreachable_set_is_sreachable by fastforce
         moreover have \<open>min1_6 (expr_pr_conjunct (Pos \<chi>)) \<ge> (expr_pr_inner \<chi>)\<close>
-          unfolding min1_6_def by (auto simp add: energy_leq_cases modal_depth_domiantes_pos_conjuncts)
+          unfolding min1_6_def by (auto simp add: energy_leq_cases modal_depth_dominates_pos_conjuncts)
         ultimately show \<open>in_wina (expr_pr_conjunct (Pos \<chi>)) (Attacker_Clause p q)\<close>
           using in_wina_Ga win_a_upwards_closure spectroscopy_defender.simps(3)
           by (metis option.discI option.sel)
@@ -872,7 +872,7 @@ proof-
           using p_reach_nonempty sreachable_set_is_sreachable \<open>p \<noteq> q\<close> by fastforce
         moreover have \<open>(min1_7 (expr_pr_conjunct (Neg \<chi>) - E 0 0 0 0 0 0 0 1)) \<ge> (expr_pr_inner \<chi>)\<close>
           using min1_7_def energy_leq_cases 
-          by (simp add: minus_energy_def modal_depth_domiantes_neg_conjuncts)
+          by (simp add: minus_energy_def modal_depth_dominates_neg_conjuncts)
         moreover from this have \<open>(min1_7 \<circ> (\<lambda>x. x - E 0 0 0 0 0 0 0 1)) (expr_pr_conjunct (Neg \<chi>)) \<ge> (expr_pr_inner \<chi>)\<close>
           by auto
         ultimately show \<open>in_wina (expr_pr_conjunct (Neg \<chi>)) (Attacker_Clause p q)\<close>

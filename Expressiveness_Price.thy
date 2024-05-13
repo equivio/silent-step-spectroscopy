@@ -262,7 +262,7 @@ primrec
   "max_pos_conj_depth_conjunct (Pos \<chi>) = modal_depth_srbb_inner \<chi>" |
   "max_pos_conj_depth_conjunct (Neg \<chi>) = max_pos_conj_depth_inner \<chi>"
 
-lemma modal_depth_domiantes_pos_conjuncts:
+lemma modal_depth_dominates_pos_conjuncts:
   fixes
     \<phi>::\<open>('a, 's) hml_srbb\<close> and
     \<chi>::\<open>('a, 's) hml_srbb_inner\<close> and
@@ -303,7 +303,7 @@ primrec
 
 
 
-lemma modal_depth_domiantes_neg_conjuncts:
+lemma modal_depth_dominates_neg_conjuncts:
   fixes
     \<phi>::\<open>('a, 's) hml_srbb\<close> and
     \<chi>::\<open>('a, 's) hml_srbb_inner\<close> and
