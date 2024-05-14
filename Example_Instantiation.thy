@@ -296,7 +296,7 @@ text \<open>Finally, we verify our definition of winning budgets.\<close>
 
 lemma wina_of_e:
   shows "Game.in_wina (E 9 8) e"
-  by (simp add: Game.in_wina.intros(1))
+  by (simp add: Game.in_wina.Defense)
 
 lemma wina_of_e_exist:
   shows "\<exists>e1. Game.in_wina e1 e" 
@@ -304,7 +304,7 @@ lemma wina_of_e_exist:
 
 lemma attacker_wins_at_e: 
   shows "\<forall>e'. e' \<noteq> eneg \<longrightarrow> Game.in_wina e' e"
-  by (simp add: Game.in_wina.intros(1))
+  by (simp add: Game.in_wina.Defense)
 
 lemma wina_of_d1:
   shows "Game.in_wina (E 9 8) d1" 
@@ -316,8 +316,8 @@ proof -
   hence "(Game.weight d1 e (E 9 8)) = E 9 8 " by simp
   hence "(Game.in_wina (((Game.weight d1 e (E 9 8)))) e)" using A3 by simp
   from this A3 have A4: "\<not>(defender d1) \<and> (\<exists>g'. ((d1 \<Zinj> g') \<and> (Game.in_wina (((Game.weight d1 g' (E 9 8)))) g')))"
-  by (meson A1 A2 Game.in_wina.intros(1,3) defender.simps(4) weight_opt.simps(38))
-  thus "Game.in_wina (E 9 8) d1" using Game.in_wina.intros(2) by blast 
+  by (meson A1 A2 Game.in_wina.Defense defender.simps(4) weight_opt.simps(38))
+  thus "Game.in_wina (E 9 8) d1" using Game.in_wina.Attack by blast 
 qed
 
 lemma wina_of_d2:
@@ -330,8 +330,8 @@ proof -
   hence "(Game.weight d2 e (E 8 9)) = E 8 9 " by simp
   hence "(Game.in_wina (((Game.weight d2 e (E 8 9)))) e)" using A3 by simp
   from this A3 have A4: "\<not>(defender d2) \<and> (\<exists>g'. ((d2 \<Zinj> g') \<and> (Game.in_wina (((Game.weight d2 g' (E 8 9)))) g')))"
-  by (meson A1 A2 Game.in_wina.intros(1,3) defender.simps(4) weight_opt.simps(38))
-  thus "Game.in_wina (E 8 9) d2" using Game.in_wina.intros(2) by blast 
+  by (meson A1 A2 Game.in_wina.Defense defender.simps(4) weight_opt.simps(38))
+  thus "Game.in_wina (E 8 9) d2" using Game.in_wina.Attack by blast 
 qed
 
 lemma wina_of_c:
@@ -365,7 +365,7 @@ proof -
   hence "(Game.weight c d2) (E 9 9) = E 8 9" using A7 by simp
   hence A8: "Game.in_wina ((Game.weight c d2) (E 9 9)) d2" using A4 by simp
 
-  thus "Game.in_wina (E 9 9) c" using A7 Game.in_wina.intros(3) energy.distinct(1) A2 A1 A6 by blast  
+  thus "Game.in_wina (E 9 9) c" using A7 Game.in_wina.Defense energy.distinct(1) A2 A1 A6 by blast  
 qed
 
 lemma not_wina_of_c:

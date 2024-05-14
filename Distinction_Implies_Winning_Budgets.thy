@@ -26,7 +26,7 @@ proof-
     by(rule spectroscopy_moves.elims, auto)
   moreover have "spectroscopy_defender (Defender_Conj p {})" by simp
   ultimately have conj_win: "in_wina (expressiveness_price \<phi>) (Defender_Conj p {})" 
-    by (simp add: in_wina.intros(1))
+    by (simp add: in_wina.Defense)
 
   from late_inst_conj[of p "{}" p "{}"] have next_move0: 
     "spectroscopy_moves (Attacker_Delayed p {}) (Defender_Conj p {}) = Some id" by force
@@ -35,9 +35,9 @@ proof-
     "spectroscopy_moves (Attacker_Immediate p {}) (Attacker_Delayed p {}) = Some id" by force
 
   moreover have "attacker (Attacker_Immediate p {})" by simp
-  ultimately show ?thesis using in_wina.intros(2)[of "Attacker_Immediate p {}" "expressiveness_price \<phi>"]
+  ultimately show ?thesis using in_wina.Attack[of "Attacker_Immediate p {}" _ "expressiveness_price \<phi>"]
     using next_move0 next_move1
-    by (metis conj_win id_apply in_wina.intros(2) not_neg option.distinct(1) option.sel spectroscopy_defender.simps(4))
+    by (metis conj_win id_apply in_wina.Attack not_neg option.distinct(1) option.sel spectroscopy_defender.simps(4))
 qed
 
 text \<open>Next, we show the statement for the case that @{term "Q \<noteq> {}"}. Following the proof of
@@ -391,7 +391,7 @@ proof-
           using \<open>\<forall>q\<in>Q. in_wina e' (Attacker_Clause p q)\<close> \<open>e' = e3 e\<close> e_def by force
         hence \<open>in_wina e (Defender_Conj p Q)\<close>
           unfolding e_def
-          by (auto simp add: in_wina.intros(3))
+          by (auto simp add: in_wina.Defense)
         moreover have \<open>e \<le> expr_pr_inner (Conj I \<psi>s)\<close>
           using \<open>e' \<le> eu'\<close> eu'_characterization \<open>e' = e3 e\<close> expr_lower case_assms(1) subset_form
           by (auto)
@@ -506,7 +506,7 @@ proof-
           using \<open>\<forall>q\<in>Q. in_wina e' (Attacker_Clause p q)\<close> \<open>e' = (subtract_fn 0 0 0 1 0 0 0 0) e\<close> e_def by force
         hence \<open>in_wina e (Defender_Stable_Conj p Q)\<close>
           unfolding e_def
-          by (auto simp add: in_wina.intros(3))
+          by (auto simp add: in_wina.Defense)
         moreover have \<open>e \<le> expr_pr_inner (StableConj I \<psi>s)\<close>
           using \<open>e' \<le> eu'\<close> eu'_characterization \<open>e' = (subtract_fn 0 0 0 1 0 0 0 0) e\<close> expr_lower case_assms(1) subset_form
           by (auto)
@@ -551,7 +551,7 @@ proof-
           ultimately have win_transfer:
             \<open>\<forall>e. in_wina ((subtract_fn 0 0 0 1 0 0 0 0) e) (Defender_Conj p {}) \<longrightarrow> in_wina e (Defender_Stable_Conj p Q')\<close>
             using gets_smaller win_a_upwards_closure 
-            by (metis energy.distinct(1) in_wina.cases in_wina.intros(3) option.sel spectroscopy_defender.simps(7))
+            by (metis energy.distinct(1) in_wina.cases in_wina.Defense option.sel spectroscopy_defender.simps(7))
           have \<open>\<forall>g'. spectroscopy_moves (Defender_Conj p {}) g' = None\<close>
           proof
             fix g'
@@ -753,7 +753,7 @@ proof-
         moreover have \<open>expr_pr_inner (BranchConj \<alpha> \<phi> I \<psi>s) = e\<close>
           using e'_characterization e'_minus unfolding e_def by force
         ultimately show \<open>in_wina (expr_pr_inner (BranchConj \<alpha> \<phi> I \<psi>s)) (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>)\<close>
-        using \<chi>_price_never_neg in_wina.intros(3) spectroscopy_defender.simps(5)
+        using \<chi>_price_never_neg in_wina.Defense spectroscopy_defender.simps(5)
           by metis
       qed 
       moreover have

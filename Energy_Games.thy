@@ -252,9 +252,8 @@ with energy \<open>e\<close>. In more detail, this yields the following definiti
 \<close>
 
 inductive in_wina:: "'energy \<Rightarrow> 'gstate \<Rightarrow> bool " where
- "in_wina e g" if "(Gd g) \<and> (\<forall>g'. \<not>(g \<Zinj> g')) \<and> (e \<noteq> defender_win_level)" |
- "in_wina e g" if "(Ga g) \<and> (\<exists>g'. ((g \<Zinj> g') \<and> (in_wina ((weight g g') e) g')))\<and> (e \<noteq> defender_win_level)" |
- "in_wina e g" if "(Gd g) \<and> (\<forall>g'. ((g \<Zinj> g') \<longrightarrow> (in_wina ((weight g g') e) g'))) \<and> (e \<noteq> defender_win_level)"
+ Attack: "in_wina e g" if \<open>Ga g\<close> \<open>g \<Zinj> g'\<close> \<open>in_wina ((weight g g') e) g'\<close> \<open>e \<noteq> defender_win_level\<close> |
+ Defense: "in_wina e g" if \<open>Gd g\<close> \<open>\<forall>g'. ((g \<Zinj> g') \<longrightarrow> (in_wina ((weight g g') e) g'))\<close> \<open>e \<noteq> defender_win_level\<close>
 
 lemma %invisible defender_win_level_not_in_wina:
   shows "\<forall>g. \<not>in_wina defender_win_level g" 
@@ -263,7 +262,8 @@ lemma %invisible defender_win_level_not_in_wina:
 lemma %invisible attacker_wins_last_wina_notempty:
   assumes "won_by_attacker g0 e0 p"
   shows "\<exists>e. in_wina e (last p)"
-  using assms won_by_attacker_def finite_play.intros(2) in_wina.intros(1) by meson
+  using assms won_by_attacker_def finite_play.intros(2)
+  by (meson in_wina.intros(2))
 
 lemma %invisible in_wina_GaE:
   assumes "in_wina e g" and "Ga g" 
@@ -287,7 +287,7 @@ lemma %invisible in_wina_Gd:
   "e \<noteq> defender_win_level"
   "\<And>g'. g \<Zinj> g' \<Longrightarrow>  weight g g' = update"
   "\<And>g'. g \<Zinj> g' \<Longrightarrow> in_wina (update e) g'"
-shows "in_wina e g" using assms in_wina.intros(3) by blast
+shows "in_wina e g" using assms in_wina.intros(2) by blast
 
 text\<open>If from a certain starting position \<open>g\<close> a game is won by the attacker with some energy \<open>e\<close> (i.e.
 \<open>e\<close> is in the winning budget of \<open>g\<close>), then the game is also won by the attacker with more energy. 
@@ -300,17 +300,13 @@ lemma win_a_upwards_closure:
   shows
     "in_wina e' g"
 using assms proof (induct arbitrary: e' rule: in_wina.induct)
-  case (1 g e)
-  then show ?case using antisim dwl_min local.reflexivity local.transitivity update_gets_smaller
-    by (metis in_wina.intros(1))
+  case (Attack g g' e)
+  then show ?case
+    using antisim dwl_min in_wina.intros(1) monotonicity by blast 
 next
-  case (2 g e)
+  case (Defense g e)
   then show ?case
     using antisim dwl_min in_wina.intros(2) monotonicity by blast 
-next
-  case (3 g e)
-  then show ?case
-    using antisim dwl_min in_wina.intros(3) monotonicity by blast 
 qed
 
 end (*End of context energy_game*)
