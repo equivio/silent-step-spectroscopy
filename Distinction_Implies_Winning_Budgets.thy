@@ -42,43 +42,7 @@ qed
 
 text \<open>Next, we show the statement for the case that @{term "Q \<noteq> {}"}. Following the proof of
       \cite[p. 20]{bisping2023lineartimebranchingtime}, we do this by induction on a more
-      complex property. We formalize this property as follows (keeping the labels from the paper):
-      \begin{itemize}
-      \item [1.] \<open>\<forall>Q p. Q \<noteq> {} \<longrightarrow> distinguishes_from \<phi> p Q\<close>\\
-      \<open>\<longrightarrow> in_wina (expressiveness_price \<phi>) (Attacker_Immediate p Q)\<close>
-      
-      \item[2.] \<open>\<forall>p Q. Q \<noteq> {} \<longrightarrow> distinguishes_from_inner \<chi> p Q \<longrightarrow> Q \<Zsurj>S Q\<close>\\
-                \<open>\<longrightarrow> in_wina (expr_pr_inner \<chi>) (Attacker_Delayed p Q)\<close>
-      
-      \item [4.] \<open>\<forall>\<Psi>_I \<Psi> p Q. \<chi> = Conj \<Psi>_I \<Psi> \<longrightarrow> Q \<noteq> {}\<close>\\
-            \<open>\<longrightarrow> distinguishes_from_inner \<chi> p Q\<close>\\
-            \<open>\<longrightarrow> in_wina (expr_pr_inner \<chi>) (Defender_Conj p Q)\<close>
-      
-      \item[5.] \<open>\<forall>\<Psi>_I \<Psi> p Q. \<chi> = StableConj \<Psi>_I \<Psi> \<longrightarrow> Q \<noteq> {}\<close>\\
-            \<open>\<longrightarrow> distinguishes_from_inner \<chi> p Q \<longrightarrow> (\<forall>q \<in> Q. \<nexists>q'. q \<mapsto> \<tau> q')\<close>\\
-            \<open>\<longrightarrow> in_wina (expr_pr_inner \<chi>) (Defender_Stable_Conj p Q)\<close>
-      
-      \item[6.] \<open>\<forall>\<Psi>_I \<Psi> \<alpha> \<phi> p Q p' Q_\<alpha>. \<chi> = BranchConj \<alpha> \<phi> \<Psi>_I \<Psi>\<close>\\
-             \<open>\<longrightarrow>distinguishes_from_inner \<chi> p Q \<longrightarrow> p \<mapsto>\<alpha> p' \<longrightarrow> p' \<Turnstile>SRBB \<phi>\<close>\\
-             \<open>\<longrightarrow> Q_\<alpha> \<noteq> {} \<longrightarrow> Q \<inter> model_set_inner (Conj \<Psi>_I \<Psi>) \<subseteq> Q_\<alpha>\<close>\\
-             \<open>\<longrightarrow> Q_\<alpha> \<subseteq> Q - model_set_inner (Obs \<alpha> \<phi>)\<close>\\
-             \<open>\<longrightarrow> in_wina (expr_pr_inner \<chi>) (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>)\<close>
-      
-      \item[3.] \<open>\<forall>p q. distinguishes_conjunct \<psi> p q\<close>\\
-                \<open>\<longrightarrow> in_wina (expr_pr_conjunct \<psi>) (Attacker_Clause p q)\<close>
-      \end{itemize}
-    Note that the sixth case differs from the paper in the assumption that @{term "Q_\<alpha> \<noteq> {}"}.
-    Strictly speaking this case is covered by the previous lemma, the case that @{term "Q = {}"},
-    since using @{term "Q \<inter> model_set_inner (Conj \<Psi>_I \<Psi>) \<subseteq> Q_\<alpha>"} and @{term "Q_\<alpha> = {}"}
-    we can conclude that @{term "Q = {}"}.
-    But adding this assumption allows us to directly apply the induction hypothesis. Without
-    further having to do this case distinction.\label{deviation:lemma1_Q_a}
-    The induction itself is then done via the rule \<open>induct\<close> on \<open>hml_srbb_hml_srbb_inner_hml_srbb_conjunct\<close>.
-    The parts of this proof that are completed work as described in the paper.
-    A notable exception to this is that we also have to prove the statement for the 
-    formula @{term "TT"}\label{deviation:lemma1TT}. This holds trivially as @{term "TT"} does not distinguishes any @{term "p"} from any
-    non-empty @{term "Q"}. 
-  \<close>
+      complex property.\<close>
 lemma distinction_implies_winning_budgets:
   assumes "distinguishes_from \<phi> p Q"
   shows "in_wina (expressiveness_price \<phi>) (Attacker_Immediate p Q)"
