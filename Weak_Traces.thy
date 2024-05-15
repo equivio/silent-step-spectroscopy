@@ -20,8 +20,7 @@ inductive
   "is_trace_formula (ImmConj I \<psi>s)" if "I = {}" |
 
   "is_trace_formula_inner (Obs \<alpha> \<phi>)" if "is_trace_formula \<phi>" |
-  "is_trace_formula_inner (Conj I \<psi>s)" if "I = {}" |
-  "is_trace_formula_inner (BranchConj \<alpha> \<phi> I \<psi>s)" if "I = {}" and "is_trace_formula \<phi>"
+  "is_trace_formula_inner (Conj I \<psi>s)" if "I = {}"
 
 text \<open>We define a function that translates a (weak) trace \<open>tr\<close> to a formula \<open>\<phi>\<close> such that a state \<open>p\<close> models \<open>\<phi>\<close>, \<open>p \<Turnstile> \<phi>\<close> if and only if \<open>tr\<close> is a (weak) trace of \<open>p\<close>.\<close>
 fun wtrace_to_srbb :: "'act list \<Rightarrow> ('act, 'i) hml_srbb"
@@ -53,9 +52,7 @@ lemma trace_formula_to_expressiveness:
   fixes \<chi> :: "('act, 'i) hml_srbb_inner"
   shows  "(is_trace_formula \<phi>       \<longrightarrow> (\<phi> \<in> \<O>       (E \<infinity> 0 0 0 0 0 0 0)))
         \<and> (is_trace_formula_inner \<chi> \<longrightarrow> (\<chi> \<in> \<O>_inner (E \<infinity> 0 0 0 0 0 0 0)))"
-  apply (rule is_trace_formula_is_trace_formula_inner.induct)
-  by (simp add: Sup_enat_def \<O>_def \<O>_inner_def leq_not_eneg)+
-
+  by (rule is_trace_formula_is_trace_formula_inner.induct) (simp add: Sup_enat_def \<O>_def \<O>_inner_def leq_not_eneg)+
 
 lemma expressiveness_to_trace_formula:
   fixes \<phi> :: "('act, 'i) hml_srbb"
@@ -100,21 +97,11 @@ next
   qed
 next
   case (BranchConj \<alpha> \<phi> I \<psi>s)
-  show ?case
-  proof (rule impI)
-    assume "BranchConj \<alpha> \<phi> I \<psi>s \<in> \<O>_inner (E \<infinity> 0 0 0 0 0 0 0)"
-    hence "I = {}" 
-      by (metis \<O>_inner_def add_eq_0_iff_both_eq_0 bot.extremum_uniqueI bot_enat_def branch_conj_depth_inner.simps(4) energy.distinct(1) energy.sel(2) expr_pr_inner.simps leq_not_eneg mem_Collect_eq zero_one_enat_neq(2))
-    from \<open>BranchConj \<alpha> \<phi> I \<psi>s \<in> \<O>_inner (E \<infinity> 0 0 0 0 0 0 0)\<close>
-    have "expr_pr_inner (BranchConj \<alpha> \<phi> I \<psi>s) \<le> E \<infinity> 0 0 0 0 0 0 0" unfolding \<O>_inner_def by auto
-    with \<open>I = {}\<close>
-    have "expressiveness_price \<phi> \<le> E \<infinity> 0 0 0 0 0 0 0" unfolding expr_pr_inner.simps 
-      by (smt (verit) bot.extremum_uniqueI bot_enat_def branch_conj_depth_inner.simps(4) ccpo_Sup_singleton enat_ord_simps(6) energy.distinct(1) energy.sel(1) energy.sel(2) energy.sel(3) energy.sel(4) energy.sel(5) energy.sel(6) energy.sel(7) energy.sel(8) expressiveness_price.elims image_empty imm_conj_depth_inner.simps(4) insert_is_Un inst_conj_depth_inner.simps(4) leq_not_eneg less_numeral_extra(3) max_neg_conj_depth_inner.simps(4) max_pos_conj_depth_inner.simps(4) neg_depth_inner.simps(4) somewhere_larger_eq st_conj_depth_inner.simps(4))
-    then have "\<phi> \<in> \<O> (E \<infinity> 0 0 0 0 0 0 0)" unfolding \<O>_def by auto
-    with \<open>I = {}\<close>
-    show "is_trace_formula_inner (BranchConj \<alpha> \<phi> I \<psi>s)" 
-      by (simp add: BranchConj.hyps(1) is_trace_formula_is_trace_formula_inner.intros(6))
-  qed
+  have \<open>expr_pr_inner (BranchConj \<alpha> \<phi> I \<psi>s) \<ge> E 0 1 1 0 0 0 0 0\<close>
+    by (simp add: leq_not_eneg)
+  hence \<open>BranchConj \<alpha> \<phi> I \<psi>s \<notin> \<O>_inner (E \<infinity> 0 0 0 0 0 0 0)\<close>
+    unfolding \<O>_inner_def by (simp add: leq_not_eneg)
+  thus ?case by blast
 next
   case (Pos x)
   then show ?case by auto

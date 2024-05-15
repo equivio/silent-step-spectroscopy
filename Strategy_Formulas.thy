@@ -541,7 +541,7 @@ next
         IH: "(\<exists>\<phi>. strategy_formula_inner g' (weight g g' e) \<phi> \<and> expr_pr_inner \<phi> \<le> weight g g' e)"
         using IH by blast
 
-      hence "(p = p' \<and> Q' = Q - Q\<alpha> \<and> p \<mapsto>\<alpha> p'' \<and> Q\<alpha> \<noteq> {} \<and> Q\<alpha> \<subseteq> Q)"
+      hence "(p = p' \<and> Q' = Q - Q\<alpha> \<and> p \<mapsto>a \<alpha> p'' \<and> Q\<alpha> \<subseteq> Q)"
         using local.br_conj move by metis
       hence "(the (spectroscopy_moves (Attacker_Delayed p Q) (Defender_Branch p' \<alpha> p'' Q' Q\<alpha>)) e) = (id e)"
         by auto
@@ -984,7 +984,6 @@ next
       hence F: "strategy_formula_conjunct (Attacker_Clause p q) (e - (E 0 1 1 0 0 0 0 0)) \<phi> \<and> expr_pr_conjunct \<phi> \<le> (e - (E 0 1 1 0 0 0 0 0))" using M \<open>q\<in> Q\<close>
         using \<open>g = Defender_Branch p \<alpha> p' Q Qa\<close> option.sel by auto
 
-
       from M have "in_wina (e - (E 0 1 1 0 0 0 0 0)) (Attacker_Clause p q)" using assms \<open>q\<in> Q\<close>
         by (metis "3" \<open>g = Defender_Branch p \<alpha> p' Q Qa\<close> option.distinct(1) option.sel) 
       hence  "spectroscopy_moves (Defender_Branch p \<alpha> p' Q Qa) (Attacker_Clause p q) 
@@ -1033,7 +1032,7 @@ next
 
     have A2: "spectroscopy_moves (Attacker_Branch p' (soft_step_set Qa \<alpha>)) (Attacker_Immediate p' (soft_step_set Qa \<alpha>)) = (subtract 1 0 0 0 0 0 0 0)" by simp
 
-    from M have "in_wina ((min1_6 (e - E 0 1 1 0 0 0 0 0))) (Attacker_Branch p' (soft_step_set Qa \<alpha>))" using assms
+    from M have win_branch: "in_wina ((min1_6 (e - E 0 1 1 0 0 0 0 0))) (Attacker_Branch p' (soft_step_set Qa \<alpha>))" using assms
       by (metis "3" E \<open>g = Defender_Branch p \<alpha> p' Q Qa\<close> bot_enat_def comp_apply option.distinct(1) option.sel)
     hence "\<exists>g''. ((spectroscopy_moves (Attacker_Branch p' (soft_step_set Qa \<alpha>)) g'' \<noteq> None) \<and> (in_wina ((weight (Attacker_Branch p' (soft_step_set Qa \<alpha>)) g'') (min1_6 (e - E 0 1 1 0 0 0 0 0))) g''))" 
       using in_wina.simps
@@ -1041,7 +1040,7 @@ next
     then obtain g'' where X: "((spectroscopy_moves (Attacker_Branch p' (soft_step_set Qa \<alpha>)) g'' \<noteq> None) \<and> (in_wina ((weight (Attacker_Branch p' (soft_step_set Qa \<alpha>)) g'') (min1_6 (e - E 0 1 1 0 0 0 0 0))) g''))" by auto
     hence "g''= (Attacker_Immediate p' (soft_step_set Qa \<alpha>))" using br_acct
       by (metis (no_types, lifting) spectroscopy_defender.elims(2) spectroscopy_defender.elims(3) spectroscopy_moves.simps(17) spectroscopy_moves.simps(51) spectroscopy_moves.simps(57) spectroscopy_moves.simps(61) spectroscopy_moves.simps(66) spectroscopy_moves.simps(71)) 
-    hence "(in_wina ((min1_6 (e - E 0 1 1 0 0 0 0 0)) - (E 1 0 0 0 0 0 0 0))
+    hence win_immediate: "(in_wina ((min1_6 (e - E 0 1 1 0 0 0 0 0)) - (E 1 0 0 0 0 0 0 0))
                   (Attacker_Immediate p' (soft_step_set Qa \<alpha>)))" using X A1
       by (simp add: A2 option.sel)
 
@@ -1062,14 +1061,23 @@ next
       by blast 
     
     hence S: "strategy_formula_inner g e (BranchConj \<alpha> \<phi> Q \<Phi>)" using A E branch_conj
-      by (simp add: \<open>g = Defender_Branch p \<alpha> p' Q Qa\<close>) 
+      by (simp add: \<open>g = Defender_Branch p \<alpha> p' Q Qa\<close>)
+
+    have above_one: \<open>0 < min (one e) (six e)\<close>
+      using win_immediate win_branch
+      by (metis  energy.distinct(1) energy.sel(1,6) gr_zeroI idiff_0_right in_wina.simps
+          leq_not_eneg min_1_6_simps(1) min_eneg(1) minus_energy_def not_one_le_zero)
 
     from A have "\<forall>q \<in> Q. expr_pr_conjunct (\<Phi> q) \<le> (e - (E 0 1 1 0 0 0 0 0))" by auto
-    from A0 have "expressiveness_price \<phi> \<le> ((min1_6 (e - E 0 1 1 0 0 0 0 0)) - (E 1 0 0 0 0 0 0 0))" by simp
-
-    hence "expr_pr_inner (BranchConj \<alpha> \<phi> Q \<Phi>) \<le> e" using expr_br_conj \<open>\<forall>q \<in> Q. expr_pr_conjunct (\<Phi> q) \<le> (e - (E 0 1 1 0 0 0 0 0))\<close>
+    moreover from A0 have "expressiveness_price \<phi> \<le> ((min1_6 (e - E 0 1 1 0 0 0 0 0)) - (E 1 0 0 0 0 0 0 0))" by simp
+    moreover hence \<open>modal_depth_srbb \<phi> \<le> min (one e) (six e) - 1\<close>
+      by (auto, smt (verit, best) antisim eneg_leq energy.distinct(1) energy.sel(1) energy.sel(6) idiff_0_right leq_not_eneg min_1_6_simps(1) min_eneg(1) minus_energy_def)
+    hence \<open>1 + modal_depth_srbb \<phi> \<le> min (one e) (six e)\<close> using above_one
+      by (metis add.right_neutral add_diff_cancel_enat add_mono_thms_linordered_semiring(1) enat.simps(3) enat_defs(2) ileI1 le_iff_add plus_1_eSuc(1)) 
+    moreover hence \<open>1 + modal_depth_srbb \<phi> \<le> six e\<close> by simp
+    ultimately have "expr_pr_inner (BranchConj \<alpha> \<phi> Q \<Phi>) \<le> e"
+      using expr_br_conj
       by metis
-
     then show ?case using S by blast
   next
     case 7
@@ -1108,7 +1116,7 @@ lemma strategy_formulas_distinguish:
       | Defender_Conj p Q \<Rightarrow> distinguishes_from_inner \<chi> p Q
       | Defender_Stable_Conj p Q \<Rightarrow> (\<forall>q. \<not> p \<mapsto> \<tau> q) 
           \<longrightarrow> distinguishes_from_inner \<chi> p Q
-      | Defender_Branch p \<alpha> p' Q Qa \<Rightarrow>((p \<mapsto> \<alpha> p') \<and> (Qa \<noteq> {})) 
+      | Defender_Branch p \<alpha> p' Q Qa \<Rightarrow>(p \<mapsto>a \<alpha> p')
           \<longrightarrow> distinguishes_from_inner \<chi> p (Q\<union>Qa)
       | _ \<Rightarrow> True))
       \<and>
@@ -1319,17 +1327,17 @@ next
      in_wina e (Defender_Branch p \<alpha> p' Q' Q\<alpha>) \<and>
      strategy_formula_inner (Defender_Branch p \<alpha> p' Q' Q\<alpha>) e \<chi> \<and>
      (case Defender_Branch p \<alpha> p' Q' Q\<alpha> of Attacker_Delayed p Q \<Rightarrow> Q \<Zsurj>S Q \<longrightarrow> distinguishes_from (hml_srbb.Internal \<chi>) p Q
-      | Defender_Branch p \<alpha> p' Q Qa \<Rightarrow> p \<mapsto>\<alpha> p' \<and> Qa \<noteq> {} \<longrightarrow> distinguishes_from_inner \<chi> p (Q \<union> Qa)
+      | Defender_Branch p \<alpha> p' Q Qa \<Rightarrow> p \<mapsto>a \<alpha> p' \<longrightarrow> distinguishes_from_inner \<chi> p (Q \<union> Qa)
       | Defender_Conj p Q \<Rightarrow> distinguishes_from_inner \<chi> p Q
       | Defender_Stable_Conj p Q \<Rightarrow> (\<forall>q. \<not> p \<mapsto>\<tau> q) \<longrightarrow> distinguishes_from_inner \<chi> p Q | _ \<Rightarrow> True)" by blast
   hence "spectroscopy_moves (Attacker_Delayed p Q) (Defender_Branch p \<alpha> p' Q' Q\<alpha>) = Some id" by simp
-  hence "p \<mapsto>\<alpha> p' \<and> Q\<alpha> \<noteq> {}"
+  hence "p \<mapsto>a \<alpha> p'"
     by (metis local.br_conj option.distinct(1)) 
-  from IH have "p \<mapsto>\<alpha> p' \<and> Q\<alpha> \<noteq> {} \<longrightarrow> distinguishes_from_inner \<chi> p (Q' \<union> Q\<alpha>)" by simp
-  hence D: "distinguishes_from_inner \<chi> p (Q' \<union> Q\<alpha>)" using \<open>p \<mapsto>\<alpha> p' \<and> Q\<alpha> \<noteq> {}\<close> by auto
+  from IH have "p \<mapsto>a \<alpha> p' \<longrightarrow> distinguishes_from_inner \<chi> p (Q' \<union> Q\<alpha>)" by simp
+  hence D: "distinguishes_from_inner \<chi> p (Q' \<union> Q\<alpha>)" using \<open>p \<mapsto>a \<alpha> p'\<close> by auto
 
-  from IH have "Q' = Q - Q\<alpha> \<and> p \<mapsto>\<alpha> p' \<and> Q\<alpha> \<noteq> {} \<and> Q\<alpha> \<subseteq> Q"
-    by (metis local.br_conj option.distinct(1))
+  from IH have "Q' = Q - Q\<alpha> \<and> p \<mapsto>a \<alpha> p' \<and> Q\<alpha> \<subseteq> Q"
+    by (metis (no_types, lifting) br_conj option.discI)
   hence "Q=(Q' \<union> Q\<alpha>)" by auto
   hence "distinguishes_from_inner \<chi> p Q" using D by auto
   hence " Q \<Zsurj>S Q \<longrightarrow> distinguishes_from (hml_srbb.Internal \<chi>) p Q"
@@ -1350,15 +1358,15 @@ next
   hence X:"p' \<Turnstile>SRBB \<psi>" by (simp add: distinguishes_from_def) 
   have Y: "\<forall>q \<in> Q'. \<not>(q \<Turnstile>SRBB \<psi>)" using \<open>distinguishes_from \<psi> p' Q'\<close>  by (simp add: distinguishes_from_def) 
 
-  have "(p \<mapsto> \<alpha> p' \<and> Q\<alpha> \<noteq> {}) \<longrightarrow> distinguishes_from_inner (BranchConj \<alpha> \<psi> Q1 \<Phi>) p (Q1 \<union> Q\<alpha>) " proof
-    assume "p \<mapsto> \<alpha> p' \<and> Q\<alpha> \<noteq> {}"
-    hence "p \<mapsto> \<alpha> p'" by simp
+  have "(p \<mapsto>a \<alpha> p') \<longrightarrow> distinguishes_from_inner (BranchConj \<alpha> \<psi> Q1 \<Phi>) p (Q1 \<union> Q\<alpha>) " proof
+    assume "p \<mapsto>a \<alpha> p'"
+    hence "p \<mapsto>a \<alpha> p'" by simp
     from IH have "spectroscopy_moves (Defender_Branch p \<alpha> p' Q1 Q\<alpha>) (Attacker_Branch p' Q') =
          Some (min1_6 \<circ> (\<lambda>x. x - E 0 1 1 0 0 0 0 0))" by auto
     hence "Q\<alpha> \<mapsto>aS \<alpha> Q'"
       by (metis local.br_obsv option.distinct(1))
 
-    hence A2: "hml_srbb_inner_models (Obs \<alpha> \<psi>) p" using X \<open>p \<mapsto> \<alpha> p' \<and> Q\<alpha> \<noteq> {}\<close>  by auto  
+    hence A2: "hml_srbb_inner_models (Obs \<alpha> \<psi>) p" using X \<open>p \<mapsto>a \<alpha> p'\<close>  by auto  
 
     have A3: "\<forall>q \<in> (Q1 \<union> Q\<alpha>). distinguishes_inner (BranchConj \<alpha> \<psi> Q1 \<Phi>) p q" proof
       fix q
@@ -1389,11 +1397,9 @@ next
       qed
     qed
 
-    from \<open>p \<mapsto> \<alpha> p' \<and> Q\<alpha> \<noteq> {}\<close> have "\<exists>qa. qa \<in> Q\<alpha>" by auto
-    then obtain qa where "qa \<in> Q\<alpha>" by auto
-    hence A4: "hml_srbb_inner_models (BranchConj \<alpha> \<psi> Q1 \<Phi>) p" using A3
-      by (meson Un_iff distinguishes_inner_def) 
-
+    have A4: "hml_srbb_inner_models (BranchConj \<alpha> \<psi> Q1 \<Phi>) p"
+      using A3 A2 unfolding distinguishes_inner_def
+      by fastforce
     from A3 have "\<forall>q \<in> (Q1 \<union> Q\<alpha>). \<not>(hml_srbb_inner_models (BranchConj \<alpha> \<psi> Q1 \<Phi>) q)"
       using distinguishes_inner_def by blast 
 

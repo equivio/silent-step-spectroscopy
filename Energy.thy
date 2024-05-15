@@ -323,4 +323,14 @@ next
     using min_1_7_simps min_less_iff_conj somewhere_larger_eq by fastforce
 qed
 
+instantiation energy :: Sup
+begin
+
+definition "Sup ee \<equiv> E (Sup (one ` (ee - {eneg}))) (Sup (two ` (ee - {eneg}))) (Sup (three ` (ee - {eneg}))) (Sup (four ` (ee - {eneg})))
+  (Sup (five ` (ee - {eneg}))) (Sup (six ` (ee - {eneg}))) (Sup (seven ` (ee - {eneg}))) (Sup (eight ` (ee - {eneg})))"
+
+instance ..
+
+end
+
 end
