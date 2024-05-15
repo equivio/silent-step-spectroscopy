@@ -13,7 +13,7 @@ subsection \<open>Fundamentals\<close>
 text\<open>We use an abstract concept of energies and only later consider eight-dimensional energy games. 
 Through our later given definition of energies as a data type, we obtain certain 
 properties that we enforce for all energy games. We therefore assume that an energy game 
-has a partial order on energies such that all updates are monotonic and never increase.\<close>
+has a partial order on energies such that all updates are monotonic and have sink where the defender wins.\<close>
 
 type_synonym 'energy update = "'energy \<Rightarrow> 'energy"
 
