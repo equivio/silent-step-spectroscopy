@@ -330,7 +330,8 @@ proof
     by (smt (z3) energy.case_eq_if energy.expand nle_le)
   show "eneg \<le> e" using eneg_leq .
   show "\<And>g g' e e'. spectroscopy_moves g g' \<noteq> None \<Longrightarrow> e \<le> e' \<Longrightarrow> the (spectroscopy_moves g g') e \<le> the (spectroscopy_moves g g') e'" using update_monotonicity by simp
-  show "\<And>g g' e. spectroscopy_moves g g' \<noteq> None \<Longrightarrow> the (spectroscopy_moves g g') e \<le> e" using update_gets_smaller by simp
+  show "\<And>g g' e. e = eneg \<Longrightarrow> spectroscopy_moves g g' \<noteq> None \<Longrightarrow> the (spectroscopy_moves g g') e = eneg"
+    using update_gets_smaller eneg_leq order_antisym_conv by blast
 qed
 
 end

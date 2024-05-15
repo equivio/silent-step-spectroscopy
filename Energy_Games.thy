@@ -23,14 +23,16 @@ Since we will only consider cases in which the attacker's moves may actually hav
 out of energy. This is the case when the energy level reaches the \<open>defender_win_level\<close>.
 In contrast to other definitions of games, we do not fix a starting position.\<close>
 locale energy_game =
-  fixes weight_opt :: "'gstate \<Rightarrow> 'gstate \<Rightarrow> 'energy update option" and
-        defender :: "'gstate \<Rightarrow> bool" ("Gd") and 
-        defender_win_level :: "'energy" and
-        ord::"'energy \<Rightarrow> 'energy \<Rightarrow> bool"
-  assumes antisim: "\<And>e e'. (ord e e') \<Longrightarrow> (ord e' e) \<Longrightarrow> e=e'" and
-          dwl_min: "\<And>e. ord defender_win_level e" and 
-          monotonicity:"\<And>g g' e e'. (weight_opt g g') \<noteq> None \<Longrightarrow> (ord e e')  \<Longrightarrow> (ord (the (weight_opt g g')e) (the (weight_opt g g')e'))" and
-          update_gets_smaller: "\<And>g g' e. ((weight_opt g g') \<noteq> None) \<Longrightarrow> (ord (the (weight_opt g g')e) e)"
+fixes
+  weight_opt :: "'gstate \<Rightarrow> 'gstate \<Rightarrow> 'energy update option" and
+  defender :: "'gstate \<Rightarrow> bool" ("Gd") and
+  defender_win_level :: "'energy" and
+  ord::"'energy \<Rightarrow> 'energy \<Rightarrow> bool"
+assumes
+  antisim: "\<And>e e'. (ord e e') \<Longrightarrow> (ord e' e) \<Longrightarrow> e = e'" and
+  dwl_min: "\<And>e. ord defender_win_level e" and
+  monotonicity:"\<And>g g' e e'. weight_opt g g' \<noteq> None \<Longrightarrow> ord e e' \<Longrightarrow> ord (the (weight_opt g g') e) (the (weight_opt g g') e')" and
+  defender_win_final: "\<And>g g' e. e = defender_win_level \<Longrightarrow> weight_opt g g' \<noteq> None \<Longrightarrow> the (weight_opt g g') e = defender_win_level"
 begin
 
 text\<open>In the following, we introduce some abbreviations for attacker positions and moves.\<close>
@@ -77,7 +79,7 @@ lemma %invisible attacker_wins_GaE:
 lemma %invisible attacker_wins_Ga:
   assumes "attacker_wins (u e) g'" "g \<Zinj>wgt u g'" "Ga g"
   shows "attacker_wins e g"
-  using assms attacker_wins.simps by (metis antisim dwl_min update_gets_smaller)
+  using assms attacker_wins.simps defender_win_final by metis
 
 lemma %invisible attacker_wins_Ga_with_id_step:
   assumes "attacker_wins e g'" "g \<Zinj>wgt id g'" "Ga g"
@@ -105,11 +107,12 @@ lemma win_a_upwards_closure:
 using assms proof (induct arbitrary: e' rule: attacker_wins.induct)
   case (Attack g g' e)
   then show ?case
-    using attacker_wins.Attack antisim dwl_min monotonicity by blast
+    using attacker_wins.Attack monotonicity
+    by (meson attacker_wins_Ga)
 next
   case (Defense g e)
   then show ?case
-    using attacker_wins.Defense antisim dwl_min monotonicity by blast
+    using attacker_wins.Defense monotonicity antisim dwl_min by blast
 qed
 
 end (*End of context energy_game*)

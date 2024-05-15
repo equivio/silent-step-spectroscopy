@@ -74,44 +74,6 @@ proof
     using weight_opt.simps by (smt (verit, del_insts) defender.cases) 
   then consider (id) "weight_opt g g' = Some id" | (min) "weight_opt g g' = Some min_update" |(10) " weight_opt g g' = Some (\<lambda>x. x - (E 1 0))" | (01) " weight_opt g g' = Some (\<lambda>x. x - (E 0 1))" by auto
 
-  thus "order (the (weight_opt g g') e) e" proof (cases)
-    case id
-    then show ?thesis
-      using order.elims(3) by fastforce
-  next
-    case min
-    then show ?thesis
-      by (smt (verit, del_insts) antisym_conv3 dual_order.refl energy.case_eq_if energy.discI energy.distinct(1) energy.exhaust energy.inject energy.sel(1) energy.sel(2) energy.simps(4) min.absorb3 min.absorb_iff2 min.commute min.idem min_update_def minus_energy_def option.sel order.elims(2) order.elims(3) order.simps(3) order_less_imp_le verit_comp_simplify1(3)) 
-  next
-    case 10
-    then show ?thesis proof (cases "order (E 1 0) e")
-      case True
-      from this \<open>weight_opt g g' = Some (\<lambda>x. x - E 1 0)\<close> have "the (weight_opt g g') e = e - E 1 0" by auto
-      hence X: "the (weight_opt g g') e = E ((one e) - 1) ((two e) - 0)" by (simp add: True minus_energy_def) 
-      have "((one e) - 1) \<le> (one e) \<and> ((two e) - 0) \<le> (two e)"
-        by (metis True add.commute add.right_neutral eSuc_minus_1 eSuc_plus_1 energy.distinct(1) energy.sel(1) idiff_0_right le_iff_add order.elims(2))
-      from this X show ?thesis
-        by (metis True energy.exhaust_sel order.simps(2) order.simps(3)) 
-    next
-      case False
-      from this \<open>weight_opt g g' = Some (\<lambda>x. x - E 1 0)\<close> show ?thesis using minus_energy_def by simp 
-    qed
-  next
-    case 01
-     then show ?thesis proof (cases "order (E 0 1) e")
-      case True
-      from this \<open>weight_opt g g' = Some (\<lambda>x. x - E 0 1)\<close> have "the (weight_opt g g') e = e - E 0 1" by auto
-      hence X: "the (weight_opt g g') e = E ((one e) - 0) ((two e) - 1)" by (simp add: True minus_energy_def) 
-      have "((one e) - 0) \<le> (one e) \<and> ((two e) - 1) \<le> (two e)"
-        by (metis True add.commute add.right_neutral eSuc_minus_1 eSuc_plus_1 energy.distinct(1) energy.exhaust_sel idiff_0_right le_iff_add order.elims(2) order.simps(2))
-      from this X show ?thesis
-        by (metis True energy.exhaust_sel order.simps(2) order.simps(3)) 
-    next
-      case False
-      from this \<open>weight_opt g g' = Some (\<lambda>x. x - E 0 1)\<close> show ?thesis using minus_energy_def by simp 
-    qed
-  qed
-
   assume "order e e'"
   from Y consider (id) "weight_opt g g' = Some id" | (min) "weight_opt g g' = Some min_update" |(10) " weight_opt g g' = Some (\<lambda>x. x - (E 1 0))" | (01) " weight_opt g g' = Some (\<lambda>x. x - (E 0 1))" by auto
   then show "order (the (weight_opt g g') e) (the (weight_opt g g') e')" proof (cases)
@@ -161,6 +123,11 @@ proof
         by (simp add: minus_energy_def)
     qed
   qed
+next
+  fix g g' e
+  assume \<open>e = eneg\<close> \<open>weight_opt g g' \<noteq> None\<close>
+  thus \<open>the (weight_opt g g') e = eneg\<close>
+    by (induct g) (induct g', auto simp add: minus_energy_def min_update_def)+
 qed
 
 notation Game.moves (infix "\<Zinj>" 70)
