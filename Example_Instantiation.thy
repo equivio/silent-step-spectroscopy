@@ -182,53 +182,53 @@ subsection\<open>Checking Definitions\<close>
 text \<open>Our definition of winning budgets.\<close>
 
 lemma wina_of_e:
-  shows "Game.in_wina (E 9 8) e"
-  by (simp add: Game.in_wina.Defense)
+  shows "Game.attacker_wins (E 9 8) e"
+  by (simp add: Game.attacker_wins.Defense)
 
 lemma wina_of_e_exist:
-  shows "\<exists>e1. Game.in_wina e1 e" 
+  shows "\<exists>e1. Game.attacker_wins e1 e" 
   using wina_of_e by blast
 
 lemma attacker_wins_at_e: 
-  shows "\<forall>e'. e' \<noteq> eneg \<longrightarrow> Game.in_wina e' e"
-  by (simp add: Game.in_wina.Defense)
+  shows "\<forall>e'. e' \<noteq> eneg \<longrightarrow> Game.attacker_wins e' e"
+  by (simp add: Game.attacker_wins.Defense)
 
 lemma wina_of_d1:
-  shows "Game.in_wina (E 9 8) d1" 
+  shows "Game.attacker_wins (E 9 8) d1" 
 proof -
   have A1: "\<not>(defender d1)" by simp
   have A2: "d1 \<Zinj> e" by simp
-  have A3: "Game.in_wina (E 9 8) e" by (rule wina_of_e)
+  have A3: "Game.attacker_wins (E 9 8) e" by (rule wina_of_e)
   have "Game.weight d1 e = id"by simp
   hence "(Game.weight d1 e (E 9 8)) = E 9 8 " by simp
-  hence "(Game.in_wina (((Game.weight d1 e (E 9 8)))) e)" using A3 by simp
-  from this A3 have A4: "\<not>(defender d1) \<and> (\<exists>g'. ((d1 \<Zinj> g') \<and> (Game.in_wina (((Game.weight d1 g' (E 9 8)))) g')))"
-  by (meson A1 A2 Game.in_wina.Defense defender.simps(4) weight_opt.simps(38))
-  thus "Game.in_wina (E 9 8) d1" using Game.in_wina.Attack by blast 
+  hence "(Game.attacker_wins (((Game.weight d1 e (E 9 8)))) e)" using A3 by simp
+  from this A3 have A4: "\<not>(defender d1) \<and> (\<exists>g'. ((d1 \<Zinj> g') \<and> (Game.attacker_wins (((Game.weight d1 g' (E 9 8)))) g')))"
+  by (meson A1 A2 Game.attacker_wins.Defense defender.simps(4) weight_opt.simps(38))
+  thus "Game.attacker_wins (E 9 8) d1" using Game.attacker_wins.Attack by blast 
 qed
 
 lemma wina_of_d2:
-  shows "Game.in_wina (E 8 9) d2" 
+  shows "Game.attacker_wins (E 8 9) d2" 
 proof -
   have A1: "\<not>(defender d2)" by simp
   have A2: "d2 \<Zinj> e" by simp
-  have A3: "Game.in_wina (E 8 9) e" by (simp add: attacker_wins_at_e)
+  have A3: "Game.attacker_wins (E 8 9) e" by (simp add: attacker_wins_at_e)
   have "Game.weight d2 e = id"by simp
   hence "(Game.weight d2 e (E 8 9)) = E 8 9 " by simp
-  hence "(Game.in_wina (((Game.weight d2 e (E 8 9)))) e)" using A3 by simp
-  from this A3 have A4: "\<not>(defender d2) \<and> (\<exists>g'. ((d2 \<Zinj> g') \<and> (Game.in_wina (((Game.weight d2 g' (E 8 9)))) g')))"
-  by (meson A1 A2 Game.in_wina.Defense defender.simps(4) weight_opt.simps(38))
-  thus "Game.in_wina (E 8 9) d2" using Game.in_wina.Attack by blast 
+  hence "(Game.attacker_wins (((Game.weight d2 e (E 8 9)))) e)" using A3 by simp
+  from this A3 have A4: "\<not>(defender d2) \<and> (\<exists>g'. ((d2 \<Zinj> g') \<and> (Game.attacker_wins (((Game.weight d2 g' (E 8 9)))) g')))"
+  by (meson A1 A2 Game.attacker_wins.Defense defender.simps(4) weight_opt.simps(38))
+  thus "Game.attacker_wins (E 8 9) d2" using Game.attacker_wins.Attack by blast 
 qed
 
 lemma wina_of_c:
-  shows "Game.in_wina (E 9 9) c"
+  shows "Game.attacker_wins (E 9 9) c"
 proof -
   have A1: "defender c" by auto
   have A2: "\<forall>g'. (c \<Zinj> g') \<longrightarrow> (g' = d1 \<or> g' = d2)"
     by (metis moves(9) state.exhaust weight_opt.simps(21) weight_opt.simps(22) weight_opt.simps(23) weight_opt.simps(24))
-  have A3: "Game.in_wina (E 9 8) d1" using wina_of_d1 by blast
-  have A4: "Game.in_wina (E 8 9) d2" using wina_of_d2 by blast
+  have A3: "Game.attacker_wins (E 9 8) d1" using wina_of_d1 by blast
+  have A4: "Game.attacker_wins (E 8 9) d2" using wina_of_d2 by blast
 
   have "\<not>order (E 9 9) (E 0 1)" by simp
   hence "(E 9 9 - (E 0 1)) = E ((one (E 9 9)) - (one (E 0 1))) ((two (E 9 9)) - (two (E 0 1)))" using minus_energy_def
@@ -239,7 +239,7 @@ proof -
 
   have "(Game.weight c d1) (E 9 9) = (E 9 9) - (E 0 1)" using weight_opt.simps(5)by simp
   hence "(Game.weight c d1) (E 9 9) = E 9 8" using A5 by simp
-  hence A6: "Game.in_wina ((Game.weight c d1) (E 9 9)) d1" using A3 by simp
+  hence A6: "Game.attacker_wins ((Game.weight c d1) (E 9 9)) d1" using A3 by simp
 
     have "\<not>order (E 9 9) (E 1 0)" by simp
   hence "(E 9 9 - (E 1 0)) = E ((one (E 9 9)) - (one (E 1 0))) ((two (E 9 9)) - (two (E 1 0)))" using minus_energy_def
@@ -250,30 +250,30 @@ proof -
 
   have "(Game.weight c d2) (E 9 9) = (E 9 9) - (E 1 0)" using weight_opt.simps(6)by simp
   hence "(Game.weight c d2) (E 9 9) = E 8 9" using A7 by simp
-  hence A8: "Game.in_wina ((Game.weight c d2) (E 9 9)) d2" using A4 by simp
+  hence A8: "Game.attacker_wins ((Game.weight c d2) (E 9 9)) d2" using A4 by simp
 
-  thus "Game.in_wina (E 9 9) c" using A7 Game.in_wina.Defense energy.distinct(1) A2 A1 A6 by blast  
+  thus "Game.attacker_wins (E 9 9) c" using A7 Game.attacker_wins.Defense energy.distinct(1) A2 A1 A6 by blast  
 qed
 
 lemma not_wina_of_c:
-  shows "\<not>Game.in_wina (E 0 0) c"
+  shows "\<not>Game.attacker_wins (E 0 0) c"
 proof -
   have "order (E 0 0) (E 0 1)" by simp
   hence "((E 0 0) - (E 0 1)) = eneg" using minus_energy_def by auto
   hence "(Game.weight c d1)(E 0 0) = eneg" by simp
-  hence A1: "\<not>(Game.in_wina ((Game.weight c d1)(E 0 0)) d1)" by (metis Game.in_wina.cases)
+  hence A1: "\<not>(Game.attacker_wins ((Game.weight c d1)(E 0 0)) d1)" by (metis Game.attacker_wins.cases)
 
   have "order (E 0 0) (E 1 0)" by simp
   hence "((E 0 0) - (E 1 0)) = eneg" using minus_energy_def by auto
   hence "(Game.weight c d2)(E 0 0) = eneg" by simp
-  hence A2: "\<not>(Game.in_wina ((Game.weight c d2)(E 0 0)) d2)" by (metis Game.in_wina.cases)
+  hence A2: "\<not>(Game.attacker_wins ((Game.weight c d2)(E 0 0)) d2)" by (metis Game.attacker_wins.cases)
 
   have "\<forall>g'. (c \<Zinj> g') \<longrightarrow> (g' = d1 \<or> g' = d2)"
     by (metis moves(9) state.exhaust weight_opt.simps(21) weight_opt.simps(22) weight_opt.simps(23) weight_opt.simps(24))
-  hence "(\<forall>g'. ((c \<Zinj> g') \<longrightarrow> \<not>(Game.in_wina ((Game.weight c g') (E 0 0)) g')))" using A1 A2 by blast
-  hence "\<not>((defender c) \<and>(\<forall>g'. ((c \<Zinj> g') \<longrightarrow> (Game.in_wina ((Game.weight c g') (E 0 0)) g'))) \<and> ((E 0 0) \<noteq> eneg))"
+  hence "(\<forall>g'. ((c \<Zinj> g') \<longrightarrow> \<not>(Game.attacker_wins ((Game.weight c g') (E 0 0)) g')))" using A1 A2 by blast
+  hence "\<not>((defender c) \<and>(\<forall>g'. ((c \<Zinj> g') \<longrightarrow> (Game.attacker_wins ((Game.weight c g') (E 0 0)) g'))) \<and> ((E 0 0) \<noteq> eneg))"
     using moves(6) by blast
-  thus "\<not>Game.in_wina (E 0 0) c" using Game.in_wina.intros by (metis Game.in_wina.cases defender.simps(3))
+  thus "\<not>Game.attacker_wins (E 0 0) c" using Game.attacker_wins.intros by (metis Game.attacker_wins.cases defender.simps(3))
 qed
 
 end

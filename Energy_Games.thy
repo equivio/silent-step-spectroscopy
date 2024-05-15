@@ -63,36 +63,36 @@ with energy \<open>e\<close>. In more detail, this yields the following definiti
 \end{itemize}
 \<close>
 
-inductive in_wina:: "'energy \<Rightarrow> 'gstate \<Rightarrow> bool " where
- Attack: "in_wina e g" if \<open>Ga g\<close> \<open>g \<Zinj> g'\<close> \<open>in_wina ((weight g g') e) g'\<close> \<open>e \<noteq> defender_win_level\<close> |
- Defense: "in_wina e g" if \<open>Gd g\<close> \<open>\<forall>g'. ((g \<Zinj> g') \<longrightarrow> (in_wina ((weight g g') e) g'))\<close> \<open>e \<noteq> defender_win_level\<close>
+inductive attacker_wins:: "'energy \<Rightarrow> 'gstate \<Rightarrow> bool " where
+ Attack: "attacker_wins e g" if \<open>Ga g\<close> \<open>g \<Zinj> g'\<close> \<open>attacker_wins ((weight g g') e) g'\<close> \<open>e \<noteq> defender_win_level\<close> |
+ Defense: "attacker_wins e g" if \<open>Gd g\<close> \<open>\<forall>g'. ((g \<Zinj> g') \<longrightarrow> (attacker_wins ((weight g g') e) g'))\<close> \<open>e \<noteq> defender_win_level\<close>
 
-lemma %invisible defender_win_level_not_in_wina:
-  shows "\<forall>g. \<not>in_wina defender_win_level g" 
-  by (metis in_wina.cases)
+lemma %invisible defender_win_level_not_attacker_wins:
+  shows "\<forall>g. \<not>attacker_wins defender_win_level g" 
+  by (metis attacker_wins.cases)
 
-lemma %invisible in_wina_GaE:
-  assumes "in_wina e g" and "Ga g" 
-  shows "\<exists>g'. ((g \<Zinj> g') \<and> (in_wina ((weight g g') e) g'))"
-  using assms(1) assms(2) in_wina.simps by blast
+lemma %invisible attacker_wins_GaE:
+  assumes "attacker_wins e g" and "Ga g" 
+  shows "\<exists>g'. ((g \<Zinj> g') \<and> (attacker_wins ((weight g g') e) g'))"
+  using assms(1) assms(2) attacker_wins.simps by blast
 
-lemma %invisible in_wina_Ga:
-  assumes "in_wina (u e) g'" "g \<Zinj>wgt u g'" "Ga g"
-  shows "in_wina e g"
-  using assms in_wina.simps by (metis antisim dwl_min update_gets_smaller)
+lemma %invisible attacker_wins_Ga:
+  assumes "attacker_wins (u e) g'" "g \<Zinj>wgt u g'" "Ga g"
+  shows "attacker_wins e g"
+  using assms attacker_wins.simps by (metis antisim dwl_min update_gets_smaller)
 
-lemma %invisible in_wina_Ga_with_id_step:
-  assumes "in_wina e g'" "g \<Zinj>wgt id g'" "Ga g"
-  shows "in_wina e g"
-  using assms by (metis id_apply in_wina.simps)
+lemma %invisible attacker_wins_Ga_with_id_step:
+  assumes "attacker_wins e g'" "g \<Zinj>wgt id g'" "Ga g"
+  shows "attacker_wins e g"
+  using assms by (metis id_apply attacker_wins.simps)
 
-lemma %invisible in_wina_Gd:
+lemma %invisible attacker_wins_Gd:
   fixes update
   assumes "Gd g"
   "e \<noteq> defender_win_level"
   "\<And>g'. g \<Zinj> g' \<Longrightarrow>  weight g g' = update"
-  "\<And>g'. g \<Zinj> g' \<Longrightarrow> in_wina (update e) g'"
-shows "in_wina e g" using assms in_wina.intros(2) by blast
+  "\<And>g'. g \<Zinj> g' \<Longrightarrow> attacker_wins (update e) g'"
+shows "attacker_wins e g" using assms attacker_wins.intros(2) by blast
 
 text\<open>If from a certain starting position \<open>g\<close> a game is won by the attacker with some energy \<open>e\<close> (i.e.
 \<open>e\<close> is in the winning budget of \<open>g\<close>), then the game is also won by the attacker with more energy. 
@@ -100,18 +100,18 @@ This is proven using the inductive definition of winning budgets and the given p
 
 lemma win_a_upwards_closure: 
   assumes
-    "in_wina e g"
+    "attacker_wins e g"
     "ord e e'"
   shows
-    "in_wina e' g"
-using assms proof (induct arbitrary: e' rule: in_wina.induct)
+    "attacker_wins e' g"
+using assms proof (induct arbitrary: e' rule: attacker_wins.induct)
   case (Attack g g' e)
   then show ?case
-    using antisim dwl_min in_wina.intros(1) monotonicity by blast 
+    using antisim dwl_min attacker_wins.intros(1) monotonicity by blast 
 next
   case (Defense g e)
   then show ?case
-    using antisim dwl_min in_wina.intros(2) monotonicity by blast 
+    using antisim dwl_min attacker_wins.intros(2) monotonicity by blast 
 qed
 
 end (*End of context energy_game*)
