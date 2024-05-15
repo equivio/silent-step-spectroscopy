@@ -27,9 +27,7 @@ locale energy_game =
         defender :: "'gstate \<Rightarrow> bool" ("Gd") and 
         defender_win_level :: "'energy" and
         ord::"'energy \<Rightarrow> 'energy \<Rightarrow> bool"
-  assumes transitivity: "\<And>e e' e''. (ord e e') \<Longrightarrow> (ord e' e'') \<Longrightarrow> (ord e e'')" and
-          reflexivity: "\<And>e. (ord e e)" and
-          antisim: "\<And>e e'. (ord e e') \<Longrightarrow> (ord e' e) \<Longrightarrow> e=e'" and
+  assumes antisim: "\<And>e e'. (ord e e') \<Longrightarrow> (ord e' e) \<Longrightarrow> e=e'" and
           dwl_min: "\<And>e. ord defender_win_level e" and 
           monotonicity:"\<And>g g' e e'. (weight_opt g g') \<noteq> None \<Longrightarrow> (ord e e')  \<Longrightarrow> (ord (the (weight_opt g g')e) (the (weight_opt g g')e'))" and
           update_gets_smaller: "\<And>g g' e. ((weight_opt g g') \<noteq> None) \<Longrightarrow> (ord (the (weight_opt g g')e) e)"
@@ -92,7 +90,7 @@ lemma %invisible attacker_wins_Gd:
   "e \<noteq> defender_win_level"
   "\<And>g'. g \<Zinj> g' \<Longrightarrow>  weight g g' = update"
   "\<And>g'. g \<Zinj> g' \<Longrightarrow> attacker_wins (update e) g'"
-shows "attacker_wins e g" using assms attacker_wins.intros(2) by blast
+shows "attacker_wins e g" using assms attacker_wins.Defense by blast
 
 text\<open>If from a certain starting position \<open>g\<close> a game is won by the attacker with some energy \<open>e\<close> (i.e.
 \<open>e\<close> is in the winning budget of \<open>g\<close>), then the game is also won by the attacker with more energy. 
@@ -107,11 +105,11 @@ lemma win_a_upwards_closure:
 using assms proof (induct arbitrary: e' rule: attacker_wins.induct)
   case (Attack g g' e)
   then show ?case
-    using antisim dwl_min attacker_wins.intros(1) monotonicity by blast 
+    using attacker_wins.Attack antisim dwl_min monotonicity by blast
 next
   case (Defense g e)
   then show ?case
-    using antisim dwl_min attacker_wins.intros(2) monotonicity by blast 
+    using attacker_wins.Defense antisim dwl_min monotonicity by blast
 qed
 
 end (*End of context energy_game*)

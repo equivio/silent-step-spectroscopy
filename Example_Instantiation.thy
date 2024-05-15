@@ -65,10 +65,6 @@ text\<open>Now, we can state our energy game example.\<close>
 interpretation Game: energy_game "weight_opt" "defender" "eneg" "order" 
 proof
   fix g g' e e' e''
-  show "order e e' \<Longrightarrow> order e' e'' \<Longrightarrow> order e e''"
-    by (smt (verit) dual_order.trans energy.discI energy.inject order.elims(1))
-  show "order e e"
-    using order.elims(3) by blast
   show "order e e' \<Longrightarrow> order e' e \<Longrightarrow> e = e'"
     by (smt (verit) antisym energy.distinct(1) energy.inject order.elims(1))
   show "order eneg e" by simp 
@@ -81,7 +77,7 @@ proof
   thus "order (the (weight_opt g g') e) e" proof (cases)
     case id
     then show ?thesis
-      by (simp add: \<open>order e e\<close>) 
+      using order.elims(3) by fastforce
   next
     case min
     then show ?thesis

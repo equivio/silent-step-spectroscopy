@@ -295,7 +295,7 @@ proof(induction rule: attacker_wins.induct)
           using g'_att_del \<open>Q' = Q\<close> \<open>p \<noteq> p'\<close> \<open>p \<mapsto> \<tau> p'\<close>
           by simp
         have "(attacker_wins (id e) (Attacker_Delayed p' Q'))"
-          using g'_att_del \<open>Q' = Q\<close> \<open>p \<noteq> p'\<close> \<open>p \<mapsto> \<tau> p'\<close> Attack \<open>g = Attacker_Delayed p Q\<close> id_apply attacker_wins.intros(2)
+          using g'_att_del \<open>Q' = Q\<close> \<open>p \<noteq> p'\<close> \<open>p \<mapsto> \<tau> p'\<close> Attack \<open>g = Attacker_Delayed p Q\<close> id_apply attacker_wins.Defense
           using \<open>weight (Attacker_Delayed p Q) g' e = id e\<close> move by presburger
 
         have "(weight g g' e) = e"
@@ -335,7 +335,7 @@ proof(induction rule: attacker_wins.induct)
       hence "(the (spectroscopy_moves (Attacker_Delayed p Q) (Attacker_Immediate p' Q')) e) = (e - (E 1 0 0 0 0 0 0 0))"
         by fastforce
       hence "(attacker_wins (e - (E 1 0 0 0 0 0 0 0)) (Attacker_Immediate p' Q'))"
-        using g'_att_imm \<open>p \<mapsto>a \<alpha> p'\<close> \<open>Q \<mapsto>aS \<alpha> Q'\<close> Attack \<open>g = Attacker_Delayed p Q\<close> id_apply attacker_wins.intros(2) move
+        using g'_att_imm \<open>p \<mapsto>a \<alpha> p'\<close> \<open>Q \<mapsto>aS \<alpha> Q'\<close> Attack \<open>g = Attacker_Delayed p Q\<close> id_apply attacker_wins.Defense move
         by presburger
 
       have "(weight g g' e) = (e - (E 1 0 0 0 0 0 0 0))"

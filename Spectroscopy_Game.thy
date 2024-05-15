@@ -326,8 +326,6 @@ qed
 interpretation Game: energy_game "spectroscopy_moves" "spectroscopy_defender" "eneg" "less_eq" 
 proof 
   fix e e' e''::energy
-  show "e \<le> e' \<Longrightarrow> e' \<le> e'' \<Longrightarrow> e \<le> e''" unfolding less_eq_energy_def by (smt (z3) energy.case_eq_if order_trans)
-  show "e \<le> e" unfolding less_eq_energy_def by (simp add: energy.case_eq_if)
   show "e \<le> e' \<Longrightarrow> e' \<le> e \<Longrightarrow> e = e'" unfolding less_eq_energy_def
     by (smt (z3) energy.case_eq_if energy.expand nle_le)
   show "eneg \<le> e" using eneg_leq .
