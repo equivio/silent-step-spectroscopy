@@ -15,7 +15,7 @@ Through our later given definition of energies as a data type, we obtain certain
 properties that we enforce for all energy games. We therefore assume that an energy game 
 has a partial order on energies such that all updates are monotonic and have sink where the defender wins.\<close>
 
-type_synonym 'energy update = "'energy \<Rightarrow> 'energy"
+type_synonym 'energy update = "'energy \<Rightarrow> 'energy option"
 
 text\<open>An energy game is played by two players on a directed graph labelled by energy updates. 
 These updates represent the costs of choosing a certain move.
@@ -26,13 +26,13 @@ locale energy_game =
 fixes
   weight_opt :: "'gstate \<Rightarrow> 'gstate \<Rightarrow> 'energy update option" and
   defender :: "'gstate \<Rightarrow> bool" ("Gd") and
-  defender_win_level :: "'energy" and
   ord::"'energy \<Rightarrow> 'energy \<Rightarrow> bool"
 assumes
   antisim: "\<And>e e'. (ord e e') \<Longrightarrow> (ord e' e) \<Longrightarrow> e = e'" and
-  dwl_min: "\<And>e. ord defender_win_level e" and
-  monotonicity:"\<And>g g' e e'. weight_opt g g' \<noteq> None \<Longrightarrow> ord e e' \<Longrightarrow> ord (the (weight_opt g g') e) (the (weight_opt g g') e')" and
-  defender_win_final: "\<And>g g' e. e = defender_win_level \<Longrightarrow> weight_opt g g' \<noteq> None \<Longrightarrow> the (weight_opt g g') e = defender_win_level"
+  monotonicity:"\<And>g g' e e' eu eu'.
+    weight_opt g g' \<noteq> None \<Longrightarrow> the (weight_opt g g') e = Some eu \<Longrightarrow> the (weight_opt g g') e' = Some eu'
+    \<Longrightarrow> ord e e' \<Longrightarrow> ord eu eu'" and
+  defender_win_min: \<open>\<And>g g' e e'. ord e e' \<Longrightarrow> weight_opt g g' \<noteq> None \<Longrightarrow> the (weight_opt g g') e' = None \<Longrightarrow> the (weight_opt g g') e = None\<close>
 begin
 
 text\<open>In the following, we introduce some abbreviations for attacker positions and moves.\<close>
@@ -64,35 +64,30 @@ with energy \<open>e\<close>. In more detail, this yields the following definiti
 \<close>
 
 inductive attacker_wins:: "'energy \<Rightarrow> 'gstate \<Rightarrow> bool " where
- Attack: "attacker_wins e g" if \<open>Ga g\<close> \<open>g \<Zinj> g'\<close> \<open>attacker_wins ((weight g g') e) g'\<close> \<open>e \<noteq> defender_win_level\<close> |
- Defense: "attacker_wins e g" if \<open>Gd g\<close> \<open>\<forall>g'. ((g \<Zinj> g') \<longrightarrow> (attacker_wins ((weight g g') e) g'))\<close> \<open>e \<noteq> defender_win_level\<close>
-
-lemma %invisible defender_win_level_not_attacker_wins:
-  shows "\<forall>g. \<not>attacker_wins defender_win_level g" 
-  by (metis attacker_wins.cases)
+ Attack: "attacker_wins e g" if \<open>Ga g\<close> \<open>g \<Zinj> g'\<close> \<open>weight g g' e = Some e'\<close> \<open>attacker_wins e' g'\<close> |
+ Defense: "attacker_wins e g" if \<open>Gd g\<close> \<open>\<forall>g'. (g \<Zinj> g') \<longrightarrow> (\<exists>e'. weight g g' e = Some e' \<and> attacker_wins e' g')\<close>
 
 lemma %invisible attacker_wins_GaE:
   assumes "attacker_wins e g" and "Ga g" 
-  shows "\<exists>g'. ((g \<Zinj> g') \<and> (attacker_wins ((weight g g') e) g'))"
-  using assms(1) assms(2) attacker_wins.simps by blast
+  shows "\<exists>g'. ((g \<Zinj> g') \<and> (attacker_wins (the (weight g g' e)) g'))"
+  using assms attacker_wins.simps option.sel by metis
 
 lemma %invisible attacker_wins_Ga:
-  assumes "attacker_wins (u e) g'" "g \<Zinj>wgt u g'" "Ga g"
+  assumes "u e = Some e'" "attacker_wins e' g'" "g \<Zinj>wgt u g'" "Ga g"
   shows "attacker_wins e g"
-  using assms attacker_wins.simps defender_win_final by metis
+  using assms attacker_wins.simps by blast
 
 lemma %invisible attacker_wins_Ga_with_id_step:
-  assumes "attacker_wins e g'" "g \<Zinj>wgt id g'" "Ga g"
+  assumes "attacker_wins e g'" "g \<Zinj>wgt Some g'" "Ga g"
   shows "attacker_wins e g"
-  using assms by (metis id_apply attacker_wins.simps)
+  using assms by (metis attacker_wins.simps)
 
 lemma %invisible attacker_wins_Gd:
   fixes update
   assumes "Gd g"
-  "e \<noteq> defender_win_level"
-  "\<And>g'. g \<Zinj> g' \<Longrightarrow>  weight g g' = update"
-  "\<And>g'. g \<Zinj> g' \<Longrightarrow> attacker_wins (update e) g'"
-shows "attacker_wins e g" using assms attacker_wins.Defense by blast
+  "\<And>g'. g \<Zinj> g' \<Longrightarrow> weight g g' = update"
+  "\<And>g'. g \<Zinj> g' \<Longrightarrow> \<exists>e'. update e = Some e' \<and> attacker_wins e' g'"
+shows "attacker_wins e g" using assms attacker_wins.Defense by metis
 
 text\<open>If from a certain starting position \<open>g\<close> a game is won by the attacker with some energy \<open>e\<close> (i.e.
 \<open>e\<close> is in the winning budget of \<open>g\<close>), then the game is also won by the attacker with more energy. 
@@ -105,14 +100,15 @@ lemma win_a_upwards_closure:
   shows
     "attacker_wins e' g"
 using assms proof (induct arbitrary: e' rule: attacker_wins.induct)
-  case (Attack g g' e)
+  case (Attack g g' e eu e')
+  with defender_win_min obtain eu' where \<open>weight g g' e' = Some eu'\<close> by fastforce
   then show ?case
-    using attacker_wins.Attack monotonicity
-    by (meson attacker_wins_Ga)
+    using Attack monotonicity attacker_wins_Ga by blast
 next
   case (Defense g e)
+  with defender_win_min have \<open>\<forall>g'. g \<Zinj> g' \<longrightarrow> (\<exists>eu'. weight g g' e' = Some eu')\<close> by fastforce
   then show ?case
-    using attacker_wins.Defense monotonicity antisim dwl_min by blast
+    using Defense attacker_wins.Defense monotonicity by meson
 qed
 
 end (*End of context energy_game*)
