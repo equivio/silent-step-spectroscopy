@@ -168,7 +168,6 @@ proof
 qed
 
 notation Game.moves (infix "\<Zinj>" 70)
-abbreviation "finite_play \<equiv> Game.finite_play"
 
 lemma moves:
   shows "a \<Zinj> b1" "a \<Zinj> b2"
@@ -180,119 +179,7 @@ lemma moves:
 
 subsection\<open>Checking Definitions\<close>
 
-text\<open>Now, we check our definition of finite plays with two examples: One that is a finite play and one that is not.
-Afterwards, we check the 'behaviour' of our definition when changing the starting position.\<close>
-lemma finite_play_example:
-  shows "finite_play a [a, b2, c, d1, e]"
-proof-
-  have "finite_play a [a]" by (rule Game.finite_play.intros(1))
-  hence "finite_play a [a, b2]" using Game.finite_play.intros(2) by fastforce
-  hence "finite_play a [a, b2, c]" using Game.finite_play.intros(2) by fastforce
-  hence "finite_play a [a, b2, c, d1]" using Game.finite_play.intros(2) by fastforce
-  thus "finite_play a [a, b2, c, d1, e]" using  Game.finite_play.intros(2) by fastforce
-qed
-
-lemma finite_play_counterexample:
-  shows "\<not>finite_play a [a, b2, e, d1, e]"
-  using Game.finite_play.intros Game.finite_play_is_path
-  by (metis append_Cons append_Nil last_snoc list.distinct(1) weight_opt.simps(20)) 
-
-lemma finite_play_check:
-  shows "\<not>finite_play b2 [a, b2, c, d1, e]"
-  by (metis Game.finite_play.cases Game.finite_play_prefix append.left_neutral append_Cons last_ConsL last_appendR not_Cons_self2 state.distinct(3) weight_opt.simps(39))
-
-lemma finite_play_check_2:
-  assumes "x\<noteq>a"
-  shows "\<not>finite_play x [a, b2, c, d1, e]" 
-proof (rule notI)
-  assume A1: "finite_play x [a, b2, c, d1, e]"
-  from A1 have A2: "finite_play x ([a] @ [b2, c, d1, e])"
-    by simp
-  from A2 have A3: "\<not>finite_play x ([a] @ [b2, c, d1, e])"
-    by (metis Game.finite_play.cases Game.finite_play_prefix append1_eq_conv append_Nil assms neq_Nil_conv weight_opt.simps(39)) 
-  from A1 A3 show "False" by simp
-qed
-
-text \<open>To check our calculation of energy levels we look at different plays and their energy levels using the following lemmas.\<close>
-
-abbreviation "energy_level \<equiv> Game.energy_level"
-
-lemma energy_level_example:
-  shows "energy_level a (E 10 10) [a, b2, c, d1, e] = E 9 8"
-proof-
-  have "energy_level a (E 10 10) [a, b2, c, d1, e] =id ((min_update (E 10 10 - E 0 1)) - E 0 1)" by simp
-  also have "... = id ((min_update (E 10 9)) - E 0 1)" by (simp add: numeral_eq_enat one_enat_def)
-  also have "... = id (E 9 9 - E 0 1)" by simp
-  also have "... = id (E 9 8)" by (simp add: numeral_eq_enat one_enat_def)
-  also have "... = E 9 8" by simp
-  finally show ?thesis .
-qed
-
-lemma energy_level_example_1:
-  shows "energy_level a (E 10 10) [a, b2, c] = E 9 9"
-proof-
-  have "energy_level a (E 10 10) [a, b2, c] = min_update (E 10 10 - E 0 1)" by simp
-  also have "... = E 9 9" by (simp add: numeral_eq_enat one_enat_def)
-  finally show "energy_level a (E 10 10) [a, b2, c] = E 9 9".
-qed
-
-lemma energy_level_example_2:
-  shows "energy_level a (E 10 10) [a, b2, d1] = undefined"
-  using Game.energy_level.elims Game.energy_level.pelims by simp
-
-lemma energy_level_example_3:
-  shows "energy_level a (E 10 10) [a, b2, b1] = undefined"
-  using Game.energy_level.elims Game.energy_level.pelims by simp
-
-lemma energy_level_example_4:
-  shows "energy_level a (E 10 10) [c] = undefined"
-  using Game.energy_level.elims Game.energy_level.pelims by simp
-
-text \<open>We also take a look at our definition of \<open>no_move\<close> using different examples of plays.
-In particular, we check our definition regarding invalid plays.\<close>
-
-lemma no_move_example:
-  shows "Game.no_move a [a, b2, c, d1, e]"
-  by (metis Game.finite_play_is_path Game.finite_play_suffix2 finite_play_example append_Cons append_Nil last_ConsL list.distinct(1) weight_opt.simps(38))
- 
-lemma no_move_example2:
-  shows "\<not>(Game.no_move a [a, b2, c])"
-proof (-) 
-  have "finite_play a ([a, b2, c] @ [d1])"
-    by (metis Game.finite_play_suffix finite_play_example append_Cons append_Nil list.distinct(1))
-  thus "\<not>(Game.no_move a [a, b2, c])" by auto
-qed
-lemma no_move_invalid_game: 
-  shows "\<not>(Game.no_move a [a, b2, d1])"
-  by (smt (verit, best) Game.finite_play.simps butlast.simps(2) butlast_snoc distinct_adj_Cons distinct_adj_Cons_Cons last.simps last_snoc weight_opt.simps(18))
-
-lemma no_move_invalid_game_1: 
-  shows "\<not>Game.no_move a [a, b2, b1]"
-  by (metis Game.finite_play.cases butlast.simps(2) butlast_snoc last.simps last_snoc list.discI weight_opt.simps(16))
-
-text \<open>In the following, we look at examples of plays and check who wins.\<close>
-
-lemma attacker_wins_example:
-  shows "Game.won_by_attacker a (E 10 10) [a, b2, c, d1, e]"
-  using no_move_example energy_level_example
-  by (simp add: Game.won_by_attacker_def)
-
-lemma no_winner_example: 
-  shows "Game.no_winner a (E 10 10) [a, b2, c]"
-  using no_move_example2 energy_level_example_1 by simp
-
-lemma attacker_turn_no_move:
-  assumes "finite_play a p" and "Game.is_attacker_turn p"
-  shows "\<not>Game.no_move a p"
-using assms proof - 
-  from assms have "last p = a \<or> last p = d1 \<or> last p = d2"
-    using defender.elims(3) by blast
-  hence "(last p)\<Zinj> b1 \<or> (last p) \<Zinj> e" by auto
-  hence "(\<exists>gn. finite_play a (p @ [gn]))" using assms(1) Game.finite_play.intros(2) by blast 
-  thus "\<not>Game.no_move a p" by simp
-qed
-
-text \<open>Finally, we verify our definition of winning budgets.\<close>
+text \<open>Our definition of winning budgets.\<close>
 
 lemma wina_of_e:
   shows "Game.in_wina (E 9 8) e"
