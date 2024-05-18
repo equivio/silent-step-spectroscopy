@@ -64,8 +64,10 @@ with energy \<open>e\<close>. In more detail, this yields the following definiti
 \<close>
 
 inductive attacker_wins:: "'energy \<Rightarrow> 'gstate \<Rightarrow> bool " where
- Attack: "attacker_wins e g" if \<open>Ga g\<close> \<open>g \<Zinj> g'\<close> \<open>weight g g' e = Some e'\<close> \<open>attacker_wins e' g'\<close> |
- Defense: "attacker_wins e g" if \<open>Gd g\<close> \<open>\<forall>g'. (g \<Zinj> g') \<longrightarrow> (\<exists>e'. weight g g' e = Some e' \<and> attacker_wins e' g')\<close>
+  Attack: "attacker_wins e g" if
+    \<open>Ga g\<close> \<open>g \<Zinj> g'\<close> \<open>weight g g' e = Some e'\<close> \<open>attacker_wins e' g'\<close> |
+  Defense: "attacker_wins e g" if
+    \<open>Gd g\<close> \<open>\<forall>g'. (g \<Zinj> g') \<longrightarrow> (\<exists>e'. weight g g' e = Some e' \<and> attacker_wins e' g')\<close>
 
 lemma %invisible attacker_wins_GaE:
   assumes "attacker_wins e g" and "Ga g" 

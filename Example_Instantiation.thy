@@ -11,29 +11,52 @@ text \<open>We first define energies in a similar manner to our definition of en
 We use \<open>eneg\<close> when the energy level is equal to or lower than the \<open>defender_win_level\<close>. We define 
 component-wise subtraction and the update \<open>min_update\<close> where the first component is replaced by the minimum of both entries.\<close>
 
-datatype energy = E (one: "enat") (two: "enat") | eneg
+datatype energy = E (one: "enat") (two: "enat")
 
-instantiation energy :: minus
-begin
 abbreviation "direct_minus e1 e2 \<equiv> E ((one e1) - (one e2)) ((two e1) - (two e2))"
 
-fun order:: "energy \<Rightarrow> energy \<Rightarrow> bool" where 
-  "order eneg _ = True" |
-  "order (E e1 e2) (E e1' e2') = (e1 \<le> e1' \<and> e2 \<le> e2')" |
-  "order _ _ = False"
 
-definition minus_energy_def: "e1 - e2 \<equiv> if (\<not> order e2 e1) then eneg
-                                             else direct_minus e1 e2"
-instance ..
-lemma energy_minus[simp]:
-  assumes "(order (E c d) (E a b))"
-  shows "E a b - E c d = E (a - c) (b - d)" using assms minus_energy_def by auto
+instantiation energy :: order
+begin
+
+fun less_eq_energy:: "energy \<Rightarrow> energy \<Rightarrow> bool" where 
+  "less_eq_energy (E ea1 ea2) (E eb1 eb2) = (ea1 \<le> eb1 \<and> ea2 \<le> eb2)"
+
+fun less_energy:: "energy \<Rightarrow> energy \<Rightarrow> bool" where 
+  "less_energy eA eB = (eA \<le> eB \<and> \<not> eB \<le> eA)"
+
+instance proof standard
+  fix eA eB :: energy
+  show \<open>(eA < eB) = (eA \<le> eB \<and> \<not> eB \<le> eA)\<close> by auto
+next
+  fix e :: energy
+  show \<open>e \<le> e\<close> 
+    using less_eq_energy.elims(3) by fastforce
+next
+  fix eA eB eC:: energy
+  assume \<open>eA \<le> eB\<close> \<open>eB \<le> eC\<close>
+  thus \<open>eA \<le> eC\<close>
+    by (smt (verit, del_insts) energy.inject less_eq_energy.elims order.trans)
+next
+  fix eA eB :: energy
+  assume \<open>eA \<le> eB\<close> \<open>eB \<le> eA\<close>
+  thus \<open>eA = eB\<close>
+    using less_eq_energy.elims(2) by fastforce
+qed
 end
 
-definition "min_update e1 \<equiv> if (e1 = eneg) then eneg else  E (min (one e1) (two e1)) (two e1)" 
+fun order_opt:: "energy option \<Rightarrow> energy option \<Rightarrow> bool" where 
+  "order_opt (Some eA) (Some eB) = (eA \<le> eB)" |
+  "order_opt None _ = True" |
+  "order_opt (Some eA) None = False"
 
-lemma min_update[simp]:
-  shows "min_update (E a b) = E (min a b) b" unfolding min_update_def using energy.sel by fastforce
+definition minus_energy_def: "minus_energy e1 e2 \<equiv> if (\<not>e2 \<le> e1) then None
+                                             else Some (direct_minus e1 e2)"
+lemma energy_minus[simp]:
+  assumes "E c d \<le> E a b"
+  shows "minus_energy (E a b) (E c d) = Some (E (a - c) (b - d))" using assms minus_energy_def by auto
+
+definition min_update_def[simp]: "min_update e1 \<equiv> Some (E (min (one e1) (two e1)) (two e1))"
 
 subsection\<open>Energy Game Example\<close>
 
@@ -41,14 +64,14 @@ text \<open>In preparation for our instantiation, we define our states, the upda
 datatype state = a | b1 | b2 | c | d1 | d2 | e
 
 fun weight_opt :: "state \<Rightarrow> state \<Rightarrow> energy update option" where
-  "weight_opt a b1 = Some (\<lambda>x. x - (E 1 0))" |
-  "weight_opt a b2 = Some (\<lambda>x. x - (E 0 1))" |
-  "weight_opt b1 c = Some id" |
+  "weight_opt a b1 = Some (\<lambda>x. minus_energy x (E 1 0))" |
+  "weight_opt a b2 = Some (\<lambda>x. minus_energy x (E 0 1))" |
+  "weight_opt b1 c = Some Some" |
   "weight_opt b2 c = Some min_update" |
-  "weight_opt c d1 = Some (\<lambda>x. x - (E 0 1))" |
-  "weight_opt c d2 = Some (\<lambda>x. x - (E 1 0))" |
-  "weight_opt d1 e = Some id" |
-  "weight_opt d2 e = Some id" |
+  "weight_opt c d1 = Some (\<lambda>x. minus_energy x (E 0 1))" |
+  "weight_opt c d2 = Some (\<lambda>x. minus_energy x (E 1 0))" |
+  "weight_opt d1 e = Some Some" |
+  "weight_opt d2 e = Some Some" |
   "weight_opt _ _ = None"
 
 find_theorems weight_opt
@@ -62,72 +85,47 @@ fun defender :: "state \<Rightarrow> bool" where
 
 text\<open>Now, we can state our energy game example.\<close>
 
-interpretation Game: energy_game "weight_opt" "defender" "eneg" "order" 
+interpretation Game: energy_game "weight_opt" "defender" "(\<le>)" 
 proof
-  fix g g' e e' e''
-  show "order e e' \<Longrightarrow> order e' e \<Longrightarrow> e = e'"
-    by (smt (verit) antisym energy.distinct(1) energy.inject order.elims(1))
-  show "order eneg e" by simp 
+  fix g g' and e e' eu eu' :: energy
+  show "e \<le> e' \<Longrightarrow> e' \<le> e \<Longrightarrow> e = e'" by auto
 
-  assume "weight_opt g g' \<noteq> None"
-  hence Y: "weight_opt g g' = Some id \<or> weight_opt g g' = Some min_update \<or> weight_opt g g' = Some (\<lambda>x. x - (E 1 0)) \<or> weight_opt g g' = Some (\<lambda>x. x - (E 0 1))"
+  assume case_assms: "e \<le> e'"
+   "the (weight_opt g g') e = Some eu" "the (weight_opt g g') e' = Some eu'"
+   "weight_opt g g' \<noteq> None"
+  hence Y: "weight_opt g g' = Some Some \<or> weight_opt g g' = Some min_update \<or> weight_opt g g' = Some (\<lambda>x. minus_energy x (E 1 0)) \<or> weight_opt g g' = Some (\<lambda>x. minus_energy x (E 0 1))"
     using weight_opt.simps by (smt (verit, del_insts) defender.cases) 
-  then consider (id) "weight_opt g g' = Some id" | (min) "weight_opt g g' = Some min_update" |(10) " weight_opt g g' = Some (\<lambda>x. x - (E 1 0))" | (01) " weight_opt g g' = Some (\<lambda>x. x - (E 0 1))" by auto
+  then consider (id) "weight_opt g g' = Some Some" | (min) "weight_opt g g' = Some min_update" |(10) " weight_opt g g' = Some (\<lambda>x. minus_energy x (E 1 0))" | (01) " weight_opt g g' = Some (\<lambda>x. minus_energy x (E 0 1))" by auto
 
-  assume "order e e'"
-  from Y consider (id) "weight_opt g g' = Some id" | (min) "weight_opt g g' = Some min_update" |(10) " weight_opt g g' = Some (\<lambda>x. x - (E 1 0))" | (01) " weight_opt g g' = Some (\<lambda>x. x - (E 0 1))" by auto
-  then show "order (the (weight_opt g g') e) (the (weight_opt g g') e')" proof (cases)
+  (*from Y consider (id) "weight_opt g g' = Some Some" | (min) "weight_opt g g' = Some min_update" |(10) " weight_opt g g' = Some (\<lambda>x. minus_energy x (E 1 0))" | (01) " weight_opt g g' = Some (\<lambda>x. minus_energy x (E 0 1))" by auto*)
+  then show "eu \<le> eu'"
+  proof (cases)
     case id
-    then show ?thesis using \<open>order e e'\<close> by auto
+    then show ?thesis
+      using case_assms by auto 
   next
     case min
-    then show ?thesis proof (cases "e =eneg")
-      case True
-      then show ?thesis using \<open>order e e'\<close> min
-        by (simp add: min_update_def)
-    next
-      case False
-      then show ?thesis using \<open>order e e'\<close> min
-        by (smt (verit) energy.sel(1) energy.sel(2) min.mono min_update_def option.sel order.elims(2) order.elims(3) order.simps(1) order.simps(3))
-    qed 
+    hence \<open>min_update e = Some eu\<close> \<open>min_update e' = Some eu'\<close> using case_assms by auto 
+    then show ?thesis
+      using case_assms(1) by (cases e, cases e', auto simp add: min_le_iff_disj)
   next
     case 10
-    then show ?thesis proof (cases "order (E 1 0) e")
-      case True
-      hence E: "the (weight_opt g g') e = E ((one e) - 1) ((two e) - 0)" using 10
-        by (simp add: minus_energy_def)
-      from True 10 have E': "the (weight_opt g g') e' = E ((one e') - 1) ((two e') - 0)" using \<open>order e e'\<close>
-        by (smt (verit) energy.sel(1) energy.sel(2) minus_energy_def option.sel order.elims(2) order.simps(2) order.simps(3) order.trans) 
-      have "order  (E ((one e) - 1) ((two e) - 0)) (E ((one e') - 1) ((two e') - 0))" using True \<open>order e e'\<close>
-        by (metis add.commute add_diff_assoc_enat energy.distinct(1) energy.exhaust energy.sel(1) energy.sel(2) idiff_0_right le_iff_add order.elims(2) order.simps(2))
-      thus ?thesis using E E' by simp
-    next
-      case False
-      then show ?thesis using 10 \<open>order e e'\<close>
-        by (simp add: minus_energy_def)
-    qed
+    hence \<open>minus_energy e (E 1 0) = Some eu\<close> \<open>minus_energy e' (E 1 0) = Some eu'\<close> using case_assms by auto 
+    then show ?thesis  using case_assms(1) unfolding minus_energy_def
+      by (cases e, cases e', auto,
+         metis add.commute add_diff_assoc_enat energy.sel idiff_0_right le_iff_add less_eq_energy.simps option.distinct(1) option.inject)
   next
     case 01
-    then show ?thesis proof (cases "order (E 0 1) e")
-      case True
-      hence E: "the (weight_opt g g') e = E ((one e) - 0) ((two e) - 1)" using 01
-        by (simp add: minus_energy_def)
-      from True 01 have E': "the (weight_opt g g') e' = E ((one e') - 0) ((two e') - 1)" using \<open>order e e'\<close>
-        by (smt (verit) energy.sel(1) energy.sel(2) minus_energy_def option.sel order.elims(2) order.simps(2) order.simps(3) order.trans) 
-      have "order  (E ((one e) - 0) ((two e) - 1)) (E ((one e') - 0) ((two e') - 1))" using True \<open>order e e'\<close>
-        by (metis add.commute add_diff_assoc_enat energy.distinct(1) energy.exhaust energy.sel(1) energy.sel(2) idiff_0_right le_iff_add order.elims(2) order.simps(2))
-      thus ?thesis using E E' by simp
-    next
-      case False
-      then show ?thesis using 01 \<open>order e e'\<close>
-        by (simp add: minus_energy_def)
-    qed
+    hence \<open>minus_energy e (E 0 1) = Some eu\<close> \<open>minus_energy e' (E 0 1) = Some eu'\<close> using case_assms by auto 
+    then show ?thesis  using case_assms(1) unfolding minus_energy_def
+      by (cases e, cases e', auto,
+         metis add.commute add_diff_assoc_enat energy.sel idiff_0_right le_iff_add less_eq_energy.simps option.distinct(1) option.inject)
   qed
 next
-  fix g g' e
-  assume \<open>e = eneg\<close> \<open>weight_opt g g' \<noteq> None\<close>
-  thus \<open>the (weight_opt g g') e = eneg\<close>
-    by (induct g) (induct g', auto simp add: minus_energy_def min_update_def)+
+  fix g g' e e'
+  assume \<open>e \<le> e'\<close> \<open>weight_opt g g' \<noteq> None\<close> \<open>the (weight_opt g g') e' = None\<close>
+  thus \<open>the (weight_opt g g') e = None\<close>
+    by (induct g) (induct g', auto simp add: minus_energy_def order.trans)+
 qed
 
 notation Game.moves (infix "\<Zinj>" 70)
@@ -153,7 +151,7 @@ lemma wina_of_e_exist:
   using wina_of_e by blast
 
 lemma attacker_wins_at_e: 
-  shows "\<forall>e'. e' \<noteq> eneg \<longrightarrow> Game.attacker_wins e' e"
+  shows "\<forall>e'. Game.attacker_wins e' e"
   by (simp add: Game.attacker_wins.Defense)
 
 lemma wina_of_d1:
@@ -162,12 +160,12 @@ proof -
   have A1: "\<not>(defender d1)" by simp
   have A2: "d1 \<Zinj> e" by simp
   have A3: "Game.attacker_wins (E 9 8) e" by (rule wina_of_e)
-  have "Game.weight d1 e = id"by simp
-  hence "(Game.weight d1 e (E 9 8)) = E 9 8 " by simp
-  hence "(Game.attacker_wins (((Game.weight d1 e (E 9 8)))) e)" using A3 by simp
-  from this A3 have A4: "\<not>(defender d1) \<and> (\<exists>g'. ((d1 \<Zinj> g') \<and> (Game.attacker_wins (((Game.weight d1 g' (E 9 8)))) g')))"
-  by (meson A1 A2 Game.attacker_wins.Defense defender.simps(4) weight_opt.simps(38))
-  thus "Game.attacker_wins (E 9 8) d1" using Game.attacker_wins.Attack by blast 
+  have Aid: "Game.weight d1 e = Some" by simp
+  hence "(Game.weight d1 e (E 9 8)) = Some (E 9 8) " by simp
+  hence "(Game.attacker_wins (the ((Game.weight d1 e (E 9 8)))) e)" using A3 by simp
+  from this A3 have A4: "\<not>(defender d1) \<and> (\<exists>g'. ((d1 \<Zinj> g') \<and> (Game.attacker_wins (the ((Game.weight d1 g' (E 9 8)))) g')))"
+    by (meson A1 A2 Game.attacker_wins.Defense defender.simps(4) weight_opt.simps(38))
+  thus "Game.attacker_wins (E 9 8) d1" using Game.attacker_wins.Attack A2 Aid wina_of_e by presburger
 qed
 
 lemma wina_of_d2:
@@ -176,12 +174,12 @@ proof -
   have A1: "\<not>(defender d2)" by simp
   have A2: "d2 \<Zinj> e" by simp
   have A3: "Game.attacker_wins (E 8 9) e" by (simp add: attacker_wins_at_e)
-  have "Game.weight d2 e = id"by simp
-  hence "(Game.weight d2 e (E 8 9)) = E 8 9 " by simp
-  hence "(Game.attacker_wins (((Game.weight d2 e (E 8 9)))) e)" using A3 by simp
-  from this A3 have A4: "\<not>(defender d2) \<and> (\<exists>g'. ((d2 \<Zinj> g') \<and> (Game.attacker_wins (((Game.weight d2 g' (E 8 9)))) g')))"
-  by (meson A1 A2 Game.attacker_wins.Defense defender.simps(4) weight_opt.simps(38))
-  thus "Game.attacker_wins (E 8 9) d2" using Game.attacker_wins.Attack by blast 
+  have Aid: "Game.weight d2 e = Some" by simp
+  hence "(Game.weight d2 e (E 8 9)) = Some (E 8 9) " by simp
+  hence "(Game.attacker_wins (the ((Game.weight d2 e (E 8 9)))) e)" using A3 by simp
+  from this A3 have A4: "\<not>(defender d2) \<and> (\<exists>g'. ((d2 \<Zinj> g') \<and> (Game.attacker_wins (the ((Game.weight d2 g' (E 8 9)))) g')))"
+    by (meson A1 A2 Game.attacker_wins.Defense defender.simps(4) weight_opt.simps(38))
+  thus "Game.attacker_wins (E 8 9) d2" using Game.attacker_wins.Attack A2 A3 Aid wina_of_e by presburger
 qed
 
 lemma wina_of_c:
@@ -193,50 +191,48 @@ proof -
   have A3: "Game.attacker_wins (E 9 8) d1" using wina_of_d1 by blast
   have A4: "Game.attacker_wins (E 8 9) d2" using wina_of_d2 by blast
 
-  have "\<not>order (E 9 9) (E 0 1)" by simp
-  hence "(E 9 9 - (E 0 1)) = E ((one (E 9 9)) - (one (E 0 1))) ((two (E 9 9)) - (two (E 0 1)))" using minus_energy_def
-    by simp
-  hence "(E 9 9 - (E 0 1)) = E 9 (9 -1)" by simp
-  hence A5: "(E 9 9 - (E 0 1)) = E 9 8" using numeral_eq_enat one_enat_def
-    by (metis add_diff_cancel_right' idiff_enat_enat inc.simps(2) numeral_inc) 
+  have "\<not>(E 9 9) \<le> (E 0 1)" by simp
+  hence "minus_energy (E 9 9) (E 0 1) = Some (E ((one (E 9 9)) - (one (E 0 1))) ((two (E 9 9)) - (two (E 0 1))))"
+    using minus_energy_def by simp
+  hence A5: "minus_energy (E 9 9) (E 0 1) = Some (E 9 8)"
+    using numeral_eq_enat one_enat_def
+    by (auto, metis diff_Suc_1 eval_nat_numeral(3) idiff_enat_enat)
 
-  have "(Game.weight c d1) (E 9 9) = (E 9 9) - (E 0 1)" using weight_opt.simps(5)by simp
-  hence "(Game.weight c d1) (E 9 9) = E 9 8" using A5 by simp
-  hence A6: "Game.attacker_wins ((Game.weight c d1) (E 9 9)) d1" using A3 by simp
+  have "(Game.weight c d1) (E 9 9) = minus_energy (E 9 9) (E 0 1)" using weight_opt.simps(5) by simp
+  hence A56: "(Game.weight c d1) (E 9 9) = Some (E 9 8)" using A5 by simp
+  hence A6: "Game.attacker_wins (the ((Game.weight c d1) (E 9 9))) d1" using A3 by simp
 
-    have "\<not>order (E 9 9) (E 1 0)" by simp
-  hence "(E 9 9 - (E 1 0)) = E ((one (E 9 9)) - (one (E 1 0))) ((two (E 9 9)) - (two (E 1 0)))" using minus_energy_def
-    by simp
-  hence "(E 9 9 - (E 1 0)) = E (9 -1) 9" by simp
-  hence A7: "(E 9 9 - (E 1 0)) = E 8 9" using numeral_eq_enat one_enat_def
-    by (metis add_diff_cancel_right' idiff_enat_enat inc.simps(2) numeral_inc) 
+  have "\<not>(E 9 9) \<le> (E 1 0)" by simp
+  hence "minus_energy (E 9 9) (E 1 0) = Some (E ((one (E 9 9)) - (one (E 1 0))) ((two (E 9 9)) - (two (E 1 0))))"
+    using minus_energy_def by simp
+  hence A7: "minus_energy (E 9 9) (E 1 0) = Some (E 8 9)"
+    using numeral_eq_enat one_enat_def
+    by (simp, metis add_diff_cancel_right' idiff_enat_enat inc.simps(2) numeral_inc) 
 
-  have "(Game.weight c d2) (E 9 9) = (E 9 9) - (E 1 0)" using weight_opt.simps(6)by simp
-  hence "(Game.weight c d2) (E 9 9) = E 8 9" using A7 by simp
-  hence A8: "Game.attacker_wins ((Game.weight c d2) (E 9 9)) d2" using A4 by simp
-
-  thus "Game.attacker_wins (E 9 9) c" using A7 Game.attacker_wins.Defense energy.distinct(1) A2 A1 A6 by blast  
+  have "(Game.weight c d2) (E 9 9) = minus_energy (E 9 9) (E 1 0)"
+    using weight_opt.simps(6)by simp
+  moreover hence "(Game.weight c d2) (E 9 9) = Some (E 8 9)"
+    using A7 by simp
+  moreover hence "Game.attacker_wins (the ((Game.weight c d2) (E 9 9))) d2"
+    using A4 by simp
+  ultimately show "Game.attacker_wins (E 9 9) c"
+    using A7 Game.attacker_wins.Defense A2 A1 A6  wina_of_d1 wina_of_d2 A56  by blast    
 qed
 
 lemma not_wina_of_c:
   shows "\<not>Game.attacker_wins (E 0 0) c"
 proof -
-  have "order (E 0 0) (E 0 1)" by simp
-  hence "((E 0 0) - (E 0 1)) = eneg" using minus_energy_def by auto
-  hence "(Game.weight c d1)(E 0 0) = eneg" by simp
-  hence A1: "\<not>(Game.attacker_wins ((Game.weight c d1)(E 0 0)) d1)" by (metis Game.attacker_wins.cases)
-
-  have "order (E 0 0) (E 1 0)" by simp
-  hence "((E 0 0) - (E 1 0)) = eneg" using minus_energy_def by auto
-  hence "(Game.weight c d2)(E 0 0) = eneg" by simp
-  hence A2: "\<not>(Game.attacker_wins ((Game.weight c d2)(E 0 0)) d2)" by (metis Game.attacker_wins.cases)
-
+  have "E 0 0 \<le> E 0 1" by simp
+  hence "minus_energy (E 0 0) (E 0 1) = None" using minus_energy_def by auto
+  hence no_win_a: "(Game.weight c d1) (E 0 0) = None" by simp
+  have "(E 0 0) \<le> (E 1 0)" by simp
+  hence "minus_energy (E 0 0) (E 1 0) = None" using minus_energy_def by auto
+  hence no_win_b: "(Game.weight c d2)(E 0 0) = None" by simp
   have "\<forall>g'. (c \<Zinj> g') \<longrightarrow> (g' = d1 \<or> g' = d2)"
     by (metis moves(9) state.exhaust weight_opt.simps(21) weight_opt.simps(22) weight_opt.simps(23) weight_opt.simps(24))
-  hence "(\<forall>g'. ((c \<Zinj> g') \<longrightarrow> \<not>(Game.attacker_wins ((Game.weight c g') (E 0 0)) g')))" using A1 A2 by blast
-  hence "\<not>((defender c) \<and>(\<forall>g'. ((c \<Zinj> g') \<longrightarrow> (Game.attacker_wins ((Game.weight c g') (E 0 0)) g'))) \<and> ((E 0 0) \<noteq> eneg))"
-    using moves(6) by blast
-  thus "\<not>Game.attacker_wins (E 0 0) c" using Game.attacker_wins.intros by (metis Game.attacker_wins.cases defender.simps(3))
+  thus "\<not>Game.attacker_wins (E 0 0) c"
+    using no_win_a no_win_b Game.attacker_wins.intros Game.attacker_wins.cases
+    by (metis moves(5) option.distinct(1))
 qed
 
 end
