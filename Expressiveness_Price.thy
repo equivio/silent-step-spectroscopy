@@ -386,10 +386,6 @@ lemma expressiveness_price_ImmConj_empty_def:
   shows "expressiveness_price (ImmConj I \<psi>s) = E 0 0 0 0 0 0 0 0" using assms 
   unfolding expressiveness_price_ImmConj_def by (simp add: bot_enat_def)
 
-text \<open>The price of a formula cannot be negative.\<close>
-lemma srbb_price_never_neg : "expressiveness_price \<phi> \<noteq> eneg"
-  by simp
-
 text \<open>We can now define a sublanguage of Hennessy-Milner Logic @{term "\<O>"} by the set of formulas with prices below an energy coordinate.\<close>
 definition \<O> :: "energy \<Rightarrow> (('a, 's) hml_srbb) set" where
   "\<O> energy \<equiv> {\<phi> . expressiveness_price \<phi> \<le> energy}"
@@ -407,9 +403,6 @@ fun expr_pr_inner :: "('a, 's) hml_srbb_inner \<Rightarrow> energy" where
                  (max_neg_conj_depth_inner \<chi>)
                  (neg_depth_inner \<chi>)"
 
-lemma \<chi>_price_never_neg: "expr_pr_inner \<chi> \<noteq> eneg"
-  by simp
-
 definition \<O>_inner :: "energy \<Rightarrow> (('a, 's) hml_srbb_inner) set" where
   "\<O>_inner energy \<equiv> {\<chi> . expr_pr_inner \<chi> \<le> energy}"
 
@@ -422,9 +415,6 @@ fun expr_pr_conjunct :: "('a, 's) hml_srbb_conjunct \<Rightarrow> energy" where
                  (max_pos_conj_depth_conjunct \<psi>)
                  (max_neg_conj_depth_conjunct \<psi>)
                  (neg_depth_conjunct \<psi>)"
-
-lemma \<psi>_price_never_neg: "expr_pr_conjunct \<psi> \<noteq> eneg"
-  by simp
 
 definition \<O>_conjunct :: "energy \<Rightarrow> (('a, 's) hml_srbb_conjunct) set" where
   "\<O>_conjunct energy \<equiv> {\<chi> . expr_pr_conjunct \<chi> \<le> energy}"

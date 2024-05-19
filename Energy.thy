@@ -92,7 +92,6 @@ lemma energy_minus:
              (e1 - e2) (f1 - f2) (g1 - g2) (h1 - h2)"
   unfolding minus_energy_def somewhere_larger_eq by simp
 
-declare [[show_types]]
 lemma minus_component_leq:
   assumes "s \<le> x" "x \<le> y"
   shows "one (x - s) \<le> one (y - s)" "two (x - s) \<le> two (y - s)"
@@ -156,7 +155,7 @@ lemma mono_subtract:
 
 text \<open>We also define abbreviations for performing subtraction.\<close>
 abbreviation "subtract_fn a b c d e f g h \<equiv>
-  (\<lambda>x. if (somewhere_larger (E a b c d e f g h)) x then None else Some (x - (E a b c d e f g h)))"
+  (\<lambda>x. if somewhere_larger x (E a b c d e f g h) then None else Some (x - (E a b c d e f g h)))"
 abbreviation "e1 \<equiv> subtract_fn 1 0 0 0 0 0 0 0"
 abbreviation "e3 \<equiv> subtract_fn 0 0 1 0 0 0 0 0"
 abbreviation "e5 \<equiv> subtract_fn 0 0 0 0 1 0 0 0"
@@ -167,6 +166,28 @@ subsection \<open>Minimum Updates\<close>
 text \<open>Next, we define two energy updates that replace the first component with the minimum of two other components.\<close>
 definition "min1_6 e \<equiv> case e of E a b c d e f g h \<Rightarrow> Some (E (min a f) b c d e f g h)"
 definition "min1_7 e \<equiv> case e of E a b c d e f g h \<Rightarrow> Some (E (min a g) b c d e f g h)"
+
+
+text \<open>lift order to options\<close>
+instantiation option :: (order) order
+begin
+
+definition less_eq_option_def[simp]:
+  \<open>less_eq_option (optA :: 'a option) optB \<equiv>
+    case optA of
+      (Some a) \<Rightarrow>
+        (case optB of
+          (Some b) \<Rightarrow> a \<le> b |
+          None \<Rightarrow> False) |
+      None \<Rightarrow> True\<close>
+
+definition less_option_def[simp]:
+  "less_option (optA :: 'a option) optB \<equiv> (optA \<le> optB \<and> \<not> optB \<le> optA)"
+
+instance by
+  (standard, auto simp add: option.case_eq_if)
+  (metis order_trans order_antisym option.simps option.sel option.case_eq_if option.expand)+
+end
 
 text \<open>Again, we prove that these updates only decrease energies.\<close>
 
@@ -192,8 +213,18 @@ lemma min_1_7_simps[simp]:
         "eight (the (min1_7 e)) = eight e"
   unfolding min1_7_def by (simp_all add: energy.case_eq_if)
 
+lemma min_1_6_some:
+  shows \<open>min1_6 e \<noteq> None\<close>
+  unfolding min1_6_def
+  using energy.case_eq_if by blast
+
+lemma min_1_7_some:
+  shows \<open>min1_7 e \<noteq> None\<close>
+  unfolding min1_7_def
+  using energy.case_eq_if by blast
+
 lemma mono_min_1_6:
-  shows "mono_on UNIV (the \<circ> min1_6)"
+  shows "mono (the \<circ> min1_6)"
 proof
   fix x y :: energy
   assume "x \<le> y"
@@ -202,7 +233,7 @@ proof
 qed
 
 lemma mono_min_1_7:
-  shows "mono_on UNIV (the \<circ> min1_7)"
+  shows "mono (the \<circ> min1_7)"
 proof
   fix x y :: energy
   assume "x \<le> y"
@@ -214,9 +245,40 @@ lemma gets_smaller_min_1_6:
   shows "the (min1_6 x) \<le> x"
   using min_1_6_simps min_less_iff_conj somewhere_larger_eq by fastforce
 
+
 lemma gets_smaller_min_1_7: 
   shows "the (min1_7 x) \<le> x"
   using min_1_7_simps min_less_iff_conj somewhere_larger_eq by fastforce
+
+lemma min_1_7_lower_end:
+  assumes \<open>(Option.bind ((subtract_fn 0 0 0 0 0 0 0 1) e) min1_7) = None\<close>
+  shows \<open>eight e = 0\<close>
+  using assms
+  by (smt (verit) bind.bind_lunit energy.sel ileI1 leq_components min_1_7_some not_gr_zero one_eSuc zero_le)
+
+lemma min_1_7_substr_simp:
+  shows \<open>(Option.bind ((subtract_fn 0 0 0 0 0 0 0 1) e) min1_7)
+    = (if eight e = 0 then None
+        else Some (E (min (one e) (seven e)) (two e) (three e) (four e) (five e) (six e) (seven e) (eight e - 1)))\<close>
+  using min_1_7_lower_end
+  by (auto simp add: leq_components min1_7_def minus_energy_def)
+
+lemma min_1_7_substr_mono:
+  shows \<open>mono (\<lambda>e. Option.bind ((subtract_fn 0 0 0 0 0 0 0 1) e) min1_7)\<close>
+proof
+  fix e1 e2 :: energy
+  assume "e1 \<le> e2"
+  thus "(\<lambda>e. Option.bind ((subtract_fn 0 0 0 0 0 0 0 1) e) min1_7) e1
+    \<le>  (\<lambda>e. Option.bind ((subtract_fn 0 0 0 0 0 0 0 1) e) min1_7) e2"
+    unfolding min_1_7_substr_simp
+    by (auto simp add: leq_components  min.coboundedI1  min.coboundedI2 enat_diff_mono)
+qed
+
+lemma min_1_6_substr_simp:
+  shows \<open>(Option.bind ((subtract_fn 0 1 1 0 0 0 0 0) e) min1_6)
+    = (if two e = 0 \<or> three e = 0 then None
+        else Some (E (min (one e) (six e)) (two e - 1) (three e - 1) (four e) (five e) (six e) (seven e) (eight e)))\<close>
+  by (auto simp add: leq_components min1_6_def minus_energy_def ileI1 one_eSuc)
 
 instantiation energy :: Sup
 begin
@@ -225,7 +287,7 @@ definition "Sup ee \<equiv> E (Sup (one ` ee)) (Sup (two ` ee )) (Sup (three ` e
   (Sup (five ` ee)) (Sup (six ` ee)) (Sup (seven ` ee)) (Sup (eight ` ee))"
 
 instance ..
-
 end
+
 
 end
