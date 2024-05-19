@@ -293,14 +293,9 @@ next
   next
     case (Defender_Branch p a p' Q' Qa)
     with defender_win_min_assms show ?thesis
-      apply (cases g', auto)
-      apply (meson option.distinct(1))
-            apply (smt (verit, best) option.distinct(1) option.inject order.trans)+
-      apply (smt (verit) bind.bind_lunit dual_order.trans min_1_6_some)
-      apply (meson option.distinct(1))
-        apply (meson option.distinct(1))
-      apply (metis option.distinct(1))
-      by (metis dual_order.trans option.distinct(1))
+      using min_1_6_substr_simp
+      by (cases g', auto)
+         (metis (no_types, lifting) le_zero_eq leq_components option.distinct(1) option.inject dual_order.trans)+
   next
     case (Defender_Conj p Q)
     with defender_win_min_assms show ?thesis
