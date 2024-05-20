@@ -256,25 +256,25 @@ lemma min_1_7_lower_end:
   using assms
   by (smt (verit) bind.bind_lunit energy.sel ileI1 leq_components min_1_7_some not_gr_zero one_eSuc zero_le)
 
-lemma min_1_7_substr_simp:
+lemma min_1_7_subtr_simp:
   shows \<open>(Option.bind ((subtract_fn 0 0 0 0 0 0 0 1) e) min1_7)
     = (if eight e = 0 then None
         else Some (E (min (one e) (seven e)) (two e) (three e) (four e) (five e) (six e) (seven e) (eight e - 1)))\<close>
   using min_1_7_lower_end
   by (auto simp add: leq_components min1_7_def minus_energy_def)
 
-lemma min_1_7_substr_mono:
+lemma min_1_7_subtr_mono:
   shows \<open>mono (\<lambda>e. Option.bind ((subtract_fn 0 0 0 0 0 0 0 1) e) min1_7)\<close>
 proof
   fix e1 e2 :: energy
   assume "e1 \<le> e2"
   thus "(\<lambda>e. Option.bind ((subtract_fn 0 0 0 0 0 0 0 1) e) min1_7) e1
     \<le>  (\<lambda>e. Option.bind ((subtract_fn 0 0 0 0 0 0 0 1) e) min1_7) e2"
-    unfolding min_1_7_substr_simp
+    unfolding min_1_7_subtr_simp
     by (auto simp add: leq_components  min.coboundedI1  min.coboundedI2 enat_diff_mono)
 qed
 
-lemma min_1_6_substr_simp:
+lemma min_1_6_subtr_simp:
   shows \<open>(Option.bind ((subtract_fn 0 1 1 0 0 0 0 0) e) min1_6)
     = (if two e = 0 \<or> three e = 0 then None
         else Some (E (min (one e) (six e)) (two e - 1) (three e - 1) (four e) (five e) (six e) (seven e) (eight e)))\<close>

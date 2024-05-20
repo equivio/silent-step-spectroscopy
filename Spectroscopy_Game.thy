@@ -143,7 +143,7 @@ next
     next
       assume \<open>spectroscopy_moves g g' = Some (\<lambda>e. Option.bind (if \<not> E 0 0 0 0 0 0 0 1 \<le> e then None else Some (e - E 0 0 0 0 0 0 0 1)) min1_7)\<close>
       thus ?thesis
-        unfolding min_1_7_substr_simp
+        unfolding min_1_7_subtr_simp
         using monotonicity_assms
         by (smt (z3) enat_diff_mono energy.sel leq_components min.mono option.distinct(1) option.sel)
     qed
@@ -192,7 +192,7 @@ next
   next
     case (Defender_Branch p a p' Q' Qa)
     with monotonicity_assms show ?thesis
-      by (cases g', auto, unfold min_1_6_substr_simp)
+      by (cases g', auto, unfold min_1_6_subtr_simp)
         (smt (z3) enat_diff_mono mono_subtract option.discI  energy.sel leq_components min.mono option.distinct(1) option.inject)+
   next
     case (Defender_Conj p Q)
@@ -293,7 +293,7 @@ next
   next
     case (Defender_Branch p a p' Q' Qa)
     with defender_win_min_assms show ?thesis
-      using min_1_6_substr_simp
+      using min_1_6_subtr_simp
       by (cases g', auto)
          (metis (no_types, lifting) le_zero_eq leq_components option.distinct(1) option.inject dual_order.trans)+
   next
