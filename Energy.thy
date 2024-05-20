@@ -37,7 +37,7 @@ instance proof
 qed
 
 
-lemma leq_components:
+lemma leq_components[simp]:
   shows "e1 \<le> e2 \<equiv> (one e1 \<le> one e2 \<and> two e1 \<le> two e2 \<and> three e1 \<le> three e2 \<and>
                      four e1 \<le> four e2 \<and> five e1 \<le> five e2 \<and> six e1 \<le> six e2 \<and>
                      seven e1 \<le> seven e2 \<and> eight e1 \<le> eight e2)"
@@ -70,7 +70,7 @@ text \<open>Using \<open>somewhere_larger\<close> we define subtraction as
 instantiation energy :: minus
 begin
 
-definition "e1 - e2 \<equiv> E
+definition minus_energy_def[simp]: "e1 - e2 \<equiv> E
   ((one e1) - (one e2)) 
   ((two e1) - (two e2)) 
   ((three e1) - (three e2)) 
@@ -86,7 +86,7 @@ end
 
 text \<open>Afterwards, we prove some lemmas to ease the manipulation of expressions 
   using subtraction on energies.\<close>
-lemma energy_minus:
+lemma energy_minus[simp]:
   shows "E a1 b1 c1 d1 e1 f1 g1 h1 - E a2 b2 c2 d2 e2 f2 g2 h2
          = E (a1 - a2) (b1 - b2) (c1 - c2) (d1 - d2) 
              (e1 - e2) (f1 - f2) (g1 - g2) (h1 - h2)"
@@ -99,7 +99,7 @@ lemma minus_component_leq:
         "five (x - s) \<le> five (y - s)" "six (x - s) \<le> six (y -s)"
         "seven (x - s) \<le> seven (y - s)" "eight (x - s) \<le> eight (y - s)"
 proof-
-  from assms have "s \<le> y" by simp
+  from assms have "s \<le> y" by (simp del: leq_components)
   with assms leq_components have
     "one (x - s) \<le> one (y - s) \<and> two (x - s) \<le> two (y - s) \<and>
     three (x - s) \<le> three (y - s) \<and> four (x - s) \<le> four (y - s) \<and>
@@ -140,18 +140,18 @@ lemma energy_diff_mono:
   fixes s :: energy
   shows "mono_on UNIV (\<lambda>x. x - s)"
   unfolding mono_on_def
-  by (auto simp add: enat_diff_mono leq_components minus_energy_def)
+  by (auto simp add: enat_diff_mono)
 
 lemma gets_smaller:
   fixes s :: energy
   shows "(\<lambda>x. x - s) x \<le> x"
-  by (auto simp add: leq_components minus_energy_def)
+  by (auto)
      (metis add.commute add_diff_cancel_enat enat_diff_mono idiff_infinity idiff_infinity_right le_iff_add not_infinity_eq zero_le)+
 
 lemma mono_subtract: 
   assumes "x \<le> x'"
   shows "(\<lambda>x. x - (E a b c d e f g h)) x \<le> (\<lambda>x. x - (E a b c d e f g h)) x'"
-  using assms enat_diff_mono leq_components minus_energy_def by force
+  using assms enat_diff_mono by force
 
 text \<open>We also define abbreviations for performing subtraction.\<close>
 abbreviation "subtract_fn a b c d e f g h \<equiv>
@@ -261,7 +261,7 @@ lemma min_1_7_subtr_simp:
     = (if eight e = 0 then None
         else Some (E (min (one e) (seven e)) (two e) (three e) (four e) (five e) (six e) (seven e) (eight e - 1)))\<close>
   using min_1_7_lower_end
-  by (auto simp add: leq_components min1_7_def minus_energy_def)
+  by (auto simp add: min1_7_def)
 
 lemma min_1_7_subtr_mono:
   shows \<open>mono (\<lambda>e. Option.bind ((subtract_fn 0 0 0 0 0 0 0 1) e) min1_7)\<close>
@@ -271,14 +271,14 @@ proof
   thus "(\<lambda>e. Option.bind ((subtract_fn 0 0 0 0 0 0 0 1) e) min1_7) e1
     \<le>  (\<lambda>e. Option.bind ((subtract_fn 0 0 0 0 0 0 0 1) e) min1_7) e2"
     unfolding min_1_7_subtr_simp
-    by (auto simp add: leq_components  min.coboundedI1  min.coboundedI2 enat_diff_mono)
+    by (auto simp add: min.coboundedI1  min.coboundedI2 enat_diff_mono)
 qed
 
 lemma min_1_6_subtr_simp:
   shows \<open>(Option.bind ((subtract_fn 0 1 1 0 0 0 0 0) e) min1_6)
     = (if two e = 0 \<or> three e = 0 then None
         else Some (E (min (one e) (six e)) (two e - 1) (three e - 1) (four e) (five e) (six e) (seven e) (eight e)))\<close>
-  by (auto simp add: leq_components min1_6_def minus_energy_def ileI1 one_eSuc)
+  by (auto simp add: min1_6_def ileI1 one_eSuc)
 
 instantiation energy :: Sup
 begin

@@ -520,7 +520,7 @@ proof-
   obtain e1 e2 e3 e4 e5 e6 e7 e8 where e_def: "e = E e1 e2 e3 e4 e5 e6 e7 e8"
     by (metis energy.exhaust_sel)
   hence is_some: "(subtract_fn 0 0 0 0 0 0 0 1 e = Some (E e1 e2 e3 e4 e5 e6 e7 (e8-1)))"
-    using minus_energy_def assms bind_eq_None_conv by fastforce
+    using assms bind_eq_None_conv by fastforce
   hence "modal_depth_srbb_inner \<chi> \<le> (min e1 e7)"
     using assms expr_pr_inner.simps leq_components min_1_7_subtr_simp e_def
     by (metis energy.sel(1) energy.sel(7) option.discI option.inject)
@@ -571,7 +571,7 @@ proof-
     by (metis option.discI)
   hence "modal_depth_srbb \<phi> \<le> (e1 - 1)"
     using assms
-    by (auto simp add: leq_components e_def minus_energy_def)
+    by (auto simp add: e_def)
   hence "modal_depth_srbb_inner (Obs \<alpha> \<phi>) \<le> e1"
     using obs_upds is_some
     unfolding leq_components e_def 
@@ -580,7 +580,7 @@ proof-
   then show ?thesis
     using is_some assms
     unfolding  e_def leq_components
-    by (auto simp add: minus_energy_def)
+    by auto
 qed
 
 lemma expr_st_conj: 
@@ -784,7 +784,7 @@ proof-
     unfolding e_def minus_energy_def leq_components
     by (metis (no_types, lifting) gr_zeroI idiff_0_right min_enat_simps(3) not_one_le_zero option.distinct(1) option.sel, auto)
   have e_comp: "e - (E 0 1 1 0 0 0 0 0) = E e1 (e2-1) (e3-1) e4 e5 e6 e7 e8" using e_def
-    by (simp add: energy_minus)
+    by simp
   have conj:
     "E (modal_depth_srbb            \<phi>)
        (branching_conjunction_depth \<phi>)
@@ -919,7 +919,7 @@ proof-
     (Sup ((max_neg_conj_depth_conjunct \<circ> \<psi>s) ` I))
     (Sup ((neg_depth_conjunct \<circ> \<psi>s) ` I))"
     unfolding expressiveness_price_ImmConj_non_empty_def[OF \<open>I \<noteq> {}\<close>]
-    by (simp add: energy_minus)
+    by simp
   also have "... \<ge> expr_pr_conjunct (\<psi>s i)"
     using assms \<open>I \<noteq> {}\<close> SUP_upper unfolding leq_components by fastforce
   finally show ?thesis .
@@ -987,7 +987,7 @@ lemma "expressiveness_price (Internal (BranchConj \<alpha> TT {} \<psi>s)) = E 1
 
 lemma expr_obs_phi:
   shows "e1 (expr_pr_inner (Obs \<alpha> \<phi>)) = Some (expressiveness_price \<phi>)"
-  by (simp add: leq_components minus_energy_def)
+  by simp
 
 end
 

@@ -118,13 +118,15 @@ next
     \<open>e \<le> e'\<close>
   show \<open>eu \<le> eu'\<close>
   proof (cases g)
-  case (Attacker_Immediate p Q)
-    with monotonicity_assms show ?thesis
-      by (cases g', simp_all) (smt (z3) mono_subtract option.distinct(1) option.sel)+
+    case (Attacker_Immediate p Q)
+    with monotonicity_assms
+    show ?thesis
+      by (cases g', simp_all, (smt (z3) option.distinct(1) option.sel minus_component_leq)+)
   next
     case (Attacker_Branch p Q)
-    with monotonicity_assms show ?thesis
-      by (cases g', simp_all) (smt (z3) mono_subtract option.distinct(1) option.sel)+
+    with monotonicity_assms
+    show ?thesis
+      by (cases g', simp_all, (smt (z3) option.distinct(1) option.sel minus_component_leq)+)
   next
     case (Attacker_Clause p q)
     hence "\<exists>p' Q'. g'= (Attacker_Delayed p' Q')"
@@ -192,17 +194,17 @@ next
   next
     case (Defender_Branch p a p' Q' Qa)
     with monotonicity_assms show ?thesis
-      by (cases g', auto, unfold min_1_6_subtr_simp)
-        (smt (z3) enat_diff_mono mono_subtract option.discI  energy.sel leq_components min.mono option.distinct(1) option.inject)+
+      by (cases g', auto simp del: leq_components, unfold min_1_6_subtr_simp)
+        (smt (z3) enat_diff_mono mono_subtract option.discI energy.sel leq_components min.mono option.distinct(1) option.inject)+
   next
     case (Defender_Conj p Q)
     with monotonicity_assms show ?thesis
-      by (cases g', simp_all)
+      by (cases g', simp_all del: leq_components)
         (smt (verit, ccfv_SIG) mono_subtract option.discI option.sel)
   next
     case (Defender_Stable_Conj x71 x72)
     with monotonicity_assms show ?thesis
-      by (cases g', simp_all)
+      by (cases g', simp_all del: leq_components)
        (smt (verit, ccfv_SIG) mono_subtract option.discI option.sel)+
   qed
 next
@@ -216,7 +218,7 @@ next
   proof (cases g)
     case (Attacker_Immediate p Q)
     with defender_win_min_assms show ?thesis
-      by (cases g', auto)
+      by (cases g', auto simp del: leq_components)
         (smt (verit, best) option.distinct(1) option.inject order.trans)+
   next
     case (Attacker_Branch p Q)
@@ -294,7 +296,7 @@ next
     case (Defender_Branch p a p' Q' Qa)
     with defender_win_min_assms show ?thesis
       using min_1_6_subtr_simp
-      by (cases g', auto)
+      by (cases g', auto simp del: leq_components)
          (metis (no_types, lifting) le_zero_eq leq_components option.distinct(1) option.inject dual_order.trans)+
   next
     case (Defender_Conj p Q)
@@ -304,7 +306,7 @@ next
   next
     case (Defender_Stable_Conj x71 x72)
     with defender_win_min_assms show ?thesis
-      by (cases g', simp_all)
+      by (cases g', simp_all del: leq_components)
          (smt (verit) dual_order.trans option.discI option.sel)+
   qed
 qed

@@ -50,11 +50,11 @@ fun order_opt:: "energy option \<Rightarrow> energy option \<Rightarrow> bool" w
   "order_opt None _ = True" |
   "order_opt (Some eA) None = False"
 
-definition minus_energy_def: "minus_energy e1 e2 \<equiv> if (\<not>e2 \<le> e1) then None
+definition minus_energy_def[simp]: "minus_energy e1 e2 \<equiv> if (\<not>e2 \<le> e1) then None
                                              else Some (direct_minus e1 e2)"
 lemma energy_minus[simp]:
   assumes "E c d \<le> E a b"
-  shows "minus_energy (E a b) (E c d) = Some (E (a - c) (b - d))" using assms minus_energy_def by auto
+  shows "minus_energy (E a b) (E c d) = Some (E (a - c) (b - d))" using assms by auto
 
 definition min_update_def[simp]: "min_update e1 \<equiv> Some (E (min (one e1) (two e1)) (two e1))"
 
@@ -111,13 +111,13 @@ proof
   next
     case 10
     hence \<open>minus_energy e (E 1 0) = Some eu\<close> \<open>minus_energy e' (E 1 0) = Some eu'\<close> using case_assms by auto 
-    then show ?thesis  using case_assms(1) unfolding minus_energy_def
+    then show ?thesis using case_assms(1)
       by (cases e, cases e', auto,
          metis add.commute add_diff_assoc_enat energy.sel idiff_0_right le_iff_add less_eq_energy.simps option.distinct(1) option.inject)
   next
     case 01
     hence \<open>minus_energy e (E 0 1) = Some eu\<close> \<open>minus_energy e' (E 0 1) = Some eu'\<close> using case_assms by auto 
-    then show ?thesis  using case_assms(1) unfolding minus_energy_def
+    then show ?thesis  using case_assms(1)
       by (cases e, cases e', auto,
          metis add.commute add_diff_assoc_enat energy.sel idiff_0_right le_iff_add less_eq_energy.simps option.distinct(1) option.inject)
   qed
@@ -125,7 +125,7 @@ next
   fix g g' e e'
   assume \<open>e \<le> e'\<close> \<open>weight_opt g g' \<noteq> None\<close> \<open>the (weight_opt g g') e' = None\<close>
   thus \<open>the (weight_opt g g') e = None\<close>
-    by (induct g) (induct g', auto simp add: minus_energy_def order.trans)+
+    by (induct g) (induct g', auto simp add: order.trans)+
 qed
 
 notation Game.moves (infix "\<Zinj>" 70)
@@ -193,7 +193,7 @@ proof -
 
   have "\<not>(E 9 9) \<le> (E 0 1)" by simp
   hence "minus_energy (E 9 9) (E 0 1) = Some (E ((one (E 9 9)) - (one (E 0 1))) ((two (E 9 9)) - (two (E 0 1))))"
-    using minus_energy_def by simp
+    by simp
   hence A5: "minus_energy (E 9 9) (E 0 1) = Some (E 9 8)"
     using numeral_eq_enat one_enat_def
     by (auto, metis diff_Suc_1 eval_nat_numeral(3) idiff_enat_enat)
@@ -204,7 +204,7 @@ proof -
 
   have "\<not>(E 9 9) \<le> (E 1 0)" by simp
   hence "minus_energy (E 9 9) (E 1 0) = Some (E ((one (E 9 9)) - (one (E 1 0))) ((two (E 9 9)) - (two (E 1 0))))"
-    using minus_energy_def by simp
+    by simp
   hence A7: "minus_energy (E 9 9) (E 1 0) = Some (E 8 9)"
     using numeral_eq_enat one_enat_def
     by (simp, metis add_diff_cancel_right' idiff_enat_enat inc.simps(2) numeral_inc) 
@@ -223,10 +223,10 @@ lemma not_wina_of_c:
   shows "\<not>Game.attacker_wins (E 0 0) c"
 proof -
   have "E 0 0 \<le> E 0 1" by simp
-  hence "minus_energy (E 0 0) (E 0 1) = None" using minus_energy_def by auto
+  hence "minus_energy (E 0 0) (E 0 1) = None" by auto
   hence no_win_a: "(Game.weight c d1) (E 0 0) = None" by simp
   have "(E 0 0) \<le> (E 1 0)" by simp
-  hence "minus_energy (E 0 0) (E 1 0) = None" using minus_energy_def by auto
+  hence "minus_energy (E 0 0) (E 1 0) = None" by auto
   hence no_win_b: "(Game.weight c d2)(E 0 0) = None" by simp
   have "\<forall>g'. (c \<Zinj> g') \<longrightarrow> (g' = d1 \<or> g' = d2)"
     by (metis moves(9) state.exhaust weight_opt.simps(21) weight_opt.simps(22) weight_opt.simps(23) weight_opt.simps(24))

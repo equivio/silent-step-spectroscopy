@@ -668,7 +668,7 @@ next
         using expr_pr_inner.simps \<open>Q = {}\<close>
         by force
       have "(e - (E 0 0 0 0 0 0 0 0)) = e" 
-        by (simp add: Defense leq_not_eneg minus_energy_def)
+        by (simp add: Defense leq_not_eneg)
       hence price: "expr_pr_inner (Conj Q \<Phi>) \<le> e"
         using \<open>expr_pr_inner (hml_srbb_inner.Conj Q \<Phi>) = E 0 0 0 0 0 0 0 0\<close> minus_energy_def \<open>e - E 0 0 0 0 0 0 0 0 = e\<close> Defense 
         by presburger
