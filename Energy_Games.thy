@@ -46,6 +46,8 @@ abbreviation weighted_move :: "'gstate \<Rightarrow> 'energy update \<Rightarrow
 
 abbreviation "weight g1 g2 \<equiv> the (weight_opt g1 g2)"
 
+abbreviation "updated g g' e \<equiv> the (weight g g' e)"
+
 subsubsection \<open>Winning Budgets\<close>
 
 text\<open>The attacker wins a game if and only if they manage to force the defender to get stuck before 
