@@ -572,97 +572,63 @@ next
     qed
   next
     case 5
-    then obtain p Q where "g = Defender_Stable_Conj p Q" by blast
-    hence cases: "\<forall>g'. spectroscopy_moves g g' \<noteq> None \<longrightarrow> (attacker_wins (the (spectroscopy_moves (Defender_Stable_Conj p Q) g') e) g') \<and>((\<exists>p' q. g' = (Attacker_Clause p' q)) \<or> (\<exists>p' Q'. g' = (Defender_Conj p' Q')))"
-      using spectroscopy_defender.cases spectroscopy_moves.simps(42) spectroscopy_moves.simps(49) spectroscopy_moves.simps(55) spectroscopy_moves.simps(65) spectroscopy_moves.simps(75)
-      by (metis Defense)
-    have "Q = {} \<or> (Q \<noteq> {} \<and> (\<forall>g'. spectroscopy_moves g g' \<noteq> None \<longrightarrow> (\<exists>p' q. g' = (Attacker_Clause p' q))))"
-      by (metis \<open>g = Defender_Stable_Conj p Q\<close> cases local.empty_stbl_conj_answer)
-    then show ?case proof(rule disjE)
-      assume "Q = {}"
-      hence \<Phi>_ex: "\<exists>\<Phi>. (spectroscopy_moves (Defender_Stable_Conj p Q) (Defender_Conj p Q) 
-    = (subtract 0 0 0 1 0 0 0 0) \<and> attacker_wins (e - (E 0 0 0 1 0 0 0 0)) (Defender_Conj p Q)
-      \<and> strategy_formula_inner (Defender_Conj p Q) (e - (E 0 0 0 1 0 0 0 0)) (Conj Q \<Phi>))"
-        using conj
-        by (metis Defense \<open>g = Defender_Stable_Conj p Q\<close> all_not_in_conv local.empty_stbl_conj_answer option.sel option.simps(3))
-      hence "attacker_wins (e - (E 0 0 0 1 0 0 0 0)) (Defender_Conj p Q)" by blast
-
-      from \<Phi>_ex obtain \<Phi> where \<Phi>_prop: "(spectroscopy_moves (Defender_Stable_Conj p Q) (Defender_Conj p Q) 
-    = (subtract 0 0 0 1 0 0 0 0) \<and> attacker_wins (e - (E 0 0 0 1 0 0 0 0)) (Defender_Conj p Q)
-      \<and> strategy_formula_inner (Defender_Conj p Q) (e - (E 0 0 0 1 0 0 0 0)) (Conj Q \<Phi>))"
-        by blast
-      hence "strategy_formula_inner g e (StableConj Q \<Phi>)" 
-        using \<open>g = Defender_Stable_Conj p Q\<close> by (simp add: \<open>Q = {}\<close> \<open>g = Defender_Stable_Conj p Q\<close> stable_conj)
-      have "\<nexists>p' q. p = p' \<and> q \<in> Q" using \<open>Q = {}\<close> 
-        by blast
-      hence "\<forall>g'. spectroscopy_moves (Defender_Conj p Q) g' = None"
-      proof-
-        have "\<forall>g'. (spectroscopy_moves (Defender_Conj p Q) g' \<noteq> None \<longrightarrow> (\<exists>p' q. g' = (Attacker_Clause p' q)))"
-          by (metis spectroscopy_defender.cases spectroscopy_moves.simps(36) spectroscopy_moves.simps(48) spectroscopy_moves.simps(54) spectroscopy_moves.simps(64) spectroscopy_moves.simps(69) spectroscopy_moves.simps(74))
-        with \<open>\<nexists>p' q. p = p' \<and> q \<in> Q\<close> show ?thesis 
-          by auto
-      qed
-      hence "(e - (E 0 0 0 1 0 0 0 0)) \<noteq> eneg" 
-        using \<open>attacker_wins (e - E 0 0 0 1 0 0 0 0) (Defender_Conj p Q)\<close> attacker_wins.simps by blast
-      hence "e \<ge> (E 0 0 0 1 0 0 0 0)" 
-        by (meson minus_energy_def)
-
-      have "expr_pr_inner (StableConj Q \<Phi>) = E (Sup ((modal_depth_srbb_conjunct \<circ> \<Phi>) ` Q))
-                 (Sup ((branch_conj_depth_conjunct \<circ> \<Phi>) ` Q))
-                 (Sup ((inst_conj_depth_conjunct \<circ> \<Phi>) ` Q))
-                 (1 + Sup ((st_conj_depth_conjunct \<circ> \<Phi>) ` Q))
-                 (Sup ((imm_conj_depth_conjunct \<circ> \<Phi>) ` Q))
-                 (Sup ((max_pos_conj_depth_conjunct \<circ> \<Phi>) ` Q))
-                 (Sup ((max_neg_conj_depth_conjunct \<circ> \<Phi>) ` Q))
-                 (Sup ((neg_depth_conjunct \<circ> \<Phi>) ` Q))" by simp
-      hence "expr_pr_inner (StableConj Q \<Phi>) = E 0 0 0 1 0 0 0 0" using \<open>Q={}\<close>
-        by (simp add: bot_enat_def) 
-      then show ?thesis using \<open>e \<ge> (E 0 0 0 1 0 0 0 0)\<close> \<open>strategy_formula_inner g e (StableConj Q \<Phi>)\<close>
-        by metis
+    then obtain p Q where g_def: "g = Defender_Stable_Conj p Q" by blast
+    have cases:
+      "\<forall>g'. spectroscopy_moves g g' \<noteq> None \<longrightarrow> 
+       (\<exists>e'. weight g g' e = Some e' \<and> attacker_wins e' g')
+        \<and> ((\<exists>p' q. g' = (Attacker_Clause p' q)) \<or> (\<exists>p' Q'. g' = (Defender_Conj p' Q')))"
+      using Defense.IH unfolding g_def
+      by (metis (no_types, opaque_lifting)
+            spectroscopy_defender.elims(2,3) spectroscopy_moves.simps(40,42,43,44,55))
+    show ?case
+    proof(cases \<open>Q = {}\<close>)
+      case True
+      then obtain e' where e'_spec:
+        \<open>weight g (Defender_Conj p Q) e = Some e'\<close>
+        \<open>e' = e - (E 0 0 0 1 0 0 0 0)\<close>
+        \<open>attacker_wins e' (Defender_Conj p Q)\<close>
+        using cases local.empty_stbl_conj_answer unfolding g_def
+        by (smt (verit, best) option.discI option.sel)
+      then obtain \<Phi> where \<Phi>_prop: "strategy_formula_inner (Defender_Conj p Q) e' (Conj Q \<Phi>)"
+        using conj True by blast
+      hence strategy: "strategy_formula_inner g e (StableConj Q \<Phi>)" 
+        by (simp add: True g_def stable_conj)
+      have \<open>E 0 0 0 1 0 0 0 0 \<le> e\<close> using e'_spec
+        using g_def option.sel True by fastforce
+      moreover have \<open>expr_pr_inner (StableConj Q \<Phi>) = E 0 0 0 1 0 0 0 0\<close>
+        using True by (simp add: bot_enat_def)
+      ultimately have \<open>expr_pr_inner (StableConj Q \<Phi>) \<le> e\<close> by simp
+      with strategy show ?thesis by blast
     next
-      assume assm: "Q \<noteq> {} \<and> (\<forall>g'. spectroscopy_moves g g' \<noteq> None \<longrightarrow> (\<exists>p' q. g' = Attacker_Clause p' q))"
-      have fa_q: "\<forall>q \<in> Q. spectroscopy_moves (Defender_Stable_Conj p Q) (Attacker_Clause p q) 
-        = (subtract 0 0 0 1 0 0 0 0) \<and> attacker_wins (e - (E 0 0 0 1 0 0 0 0)) (Attacker_Clause p q)"
-        using \<open>g = Defender_Stable_Conj p Q\<close> cases by force
-      hence "\<forall>q \<in> Q. spectroscopy_moves (Defender_Stable_Conj p Q) (Attacker_Clause p q) 
-        = (subtract 0 0 0 1 0 0 0 0)" by blast
-      hence "\<forall>q \<in> Q. \<exists>g'. spectroscopy_moves (Defender_Stable_Conj p Q) g' \<noteq> None" 
-        by blast
-      hence "\<forall>q \<in> Q. \<exists>g'. attacker_wins (weight g g' e) g' \<and> (\<exists>\<phi>. strategy_formula_conjunct g' (weight g g' e) \<phi> \<and>
-                  expr_pr_conjunct \<phi> \<le> weight g g' e)"
-        using Defense \<open>g = Defender_Stable_Conj p Q\<close> cases
-        by (metis assm)
-      hence IH: "\<forall>q \<in> Q. attacker_wins (e - E 0 0 0 1 0 0 0 0) (Attacker_Clause p q) \<and> (\<exists>\<phi>. strategy_formula_conjunct (Attacker_Clause p q) (e - E 0 0 0 1 0 0 0 0) \<phi> \<and>
-                  expr_pr_conjunct \<phi> \<le> weight g (Attacker_Clause p q) e)" 
-        by (metis Defense \<open>\<forall>q\<in>Q. spectroscopy_moves (Defender_Stable_Conj p Q) (Attacker_Clause p q) = subtract 0 0 0 1 0 0 0 0 \<and> attacker_wins (e - E 0 0 0 1 0 0 0 0) (Attacker_Clause p q)\<close> \<open>g = Defender_Stable_Conj p Q\<close> option.distinct(1) option.sel)
-
-      hence "\<exists>\<Phi>. \<forall>q \<in> Q. attacker_wins (e - E 0 0 0 1 0 0 0 0) (Attacker_Clause p q) \<and> (strategy_formula_conjunct (Attacker_Clause p q) (e - E 0 0 0 1 0 0 0 0) (\<Phi> q) \<and>
-                  expr_pr_conjunct (\<Phi> q) \<le> weight g (Attacker_Clause p q) e)"
-        by meson 
-      hence "\<exists>\<Phi>. (\<forall>q \<in> Q. strategy_formula_conjunct (Attacker_Clause p q) (e - (E 0 0 0 1 0 0 0 0)) (\<Phi> q)
-              \<and> (strategy_formula_conjunct (Attacker_Clause p q) (e - E 0 0 0 1 0 0 0 0) (\<Phi> q) \<and>
-              expr_pr_conjunct (\<Phi> q) \<le> weight g (Attacker_Clause p q) e))"
-        using Defense \<open>g = Defender_Stable_Conj p Q\<close> cases  
+      case False
+      define e' where \<open>e' \<equiv> e - (E 0 0 0 1 0 0 0 0)\<close>
+      have e'_spec:
+        \<open>\<forall>q \<in> Q. weight (Defender_Stable_Conj p Q) (Attacker_Clause p q) e = Some e'
+          \<and> attacker_wins e' (Attacker_Clause p q)\<close>
+        using cases local.conj_s_answer
+        unfolding g_def e'_def 
+        by (smt (verit, best) option.discI option.sel)
+      hence IH: "\<forall>q \<in> Q. \<exists>\<phi>.
+        strategy_formula_conjunct (Attacker_Clause p q) e' \<phi> \<and>
+        expr_pr_conjunct \<phi> \<le> e'"
+        using Defense.IH local.conj_s_answer unfolding g_def e'_def
+        by (metis (no_types, lifting)  option.discI option.sel)
+      hence "\<exists>\<Phi>. \<forall>q \<in> Q.
+        strategy_formula_conjunct (Attacker_Clause p q) e' (\<Phi> q) \<and>
+        expr_pr_conjunct (\<Phi> q) \<le> e'"
         by meson
-      hence "\<exists>\<Phi>. (\<forall>q \<in> Q. spectroscopy_moves (Defender_Stable_Conj p Q) (Attacker_Clause p q) 
-        = (subtract 0 0 0 1 0 0 0 0) \<and> attacker_wins (e - (E 0 0 0 1 0 0 0 0)) (Attacker_Clause p q)
-          \<and> strategy_formula_conjunct (Attacker_Clause p q) (e - (E 0 0 0 1 0 0 0 0)) (\<Phi> q)
-          \<and> (strategy_formula_conjunct (Attacker_Clause p q) (e - E 0 0 0 1 0 0 0 0) (\<Phi> q) \<and>
-              expr_pr_conjunct (\<Phi> q) \<le> weight g (Attacker_Clause p q) e))"
-        using fa_q by blast
-      then obtain \<Phi> where \<Phi>_prop: "(\<forall>q \<in> Q. spectroscopy_moves (Defender_Stable_Conj p Q) (Attacker_Clause p q) 
-        = (subtract 0 0 0 1 0 0 0 0) \<and> attacker_wins (e - (E 0 0 0 1 0 0 0 0)) (Attacker_Clause p q)
-          \<and> strategy_formula_conjunct (Attacker_Clause p q) (e - (E 0 0 0 1 0 0 0 0)) (\<Phi> q)
-          \<and> (strategy_formula_conjunct (Attacker_Clause p q) (e - E 0 0 0 1 0 0 0 0) (\<Phi> q) \<and>
-              expr_pr_conjunct (\<Phi> q) \<le> weight g (Attacker_Clause p q) e))"
+      then obtain \<Phi> where \<Phi>_prop: "\<forall>q \<in> Q.
+        strategy_formula_conjunct (Attacker_Clause p q) e' (\<Phi> q)
+        \<and> expr_pr_conjunct (\<Phi> q) \<le> e'"
         by blast
-      hence "\<forall>q \<in> Q. expr_pr_conjunct (\<Phi> q) \<le> (e - (E 0 0 0 1 0 0 0 0))" 
-        by (simp add: \<open>g = Defender_Stable_Conj p Q\<close>)
+      have \<open>E 0 0 0 1 0 0 0 0 \<le> e\<close>
+        using e'_spec False by fastforce
       hence "expr_pr_inner (StableConj Q \<Phi>) \<le> e"
-        using expr_st_conj assm 
-        by metis
-      then show ?thesis using \<Phi>_prop 
-        using \<open>g = Defender_Stable_Conj p Q\<close> stable_conj by blast
+        using expr_st_conj e'_def \<Phi>_prop False by metis
+      moreover have \<open>strategy_formula_inner g e (StableConj Q \<Phi>)\<close>
+        using \<Phi>_prop e'_spec full_spec_game_axioms full_spec_game.stable_conj
+        unfolding e'_def  g_def by fastforce
+      ultimately show ?thesis by blast
     qed
   next
     case 6
