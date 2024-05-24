@@ -631,7 +631,7 @@ proof -
     by (metis add_diff_cancel_enat add_left_mono enat.simps(3) enat_defs(2) energy.sel(4) le_iff_add option.distinct(1))
   then show ?thesis
     using st_conj_upds sups
-    by (simp add: leq_components e_def)
+    by (simp add: e_def)
 qed
 
 lemma expr_imm_conj:
@@ -689,7 +689,7 @@ proof-
     "(max_pos_conj_depth_inner (Conj I \<psi>s)) \<le> e6"
     "(max_neg_conj_depth_inner (Conj I \<psi>s)) \<le> e7"
     "(neg_depth_inner (Conj I \<psi>s))\<le> e8"
-    by (auto simp add: leq_components)
+    by auto
   hence E:
     "Sup ((modal_depth_srbb_conjunct \<circ> \<psi>s) ` I) \<le> e1"
     "Sup ((branch_conj_depth_conjunct \<circ> \<psi>s) ` I) \<le> e2"
@@ -758,7 +758,7 @@ proof-
     by (metis add.right_neutral add_diff_cancel_enat enat_add_left_cancel_le ileI1 le_iff_add plus_1_eSuc(1))
   then show ?thesis
     using conj_upds sups
-    by (simp add: e_def leq_components)
+    by (simp add: e_def)
 qed
 
 lemma expr_br_conj:
@@ -839,7 +839,7 @@ proof-
     "\<forall>q\<in>Q. (max_pos_conj_depth_conjunct  (\<Phi> q)) \<le> e6"
     "\<forall>q\<in>Q. (max_neg_conj_depth_conjunct  (\<Phi> q)) \<le> e7"
     "\<forall>q\<in>Q. (neg_depth_conjunct  (\<Phi> q)) \<le> e8"
-    by (auto simp add: leq_components)
+    by auto
   hence "\<forall>q\<in>Q. (1 + branch_conj_depth_conjunct  (\<Phi> q)) \<le> e2"
     by (metis \<open>0 < e2\<close> add.commute add_diff_assoc_enat add_diff_cancel_enat add_right_mono i1_ne_infinity ileI1 one_eSuc)
   from branch_single have "\<forall>q\<in>Q. (1 + inst_conj_depth_conjunct  (\<Phi> q)) \<le> e3"
