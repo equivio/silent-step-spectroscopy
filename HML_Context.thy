@@ -113,12 +113,12 @@ proof -
   assume IH: "\<And>\<psi>' \<psi>. \<psi>' \<in> range \<psi>s' \<Longrightarrow> \<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r \<Longrightarrow> fill_conjunct \<phi>l \<psi>' \<Lleftarrow>\<and>\<Rrightarrow> \<psi> \<Longrightarrow> fill_conjunct \<phi>r \<psi>' \<Lleftarrow>\<and>\<Rrightarrow> \<psi>"
         and "\<phi>l \<Lleftarrow>\<Rrightarrow> \<phi>r" 
         and "fill \<phi>l (ConjC I \<psi>s I' \<psi>s') \<Lleftarrow>\<Rrightarrow> \<phi>"
-  then have "(\<forall>p. p \<Turnstile> \<phi>l = p \<Turnstile> \<phi>r)
-           \<and> (\<forall>p. p \<Turnstile> Conj (I \<union> I') (\<lambda>i. if i \<in> I' then fill_conjunct \<phi>l (\<psi>s' i) else \<psi>s i) = p \<Turnstile> \<phi>)"
+  then have "(\<forall>p. p \<Turnstile> \<phi>l \<longleftrightarrow> p \<Turnstile> \<phi>r)
+           \<and> (\<forall>p. p \<Turnstile> Conj (I \<union> I') (\<lambda>i. if i \<in> I' then fill_conjunct \<phi>l (\<psi>s' i) else \<psi>s i) \<longleftrightarrow> p \<Turnstile> \<phi>)"
     unfolding fill.simps and hml_eq_equality
     by force
-  then have "\<forall>p. p \<Turnstile> \<phi>l = p \<Turnstile> \<phi>r"
-        and thing: "\<forall>p. p \<Turnstile> Conj (I \<union> I') (\<lambda>i. if i \<in> I' then fill_conjunct \<phi>l (\<psi>s' i) else \<psi>s i) = p \<Turnstile> \<phi>"
+  then have "\<forall>p. p \<Turnstile> \<phi>l \<longleftrightarrow> p \<Turnstile> \<phi>r"
+        and thing: "\<forall>p. p \<Turnstile> Conj (I \<union> I') (\<lambda>i. if i \<in> I' then fill_conjunct \<phi>l (\<psi>s' i) else \<psi>s i) \<longleftrightarrow> p \<Turnstile> \<phi>"
     by auto
 
   from IH
@@ -129,7 +129,7 @@ proof -
     unfolding fill.simps and hml_eq_equality
   proof (rule allI)
     fix p
-    show "p \<Turnstile> Conj (I \<union> I') (\<lambda>i. if i \<in> I' then fill_conjunct \<phi>r (\<psi>s' i) else \<psi>s i) = p \<Turnstile> \<phi>"
+    show "p \<Turnstile> Conj (I \<union> I') (\<lambda>i. if i \<in> I' then fill_conjunct \<phi>r (\<psi>s' i) else \<psi>s i) \<longleftrightarrow> p \<Turnstile> \<phi>"
     proof (rule iffI)
       assume "p \<Turnstile> Conj (I \<union> I') (\<lambda>i. if i \<in> I' then fill_conjunct \<phi>r (\<psi>s' i) else \<psi>s i)"
       then have "(p \<Turnstile> Conj (I - I') \<psi>s)
@@ -139,10 +139,10 @@ proof -
             and "p \<Turnstile> Conj I' ((fill_conjunct \<phi>r) \<circ> \<psi>s')" by auto
 
       from thing
-      have "p \<Turnstile> Conj (I \<union> I') (\<lambda>i. if i \<in> I' then fill_conjunct \<phi>l (\<psi>s' i) else \<psi>s i) = p \<Turnstile> \<phi>" by (rule spec)
-      then have "((p \<Turnstile> Conj (I - I') \<psi>s) \<and> (p \<Turnstile> Conj I' (\<lambda>i. fill_conjunct \<phi>l (\<psi>s' i)))) = p \<Turnstile> \<phi>"  
+      have "p \<Turnstile> Conj (I \<union> I') (\<lambda>i. if i \<in> I' then fill_conjunct \<phi>l (\<psi>s' i) else \<psi>s i) \<longleftrightarrow> p \<Turnstile> \<phi>" by (rule spec)
+      then have "((p \<Turnstile> Conj (I - I') \<psi>s) \<and> (p \<Turnstile> Conj I' (\<lambda>i. fill_conjunct \<phi>l (\<psi>s' i)))) \<longleftrightarrow> p \<Turnstile> \<phi>"  
         by (smt (z3) Un_iff \<open>p \<Turnstile> Conj (I - I') \<psi>s\<close> \<open>p \<Turnstile> Conj (I \<union> I') (\<lambda>i. if i \<in> I' then fill_conjunct \<phi>r (\<psi>s' i) else \<psi>s i)\<close> hml_models.simps(5))
-      then have nthing: "((p \<Turnstile> Conj (I - I') \<psi>s) \<and> (p \<Turnstile> Conj I' ((fill_conjunct \<phi>l) \<circ> \<psi>s'))) = p \<Turnstile> \<phi>"
+      then have nthing: "((p \<Turnstile> Conj (I - I') \<psi>s) \<and> (p \<Turnstile> Conj I' ((fill_conjunct \<phi>l) \<circ> \<psi>s'))) \<longleftrightarrow> p \<Turnstile> \<phi>"
         by auto
 
       from \<open>p \<Turnstile> Conj I' ((fill_conjunct \<phi>r) \<circ> \<psi>s')\<close>
@@ -151,7 +151,7 @@ proof -
       have "p \<Turnstile> Conj I' ((fill_conjunct \<phi>l) \<circ> \<psi>s')" 
         by (smt (verit) IH LTS_Tau.hml_conjunct_eq_def hml_conjunct_impl_def hml_models.simps(5) o_def rangeI)
 
-      from \<open>((p \<Turnstile> Conj (I - I') \<psi>s) \<and> (p \<Turnstile> Conj I' ((fill_conjunct \<phi>l) \<circ> \<psi>s'))) = p \<Turnstile> \<phi>\<close>
+      from \<open>((p \<Turnstile> Conj (I - I') \<psi>s) \<and> (p \<Turnstile> Conj I' ((fill_conjunct \<phi>l) \<circ> \<psi>s'))) \<longleftrightarrow> p \<Turnstile> \<phi>\<close>
        and \<open>p \<Turnstile> Conj (I - I') \<psi>s\<close>
        and \<open>p \<Turnstile> Conj I' ((fill_conjunct \<phi>l) \<circ> \<psi>s')\<close>
       show "p \<Turnstile> \<phi>" 
@@ -225,7 +225,7 @@ proof -
           unfolding fill.simps and hml_models.simps.
         then have "(\<forall>i\<in>I'. hml_conjunct_models p (fill_conjunct \<phi>l (\<psi>s' i)))
                  \<and> (\<forall>i\<in>I - I'. hml_conjunct_models p (\<psi>s i))" 
-          by (metis DiffD1 DiffD2 Un_iff)
+          by (metis (full_types) DiffD1 DiffD2 Un_iff)
         then have "\<forall>i\<in>I'. hml_conjunct_models p (fill_conjunct \<phi>l (\<psi>s' i))"
               and "\<forall>i\<in>I - I'. hml_conjunct_models p (\<psi>s i)" by auto
 
@@ -255,7 +255,7 @@ proof -
           unfolding fill.simps and hml_models.simps.
         then have "(\<forall>i\<in>I'. hml_conjunct_models p (fill_conjunct \<phi>r (\<psi>s' i)))
                  \<and> (\<forall>i\<in>I - I'. hml_conjunct_models p (\<psi>s i))" 
-          by (metis DiffD1 DiffD2 Un_iff)
+          by (metis (full_types) DiffD1 DiffD2 Un_iff)
         hence "\<forall>i\<in>I'. hml_conjunct_models p (fill_conjunct \<phi>r (\<psi>s' i))"
           and "\<forall>i\<in>I - I'. hml_conjunct_models p (\<psi>s i)" by auto
 

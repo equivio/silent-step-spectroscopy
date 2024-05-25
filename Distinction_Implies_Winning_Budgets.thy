@@ -757,7 +757,7 @@ proof-
         from case_assms(1) obtain p' where p'_spec: \<open>p \<mapsto>a \<alpha> p'\<close> \<open>p' \<Turnstile>SRBB \<phi>\<close> 
           unfolding distinguishes_from_inner_def
               and distinguishes_def
-          using soft_poss_to_or hml_models.simps(2) by (auto) (blast)
+          using soft_poss_to_or hml_models.simps(2) by auto
         define Q_\<alpha> where \<open>Q_\<alpha> = Q - model_set_inner (Obs \<alpha> \<phi>)\<close>
         have \<open>attacker_wins (expr_pr_inner (BranchConj \<alpha> \<phi> I \<psi>s)) (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>)\<close>
           using main_case case_assms(1) p'_spec Q_\<alpha>_def by blast
@@ -827,7 +827,7 @@ proof-
           using p_reach_nonempty sreachable_set_is_sreachable \<open>p \<noteq> q\<close> by fastforce
         moreover have \<open>the (min1_7 (expr_pr_conjunct (Neg \<chi>) - E 0 0 0 0 0 0 0 1)) \<ge> (expr_pr_inner \<chi>)\<close>
           using min1_7_def energy_leq_cases
-          by (simp add: minus_energy_def modal_depth_dominates_neg_conjuncts)
+          by (simp add: modal_depth_dominates_neg_conjuncts)
         moreover from this have \<open>\<exists>e'. Some e' = ((\<lambda>e. Option.bind ((subtract_fn 0 0 0 0 0 0 0 1) e) min1_7) (expr_pr_conjunct (Neg \<chi>))) \<and> e' \<ge> (expr_pr_inner \<chi>)\<close>
           unfolding min_1_7_subtr_simp by auto
         ultimately show \<open>attacker_wins (expr_pr_conjunct (Neg \<chi>)) (Attacker_Clause p q)\<close>

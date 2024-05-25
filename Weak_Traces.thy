@@ -52,7 +52,7 @@ lemma trace_formula_to_expressiveness:
   fixes \<chi> :: "('act, 'i) hml_srbb_inner"
   shows  "(is_trace_formula \<phi>       \<longrightarrow> (\<phi> \<in> \<O>       (E \<infinity> 0 0 0 0 0 0 0)))
         \<and> (is_trace_formula_inner \<chi> \<longrightarrow> (\<chi> \<in> \<O>_inner (E \<infinity> 0 0 0 0 0 0 0)))"
-  by (rule is_trace_formula_is_trace_formula_inner.induct) (simp add: Sup_enat_def \<O>_def \<O>_inner_def leq_not_eneg)+
+  by (rule is_trace_formula_is_trace_formula_inner.induct) (simp add: Sup_enat_def \<O>_def \<O>_inner_def)+
 
 lemma expressiveness_to_trace_formula:
   fixes \<phi> :: "('act, 'i) hml_srbb"
@@ -70,18 +70,20 @@ next
     by (simp add: \<O>_inner_def \<O>_def is_trace_formula_is_trace_formula_inner.intros(2))
 next
   case (ImmConj x1 x2)
-  then show ?case apply (simp add: \<O>_def leq_not_eneg)
-  using \<O>_def leq_not_eneg is_trace_formula_is_trace_formula_inner.intros(3) by blast
+  then show ?case
+    using \<O>_def is_trace_formula_is_trace_formula_inner.intros(3)
+    by(auto simp add: \<O>_def)
 next
   case (Obs x1 x2)
-  then show ?case by (simp add: \<O>_def \<O>_inner_def is_trace_formula_is_trace_formula_inner.intros(4) leq_not_eneg)
+  then show ?case by (simp add: \<O>_def \<O>_inner_def is_trace_formula_is_trace_formula_inner.intros(4))
 next
   case (Conj I \<psi>s)
   show ?case
   proof (rule impI)
     assume "Conj I \<psi>s \<in> \<O>_inner (E \<infinity> 0 0 0 0 0 0 0)"
-    hence "I = {}" 
-      by (metis \<O>_inner_def add_eq_0_iff_both_eq_0 bot.extremum_uniqueI bot_enat_def energy.distinct(1) energy.sel(3) expr_pr_inner.simps inst_conj_depth_inner.simps(2) leq_not_eneg mem_Collect_eq zero_one_enat_neq(2))
+    hence "I = {}"
+      unfolding \<O>_inner_def
+      by (metis bot.extremum_uniqueI bot_enat_def energy.sel(3) expr_pr_inner.simps inst_conj_depth_inner.simps(2) le_iff_add leq_components mem_Collect_eq not_one_le_zero)
     then show "is_trace_formula_inner (Conj I \<psi>s)" 
       by (simp add: is_trace_formula_is_trace_formula_inner.intros(5))
   qed
@@ -91,16 +93,16 @@ next
   proof (rule impI)
     assume "StableConj I \<psi>s \<in> \<O>_inner (E \<infinity> 0 0 0 0 0 0 0)"
     have "StableConj I \<psi>s \<notin> \<O>_inner (E \<infinity> 0 0 0 0 0 0 0)" 
-      by (simp add: \<O>_inner_def leq_not_eneg)
+      by (simp add: \<O>_inner_def)
     with \<open>StableConj I \<psi>s \<in> \<O>_inner (E \<infinity> 0 0 0 0 0 0 0)\<close>
     show "is_trace_formula_inner (StableConj I \<psi>s)" by contradiction
   qed
 next
   case (BranchConj \<alpha> \<phi> I \<psi>s)
   have \<open>expr_pr_inner (BranchConj \<alpha> \<phi> I \<psi>s) \<ge> E 0 1 1 0 0 0 0 0\<close>
-    by (simp add: leq_not_eneg)
+    by simp
   hence \<open>BranchConj \<alpha> \<phi> I \<psi>s \<notin> \<O>_inner (E \<infinity> 0 0 0 0 0 0 0)\<close>
-    unfolding \<O>_inner_def by (simp add: leq_not_eneg)
+    unfolding \<O>_inner_def by simp
   thus ?case by blast
 next
   case (Pos x)
