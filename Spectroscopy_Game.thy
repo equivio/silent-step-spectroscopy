@@ -49,7 +49,7 @@ fun spectroscopy_moves :: "('s, 'a) spectroscopy_position \<Rightarrow> ('s, 'a)
     "spectroscopy_moves (Attacker_Delayed p Q) (Defender_Conj p' Q')
       = (if p = p' \<and> Q = Q' then Some Some else None)" |
 
-  conj_answer: 
+  conj_answer:
     "spectroscopy_moves (Defender_Conj p Q) (Attacker_Clause p' q) 
       = (if p = p' \<and> q \<in> Q then (subtract 0 0 1 0 0 0 0 0) else None)" |
   
