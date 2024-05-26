@@ -127,14 +127,14 @@ We define what it means for a process @{term "p"} to satisfy a formula @{term "\
 \<close>
 
 primrec
-      hml_models          :: "'s \<Rightarrow> ('a, 's) hml \<Rightarrow> bool" ("_ \<Turnstile> _" 60) 
+      hml_models          :: "'s \<Rightarrow> ('a, 's) hml \<Rightarrow> bool" (infixl "\<Turnstile>" 50) 
   and hml_conjunct_models :: "'s \<Rightarrow> ('a, 's) hml_conjunct \<Rightarrow> bool"
 where
-  "(_ \<Turnstile> TT) = True" |
-  "(p \<Turnstile> (Obs a \<phi>)) = (\<exists>p'. p \<mapsto> a p' \<and> (p' \<Turnstile> \<phi>))" |
-  "(p \<Turnstile> (Internal \<phi>)) = (\<exists>p'. p \<Zsurj> p' \<and> (p' \<Turnstile> \<phi>))" |
-  "(p \<Turnstile> (Silent \<phi>)) = ((\<exists>p'. p \<mapsto> \<tau> p' \<and> (p' \<Turnstile> \<phi>)) \<or> (p \<Turnstile> \<phi>))" |
-  "(p \<Turnstile> (Conj I \<psi>s)) = (\<forall>i \<in> I. hml_conjunct_models p (\<psi>s i))" |
+  "_ \<Turnstile> TT = True" |
+  "p \<Turnstile> Obs a \<phi> = (\<exists>p'. p \<mapsto> a p' \<and> p' \<Turnstile> \<phi>)" |
+  "p \<Turnstile> Internal \<phi> = (\<exists>p'. p \<Zsurj> p' \<and> p' \<Turnstile> \<phi>)" |
+  "p \<Turnstile> Silent \<phi> = ((\<exists>p'. p \<mapsto> \<tau> p' \<and> p' \<Turnstile> \<phi>) \<or> p \<Turnstile> \<phi>)" |
+  "p \<Turnstile> Conj I \<psi>s = (\<forall>i \<in> I. hml_conjunct_models p (\<psi>s i))" |
 
   "(hml_conjunct_models p (Pos \<phi>)) = (p \<Turnstile> \<phi>)" |
   "(hml_conjunct_models p (Neg \<phi>)) = (\<not>(p \<Turnstile> \<phi>))"
@@ -147,7 +147,7 @@ begin
 text \<open> Given this semantics, one may note that the @{term "Silent"} data constructor representing \<open>(\<tau>)\<phi>\<close>
 is redundant.  It does not add to the expressiveness of the HML language and could safely be turned
 into an abbreviation for \<open>\<And>{\<not>(\<And>{\<not>\<langle>\<tau>\<rangle>\<phi>, \<not>\<phi>})}\<close>: \<close>
-lemma "(state \<Turnstile> (Silent \<phi>))
+lemma "state \<Turnstile> Silent \<phi>
      = (state \<Turnstile> (Conj {left}
                        (\<lambda>i. if i = left
                             then Neg (Conj {left, right}
@@ -219,7 +219,7 @@ text \<open>
 if \<open>\<alpha> = \<tau>\<close> and \<open>\<phi>\<close> is already satisfied.
 \<close>
 lemma soft_poss_to_or[simp]:
-  "p \<Turnstile> (HML_soft_poss \<alpha> \<phi>) = (p \<Turnstile> Obs \<alpha> \<phi>) \<or> (\<alpha> = \<tau> \<and> p \<Turnstile> \<phi>)"
+  "(p \<Turnstile> HML_soft_poss \<alpha> \<phi>) \<longleftrightarrow> (p \<Turnstile> Obs \<alpha> \<phi>) \<or> (\<alpha> = \<tau> \<and> (p \<Turnstile> \<phi>))"
   by auto
 
 end (* context LTS_Tau *)
@@ -236,7 +236,7 @@ whereby the LTS needs to be inhabited so that at least two indices are available
 abbreviation
   HML_and :: "('a, 's) hml_conjunct \<Rightarrow> ('a, 's) hml_conjunct
               \<Rightarrow> ('a, 's) hml"
-  ("_ \<and>hml _" 70) where
+  (infixl "\<and>hml" 80) where
 
   "left_conjunct \<and>hml right_conjunct \<equiv> 
    Conj {left, right} (\<lambda>i. if i = left
@@ -272,7 +272,7 @@ abbreviation HML_not :: "('a, 's) hml \<Rightarrow> ('a, 's) hml" where
 text \<open> The formula \<open>\<not>\<not>\<phi>\<close> is satisfied if and only if \<open>\<phi>\<close> is satisfied. \<close>
 lemma hml_not_not:
   shows "(state \<Turnstile> \<phi>)
-       = (state \<Turnstile> HML_not (HML_not \<phi>))"
+       \<longleftrightarrow> (state \<Turnstile> HML_not (HML_not \<phi>))"
   by simp
 
 text \<open>
@@ -280,7 +280,7 @@ text \<open>
 This lifts the negation from HML to HOL.
 \<close>
 lemma hml_not_not_models[simp]:
-  shows "(state \<Turnstile> HML_not \<phi>) = (\<not> state \<Turnstile> \<phi>)"
+  shows "state \<Turnstile> HML_not \<phi> == \<not> (state \<Turnstile> \<phi>)"
   by simp
 
 subsubsection \<open> Falsum\<close>
@@ -290,17 +290,17 @@ abbreviation HML_falsum :: "('a, 's) hml" ("\<bottom>\<bottom>") where
 
 text \<open> No process satisfies falsum.\<close>
 lemma never_models_falsum[simp]:
-  shows "\<not> state \<Turnstile> \<bottom>\<bottom>"
+  shows "\<not> (state \<Turnstile> \<bottom>\<bottom>)"
   by simp
 
 subsubsection \<open> Binary Disjunction\<close>
 
-text \<open> The formula @{term "(\<phi> \<or> \<phi>')"} is realized by using binary conjunction and negation. \<close>
+text \<open> The formula @{term "(\<phi> \<or>hml \<phi>')"} is realized by using binary conjunction and negation. \<close>
 
-definition HML_or :: "('a, 's) hml \<Rightarrow> ('a, 's) hml \<Rightarrow> ('a, 's) hml" ("_ \<or> _" 70) where
-  "\<phi>l \<or> \<phi>r \<equiv> HML_not (Neg \<phi>l \<and>hml Neg \<phi>r)"
+definition HML_or :: "('a, 's) hml \<Rightarrow> ('a, 's) hml \<Rightarrow> ('a, 's) hml" ("_ \<or>hml _" 70) where
+  "\<phi>l \<or>hml \<phi>r \<equiv> HML_not (Neg \<phi>l \<and>hml Neg \<phi>r)"
 
-lemma hml_or_or[simp]: "(p \<Turnstile> (\<phi>l \<or> \<phi>r)) = ((p \<Turnstile> \<phi>l) \<or> (p \<Turnstile> \<phi>r))"
+lemma hml_or_or[simp]: "(p \<Turnstile> (\<phi>l \<or>hml \<phi>r)) = ((p \<Turnstile> \<phi>l) \<or> (p \<Turnstile> \<phi>r))"
   unfolding HML_or_def 
   using Inhabited_LTS_axioms Inhabited_LTS_def hml_conjunct_models.simps(2) hml_models.simps(1) hml_models.simps(5) by force
 
@@ -314,7 +314,7 @@ subsection \<open> Pre-Order \label{sect:hmlImpl}\<close>
 
 text \<open> A HML formula \<open>\<phi>l\<close> implies another (\<open>\<phi>r\<close>) if the fact that some process \<open>p\<close> satisfies \<open>\<phi>l\<close>
 implies that \<open>p\<close> must also satisfy \<open>\<phi>r\<close>, regardless of the process \<open>p\<close>. \<close>
-definition hml_impl :: "('a, 's) hml \<Rightarrow> ('a, 's) hml \<Rightarrow> bool" (infix "\<Rrightarrow>" 60)  where
+definition hml_impl :: "('a, 's) hml \<Rightarrow> ('a, 's) hml \<Rightarrow> bool" (infixr "\<Rrightarrow>" 60)  where
   "\<phi>l \<Rrightarrow> \<phi>r \<equiv> (\<forall>p. (p \<Turnstile> \<phi>l) \<longrightarrow> (p \<Turnstile> \<phi>r))"
 
 lemma hml_impl_iffI:
@@ -888,7 +888,7 @@ lemma
   by (meson equivp_transp)
 
 text \<open> The formula \<open>(\<tau>)\<phi>\<close> is equivalent to \<open>\<langle>\<tau>\<rangle>\<phi> \<or> \<phi>\<close>. \<close>
-lemma silent_is_or: "(Silent \<phi>) \<Lleftarrow>\<Rrightarrow> ((Obs \<tau> \<phi>) \<or> \<phi>)"
+lemma silent_is_or: "(Silent \<phi>) \<Lleftarrow>\<Rrightarrow> ((Obs \<tau> \<phi>) \<or>hml \<phi>)"
   unfolding hml_eq_equality
         and hml_or_or
         and opt_\<tau>_is_or
@@ -901,12 +901,12 @@ lemma hml_not_not_eq: "\<phi> \<Lleftarrow>\<Rrightarrow> HML_not (HML_not \<phi
 
 text \<open>The formula \<open>\<phi> \<and> \<not>\<phi>\<close> is equivalent to \<open>\<bottom>\<close>. \<close>
 lemma hml_absurdity:
-  shows "Pos \<phi> \<and>hml Neg \<phi> \<Lleftarrow>\<Rrightarrow> \<bottom>\<bottom>"
+  shows "(Pos \<phi> \<and>hml Neg \<phi>) \<Lleftarrow>\<Rrightarrow> \<bottom>\<bottom>"
   by (smt (verit) Inhabited_LTS_axioms Inhabited_LTS_def LTS_Tau.hml_eq_equality hml_conjunct_models.simps(1) hml_conjunct_models.simps(2) hml_models.simps(5) insertCI never_models_falsum)
 
 text \<open> The formula \<open>\<phi> \<or> \<not>\<phi>\<close> is equivalent to \<open>\<top>\<close>. \<close>
 lemma hml_tertium_non_datur:
-  shows "TT \<Lleftarrow>\<Rrightarrow> (\<phi> \<or> HML_not \<phi>)"
+  shows "TT \<Lleftarrow>\<Rrightarrow> (\<phi> \<or>hml HML_not \<phi>)"
   using hml_absurdity and hml_not_not_eq 
   by (simp add: hml_eq_equality)
 
