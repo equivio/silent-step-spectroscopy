@@ -143,6 +143,14 @@ models predicate.
 lemma eq_equality[simp]: "(logical_eq \<phi>l \<phi>r) = (\<forall>p. models p \<phi>l = models p \<phi>r)"
   by force
 
+lemma logical_eqI[intro]:
+  assumes
+    \<open>\<And>s. models s \<phi>l \<Longrightarrow> models s \<phi>r\<close>
+    \<open>\<And>s. models s \<phi>r \<Longrightarrow> models s \<phi>l\<close>
+  shows
+    \<open>logical_eq \<phi>l \<phi>r\<close>
+  using assms by auto
+
 definition distinguishes :: "'formula \<Rightarrow> 's \<Rightarrow> 's \<Rightarrow> bool" where
   distinguishes_def[simp]:
   "distinguishes \<phi> p q \<equiv> models p \<phi> \<and> \<not>(models q \<phi>)"
@@ -157,6 +165,16 @@ lemma distinction_unlifting:
   shows
     \<open>\<forall>q\<in>Q. distinguishes \<phi> p q\<close>
   using assms by simp
+
+lemma no_distinction_fom_self:
+  assumes
+    \<open>distinguishes \<phi> p p\<close>
+  shows
+    \<open>False\<close>
+  using assms by simp
+
+abbreviation model_set :: "'formula \<Rightarrow> 's set" where
+  "model_set \<phi> \<equiv> {p. models p \<phi>}"
 
 end
 
@@ -1098,10 +1116,6 @@ lemma vertum_cant_distinguish:
   shows "\<not> (p << TT >> q)"
   by auto
 
-text \<open> Regardless of the formula chosen, a process can never be distinguished from itself.\<close>
-lemma cant_self_distinguish:
-  shows "\<not> (p << \<phi> >> p)"
-  by simp
 
 end (* LTS_Tau *)
 
