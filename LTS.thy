@@ -70,8 +70,8 @@ text \<open>A state \<open>p\<close> is @{term "silent_reachable"}, represented 
 from \<open>p'\<close> to \<open>p\<close>.\<close>
 inductive silent_reachable :: "'s \<Rightarrow> 's \<Rightarrow> bool"  (infix "\<Zsurj>" 80)
   where
-    "p \<Zsurj> p" |
-    "p \<Zsurj> p''" if "p \<mapsto> \<tau> p'" and "p' \<Zsurj> p''"
+    refl: "p \<Zsurj> p" |
+    step: "p \<Zsurj> p''" if "p \<mapsto> \<tau> p'" and "p' \<Zsurj> p''"
 
 text \<open>If \<open>p'\<close> is silent reachable from \<open>p\<close> and there is a \<open>\<tau>\<close>-transition from \<open>p'\<close> to \<open>p''\<close> then \<open>p''\<close> is silent reachable from \<open>p\<close>.\<close>
 lemma silent_reachable_append_\<tau>: "p \<Zsurj> p' \<Longrightarrow> p' \<mapsto> \<tau> p'' \<Longrightarrow> p \<Zsurj> p''"
@@ -98,17 +98,18 @@ text \<open>If a state \<open>p'\<close> is @{term "silent_reachable"} from \<op
 lemma silent_reachable_impl_loopless:
   assumes "p \<Zsurj> p'"
   shows "p \<Zsurj>L p'"
-  using assms proof(induct rule: silent_reachable.induct)
-  case (1 p)
+  using assms
+proof(induct rule: silent_reachable.induct)
+  case (refl p)
   thus ?case by (rule silent_reachable_loopless.intros(1))
 next
-  case (2 p p' p'')
+  case (step p p' p'')
   thus ?case proof(cases "p = p'")
     case True
-    thus ?thesis using "2.hyps"(3) by auto
+    thus ?thesis using "step.hyps"(3) by auto
   next
     case False
-    thus ?thesis using "2.hyps" silent_reachable_loopless.intros(2) by blast
+    thus ?thesis using "step.hyps" silent_reachable_loopless.intros(2) by blast
   qed
 qed
 
