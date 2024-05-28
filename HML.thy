@@ -173,14 +173,74 @@ lemma no_distinction_fom_self:
     \<open>False\<close>
   using assms by simp
 
+text \<open>If $\varphi$ is equivalent to $\varphi'$ and $\varphi$ distinguishes process @{term "p"} from
+process @{term "q"}, the $\varphi'$ also distinguishes process @{term "p"} from process @{term "q"}.\<close>
+lemma dist_equal_dist:
+  assumes "logical_eq \<phi>l \<phi>r"
+      and "distinguishes \<phi>l p q"
+    shows "distinguishes \<phi>r p q"
+  using assms
+  by auto
+
 abbreviation model_set :: "'formula \<Rightarrow> 's set" where
   "model_set \<phi> \<equiv> {p. models p \<phi>}"
+
+subsection \<open>Formula Set derived Pre-Order on Processes\<close>
+
+text \<open> A set of formulas pre-orders two processes @{term "p"} and @{term "q"} if
+for all formulas in this set the fact that @{term "p"} satisfies a formula means that also
+@{term "q"} must satisfy this formula. \<close>
+definition preordered :: "'formula set \<Rightarrow> 's \<Rightarrow> 's \<Rightarrow> bool" where
+  preordered_def[simp]:
+  "preordered \<phi>s p q \<equiv> \<forall>\<phi> \<in> \<phi>s. models p \<phi> \<longrightarrow> models q \<phi>"
+
+text \<open>
+If a set of formulas pre-orders two processes @{term "p"} and @{term "q"}, then no formula in that set
+may distinguish @{term "p"} from @{term "q"}.
+\<close>
+lemma preordered_no_distinction: 
+  "preordered \<phi>s p q = (\<forall>\<phi> \<in> \<phi>s. \<not>(distinguishes \<phi> p q))"
+  by simp
+
+text \<open>A formula set derived pre-order is a pre-order.\<close>
+lemma preordered_preord:
+  "reflp (preordered \<phi>s)"
+  "transp (preordered \<phi>s)"
+  unfolding reflp_def transp_def by auto
+
+subsection \<open>Formula Set derived Equivalence of Processes \<close>
+
+text \<open>A set of formulas equates two processes @{term "p"} and @{term "q"} if
+this set of formulas pre-orders these two processes in both directions. \<close>
+definition equivalent :: "'formula set \<Rightarrow> 's \<Rightarrow> 's \<Rightarrow> bool" where
+  equivalent_def[simp]:
+  "equivalent \<phi>s p q \<equiv> preordered \<phi>s p q \<and> preordered \<phi>s q p"
+
+text \<open>
+If a set of formulas equates two processes @{term "p"} and @{term "q"}, then no formula in that set
+may distinguish @{term "p"} from @{term "q"} nor the other way around.
+\<close>
+lemma equivalent_no_distinction: "equivalent \<phi>s p q
+     = (\<forall>\<phi> \<in> \<phi>s. \<not>(distinguishes \<phi> p q) \<and> \<not>(distinguishes \<phi> q p))"
+  by auto
+
+text \<open> A formula-set-derived equivalence is an equivalence. \<close>
+lemma equivalent_equiv: "equivp (equivalent \<phi>s)"
+proof (rule equivpI)
+  show \<open>reflp (equivalent \<phi>s)\<close>
+    by (simp add: reflpI)
+  show \<open>symp (equivalent \<phi>s)\<close>
+    unfolding equivalent_no_distinction symp_def
+    by auto
+  show \<open>transp (equivalent \<phi>s)\<close>
+    unfolding transp_def equivalent_def preordered_def
+    by blast
+qed
 
 end
 
 context LTS_Tau
 begin
-
 
 text \<open>
 We define what it means for a process @{term "p"} to satisfy a formula @{term "\<phi>"}, written as

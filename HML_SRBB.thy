@@ -197,9 +197,9 @@ fun hml_srbb_inner_models :: "'s \<Rightarrow>('a, 's) hml_srbb_inner \<Rightarr
 fun hml_srbb_conjunct_models :: "'s \<Rightarrow> ('a, 's) hml_srbb_conjunct \<Rightarrow> bool" where
   "hml_srbb_conjunct_models s \<psi> = (hml_conjunct_models s (hml_srbb_conjunct_to_hml_conjunct \<psi>))"
 
-interpretation lts_semantics where models = hml_srbb_models .
-interpretation hml_srbb_inner: lts_semantics where models = hml_srbb_inner_models .
-interpretation hml_srbb_conj: lts_semantics where models = hml_srbb_conjunct_models .
+sublocale lts_semantics \<open>step\<close> \<open>hml_srbb_models\<close> .
+sublocale hml_srbb_inner: lts_semantics where models = hml_srbb_inner_models .
+sublocale hml_srbb_conj: lts_semantics where models = hml_srbb_conjunct_models . 
 
 subsection \<open> Different Variants of Verum \<close>
 
@@ -912,70 +912,6 @@ next
               hml_srbb_conjunct.exhaust hml_srbb_conjunct_models.elims(2))
   thus \<open>p \<Turnstile>SRBB hml_srbb.Internal (StableConj I \<Psi>)\<close>
     using p'_spec(1) by auto
-qed
-
-subsection \<open> Distinguishing Formulas and Equivalence \<close>
-
-text \<open> If $\varphi$ is equivalent to $\varphi'$ and $\varphi$ distinguishes process @{term "p"} from
-process @{term "q"}, the $\varphi'$ also distinguishes process @{term "p"} from process @{term "q"}. \<close>
-lemma dist_equal_dist:
-  assumes "\<phi>l \<Lleftarrow>srbb\<Rrightarrow> \<phi>r"
-      and "distinguishes \<phi>l p q"
-    shows "distinguishes \<phi>r p q"
-  using assms
-  by simp
-
-subsection \<open> HML$_\text{SRBB}$ Formula Set derived Pre-Order on Processes \<close>
-
-text \<open> A set of HML$_\text{SRBB}$ formulas pre-order two processes @{term "p"} and @{term "q"} if
-for all formulas in this set the fact that @{term "p"} satisfies a formula means that also
-@{term "q"} must satisfy this formula. \<close>
-definition hml_preordered :: "(('a, 's) hml_srbb) set \<Rightarrow> 's \<Rightarrow> 's \<Rightarrow> bool" where
-  "hml_preordered \<phi>s p q \<equiv> \<forall>\<phi> \<in> \<phi>s. p \<Turnstile>SRBB \<phi> \<longrightarrow> q \<Turnstile>SRBB \<phi>"
-
-text \<open>
-If a set of formulas pre-orders two processes @{term "p"} and @{term "q"}, then no formula in that set
-may distinguish @{term "p"} from @{term "q"}.
-\<close>
-lemma "hml_preordered \<phi>s p q = (\<forall>\<phi> \<in> \<phi>s. \<not>(distinguishes \<phi> p q))"
-  by (simp add: distinguishes_def hml_preordered_def)
-
-text \<open> A formula set derived pre-order is a pre-order. \<close>
-lemma "reflp (hml_preordered \<phi>s) \<and> transp (hml_preordered \<phi>s)"
-proof (rule conjI)
-  show "reflp (hml_preordered \<phi>s)" 
-    by (simp add: hml_preordered_def reflpI)
-next
-  show "transp (hml_preordered \<phi>s)" 
-    by (smt (verit, best) hml_preordered_def transpI)
-qed
-
-subsection \<open>HML$_\text{SRBB}$ Formula Set derived Equivalence of Processes \<close>
-
-text \<open> A set of HML$_\text{SRBB}$ formulas equates two processes @{term "p"} and @{term "q"} if
-this set of formulas pre-orders these two processes in both directions. \<close>
-definition hml_equivalent :: "(('a, 's) hml_srbb) set \<Rightarrow> 's \<Rightarrow> 's \<Rightarrow> bool" where
-  "hml_equivalent \<phi>s p q \<equiv> hml_preordered \<phi>s p q \<and> hml_preordered \<phi>s q p"
-
-text \<open>
-If a set of formulas equates two processes @{term "p"} and @{term "q"}, then no formula in that set
-may distinguish @{term "p"} from @{term "q"} nor the other way around.
-\<close>
-lemma "hml_equivalent \<phi>s p q
-     = (\<forall>\<phi> \<in> \<phi>s. \<not>(distinguishes \<phi> p q) \<and> \<not>(distinguishes \<phi> q p))"
-  using distinguishes_def hml_equivalent_def hml_preordered_def by auto
-
-text \<open> A formula set derived equivalence is an equivalence. \<close>
-lemma "equivp (hml_equivalent \<phi>s)"
-proof (rule equivpI)
-  show "reflp (hml_equivalent \<phi>s)" 
-    by (simp add: hml_equivalent_def hml_preordered_def reflpI)
-next
-  show "symp (hml_equivalent \<phi>s)" 
-    by (metis hml_equivalent_def sympI)
-next
-  show "transp (hml_equivalent \<phi>s)" 
-    by (smt (verit) hml_equivalent_def hml_preordered_def transpI)
 qed
 
 end (* Inhabited_Tau_LTS *)

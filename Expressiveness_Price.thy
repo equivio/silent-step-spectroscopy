@@ -998,11 +998,11 @@ begin
 
 text \<open>A state \<open>p\<close> pre-orders another state \<open>q\<close> with respect to some energy \<open>e\<close> if and only if \<open>p\<close> HML pre-orders \<open>q\<close> with respect to the HML sublanguage @{term "\<O>"} derived from \<open>e\<close>.\<close>
 definition expr_preord :: "'s \<Rightarrow> energy \<Rightarrow> 's \<Rightarrow> bool" ("_ \<preceq> _ _" 60) where
-  "(p \<preceq> e q) \<equiv> hml_preordered (\<O> e) p q"
+  "(p \<preceq> e q) \<equiv> preordered (\<O> e) p q"
 
 text \<open>Conversely, \<open>p\<close> and \<open>q\<close> are equivalent with respect to \<open>e\<close> if and only if they are equivalent with respect to that HML sublanguage @{term "\<O>"}.\<close>
 definition expr_equiv :: "'s \<Rightarrow> energy \<Rightarrow> 's \<Rightarrow> bool" ("_ \<sim> _ _" 60) where
-  "(p \<sim> e q) \<equiv> hml_equivalent (\<O> e) p q"
+  "(p \<sim> e q) \<equiv> equivalent (\<O> e) p q"
 
 end
 
