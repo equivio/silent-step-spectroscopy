@@ -60,7 +60,7 @@ proof-
             \<longrightarrow> attacker_wins (expr_pr_inner \<chi>) (Defender_Stable_Conj p Q))
         \<and> (\<forall>\<Psi>_I \<Psi> \<alpha> \<phi> p Q p' Q_\<alpha>. \<chi> = BranchConj \<alpha> \<phi> \<Psi>_I \<Psi> \<longrightarrow>
             hml_srbb_inner.distinguishes_from \<chi> p Q \<longrightarrow> p \<mapsto>a \<alpha> p' \<longrightarrow> p' \<Turnstile>SRBB \<phi> \<longrightarrow>
-            Q_\<alpha> \<noteq> {} \<longrightarrow> Q_\<alpha> = Q - hml_srbb_inner.model_set (Obs \<alpha> \<phi>)
+             Q_\<alpha> = Q - hml_srbb_inner.model_set (Obs \<alpha> \<phi>)
             \<longrightarrow> attacker_wins (expr_pr_inner \<chi>) (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>)))
       \<and>
         (\<forall>p q. hml_srbb_conj.distinguishes \<psi> p q
@@ -80,7 +80,7 @@ proof-
             \<longrightarrow> attacker_wins (expr_pr_inner \<chi>) (Defender_Stable_Conj p Q))
         \<and> (\<forall>\<Psi>_I \<Psi> \<alpha> \<phi> p Q p' Q_\<alpha>. \<chi> = BranchConj \<alpha> \<phi> \<Psi>_I \<Psi> \<longrightarrow>
             hml_srbb_inner.distinguishes_from \<chi> p Q \<longrightarrow> p \<mapsto>a \<alpha> p' \<longrightarrow> p' \<Turnstile>SRBB \<phi> \<longrightarrow>
-            Q_\<alpha> \<noteq> {} \<longrightarrow> Q_\<alpha> = Q - hml_srbb_inner.model_set (Obs \<alpha> \<phi>)
+             Q_\<alpha> = Q - hml_srbb_inner.model_set (Obs \<alpha> \<phi>)
             \<longrightarrow> attacker_wins (expr_pr_inner \<chi>) (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>)))
       \<and>
         (\<forall>p q. hml_srbb_conj.distinguishes \<psi> p q
