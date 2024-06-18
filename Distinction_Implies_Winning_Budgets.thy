@@ -50,40 +50,40 @@ proof-
         (\<forall>Q p. Q \<noteq> {} \<longrightarrow> distinguishes_from \<phi> p Q
                \<longrightarrow> attacker_wins (expressiveness_price \<phi>) (Attacker_Immediate p Q))
       \<and>
-        ((\<forall>p Q. Q \<noteq> {} \<longrightarrow> distinguishes_from_inner \<chi> p Q \<longrightarrow> Q \<Zsurj>S Q
+        ((\<forall>p Q. Q \<noteq> {} \<longrightarrow> hml_srbb_inner.distinguishes_from \<chi> p Q \<longrightarrow> Q \<Zsurj>S Q
             \<longrightarrow> attacker_wins (expr_pr_inner \<chi>) (Attacker_Delayed p Q))
         \<and> (\<forall>\<Psi>_I \<Psi> p Q. \<chi> = Conj \<Psi>_I \<Psi> \<longrightarrow>
-            Q \<noteq> {} \<longrightarrow> distinguishes_from_inner \<chi> p Q
+            Q \<noteq> {} \<longrightarrow> hml_srbb_inner.distinguishes_from \<chi> p Q
             \<longrightarrow> attacker_wins (expr_pr_inner \<chi>) (Defender_Conj p Q))
         \<and> (\<forall>\<Psi>_I \<Psi> p Q. \<chi> = StableConj \<Psi>_I \<Psi> \<longrightarrow>
-            Q \<noteq> {} \<longrightarrow> distinguishes_from_inner \<chi> p Q \<longrightarrow> (\<forall>q \<in> Q. \<nexists>q'. q \<mapsto> \<tau> q')
+            Q \<noteq> {} \<longrightarrow> hml_srbb_inner.distinguishes_from \<chi> p Q \<longrightarrow> (\<forall>q \<in> Q. \<nexists>q'. q \<mapsto> \<tau> q')
             \<longrightarrow> attacker_wins (expr_pr_inner \<chi>) (Defender_Stable_Conj p Q))
         \<and> (\<forall>\<Psi>_I \<Psi> \<alpha> \<phi> p Q p' Q_\<alpha>. \<chi> = BranchConj \<alpha> \<phi> \<Psi>_I \<Psi> \<longrightarrow>
-            distinguishes_from_inner \<chi> p Q \<longrightarrow> p \<mapsto>a \<alpha> p' \<longrightarrow> p' \<Turnstile>SRBB \<phi> \<longrightarrow>
-            Q_\<alpha> \<noteq> {} \<longrightarrow> Q_\<alpha> = Q - model_set_inner (Obs \<alpha> \<phi>)
+            hml_srbb_inner.distinguishes_from \<chi> p Q \<longrightarrow> p \<mapsto>a \<alpha> p' \<longrightarrow> p' \<Turnstile>SRBB \<phi> \<longrightarrow>
+             Q_\<alpha> = Q - hml_srbb_inner.model_set (Obs \<alpha> \<phi>)
             \<longrightarrow> attacker_wins (expr_pr_inner \<chi>) (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>)))
       \<and>
-        (\<forall>p q. distinguishes_conjunct \<psi> p q
+        (\<forall>p q. hml_srbb_conj.distinguishes \<psi> p q
                \<longrightarrow> attacker_wins (expr_pr_conjunct \<psi>) (Attacker_Clause p q))"
   proof -
     fix \<phi> \<chi> \<psi>
     show "(\<forall>Q p. Q \<noteq> {} \<longrightarrow> distinguishes_from \<phi> p Q
                \<longrightarrow> attacker_wins (expressiveness_price \<phi>) (Attacker_Immediate p Q))
       \<and>
-        ((\<forall>p Q. Q \<noteq> {} \<longrightarrow> distinguishes_from_inner \<chi> p Q \<longrightarrow> Q \<Zsurj>S Q
+        ((\<forall>p Q. Q \<noteq> {} \<longrightarrow> hml_srbb_inner.distinguishes_from \<chi> p Q \<longrightarrow> Q \<Zsurj>S Q
             \<longrightarrow> attacker_wins (expr_pr_inner \<chi>) (Attacker_Delayed p Q))
         \<and> (\<forall>\<Psi>_I \<Psi> p Q. \<chi> = Conj \<Psi>_I \<Psi> \<longrightarrow>
-            Q \<noteq> {} \<longrightarrow> distinguishes_from_inner \<chi> p Q
+            Q \<noteq> {} \<longrightarrow> hml_srbb_inner.distinguishes_from \<chi> p Q
             \<longrightarrow> attacker_wins (expr_pr_inner \<chi>) (Defender_Conj p Q))
         \<and> (\<forall>\<Psi>_I \<Psi> p Q. \<chi> = StableConj \<Psi>_I \<Psi> \<longrightarrow>
-            Q \<noteq> {} \<longrightarrow> distinguishes_from_inner \<chi> p Q \<longrightarrow> (\<forall>q \<in> Q. \<nexists>q'. q \<mapsto> \<tau> q')
+            Q \<noteq> {} \<longrightarrow> hml_srbb_inner.distinguishes_from \<chi> p Q \<longrightarrow> (\<forall>q \<in> Q. \<nexists>q'. q \<mapsto> \<tau> q')
             \<longrightarrow> attacker_wins (expr_pr_inner \<chi>) (Defender_Stable_Conj p Q))
         \<and> (\<forall>\<Psi>_I \<Psi> \<alpha> \<phi> p Q p' Q_\<alpha>. \<chi> = BranchConj \<alpha> \<phi> \<Psi>_I \<Psi> \<longrightarrow>
-            distinguishes_from_inner \<chi> p Q \<longrightarrow> p \<mapsto>a \<alpha> p' \<longrightarrow> p' \<Turnstile>SRBB \<phi> \<longrightarrow>
-            Q_\<alpha> \<noteq> {} \<longrightarrow> Q_\<alpha> = Q - model_set_inner (Obs \<alpha> \<phi>)
+            hml_srbb_inner.distinguishes_from \<chi> p Q \<longrightarrow> p \<mapsto>a \<alpha> p' \<longrightarrow> p' \<Turnstile>SRBB \<phi> \<longrightarrow>
+             Q_\<alpha> = Q - hml_srbb_inner.model_set (Obs \<alpha> \<phi>)
             \<longrightarrow> attacker_wins (expr_pr_inner \<chi>) (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>)))
       \<and>
-        (\<forall>p q. distinguishes_conjunct \<psi> p q
+        (\<forall>p q. hml_srbb_conj.distinguishes \<psi> p q
                \<longrightarrow> attacker_wins (expr_pr_conjunct \<psi>) (Attacker_Clause p q))"
     proof (induct rule: hml_srbb_hml_srbb_inner_hml_srbb_conjunct.induct)
       case TT
@@ -147,8 +147,8 @@ proof-
   
         from \<open>p' \<Turnstile> hml_srbb_inner_to_hml \<chi>\<close>
          and \<open>\<forall>q' \<in> Q\<tau>. \<not>(q' \<Turnstile> hml_srbb_inner_to_hml \<chi>)\<close>
-        have "distinguishes_from_inner \<chi> p' Q\<tau>" 
-          by (simp add: distinguishes_from_inner_def distinguishes_inner_def)
+        have "hml_srbb_inner.distinguishes_from \<chi> p' Q\<tau>" 
+          by simp
   
         with \<open>Q\<tau> \<Zsurj>S Q\<tau>\<close> \<open>Q\<tau> \<noteq> {}\<close> Internal
         have "attacker_wins (expr_pr_inner \<chi>) (Attacker_Delayed p' Q\<tau>)" 
@@ -188,11 +188,11 @@ proof-
         assume "Q \<noteq> {}" and "distinguishes_from (ImmConj I \<psi>s) p Q"
         from this(2) have "\<forall>q\<in>Q. p \<Turnstile>SRBB ImmConj I \<psi>s \<and> \<not> q \<Turnstile>SRBB ImmConj I \<psi>s" 
           unfolding distinguishes_from_def distinguishes_def by blast
-        hence "\<forall>q\<in>Q. \<exists>i\<in>I. hml_srbb_conjunct_models (\<psi>s i) p \<and> \<not>hml_srbb_conjunct_models (\<psi>s i) q"
+        hence "\<forall>q\<in>Q. \<exists>i\<in>I. hml_srbb_conjunct_models p (\<psi>s i) \<and> \<not>hml_srbb_conjunct_models q (\<psi>s i)"
           by simp
-        hence "\<forall>q\<in>Q. \<exists>i\<in>I. distinguishes_conjunct (\<psi>s i) p q"
-          using distinguishes_conjunct_def by simp
-        hence "\<forall>q\<in>Q. \<exists>i\<in>I. ((\<psi>s i) \<in> range \<psi>s) \<and> distinguishes_conjunct (\<psi>s i) p q" by blast
+        hence "\<forall>q\<in>Q. \<exists>i\<in>I. hml_srbb_conj.distinguishes (\<psi>s i) p q"
+          using hml_srbb_conj.distinguishes_def by simp
+        hence "\<forall>q\<in>Q. \<exists>i\<in>I. ((\<psi>s i) \<in> range \<psi>s) \<and> hml_srbb_conj.distinguishes (\<psi>s i) p q" by blast
         hence "\<forall>q\<in>Q. \<exists>i\<in>I. attacker_wins (expr_pr_conjunct (\<psi>s i)) (Attacker_Clause p q)" using ImmConj by blast
         hence a_clause_wina: "\<forall>q\<in>Q. \<exists>i\<in>I. attacker_wins (expressiveness_price (ImmConj I \<psi>s) - E 0 0 1 0 1 0 0 0) (Attacker_Clause p q)"
           using expressiveness_price_ImmConj_geq_parts win_a_upwards_closure by fast
@@ -228,22 +228,18 @@ proof-
       qed
     next
       case (Obs \<alpha> \<phi>)
-      have "\<forall>p Q. Q \<noteq> {} \<longrightarrow> distinguishes_from_inner (hml_srbb_inner.Obs \<alpha> \<phi>) p Q \<longrightarrow> Q \<Zsurj>S Q
+      have "\<forall>p Q. Q \<noteq> {} \<longrightarrow> hml_srbb_inner.distinguishes_from (hml_srbb_inner.Obs \<alpha> \<phi>) p Q \<longrightarrow> Q \<Zsurj>S Q
                 \<longrightarrow> attacker_wins (expr_pr_inner (hml_srbb_inner.Obs \<alpha> \<phi>)) (Attacker_Delayed p Q)" 
       proof(clarify)
         fix p Q
-        assume "Q \<noteq> {}" "distinguishes_from_inner (hml_srbb_inner.Obs \<alpha> \<phi>) p Q" " \<forall>p\<in>Q. \<forall>q. p \<Zsurj> q \<longrightarrow> q \<in> Q"
+        assume "Q \<noteq> {}" "hml_srbb_inner.distinguishes_from (hml_srbb_inner.Obs \<alpha> \<phi>) p Q" " \<forall>p\<in>Q. \<forall>q. p \<Zsurj> q \<longrightarrow> q \<in> Q"
         have "\<exists>p' Q'. p \<mapsto>a \<alpha> p' \<and> Q \<mapsto>aS \<alpha> Q' \<and> attacker_wins (expressiveness_price \<phi>) (Attacker_Immediate p' Q')" 
         proof(cases "\<alpha> = \<tau>")
           case True
-          with \<open>distinguishes_from_inner (hml_srbb_inner.Obs \<alpha> \<phi>) p Q\<close> have dist_unfold:
+          with \<open>hml_srbb_inner.distinguishes_from (hml_srbb_inner.Obs \<alpha> \<phi>) p Q\<close> have dist_unfold:
                "p \<Turnstile> Silent (hml_srbb_to_hml \<phi>) \<and> (\<forall>q\<in>Q. \<not> q \<Turnstile> Silent (hml_srbb_to_hml \<phi>))"
-            unfolding True distinguishes_from_inner_def distinguishes_inner_def
-            hml_srbb_inner_models.simps hml_srbb_inner_to_hml.simps hml_models.simps(4)
             by simp
           hence "((\<exists>p'. p \<mapsto>\<tau> p' \<and> p' \<Turnstile> hml_srbb_to_hml \<phi>) \<or> p \<Turnstile> hml_srbb_to_hml \<phi>)"
-            unfolding True distinguishes_from_inner_def distinguishes_inner_def
-            hml_srbb_inner_models.simps hml_srbb_inner_to_hml.simps hml_models.simps(4)
             by simp
           then obtain p' where "p' \<Turnstile> hml_srbb_to_hml \<phi>" "p \<mapsto>a \<alpha> p'" 
             unfolding True by blast
@@ -254,7 +250,7 @@ proof-
           hence "\<forall>q\<in>Q. \<not>q \<Turnstile> hml_srbb_to_hml \<phi>" using \<open>\<forall>p\<in>Q. \<forall>q. p \<Zsurj> q \<longrightarrow> q \<in> Q\<close> by fastforce
   
           hence "distinguishes_from \<phi> p' Q"
-            by (simp add: \<open>p' \<Turnstile> hml_srbb_to_hml \<phi>\<close> distinguishes_def distinguishes_from_def)
+            by (simp add: \<open>p' \<Turnstile> hml_srbb_to_hml \<phi>\<close>)
           with Obs have "attacker_wins (expressiveness_price \<phi>) (Attacker_Immediate p' Q)" 
             using \<open>Q \<noteq> {}\<close> by blast
           moreover have "Q \<mapsto>aS \<alpha> Q"
@@ -263,23 +259,19 @@ proof-
           ultimately show ?thesis using \<open>p \<mapsto>a \<alpha> p'\<close> by blast
         next
           case False
-          with \<open>distinguishes_from_inner (hml_srbb_inner.Obs \<alpha> \<phi>) p Q\<close> 
+          with \<open>hml_srbb_inner.distinguishes_from (hml_srbb_inner.Obs \<alpha> \<phi>) p Q\<close> 
           obtain p'' where "(p \<mapsto>\<alpha> p'') \<and> (p'' \<Turnstile> (hml_srbb_to_hml \<phi>))" 
-            unfolding distinguishes_from_inner_def distinguishes_inner_def
-              hml_srbb_inner_models.simps hml_srbb_inner_to_hml.simps 
-            using hml_models.simps \<open>Q \<noteq> {}\<close> by auto
+            by auto
   
           let ?Q' = "step_set Q \<alpha>"
-          from \<open>distinguishes_from_inner (hml_srbb_inner.Obs \<alpha> \<phi>) p Q\<close> 
+          from \<open>hml_srbb_inner.distinguishes_from (hml_srbb_inner.Obs \<alpha> \<phi>) p Q\<close> 
           have "\<forall>q\<in>Q. \<not> q \<Turnstile> hml.Obs \<alpha> (hml_srbb_to_hml \<phi>)" 
-            unfolding distinguishes_from_inner_def distinguishes_inner_def
-              hml_srbb_inner_models.simps hml_srbb_inner_to_hml.simps 
-            using hml_models.simps \<open>Q \<noteq> {}\<close> by (metis (full_types))
+            using \<open>Q \<noteq> {}\<close> by simp
           hence "\<forall>q\<in>?Q'. \<not> q \<Turnstile> hml_srbb_to_hml \<phi>"
             using step_set_is_step_set by fastforce
           from \<open>\<forall>q\<in>step_set Q \<alpha>. \<not> q \<Turnstile> hml_srbb_to_hml \<phi>\<close> \<open>p \<mapsto>\<alpha> p'' \<and> p'' \<Turnstile> hml_srbb_to_hml \<phi>\<close>
           have "distinguishes_from \<phi> p'' ?Q'"
-            by (simp add: distinguishes_def distinguishes_from_def)
+            by simp
           hence "attacker_wins (expressiveness_price \<phi>) (Attacker_Immediate p'' ?Q')"
             by (metis Obs distinction_implies_winning_budgets_empty_Q)
           moreover have "p \<mapsto>\<alpha> p''" using \<open>p \<mapsto>\<alpha> p'' \<and> p'' \<Turnstile> hml_srbb_to_hml \<phi>\<close> by simp
@@ -307,23 +299,23 @@ proof-
     next
       case (Conj I \<psi>s)
       have main_case: \<open>\<forall>\<Psi>_I \<Psi> p Q. hml_srbb_inner.Conj I \<psi>s = hml_srbb_inner.Conj \<Psi>_I \<Psi> \<longrightarrow>
-             Q \<noteq> {} \<longrightarrow> distinguishes_from_inner (hml_srbb_inner.Conj I \<psi>s) p Q
+             Q \<noteq> {} \<longrightarrow> hml_srbb_inner.distinguishes_from (hml_srbb_inner.Conj I \<psi>s) p Q
              \<longrightarrow> attacker_wins (expr_pr_inner (hml_srbb_inner.Conj I \<psi>s)) (Defender_Conj p Q)\<close>
       proof clarify
         fix p Q
         assume case_assms:
           \<open>Q \<noteq> {}\<close>
-          \<open>distinguishes_from_inner (hml_srbb_inner.Conj I \<psi>s) p Q\<close>
-        hence distinctions: \<open>\<forall>q\<in>Q. \<exists>i\<in>I. distinguishes_conjunct (\<psi>s i) p q\<close>
-          using distinguishes_from_inner'_def distinguishes_from_inner_priming srbb_dist_conjunction_implies_dist_conjunct by auto
-        hence inductive_wins: \<open>\<forall>q\<in>Q. \<exists>i\<in>I. distinguishes_conjunct (\<psi>s i) p q
+          \<open>hml_srbb_inner.distinguishes_from (hml_srbb_inner.Conj I \<psi>s) p Q\<close>
+        hence distinctions: \<open>\<forall>q\<in>Q. \<exists>i\<in>I. hml_srbb_conj.distinguishes (\<psi>s i) p q\<close>
+          by auto
+        hence inductive_wins: \<open>\<forall>q\<in>Q. \<exists>i\<in>I. hml_srbb_conj.distinguishes (\<psi>s i) p q
             \<and> attacker_wins (expr_pr_conjunct (\<psi>s i)) (Attacker_Clause p q)\<close>
           using Conj by blast
         define \<psi>qs where
-          \<open>\<psi>qs \<equiv> \<lambda>q. (SOME \<psi>. \<exists>i\<in>I. \<psi> = \<psi>s i \<and>  distinguishes_conjunct \<psi> p q
+          \<open>\<psi>qs \<equiv> \<lambda>q. (SOME \<psi>. \<exists>i\<in>I. \<psi> = \<psi>s i \<and>  hml_srbb_conj.distinguishes \<psi> p q
             \<and> attacker_wins (expr_pr_conjunct \<psi>) (Attacker_Clause p q))\<close>
         with inductive_wins someI have \<psi>qs_spec:
-          \<open>\<forall>q\<in>Q. \<exists>i\<in>I. \<psi>qs q = \<psi>s i \<and> distinguishes_conjunct (\<psi>qs q ) p q
+          \<open>\<forall>q\<in>Q. \<exists>i\<in>I. \<psi>qs q = \<psi>s i \<and> hml_srbb_conj.distinguishes (\<psi>qs q ) p q
             \<and> attacker_wins (expr_pr_conjunct (\<psi>qs q)) (Attacker_Clause p q)\<close>
           by (smt (verit))
         have conjuncts_present: \<open>\<forall>q\<in>Q. expr_pr_conjunct (\<psi>qs q) \<in> expr_pr_conjunct ` (\<psi>qs ` Q)\<close>
@@ -402,13 +394,13 @@ proof-
           using win_a_upwards_closure by blast
       qed
       moreover have
-        "\<forall>p Q. Q \<noteq> {} \<longrightarrow> distinguishes_from_inner (hml_srbb_inner.Conj I \<psi>s) p Q \<longrightarrow> Q \<Zsurj>S Q
+        "\<forall>p Q. Q \<noteq> {} \<longrightarrow> hml_srbb_inner.distinguishes_from (hml_srbb_inner.Conj I \<psi>s) p Q \<longrightarrow> Q \<Zsurj>S Q
              \<longrightarrow> attacker_wins (expr_pr_inner (hml_srbb_inner.Conj I \<psi>s)) (Attacker_Delayed p Q)"
       proof clarify
         fix p Q
         assume
           \<open>Q \<noteq> {}\<close>
-          \<open>distinguishes_from_inner (hml_srbb_inner.Conj I \<psi>s) p Q\<close>
+          \<open>hml_srbb_inner.distinguishes_from (hml_srbb_inner.Conj I \<psi>s) p Q\<close>
         hence \<open>attacker_wins (expr_pr_inner (hml_srbb_inner.Conj I \<psi>s)) (Defender_Conj p Q)\<close>
           using main_case by blast
         moreover have \<open>spectroscopy_moves (Attacker_Delayed p Q) (Defender_Conj p Q) = Some Some\<close>
@@ -421,26 +413,25 @@ proof-
       case (StableConj I \<psi>s)
       \<comment>\<open>The following proof is virtually the same as for \<open>Conj I \<psi>s\<close>\<close>
       have main_case: "(\<forall>\<Psi>_I \<Psi> p Q. StableConj I \<psi>s = StableConj \<Psi>_I \<Psi> \<longrightarrow>
-             Q \<noteq> {} \<longrightarrow> distinguishes_from_inner (StableConj I \<psi>s) p Q \<longrightarrow> (\<forall>q\<in>Q. \<nexists>q'. q \<mapsto>\<tau> q')
+             Q \<noteq> {} \<longrightarrow> hml_srbb_inner.distinguishes_from (StableConj I \<psi>s) p Q \<longrightarrow> (\<forall>q\<in>Q. \<nexists>q'. q \<mapsto>\<tau> q')
              \<longrightarrow> attacker_wins (expr_pr_inner (StableConj I \<psi>s)) (Defender_Stable_Conj p Q))" 
       proof clarify
         fix p Q
         assume case_assms:
           \<open>Q \<noteq> {}\<close>
-          \<open>distinguishes_from_inner (StableConj I \<psi>s) p Q\<close>
+          \<open>hml_srbb_inner.distinguishes_from (StableConj I \<psi>s) p Q\<close>
           \<open>\<forall>q\<in>Q. \<nexists>q'. q \<mapsto>\<tau> q'\<close>
-        hence distinctions: \<open>\<forall>q\<in>Q. \<exists>i\<in>I. distinguishes_conjunct (\<psi>s i) p q\<close>
-          using distinguishes_from_inner'_def distinguishes_from_inner_priming
-           srbb_dist_stable_conjunction_implies_dist_conjunct_or_stable inverted_distinguishes
-          unfolding distinguishes_hml_def by (auto, meson)
-        hence inductive_wins: \<open>\<forall>q\<in>Q. \<exists>i\<in>I. distinguishes_conjunct (\<psi>s i) p q
+        hence distinctions: \<open>\<forall>q\<in>Q. \<exists>i\<in>I. hml_srbb_conj.distinguishes (\<psi>s i) p q\<close>
+          using srbb_dist_stable_conjunction_implies_dist_conjunct_or_stable
+          by (auto, blast)
+        hence inductive_wins: \<open>\<forall>q\<in>Q. \<exists>i\<in>I. hml_srbb_conj.distinguishes (\<psi>s i) p q
             \<and> attacker_wins (expr_pr_conjunct (\<psi>s i)) (Attacker_Clause p q)\<close>
           using StableConj by blast
         define \<psi>qs where
-          \<open>\<psi>qs \<equiv> \<lambda>q. (SOME \<psi>. \<exists>i\<in>I. \<psi> = \<psi>s i \<and>  distinguishes_conjunct \<psi> p q
+          \<open>\<psi>qs \<equiv> \<lambda>q. (SOME \<psi>. \<exists>i\<in>I. \<psi> = \<psi>s i \<and>  hml_srbb_conj.distinguishes \<psi> p q
             \<and> attacker_wins (expr_pr_conjunct \<psi>) (Attacker_Clause p q))\<close>
         with inductive_wins someI have \<psi>qs_spec:
-          \<open>\<forall>q\<in>Q. \<exists>i\<in>I. \<psi>qs q = \<psi>s i \<and> distinguishes_conjunct (\<psi>qs q ) p q
+          \<open>\<forall>q\<in>Q. \<exists>i\<in>I. \<psi>qs q = \<psi>s i \<and> hml_srbb_conj.distinguishes (\<psi>qs q ) p q
             \<and> attacker_wins (expr_pr_conjunct (\<psi>qs q)) (Attacker_Clause p q)\<close>
           by (smt (verit))
         have conjuncts_present: \<open>\<forall>q\<in>Q. expr_pr_conjunct (\<psi>qs q) \<in> expr_pr_conjunct ` (\<psi>qs ` Q)\<close>
@@ -516,7 +507,7 @@ proof-
           using win_a_upwards_closure by blast
       qed
       moreover have
-        "(\<forall>p Q. Q \<noteq> {} \<longrightarrow> distinguishes_from_inner (StableConj I \<psi>s) p Q \<longrightarrow> Q \<Zsurj>S Q
+        "(\<forall>p Q. Q \<noteq> {} \<longrightarrow> hml_srbb_inner.distinguishes_from (StableConj I \<psi>s) p Q \<longrightarrow> Q \<Zsurj>S Q
            \<longrightarrow> attacker_wins (expr_pr_inner (StableConj I \<psi>s)) (Attacker_Delayed p Q))"
       proof clarify
         \<comment> \<open>This is where things are more complicated than in the Conj-case. (We have to differentiate
@@ -524,12 +515,12 @@ proof-
         fix p Q
         assume case_assms:
           "Q \<noteq> {}"
-          "distinguishes_from_inner (StableConj I \<psi>s) p Q"
+          "hml_srbb_inner.distinguishes_from (StableConj I \<psi>s) p Q"
           "\<forall>q'\<in>Q. \<exists>q\<in>Q. q \<Zsurj> q'"
           "\<forall>q\<in>Q. \<forall>q'. q \<Zsurj> q' \<longrightarrow> q' \<in> Q"
         define Q' where \<open>Q' = { q \<in> Q. (\<nexists>q'. q \<mapsto>\<tau> q')}\<close>
-        with case_assms(2) have Q'_spec: \<open>distinguishes_from_inner (StableConj I \<psi>s) p Q'\<close> \<open>\<nexists>p''. p \<mapsto>\<tau> p''\<close>
-          unfolding distinguishes_from_inner_def by auto
+        with case_assms(2) have Q'_spec: \<open>hml_srbb_inner.distinguishes_from (StableConj I \<psi>s) p Q'\<close> \<open>\<nexists>p''. p \<mapsto>\<tau> p''\<close>
+          unfolding hml_srbb_inner.distinguishes_from_def by auto
         hence move: \<open>spectroscopy_moves (Attacker_Delayed p Q) (Defender_Stable_Conj p Q') = Some Some\<close>
           unfolding Q'_def by auto
         show \<open>attacker_wins (expr_pr_inner (StableConj I \<psi>s)) (Attacker_Delayed p Q)\<close>
@@ -576,50 +567,53 @@ proof-
       case (BranchConj \<alpha> \<phi> I \<psi>s)
       have main_case:
         "\<forall>p Q p' Q_\<alpha>.
-             distinguishes_from_inner (BranchConj \<alpha> \<phi> I \<psi>s) p Q \<longrightarrow> p \<mapsto>a \<alpha> p' \<longrightarrow> p' \<Turnstile>SRBB \<phi> \<longrightarrow>
-             Q_\<alpha> = Q - model_set_inner (Obs \<alpha> \<phi>)
+             hml_srbb_inner.distinguishes_from (BranchConj \<alpha> \<phi> I \<psi>s) p Q \<longrightarrow> p \<mapsto>a \<alpha> p' \<longrightarrow> p' \<Turnstile>SRBB \<phi> \<longrightarrow>
+             Q_\<alpha> = Q - hml_srbb_inner.model_set (Obs \<alpha> \<phi>)
              \<longrightarrow> attacker_wins (expr_pr_inner (BranchConj \<alpha> \<phi> I \<psi>s)) (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>)"
       proof ((rule allI)+, (rule impI)+)
         fix p Q p' Q_\<alpha>
         assume case_assms:
-          \<open>distinguishes_from_inner (BranchConj \<alpha> \<phi> I \<psi>s) p Q\<close>
+          \<open>hml_srbb_inner.distinguishes_from (BranchConj \<alpha> \<phi> I \<psi>s) p Q\<close>
           \<open>p \<mapsto>a \<alpha> p'\<close>
           \<open>p' \<Turnstile>SRBB \<phi>\<close>
-          \<open>Q_\<alpha> = Q - model_set_inner (Obs \<alpha> \<phi>)\<close>
-        from case_assms(1) have distinctions: \<open>\<forall>q\<in>(Q \<inter> model_set_inner (Obs \<alpha> \<phi>)). \<exists>i\<in>I. distinguishes_conjunct (\<psi>s i) p q\<close>
-          using distinguishes_from_inner'_def distinguishes_from_inner_priming
-            inverted_distinguishes srbb_dist_branch_conjunction_implies_dist_conjunct_or_branch
-            dist_inner_srbb_eq_dist_hml distinguishes_hml_def distinguishes_inner_def
-          by (smt (verit) Int_Collect)
-        hence inductive_wins: \<open>\<forall>q\<in>(Q \<inter> model_set_inner (Obs \<alpha> \<phi>)). \<exists>i\<in>I. distinguishes_conjunct (\<psi>s i) p q
+          \<open>Q_\<alpha> = Q - hml_srbb_inner.model_set (Obs \<alpha> \<phi>)\<close>
+        from case_assms(1) have distinctions:
+          \<open>\<forall>q\<in>(Q \<inter> hml_srbb_inner.model_set (Obs \<alpha> \<phi>)).
+            \<exists>i\<in>I. hml_srbb_conj.distinguishes (\<psi>s i) p q\<close>
+          using srbb_dist_branch_conjunction_implies_dist_conjunct_or_branch
+            hml_srbb_inner.distinction_unlifting unfolding hml_srbb_inner.distinguishes_def
+          by (metis Int_Collect)
+        hence inductive_wins: \<open>\<forall>q\<in>(Q \<inter> hml_srbb_inner.model_set (Obs \<alpha> \<phi>)).
+          \<exists>i\<in>I. hml_srbb_conj.distinguishes (\<psi>s i) p q
             \<and> attacker_wins (expr_pr_conjunct (\<psi>s i)) (Attacker_Clause p q)\<close>
           using BranchConj by blast
         define \<psi>qs where
-          \<open>\<psi>qs \<equiv> \<lambda>q. (SOME \<psi>. \<exists>i\<in>I. \<psi> = \<psi>s i \<and>  distinguishes_conjunct \<psi> p q
+          \<open>\<psi>qs \<equiv> \<lambda>q. (SOME \<psi>. \<exists>i\<in>I. \<psi> = \<psi>s i \<and>  hml_srbb_conj.distinguishes \<psi> p q
             \<and> attacker_wins (expr_pr_conjunct \<psi>) (Attacker_Clause p q))\<close>
         with inductive_wins someI have \<psi>qs_spec:
-          \<open>\<forall>q\<in>(Q \<inter> model_set_inner (Obs \<alpha> \<phi>)). \<exists>i\<in>I. \<psi>qs q = \<psi>s i \<and> distinguishes_conjunct (\<psi>qs q ) p q
-            \<and> attacker_wins (expr_pr_conjunct (\<psi>qs q)) (Attacker_Clause p q)\<close>
+          \<open>\<forall>q\<in>(Q \<inter> hml_srbb_inner.model_set (Obs \<alpha> \<phi>)).
+            \<exists>i\<in>I. \<psi>qs q = \<psi>s i \<and> hml_srbb_conj.distinguishes (\<psi>qs q ) p q
+              \<and> attacker_wins (expr_pr_conjunct (\<psi>qs q)) (Attacker_Clause p q)\<close>
           by (smt (verit))
         have conjuncts_present:
-          \<open>\<forall>q\<in>(Q \<inter> model_set_inner (Obs \<alpha> \<phi>)). expr_pr_conjunct (\<psi>qs q)
-            \<in> expr_pr_conjunct ` (\<psi>qs ` (Q \<inter> model_set_inner (Obs \<alpha> \<phi>)))\<close>
+          \<open>\<forall>q\<in>(Q \<inter> hml_srbb_inner.model_set (Obs \<alpha> \<phi>)). expr_pr_conjunct (\<psi>qs q)
+            \<in> expr_pr_conjunct ` (\<psi>qs ` (Q \<inter> hml_srbb_inner.model_set (Obs \<alpha> \<phi>)))\<close>
           by blast
         define e'0 where \<open>e'0 = E
-          (Sup (one   ` (expr_pr_conjunct ` (\<psi>qs ` (Q \<inter> model_set_inner (Obs \<alpha> \<phi>))))))
-          (Sup (two   ` (expr_pr_conjunct ` (\<psi>qs ` (Q \<inter> model_set_inner (Obs \<alpha> \<phi>))))))
-          (Sup (three ` (expr_pr_conjunct ` (\<psi>qs ` (Q \<inter> model_set_inner (Obs \<alpha> \<phi>))))))
-          (Sup (four  ` (expr_pr_conjunct ` (\<psi>qs ` (Q \<inter> model_set_inner (Obs \<alpha> \<phi>))))))
-          (Sup (five  ` (expr_pr_conjunct ` (\<psi>qs ` (Q \<inter> model_set_inner (Obs \<alpha> \<phi>))))))
-          (Sup (six   ` (expr_pr_conjunct ` (\<psi>qs ` (Q \<inter> model_set_inner (Obs \<alpha> \<phi>))))))
-          (Sup (seven ` (expr_pr_conjunct ` (\<psi>qs ` (Q \<inter> model_set_inner (Obs \<alpha> \<phi>))))))
-          (Sup (eight ` (expr_pr_conjunct ` (\<psi>qs ` (Q \<inter> model_set_inner (Obs \<alpha> \<phi>))))))\<close>
+          (Sup (one   ` (expr_pr_conjunct ` (\<psi>qs ` (Q \<inter> hml_srbb_inner.model_set (Obs \<alpha> \<phi>))))))
+          (Sup (two   ` (expr_pr_conjunct ` (\<psi>qs ` (Q \<inter> hml_srbb_inner.model_set (Obs \<alpha> \<phi>))))))
+          (Sup (three ` (expr_pr_conjunct ` (\<psi>qs ` (Q \<inter> hml_srbb_inner.model_set (Obs \<alpha> \<phi>))))))
+          (Sup (four  ` (expr_pr_conjunct ` (\<psi>qs ` (Q \<inter> hml_srbb_inner.model_set (Obs \<alpha> \<phi>))))))
+          (Sup (five  ` (expr_pr_conjunct ` (\<psi>qs ` (Q \<inter> hml_srbb_inner.model_set (Obs \<alpha> \<phi>))))))
+          (Sup (six   ` (expr_pr_conjunct ` (\<psi>qs ` (Q \<inter> hml_srbb_inner.model_set (Obs \<alpha> \<phi>))))))
+          (Sup (seven ` (expr_pr_conjunct ` (\<psi>qs ` (Q \<inter> hml_srbb_inner.model_set (Obs \<alpha> \<phi>))))))
+          (Sup (eight ` (expr_pr_conjunct ` (\<psi>qs ` (Q \<inter> hml_srbb_inner.model_set (Obs \<alpha> \<phi>))))))\<close>
         from conjuncts_present have branch_answer_bound:
-            \<open>\<forall>q\<in>(Q \<inter> model_set_inner (Obs \<alpha> \<phi>)). (expr_pr_conjunct (\<psi>qs q)) \<le> e'0\<close>
+            \<open>\<forall>q\<in>(Q \<inter> hml_srbb_inner.model_set (Obs \<alpha> \<phi>)). (expr_pr_conjunct (\<psi>qs q)) \<le> e'0\<close>
           unfolding e'0_def using SUP_upper energy.sel energy.simps(3) energy_leq_cases image_iff
           by (smt (z3))
         with \<psi>qs_spec win_a_upwards_closure have
-          conj_wins: \<open>\<forall>q\<in>(Q \<inter> model_set_inner (Obs \<alpha> \<phi>)). attacker_wins e'0 (Attacker_Clause p q)\<close> by blast
+          conj_wins: \<open>\<forall>q\<in>(Q \<inter> hml_srbb_inner.model_set (Obs \<alpha> \<phi>)). attacker_wins e'0 (Attacker_Clause p q)\<close> by blast
         define eu'0 where \<open>eu'0 = E
           (Sup (one   ` (expr_pr_conjunct ` (\<psi>s ` I))))
           (Sup (two   ` (expr_pr_conjunct ` (\<psi>s ` I))))
@@ -629,7 +623,7 @@ proof-
           (Sup (six   ` (expr_pr_conjunct ` (\<psi>s ` I))))
           (Sup (seven ` (expr_pr_conjunct ` (\<psi>s ` I))))
           (Sup (eight ` (expr_pr_conjunct ` (\<psi>s ` I))))\<close>
-        have subset_form: \<open>\<psi>qs ` (Q \<inter> model_set_inner (Obs \<alpha> \<phi>)) \<subseteq> \<psi>s ` I\<close>
+        have subset_form: \<open>\<psi>qs ` (Q \<inter> hml_srbb_inner.model_set (Obs \<alpha> \<phi>)) \<subseteq> \<psi>s ` I\<close>
           using \<psi>qs_spec by fastforce
         hence \<open>e'0 \<le> eu'0\<close> unfolding e'0_def eu'0_def
           by (metis (mono_tags, lifting) Sup_subset_mono energy.sel energy_leq_cases image_mono)
@@ -639,9 +633,10 @@ proof-
         define Q' where \<open>Q' \<equiv> (soft_step_set Q_\<alpha> \<alpha>)\<close>
         hence \<open>distinguishes_from \<phi> p' Q'\<close>
           using case_assms(2,3) no_q_way soft_step_set_is_soft_step_set mem_Collect_eq opt_\<tau>_is_or
-          unfolding distinguishes_from_inner_def distinguishes_from_def case_assms(4)
-          by (metis DiffD2 hml_srbb_inner_models.elims(3) hml_srbb_inner_to_hml.simps(1) hml_srbb_models.elims(2))
-        with BranchConj have win_a_branch: \<open>attacker_wins (expressiveness_price \<phi>) (Attacker_Immediate p' Q')\<close>
+          unfolding case_assms(4)
+          by fastforce
+        with BranchConj have win_a_branch:
+          \<open>attacker_wins (expressiveness_price \<phi>) (Attacker_Immediate p' Q')\<close>
           using distinction_implies_winning_budgets_empty_Q by (cases \<open>Q' = {}\<close>) auto
         have \<open>expr_pr_inner (Obs \<alpha> \<phi>) \<ge> (E 1 0 0 0 0 0 0 0)\<close> by auto
         hence \<open>e1 (expr_pr_inner (Obs \<alpha> \<phi>)) = Some (expressiveness_price \<phi>)\<close>
@@ -672,7 +667,6 @@ proof-
         hence six_e'_simp: \<open>six e' = Sup ({1 + modal_depth_srbb \<phi>} \<union> (six ` (expr_pr_conjunct ` (\<psi>s ` I))))\<close>
           by (auto simp add: modal_depth_dominates_pos_conjuncts add_increasing  sup.absorb2 sup.coboundedI1)
         hence \<open>six e' \<le> one e'\<close>
-          using modal_depth_dominates_pos_conjuncts
           unfolding e'_def
           by (auto, smt (verit) SUP_mono energy.sel(1) energy.sel(6) image_iff modal_depth_dominates_pos_conjuncts sup.coboundedI2)
         hence \<open>one (the (min1_6 e')) = (six e')\<close>
@@ -748,17 +742,17 @@ proof-
           by metis
       qed 
       moreover have
-        "\<forall>p Q. Q \<noteq> {} \<longrightarrow> distinguishes_from_inner (BranchConj \<alpha> \<phi> I \<psi>s) p Q
+        "\<forall>p Q. Q \<noteq> {} \<longrightarrow> hml_srbb_inner.distinguishes_from (BranchConj \<alpha> \<phi> I \<psi>s) p Q
              \<longrightarrow> attacker_wins (expr_pr_inner (BranchConj \<alpha> \<phi> I \<psi>s)) (Attacker_Delayed p Q)"
       proof clarify
         fix p Q
         assume case_assms:
-          \<open>distinguishes_from_inner (BranchConj \<alpha> \<phi> I \<psi>s) p Q\<close>
+          \<open>hml_srbb_inner.distinguishes_from (BranchConj \<alpha> \<phi> I \<psi>s) p Q\<close>
         from case_assms(1) obtain p' where p'_spec: \<open>p \<mapsto>a \<alpha> p'\<close> \<open>p' \<Turnstile>SRBB \<phi>\<close> 
-          unfolding distinguishes_from_inner_def
+          unfolding hml_srbb_inner.distinguishes_from_def
               and distinguishes_def
           using soft_poss_to_or hml_models.simps(2) by auto
-        define Q_\<alpha> where \<open>Q_\<alpha> = Q - model_set_inner (Obs \<alpha> \<phi>)\<close>
+        define Q_\<alpha> where \<open>Q_\<alpha> = Q - hml_srbb_inner.model_set (Obs \<alpha> \<phi>)\<close>
         have \<open>attacker_wins (expr_pr_inner (BranchConj \<alpha> \<phi> I \<psi>s)) (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>)\<close>
           using main_case case_assms(1) p'_spec Q_\<alpha>_def by blast
         moreover have \<open>spectroscopy_moves (Attacker_Delayed p Q) (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>) = Some Some\<close>
@@ -772,14 +766,14 @@ proof-
       show ?case
       proof clarify
         fix p q
-        assume case_assms: \<open>distinguishes_conjunct (Pos \<chi>) p q\<close>
-        then obtain p' where p'_spec: \<open>p \<Zsurj> p'\<close> \<open>p' \<in> model_set_inner \<chi>\<close>
-          unfolding distinguishes_conjunct_def by auto
-        moreover have q_reach: \<open>silent_reachable_set {q} \<inter> model_set_inner \<chi> = {}\<close>
+        assume case_assms: \<open>hml_srbb_conj.distinguishes (Pos \<chi>) p q\<close>
+        then obtain p' where p'_spec: \<open>p \<Zsurj> p'\<close> \<open>p' \<in> hml_srbb_inner.model_set \<chi>\<close>
+          unfolding hml_srbb_conj.distinguishes_def by auto
+        moreover have q_reach: \<open>silent_reachable_set {q} \<inter> hml_srbb_inner.model_set \<chi> = {}\<close>
           using case_assms sreachable_set_is_sreachable
-          unfolding distinguishes_conjunct_def by force
-        ultimately have distinction: \<open>distinguishes_from_inner \<chi> p' (silent_reachable_set {q})\<close>
-          unfolding distinguishes_from_inner_def by auto
+          unfolding hml_srbb_conj.distinguishes_def by force
+        ultimately have distinction: \<open>hml_srbb_inner.distinguishes_from \<chi> p' (silent_reachable_set {q})\<close>
+          unfolding hml_srbb_inner.distinguishes_from_def by auto
         have q_reach_nonempty:
             \<open>silent_reachable_set {q} \<noteq> {}\<close>
             \<open>silent_reachable_set {q} \<Zsurj>S silent_reachable_set {q} \<close>
@@ -803,18 +797,18 @@ proof-
       show ?case
       proof clarify
         fix p q
-        assume case_assms: \<open>distinguishes_conjunct (Neg \<chi>) p q\<close>
-        then obtain q' where q'_spec: \<open>q \<Zsurj> q'\<close> \<open>q' \<in> model_set_inner \<chi>\<close>
-          unfolding distinguishes_conjunct_def by auto
-        moreover have p_reach: \<open>silent_reachable_set {p} \<inter> model_set_inner \<chi> = {}\<close>
+        assume case_assms: \<open>hml_srbb_conj.distinguishes (Neg \<chi>) p q\<close>
+        then obtain q' where q'_spec: \<open>q \<Zsurj> q'\<close> \<open>q' \<in> hml_srbb_inner.model_set \<chi>\<close>
+          unfolding hml_srbb_conj.distinguishes_def by auto
+        moreover have p_reach: \<open>silent_reachable_set {p} \<inter> hml_srbb_inner.model_set \<chi> = {}\<close>
           using case_assms sreachable_set_is_sreachable
-          unfolding distinguishes_conjunct_def by force
-        ultimately have distinction: \<open>distinguishes_from_inner \<chi> q' (silent_reachable_set {p})\<close>
-          unfolding distinguishes_from_inner_def by auto
-        have \<open>p \<noteq> q\<close> using case_assms unfolding distinguishes_conjunct_def by auto
+          unfolding hml_srbb_conj.distinguishes_def by force
+        ultimately have distinction: \<open>hml_srbb_inner.distinguishes_from \<chi> q' (silent_reachable_set {p})\<close>
+          unfolding hml_srbb_inner.distinguishes_from_def by auto
+        have \<open>p \<noteq> q\<close> using case_assms unfolding hml_srbb_conj.distinguishes_def by auto
         have p_reach_nonempty:
             \<open>silent_reachable_set {p} \<noteq> {}\<close>
-            \<open>silent_reachable_set {p} \<Zsurj>S silent_reachable_set {p} \<close>
+            \<open>silent_reachable_set {p} \<Zsurj>S silent_reachable_set {p}\<close>
           unfolding silent_reachable_set_def
           using silent_reachable.intros(1) silent_reachable_trans by auto
         hence \<open>attacker_wins (expr_pr_inner \<chi>) (Attacker_Delayed q' (silent_reachable_set {p}))\<close>
