@@ -390,6 +390,8 @@ text \<open>We can now define a sublanguage of Hennessy-Milner Logic @{term "\<O
 definition \<O> :: "energy \<Rightarrow> (('a, 's) hml_srbb) set" where
   "\<O> energy \<equiv> {\<phi> . expressiveness_price \<phi> \<le> energy}"
 
+lemma \<O>_sup: \<open>UNIV = \<O> (E \<infinity> \<infinity> \<infinity> \<infinity> \<infinity> \<infinity> \<infinity> \<infinity>)\<close> unfolding \<O>_def by auto
+
 text \<open>Formalizing HML$_{SRBB}$ by mutually recursive data types leads to expressiveness price functions of these other types,
 namely @{term "expr_pr_inner"} and @{term "expr_pr_conjunct"}, and corresponding definitions and lemmas.\<close>
 

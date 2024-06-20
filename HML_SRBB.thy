@@ -225,7 +225,7 @@ lemma stable_conj_parts:
 subsection \<open> Distinguishing Formulas \<close>
 
 text \<open>
-One may evaluate wheter a HML$_\text{SRBB}$ formula distinguishes two processes by translating the formula
+One may evaluate whether a HML$_\text{SRBB}$ formula distinguishes two processes by translating the formula
 into a HML formula and then check if this formula distinguishes the two processes.
 \<close>
 lemma dist_srbb_eq_dist_hml:
