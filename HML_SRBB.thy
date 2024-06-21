@@ -222,6 +222,19 @@ lemma stable_conj_parts:
   shows \<open>hml_srbb_conjunct_models p (\<Psi> i)\<close>
   using assms left_right_distinct by auto
 
+lemma branching_conj_parts:
+  assumes
+    \<open>hml_srbb_inner_models p (BranchConj \<alpha> \<phi> I \<Psi>)\<close>
+    \<open>i \<in> I \<close>
+  shows \<open>hml_srbb_conjunct_models p (\<Psi> i)\<close>
+  using assms left_right_distinct by auto
+
+lemma branching_conj_obs:
+  assumes
+    \<open>hml_srbb_inner_models p (BranchConj \<alpha> \<phi> I \<Psi>)\<close>
+  shows \<open>hml_srbb_inner_models p (Obs \<alpha> \<phi>)\<close>
+  using assms left_right_distinct by auto
+
 subsection \<open> Distinguishing Formulas \<close>
 
 text \<open>
