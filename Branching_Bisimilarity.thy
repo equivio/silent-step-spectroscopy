@@ -135,6 +135,26 @@ proof
   qed
 qed
 
+lemma distinction_combination:
+  assumes
+    \<open>p \<mapsto>a \<alpha> p'\<close>
+    \<open>\<forall>q'\<in>I. \<forall>q''. q' \<mapsto>a \<alpha> q'' \<longrightarrow> (distinguishes (\<Phi> q'') p' q'')\<close>
+  shows
+    \<open>\<forall>q'\<in>I. hml_srbb_inner.distinguishes (Obs \<alpha> (ImmConj {q''. \<exists>q'''. q \<Zsurj> q''' \<and> q''' \<mapsto>a \<alpha> q''} (conjunctify_distinctions \<Phi> p'))) p q'\<close>
+  using assms distinction_conjunctification
+  unfolding hml_srbb_conj.distinguishes_def distinguishes_def
+  sorry(*
+  apply auto
+          apply (metis assms(2) distinction_conjunctification hml_srbb_conj.distinguishes_def hml_srbb_conjunct_models.elims(2) mem_Collect_eq)
+         defer
+  defer
+  apply (metis mem_Collect_eq)
+  apply (metis singleton_iff)
+  apply (metis mem_Collect_eq)
+  apply (metis singleton_iff)
+  apply (metis mem_Collect_eq)
+    apply (metis singleton_iff)*)
+
 lemma modal_stability_respecting:
   \<open>stability_respecting (preordered UNIV)\<close>
   unfolding stability_respecting_def
@@ -214,19 +234,51 @@ proof -
   have \<open>\<nexists>p \<alpha> p' q. (preordered UNIV) p q \<and> p \<mapsto> \<alpha> p' \<and>
       (\<alpha> \<noteq> \<tau> \<or> \<not>(preordered UNIV) p' q) \<and>
       (\<forall>q' q''. q \<Zsurj> q' \<longrightarrow> q' \<mapsto> \<alpha> q'' \<longrightarrow> \<not> preordered UNIV p q' \<or> \<not> preordered UNIV p' q'')\<close>
-  proof safe
+  proof clarify
     fix p \<alpha> p' q
     assume contradiction:
       \<open>preordered UNIV p q\<close> \<open>p \<mapsto> \<alpha> p'\<close>
       \<open>\<forall>q' q''. q \<Zsurj> q' \<longrightarrow> q' \<mapsto> \<alpha> q'' \<longrightarrow> \<not> preordered UNIV p q' \<or> \<not> preordered UNIV p' q''\<close>
-    {
-      assume \<open>\<alpha> \<noteq> \<tau>\<close>
-      thus False sorry
-    }
-    {
-      assume \<open> \<not> preordered UNIV p' q\<close>
-      thus False sorry 
-    }
+      \<open>\<alpha> \<noteq> \<tau> \<or> \<not> preordered UNIV p' q\<close>
+    hence distinctions: \<open>\<forall>q'. q \<Zsurj> q' \<longrightarrow>
+      (\<exists>\<phi>. distinguishes \<phi> p q') \<or>
+      (\<forall>q''. q' \<mapsto>a \<alpha> q'' \<longrightarrow> (\<exists>\<phi>. distinguishes \<phi> p' q''))\<close>
+      using preordered_no_distinction
+      by (metis equivpI equivp_def lts_semantics.preordered_preord modal_sym)
+    hence \<open>\<forall>q''. \<forall>q'\<in>{q'. q \<Zsurj> q' \<and> (\<nexists>\<phi>. distinguishes \<phi> p q')}. q' \<mapsto>a \<alpha> q'' \<longrightarrow> (\<exists>\<phi>. distinguishes \<phi> p' q'')\<close>
+      by auto
+    hence \<open>\<forall>q''. (\<exists>q'. q \<Zsurj> q' \<and> (\<nexists>\<phi>. distinguishes \<phi> p q') \<and> q' \<mapsto>a \<alpha> q'') \<longrightarrow> (\<exists>\<phi>. distinguishes \<phi> p' q'')\<close>
+      by blast
+    then obtain \<Phi>\<alpha> where \<open>\<forall>q''. (\<exists>q'. q \<Zsurj> q' \<and> (\<nexists>\<phi>. distinguishes \<phi> p q') \<and> q' \<mapsto>a \<alpha> q'') \<longrightarrow> distinguishes (\<Phi>\<alpha> q'') p' q''\<close> by metis
+    hence distinctions_\<alpha>: \<open>\<forall>q'\<in>{q'. q \<Zsurj> q' \<and> (\<nexists>\<phi>. distinguishes \<phi> p q')}. \<forall>q''. q' \<mapsto>a \<alpha> q'' \<longrightarrow> distinguishes (\<Phi>\<alpha> q'') p' q''\<close>
+      by blast
+    from distinctions obtain \<Phi>\<eta> where
+      \<open>\<forall>q'\<in>{q'. q \<Zsurj> q' \<and> (\<exists>\<phi>. distinguishes \<phi> p q')}. distinguishes (\<Phi>\<eta> q') p q'\<close> by moura
+    with distinction_conjunctification obtain \<Psi>\<eta> where distinctions_\<eta>:
+      \<open>\<forall>q'\<in>{q'. q \<Zsurj> q' \<and> (\<exists>\<phi>. distinguishes \<phi> p q')}. hml_srbb_conj.distinguishes (\<Psi>\<eta> q') p q'\<close> by blast
+    have \<open>p \<mapsto>a \<alpha> p'\<close> using \<open>p \<mapsto> \<alpha> p'\<close> by auto
+    from distinction_combination[OF this distinctions_\<alpha>] have obs_dist:
+      \<open>\<forall>q'\<in>{q'. q \<Zsurj> q' \<and> (\<nexists>\<phi>. distinguishes \<phi> p q')}. hml_srbb_inner.distinguishes (Obs \<alpha> (ImmConj {q''. \<exists>q'''. q \<Zsurj> q''' \<and> q''' \<mapsto>a \<alpha> q''} (conjunctify_distinctions \<Phi>\<alpha> p'))) p q'\<close> .
+    with distinctions_\<eta> have
+      \<open>hml_srbb_inner_models p (BranchConj \<alpha> (ImmConj {q''. \<exists>q'''. q \<Zsurj> q''' \<and> q''' \<mapsto>a \<alpha> q''} (conjunctify_distinctions \<Phi>\<alpha> p')) {q'. q \<Zsurj> q' \<and> (\<exists>\<phi>. distinguishes \<phi> p q')} \<Psi>\<eta>)\<close>
+      using left_right_distinct unfolding distinguishes_def hml_srbb_conj.distinguishes_def hml_srbb_inner.distinguishes_def
+      apply auto
+      apply (metis LTS_Tau.refl UNIV_I contradiction(1) hml_srbb_models.elims(1) preordered_def)
+      apply (metis Inhabited_Tau_LTS.hml_srbb_models.elims(1) Inhabited_Tau_LTS_axioms LTS_Tau.refl UNIV_I contradiction(1) preordered_def)
+      by (metis Inhabited_Tau_LTS.hml_srbb_models.elims(1) Inhabited_Tau_LTS_axioms LTS_Tau.refl UNIV_I contradiction(1) preordered_def)
+    moreover have \<open>\<forall>q'. q \<Zsurj> q' \<longrightarrow> \<not> hml_srbb_inner_models q'
+        (BranchConj \<alpha> (ImmConj {q''. \<exists>q'''. q \<Zsurj> q''' \<and> q''' \<mapsto>a \<alpha> q''} (conjunctify_distinctions \<Phi>\<alpha> p')) {q'. q \<Zsurj> q' \<and> (\<exists>\<phi>. distinguishes \<phi> p q')} \<Psi>\<eta>)\<close>
+    proof safe
+      fix q'
+      assume \<open>q \<Zsurj> q'\<close> \<open>hml_srbb_inner_models q' (BranchConj \<alpha> (ImmConj {q''. \<exists>q'''. q \<Zsurj> q''' \<and> q''' \<mapsto>a \<alpha> q''} (conjunctify_distinctions \<Phi>\<alpha> p')) {q'. q \<Zsurj> q' \<and> (\<exists>\<phi>. distinguishes \<phi> p q')} \<Psi>\<eta>)\<close>
+      thus \<open>False\<close>
+      using obs_dist distinctions_\<eta> left_right_distinct unfolding distinguishes_def hml_srbb_conj.distinguishes_def hml_srbb_inner.distinguishes_def
+      by (auto, blast+)
+    qed
+    ultimately have \<open>distinguishes (Internal (BranchConj \<alpha> (ImmConj {q''. \<exists>q'''. q \<Zsurj> q''' \<and> q''' \<mapsto>a \<alpha> q''} (conjunctify_distinctions \<Phi>\<alpha> p')) {q'. q \<Zsurj> q' \<and> (\<exists>\<phi>. distinguishes \<phi> p q')} \<Psi>\<eta>)) p q\<close>
+      unfolding distinguishes_def
+      using left_right_distinct silent_reachable.refl by (auto, blast)
+    thus False using contradiction(1) preordered_no_distinction by blast
   qed
   thus ?thesis
     unfolding branching_simulation_def by blast
