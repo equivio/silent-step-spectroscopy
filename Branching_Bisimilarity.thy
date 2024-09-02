@@ -376,6 +376,14 @@ proof -
 qed
 *)
 
+lemma sr_branching_bisimulation_silently_retained:
+  assumes
+    \<open>sr_branching_bisimulated p q\<close>
+    \<open>p \<Zsurj> p'\<close>
+  shows
+    \<open>\<exists>q'. q \<Zsurj> q' \<and> sr_branching_bisimulated p' q'\<close> using assms(2,1)
+  using branching_bisimilarity_branching_sim silence_retains_branching_sim by blast
+
 (*
 (False)
 lemma sr_branching_bisimulation_stuttering:
@@ -407,7 +415,14 @@ lemma sr_branching_bisimulation_sim:
     \<open>p \<Zsurj> p'\<close> \<open>p' \<mapsto>a \<alpha> p''\<close>
   shows
     \<open>\<exists>q' q''. q \<Zsurj> q' \<and> q' \<mapsto>a \<alpha> q'' \<and> sr_branching_bisimulated p' q' \<and> sr_branching_bisimulated p'' q''\<close>
-  sorry (* needed for logic_sr_branching_bisim_invariant *)
+proof -
+  obtain q' where \<open>q \<Zsurj> q'\<close> \<open>sr_branching_bisimulated p' q'\<close>
+    using assms sr_branching_bisimulation_silently_retained by blast
+  thus ?thesis
+    using assms(3) branching_bisimilarity_branching_sim silent_reachable_trans
+    unfolding branching_simulation_def
+    by blast
+qed
 
 lemma sr_branching_bisimulation_stabilizes:
   assumes
@@ -435,13 +450,12 @@ lemma sr_branching_bisimulated_sym:
     \<open>sr_branching_bisimulated q p\<close>
   using assms unfolding sr_branching_bisimulated_def by (meson sympD)
 
-
 lemma sr_branching_bisim_stronger:
   assumes
     \<open>sr_branching_bisimulated p q\<close>
   shows
     \<open>branching_bisimulated p q\<close>
-  oops
+  using assms unfolding sr_branching_bisimulated_def branching_bisimulated_def by auto
 
 definition conjunctify_distinctions ::
   \<open>('s \<Rightarrow> ('a, 's) hml_srbb) \<Rightarrow> 's \<Rightarrow> ('s \<Rightarrow> ('a, 's) hml_srbb_conjunct)\<close> where
@@ -657,9 +671,8 @@ proof-
         fix p q
         assume \<open>sr_branching_bisimulated p q\<close> \<open>p \<Turnstile>SRBB hml_srbb.Internal \<chi>\<close>
         then obtain p' where \<open>p \<Zsurj> p'\<close> \<open>hml_srbb_inner_models p' \<chi>\<close> by auto
-        hence \<open>sr_branching_bisimulated p' q\<close> using \<open>sr_branching_bisimulated p q\<close>
-          using sr_branching_bisimulation_stuttering sorry
-        hence \<open>\<exists>q'. q \<Zsurj> q' \<and> hml_srbb_inner_models q' \<chi>\<close> using Internal \<open>hml_srbb_inner_models p' \<chi>\<close> by blast
+        hence \<open>\<exists>q'. q \<Zsurj> q' \<and> hml_srbb_inner_models q' \<chi>\<close> using Internal \<open>hml_srbb_inner_models p' \<chi>\<close>
+          by (meson LTS_Tau.silent_reachable_trans \<open>p ~SRBB q\<close> sr_branching_bisimulation_silently_retained)
         thus \<open>q \<Turnstile>SRBB hml_srbb.Internal \<chi>\<close> by auto
       qed
     next
@@ -750,10 +763,9 @@ proof-
           \<open>sr_branching_bisimulated p q\<close>
           \<open>hml_srbb_conjunct_models p (Pos \<chi>)\<close>
         then obtain p' where \<open>p \<Zsurj> p'\<close> \<open>hml_srbb_inner_models p' \<chi>\<close> by auto
-        hence \<open>sr_branching_bisimulated p' q\<close>
-          using sr_branching_bisimulation_stuttering_all \<open>sr_branching_bisimulated p q\<close> sorry
         then obtain q' where \<open>q \<Zsurj> q'\<close> \<open>hml_srbb_inner_models q' \<chi>\<close>
-          using \<open>hml_srbb_inner_models p' \<chi>\<close> Pos by blast
+          using Pos \<open>p ~SRBB q\<close> sr_branching_bisimulation_silently_retained
+          by (meson  silent_reachable_trans)
         thus \<open>hml_srbb_conjunct_models q (Pos \<chi>)\<close> by auto
       qed
     next
@@ -768,7 +780,8 @@ proof-
         moreover have
           \<open>(\<exists>q'. q \<Zsurj> q' \<and> hml_srbb_inner_models q' \<chi>) \<longrightarrow> (\<exists>p'. p \<Zsurj> p' \<and> hml_srbb_inner_models p' \<chi>)\<close>
           using Neg sr_branching_bisimulated_sym[OF \<open>sr_branching_bisimulated p q\<close>]
-            sr_branching_bisimulation_stuttering_all sorry
+            sr_branching_bisimulation_silently_retained
+          by (meson silent_reachable_trans)
         ultimately have \<open>\<forall>q'. q \<Zsurj> q' \<longrightarrow> \<not>hml_srbb_inner_models q' \<chi>\<close> by blast
         thus \<open>hml_srbb_conjunct_models q (Neg \<chi>)\<close> by simp
       qed
