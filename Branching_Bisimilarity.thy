@@ -187,28 +187,7 @@ lemma sr_branching_bisimulation_stuttering:
     \<open>hd pp ~SRBB pp!i\<close>
 proof -
   have chain_reachable: \<open>\<forall>j < length pp. \<forall>i \<le> j. pp!i \<Zsurj> pp!j\<close>
-  proof safe
-    fix j i
-    assume \<open>j < length pp\<close> \<open>i \<le> j\<close>
-    thus \<open>pp!i \<Zsurj> pp!j\<close>
-    proof (induct j)
-      case 0
-      then show ?case
-        using silent_reachable.refl by blast
-    next
-      case (Suc j)
-      then show ?case
-      proof (induct i)
-        case 0
-        then show ?case using assms(2) silent_reachable_append_\<tau>
-          by (metis Suc_lessD Suc_lessE bot_nat_0.extremum diff_Suc_1)
-      next
-        case (Suc i)
-        then show ?case using silent_reachable.refl assms(2) silent_reachable_append_\<tau>
-          by (metis Suc_lessD Suc_lessE  diff_Suc_1 le_SucE)
-      qed
-    qed
-  qed
+    using tau_chain_reachabilty assms(2) .
   hence chain_hd_last:
     \<open>\<forall>i < length pp. hd pp \<Zsurj> pp!i\<close>
     \<open>\<forall>i < length pp.  pp!i \<Zsurj> last pp\<close>
@@ -383,31 +362,6 @@ lemma sr_branching_bisimulation_silently_retained:
   shows
     \<open>\<exists>q'. q \<Zsurj> q' \<and> sr_branching_bisimulated p' q'\<close> using assms(2,1)
   using branching_bisimilarity_branching_sim silence_retains_branching_sim by blast
-
-(*
-(False)
-lemma sr_branching_bisimulation_stuttering:
-  assumes
-    \<open>sr_branching_bisimulated p q\<close>
-    \<open>p \<Zsurj> p'\<close>
-  shows
-    \<open>sr_branching_bisimulated p' q\<close> using assms(2,1)
-nitpick
-proof (induct)
-  case (refl p)
-  then show ?case .
-next
-  case (step p p' p'')
-  then obtain R where \<open>branching_simulation R\<close> \<open>symp R\<close> \<open>stability_respecting R\<close> \<open>R p q\<close>
-    unfolding sr_branching_bisimulated_def by blast
-  hence \<open>R p' q\<close>
-    using \<open>p \<mapsto> \<tau> p'\<close>
-    unfolding branching_simulation_def
-  proof simp
-  hence \<open>sr_branching_bisimulated p' q\<close>  sorry
-  then show ?case sorry
-qed (* needed for logic_sr_branching_bisim_invariant (and lemma sr_branching_bisimulation_stabilizes) *)
-*)
 
 lemma sr_branching_bisimulation_sim:
   assumes
