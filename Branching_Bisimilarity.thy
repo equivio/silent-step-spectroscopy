@@ -1,34 +1,6 @@
 theory Branching_Bisimilarity
   imports HML_SRBB Expressiveness_Price
-Complex_Main
 begin
-
-print_methods
-
-lemma assumes "A" shows "A \<and> A"
-  using conjI \<open>A\<close> \<open>A\<close> .
-
-lemma assumes "A" shows "A \<and> A"
-proof -
-  from conjI \<open>A\<close> \<open>A\<close> show "A \<and> A" by this
-qed
-
-lemma
-  assumes \<open>A\<close> shows \<open>A \<and> A\<close>
-  using conjI[OF \<open>A\<close> \<open>A\<close>] by assumption
-
-lemma \<open>\<exists>x::real. 2 / 3 < x \<and> x < 3 / 4\<close>
-  apply simp
-  (* proof sate: \<exists>x. 2 < x * 3 \<and> x * 4 < 3 *)
-  by (smt (z3))
-
-lemma \<open>\<exists>x::real. 2 / 3 < x \<and> x < 3 / 4\<close>
-proof -
-  have \<open>(2::real) / 3 < 17 / 24\<close> by simp
-  moreover have \<open>(17::real) / 24 < 3 / 4\<close> by simp
-  ultimately show ?thesis by blast
-qed
-
 
 context Inhabited_Tau_LTS
 begin
@@ -71,10 +43,6 @@ definition branching_simulated :: \<open>'s \<Rightarrow> 's \<Rightarrow> bool\
 
 definition branching_bisimulated :: \<open>'s \<Rightarrow> 's \<Rightarrow> bool\<close> where
   \<open>branching_bisimulated p q \<equiv> \<exists>R. branching_simulation R \<and> symp R \<and> R p q\<close>
-
-definition directed_branching_bisimulation :: \<open>('s \<Rightarrow> 's \<Rightarrow> bool) \<Rightarrow> bool\<close> where
-  \<open>directed_branching_bisimulation R \<equiv> \<forall>p \<alpha> p' p'' q. R p q \<longrightarrow> p \<Zsurj> p' \<longrightarrow> p' \<mapsto> \<alpha> p'' \<longrightarrow>
-    (\<exists>q' q''. q \<Zsurj> q' \<and> q' \<mapsto> \<alpha> q'' \<and> R p' q' \<and> R p'' q'' \<and>  R q'' p'')\<close>
 
 definition stability_respecting :: \<open>('s \<Rightarrow> 's \<Rightarrow> bool) \<Rightarrow> bool\<close> where
   \<open>stability_respecting R \<equiv> \<forall> p q. R p q \<and> stable_state p \<longrightarrow>
@@ -290,10 +258,10 @@ proof -
     unfolding R_def sr_branching_bisimulated_def
     by (smt (verit, best) sympI)
   moreover have \<open>stability_respecting R\<close>
-    using chain_hd_last(1) stable_state_stable sr_branching_bisimulated_symp
+    using assms(3) stable_state_stable sr_branching_bisimulated_sym
       branching_bisimilarity_stability
     unfolding R_def stability_respecting_def
-    by (metis assms(3) chain_hd_last(2) sr_branching_bisimulation_silently_retained)
+    by (metis chain_hd_last)
   moreover have \<open>\<And>i. i < length pp \<Longrightarrow> R (hd pp) (pp!i)\<close> unfolding R_def by auto
   ultimately show ?thesis
     using assms(4) sr_branching_bisimulated_def by blast
@@ -318,70 +286,6 @@ proof -
   ultimately show ?thesis by blast
 qed
 
-(*
-lemma sr_branching_bisim_cycles:
-  assumes
-    \<open>p \<Zsurj> p'\<close>
-    \<open>p' ~SRBB q\<close>
-    \<open>q \<Zsurj> q'\<close>
-    \<open>q' ~SRBB p\<close>
-  shows
-    \<open>p ~SRBB q\<close>
-  using assms
-proof -
-  define R where \<open>R \<equiv> \<lambda>pp qq. pp ~SRBB qq \<or> (pp = p \<and> qq = q) \<or> (pp = q \<and> qq = p)\<close>
-  have \<open>symp R\<close>
-    unfolding symp_def R_def sr_branching_bisimulated_def
-    by blast
-  moreover have \<open>stability_respecting R\<close>
-    using assms(1,2) stable_state_stable silent_reachable_trans[OF assms(1)]
-    unfolding R_def sr_branching_bisimulated_def stability_respecting_def symp_def
-    by (safe, smt (verit, best))+
-  moreover have \<open>branching_simulation R\<close>
-  proof -
-    have \<open>\<And>\<alpha> p'a. p \<mapsto> \<alpha> p'a \<Longrightarrow>
-      \<forall>q'. q \<Zsurj> q' \<longrightarrow> (\<forall>q''. q' \<mapsto> \<alpha> q'' \<longrightarrow> \<not> p ~SRBB q' \<and> q' \<noteq> q \<and> (p = q \<longrightarrow> q' \<noteq> q) \<or> \<not> p'a ~SRBB q'' \<and> (p'a = q \<longrightarrow> q'' \<noteq> p)) \<Longrightarrow>
-      \<not> p'a ~SRBB q \<Longrightarrow> p'a \<noteq> p
-      \<Longrightarrow> p'a = q\<close>
-    proof -
-      fix \<alpha> p'a
-      assume
-        \<open>p \<mapsto> \<alpha> p'a\<close>
-        \<open>\<forall>q'. q \<Zsurj> q' \<longrightarrow> (\<forall>q''. q' \<mapsto> \<alpha> q'' \<longrightarrow> \<not> p ~SRBB q' \<and> q' \<noteq> q \<and> (p = q \<longrightarrow> q' \<noteq> q) \<or> \<not> p'a ~SRBB q'' \<and> (p'a = q \<longrightarrow> q'' \<noteq> p))\<close>
-        \<open>\<not> p'a ~SRBB q\<close> \<open>p'a \<noteq> p\<close>
-      thus \<open>p'a = q\<close> sorry
-    qed
-
-    have \<open>\<And>\<alpha> p'a. R p q \<Longrightarrow> p \<mapsto> \<alpha> p'a \<Longrightarrow>
-      \<forall>q'. R p q' \<longrightarrow> q \<Zsurj> q' \<longrightarrow> (\<forall>q''. q' \<mapsto> \<alpha> q'' \<longrightarrow> \<not> R p'a q'') \<Longrightarrow> \<alpha> = \<tau> \<and>  R p'a q\<close>
-    proof
-      fix \<alpha> p'a
-      assume \<open>R p q\<close> \<open>p \<mapsto> \<alpha> p'a\<close> \<open>\<forall>q'. R p q' \<longrightarrow> q \<Zsurj> q' \<longrightarrow> (\<forall>q''. q' \<mapsto> \<alpha> q'' \<longrightarrow> \<not> R p'a q'')\<close>
-      show \<open>\<alpha> = \<tau>\<close> sorry
-      show \<open>R p'a q \<close> nitpick
-
-
-    have \<open>\<forall>\<alpha> p'. R p q \<longrightarrow> p \<mapsto> \<alpha> p' \<longrightarrow> \<alpha> = \<tau> \<and> R p' q \<or> (\<exists>q' q''. q \<Zsurj> q' \<and> q' \<mapsto> \<alpha> q'' \<and> R p q' \<and> R p' q'')\<close>
-      using assms
-      apply auto
-       apply (smt (verit, ccfv_threshold) R_def branching_simulation_def silent_reachable_trans sr_branching_bisimulated_def sympE)
-      using R_def branching_simulation_def silent_reachable_trans sr_branching_bisimulated_def sympE
-      sledgehammer
-      sorry
-    moreover have \<open>\<forall>\<alpha> p'. R q p \<longrightarrow> q \<mapsto> \<alpha> p' \<longrightarrow> \<alpha> = \<tau> \<and> R p' p \<or> (\<exists>q' q''. p \<Zsurj> q' \<and> q' \<mapsto> \<alpha> q'' \<and> R q q' \<and> R p' q'')\<close> sorry
-    moreover have \<open>\<forall>pp qq \<alpha> p'. pp ~SRBB qq \<longrightarrow> pp \<mapsto> \<alpha> p' \<longrightarrow> \<alpha> = \<tau> \<and> R p' qq \<or> (\<exists>q' q''. qq \<Zsurj> q' \<and> q' \<mapsto> \<alpha> q'' \<and> R pp q' \<and> R p' q'')\<close>
-      using branching_bisimilarity_branching_sim
-      unfolding R_def branching_simulation_def
-      by blast
-    moreover have \<open>\<forall>pp qq. pp ~SRBB qq \<longrightarrow> R pp qq\<close> unfolding R_def by blast
-    ultimately show \<open>branching_simulation R\<close> unfolding R_def branching_simulation_def by auto
-  qed
-  moreover have \<open>R p q\<close> unfolding R_def by blast
-  ultimately show ?thesis
-    unfolding sr_branching_bisimulated_def by blast
-qed
-*)
-
 lemma sr_branching_bisim_stronger:
   assumes
     \<open>sr_branching_bisimulated p q\<close>
@@ -389,6 +293,7 @@ lemma sr_branching_bisim_stronger:
     \<open>branching_bisimulated p q\<close>
   using assms unfolding sr_branching_bisimulated_def branching_bisimulated_def by auto
 
+(*
 lemma sr_branching_bisimulated_equivalence: \<open>equivp (~SRBB)\<close>
 proof (rule equivpI)
   show \<open>symp (~SRBB)\<close> using sr_branching_bisimulated_symp .
@@ -426,7 +331,7 @@ lemma sr_branching_bisimulation_stuttering_all:
   using assms equivp_def sr_branching_bisimulated_equivalence equivp_def order_le_less_trans
     sr_branching_bisimulation_stuttering
   by metis
-
+*)
 
 definition conjunctify_distinctions ::
   \<open>('s \<Rightarrow> ('a, 's) hml_srbb) \<Rightarrow> 's \<Rightarrow> ('s \<Rightarrow> ('a, 's) hml_srbb_conjunct)\<close> where
@@ -464,12 +369,6 @@ proof
   qed
 qed
 
-(*  
-   \<open>p \<mapsto>a \<alpha> p'\<close>
-
-  \<open>\<forall>q'\<in>{q'. q \<Zsurj> q' \<and> (\<nexists>\<phi>. distinguishes \<phi> p q')}. \<forall>q''.
-        q' \<mapsto>a \<alpha> q'' \<longrightarrow> distinguishes (\<Phi>\<alpha> q'') p' q''\<close> *)
-
 lemma distinction_combination:
   fixes p q
   defines \<open>Q\<alpha> \<equiv> {q'. q \<Zsurj> q' \<and> (\<nexists>\<phi>. distinguishes \<phi> p q')}\<close>
@@ -482,12 +381,6 @@ lemma distinction_combination:
       hml_srbb_inner.distinguishes (Obs \<alpha> (ImmConj {q''. \<exists>q'''\<in>Q\<alpha>. q''' \<mapsto>a \<alpha> q''}
                                                    (conjunctify_distinctions \<Phi> p'))) p q'\<close>
 proof -
-  (*
-fix q0'
-  assume \<open>q0' \<in> Q\<alpha>\<close>
-  hence \<open>\<forall>q''. q' \<mapsto>a \<alpha> q'' \<longrightarrow> distinguishes (\<Phi> q'') p' q''\<close> using assms(3) by blast
-  hence \<open>\<forall>q''\<in>{q''. q' \<mapsto>a \<alpha> q''}. distinguishes (\<Phi> q'') p' q''\<close> by auto
-  *)
   have \<open>\<forall>q'\<in> Q\<alpha>. \<forall>q''\<in>{q''. q' \<mapsto>a \<alpha> q''}.
       hml_srbb_conj.distinguishes ((conjunctify_distinctions \<Phi> p') q'') p' q''\<close>
   proof clarify
@@ -630,7 +523,7 @@ proof -
           {q'. q \<Zsurj> q' \<and> (\<exists>\<phi>. distinguishes \<phi> p q')} \<Psi>\<eta>)\<close>
       using left_right_distinct contradiction(1) silent_reachable.refl
       unfolding Q\<alpha>_def distinguishes_def hml_srbb_conj.distinguishes_def hml_srbb_inner.distinguishes_def preordered_def
-      by auto (smt (verit))+
+      by simp force
     moreover have \<open>\<forall>q'. q \<Zsurj> q' \<longrightarrow> \<not> hml_srbb_inner_models q'
         (BranchConj \<alpha> (ImmConj {q''. \<exists>q'''\<in>Q\<alpha>. q''' \<mapsto>a \<alpha> q''} (conjunctify_distinctions \<Phi>\<alpha> p')) {q'. q \<Zsurj> q' \<and> (\<exists>\<phi>. distinguishes \<phi> p q')} \<Psi>\<eta>)\<close>
     proof safe
@@ -649,8 +542,6 @@ proof -
   thus ?thesis
     unfolding branching_simulation_def by blast
 qed
-
-thm hml_srbb_hml_srbb_inner_hml_srbb_conjunct.induct
 
 lemma logic_sr_branching_bisim_invariant:
   assumes

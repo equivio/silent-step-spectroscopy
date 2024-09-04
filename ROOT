@@ -30,6 +30,7 @@ session LinearTimeBranchingTimeSpectroscopyAccountingForSilentSteps = HOL +
   theories
     Silent_Step_Spectroscopy
     Weak_Traces
+    Branching_Bisimilarity
     Example_Instantiation
 
 (* Dependencies on document source files: *)
