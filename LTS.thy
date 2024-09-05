@@ -113,6 +113,32 @@ next
   qed
 qed
 
+lemma tau_chain_reachabilty:
+  assumes \<open>\<forall>i < length pp - 1.  pp!i \<mapsto> \<tau> pp!(Suc i)\<close>
+  shows \<open>\<forall>j < length pp. \<forall>i \<le> j. pp!i \<Zsurj> pp!j\<close>
+proof safe
+  fix j i
+  assume \<open>j < length pp\<close> \<open>i \<le> j\<close>
+  thus \<open>pp!i \<Zsurj> pp!j\<close>
+  proof (induct j)
+    case 0
+    then show ?case
+      using silent_reachable.refl by blast
+  next
+    case (Suc j)
+    then show ?case
+    proof (induct i)
+      case 0
+      then show ?case using assms silent_reachable_append_\<tau>
+        by (metis Suc_lessD Suc_lessE bot_nat_0.extremum diff_Suc_1)
+    next
+      case (Suc i)
+      then show ?case using silent_reachable.refl assms silent_reachable_append_\<tau>
+        by (metis Suc_lessD Suc_lessE  diff_Suc_1 le_SucE)
+    qed
+  qed
+qed
+
 text \<open>In the following, we define @{term "weak_step"} as a new notion of transition relation between states. A state \<open>p\<close> can reach
 \<open>p'\<close> by performing an \<open>\<alpha>\<close>-transition, possibly proceeded and followed by any number of \<open>\<tau>\<close>-transitions.\<close>
 definition weak_step ("_ \<Zsurj>\<mapsto>\<Zsurj> _ _" [70, 70, 70] 80) where

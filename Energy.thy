@@ -184,9 +184,27 @@ definition less_eq_option_def[simp]:
 definition less_option_def[simp]:
   "less_option (optA :: 'a option) optB \<equiv> (optA \<le> optB \<and> \<not> optB \<le> optA)"
 
-instance by
-  (standard, auto simp add: option.case_eq_if)
-  (metis order_trans order_antisym option.simps option.sel option.case_eq_if option.expand)+
+instance proof standard
+  fix x y::\<open>'a option\<close>
+  show \<open>(x < y) = (x \<le> y \<and> \<not> y \<le> x)\<close> by simp
+next
+  fix x::\<open>'a option\<close>
+  show \<open>x \<le> x\<close>
+    by (simp add: option.case_eq_if)
+next
+  fix x y z::\<open>'a option\<close>
+  assume \<open>x \<le> y\<close> \<open>y \<le> z\<close>
+  thus \<open>x \<le> z\<close>
+    unfolding less_eq_option_def
+    by (metis option.case_eq_if order_trans)
+next
+  fix x y::\<open>'a option\<close>
+  assume \<open> x \<le> y\<close> \<open>y \<le> x\<close>
+  thus \<open>x = y\<close>
+    unfolding less_eq_option_def
+    by (smt (z3) inf.absorb_iff2 le_boolD option.case_eq_if option.split_sel order_antisym)
+qed
+
 end
 
 text \<open>Again, we prove that these updates only decrease energies.\<close>

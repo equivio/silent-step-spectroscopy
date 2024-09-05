@@ -2,7 +2,7 @@ text \<open>\newpage\<close>
 section \<open>Expressiveness Price Function \label{sect:ExpressivenessMeasure}\<close>
 
 theory Expressiveness_Price
-  imports HML_SRBB Energy Spectroscopy_Game
+  imports HML_SRBB Energy
 begin
 
 text \<open>
@@ -390,6 +390,8 @@ text \<open>We can now define a sublanguage of Hennessy-Milner Logic @{term "\<O
 definition \<O> :: "energy \<Rightarrow> (('a, 's) hml_srbb) set" where
   "\<O> energy \<equiv> {\<phi> . expressiveness_price \<phi> \<le> energy}"
 
+lemma \<O>_sup: \<open>UNIV = \<O> (E \<infinity> \<infinity> \<infinity> \<infinity> \<infinity> \<infinity> \<infinity> \<infinity>)\<close> unfolding \<O>_def by auto
+
 text \<open>Formalizing HML$_{SRBB}$ by mutually recursive data types leads to expressiveness price functions of these other types,
 namely @{term "expr_pr_inner"} and @{term "expr_pr_conjunct"}, and corresponding definitions and lemmas.\<close>
 
@@ -425,7 +427,7 @@ text \<open>
 We demonstrate the pricing mechanisms for various formulas. These proofs operate under the assumption of an expressiveness price \<open>e\<close> for a given formula \<open>\<chi>\<close> and proceed to determine the price of a derived formula such as \<open>Pos \<chi>\<close>. 
 The proofs all are of a similar nature. They decompose the expression function(s) into their constituent parts and apply their definitions to the constructed formula (\<open>(Pos \<chi>)\<close>).\<close>
 
-context full_spec_game
+context Inhabited_Tau_LTS
 begin
 
 text \<open>For example, here, we establish that the expressiveness price of \<open>Internal \<chi>\<close> is equal to the expressiveness price of \<open>\<chi>\<close>.\<close>
