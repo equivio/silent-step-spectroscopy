@@ -1,3 +1,5 @@
+section \<open>Branching Bisimilarity\<close>
+
 theory Branching_Bisimilarity
   imports HML_SRBB Expressiveness_Price
 begin
@@ -292,46 +294,6 @@ lemma sr_branching_bisim_stronger:
   shows
     \<open>branching_bisimulated p q\<close>
   using assms unfolding sr_branching_bisimulated_def branching_bisimulated_def by auto
-
-(*
-lemma sr_branching_bisimulated_equivalence: \<open>equivp (~SRBB)\<close>
-proof (rule equivpI)
-  show \<open>symp (~SRBB)\<close> using sr_branching_bisimulated_symp .
-  show \<open>reflp (~SRBB)\<close> using sr_branching_bisimulated_reflp .
-  show \<open>transp (~SRBB)\<close>
-    unfolding transp_def
-  proof safe
-    fix p q r
-    assume p_q_r: \<open>p ~SRBB q\<close> \<open>q ~SRBB r\<close>
-    hence r_q_p: \<open>q ~SRBB p\<close> \<open>r ~SRBB q\<close> using sr_branching_bisimulated_sym by auto
-    show \<open>p ~SRBB r\<close> sorry (*
-    proof (rule establish_sr_branching_bisim[rule_format])
-      fix \<alpha> p'
-      assume \<open>p \<mapsto> \<alpha> p'\<close>
-      thus \<open>\<alpha> = \<tau> \<and> p' ~SRBB r \<or> (\<exists>q' q''. r \<Zsurj> q' \<and> q' \<mapsto> \<alpha> q'' \<and> p ~SRBB q' \<and> p' ~SRBB q'')\<close> sorry
-    next
-      assume \<open>\<And>p'. \<not> p \<mapsto> \<tau> p'\<close>
-      then obtain q' where \<open>q \<Zsurj> q' \<and> p ~SRBB q' \<and> stable_state q'\<close>
-        using p_q_r(1) sr_branching_bisimulation_stabilizes by force 
-      thus \<open>\<exists>q'. r \<Zsurj> q' \<and> p ~SRBB q' \<and> stable_state q'\<close> 
-        using p_q_r sledgehammer
-      qed
-    qed*)
-  qed
-qed
-
-lemma sr_branching_bisimulation_stuttering_all:
-  assumes
-    \<open>pp \<noteq> []\<close>
-    \<open>\<forall>i < length pp - 1.  pp!i \<mapsto> \<tau> pp!(Suc i)\<close>
-    \<open>hd pp ~SRBB last pp\<close>
-    \<open>i \<le> j\<close> \<open>j < length pp\<close>
-  shows
-    \<open>pp!i ~SRBB pp!j\<close>
-  using assms equivp_def sr_branching_bisimulated_equivalence equivp_def order_le_less_trans
-    sr_branching_bisimulation_stuttering
-  by metis
-*)
 
 definition conjunctify_distinctions ::
   \<open>('s \<Rightarrow> ('a, 's) hml_srbb) \<Rightarrow> 's \<Rightarrow> ('s \<Rightarrow> ('a, 's) hml_srbb_conjunct)\<close> where
@@ -691,6 +653,34 @@ qed
 lemma sr_branching_bisim_is_hmlsrbb: \<open>sr_branching_bisimulated p q = preordered UNIV p q\<close>
   using modal_stability_respecting modal_sym modal_branching_sim logic_sr_branching_bisim_invariant
   unfolding sr_branching_bisimulated_def by auto
+
+lemma sr_branching_bisimulated_transitive:
+  assumes
+    \<open>p ~SRBB q\<close>
+    \<open>q ~SRBB r\<close>
+  shows
+    \<open>p ~SRBB r\<close>
+  using assms unfolding sr_branching_bisim_is_hmlsrbb by simp
+
+lemma sr_branching_bisimulated_equivalence: \<open>equivp (~SRBB)\<close>
+proof (rule equivpI)
+  show \<open>symp (~SRBB)\<close> using sr_branching_bisimulated_symp .
+  show \<open>reflp (~SRBB)\<close> using sr_branching_bisimulated_reflp .
+  show \<open>transp (~SRBB)\<close>
+    unfolding transp_def using sr_branching_bisimulated_transitive by blast
+qed
+
+lemma sr_branching_bisimulation_stuttering_all:
+  assumes
+    \<open>pp \<noteq> []\<close>
+    \<open>\<forall>i < length pp - 1.  pp!i \<mapsto> \<tau> pp!(Suc i)\<close>
+    \<open>hd pp ~SRBB last pp\<close>
+    \<open>i \<le> j\<close> \<open>j < length pp\<close>
+  shows
+    \<open>pp!i ~SRBB pp!j\<close>
+  using assms equivp_def sr_branching_bisimulated_equivalence equivp_def order_le_less_trans
+    sr_branching_bisimulation_stuttering
+  by metis
 
 theorem \<open>sr_branching_bisimulated p q = (p \<preceq> (E \<infinity> \<infinity> \<infinity> \<infinity> \<infinity> \<infinity> \<infinity> \<infinity>) q)\<close>
   using sr_branching_bisim_is_hmlsrbb \<O>_sup
