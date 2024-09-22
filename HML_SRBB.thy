@@ -10,6 +10,8 @@ there are good reasons to believe that this subset truly characterizes SRBB (c.f
 we do not provide a formal proof. From this sublanguage smaller subsets are derived
 via the notion of expressiveness prices (\ref{sect:ExpressivenessMeasure}). \<close>
 
+
+
 text \<open>
 The mutually recursive data types @{term "hml_srbb"}, @{term "hml_srbb_inner"} and @{term "hml_srbb_conjunct"}
 represent the subset of all @{term "hml"} formulas, which characterize stability-respecting branching
@@ -92,6 +94,55 @@ clause of note is the translation of the @{term "Obs"} data constructor of type 
 
 context Inhabited_Tau_LTS
 begin
+
+inductive
+      is_srbb :: "('a, 's) hml \<Rightarrow> bool"
+  and is_srbb_inner :: "('a, 's) hml \<Rightarrow> bool"
+  and is_srbb_conjunct :: "('a, 's) hml_conjunct \<Rightarrow> bool"
+where
+  verum_srbb:
+    "is_srbb hml.TT" |
+  internal_srbb:
+    "is_srbb (hml.Internal \<phi>)" 
+    if "is_srbb_inner \<phi>" |
+  imm_conj_srbb:
+    "is_srbb (hml.Conj I \<psi>s)"
+    if "\<forall>i \<in> I. is_srbb_conjunct (\<psi>s i)" |
+
+  obs_srbb_inner:
+    "is_srbb_inner (HML_soft_poss a \<phi>)"
+    if "is_srbb \<phi>" |
+  conj_srbb_inner:
+    "is_srbb_inner (hml.Conj I \<psi>s)"
+    if "\<forall>i \<in> I. is_srbb_conjunct (\<psi>s i)" |
+  stable_conj_srbb_inner:
+    "is_srbb_inner (hml_conjunct.Neg (hml.Obs \<tau> hml.TT) \<and>hml hml_conjunct.Pos (hml.Conj I \<psi>s))"
+    if "\<forall>i \<in> I. is_srbb_conjunct (\<psi>s i)" |
+  branch_conj_srbb_inner:
+    "is_srbb_inner (hml_conjunct.Pos (HML_soft_poss a \<phi>) \<and>hml hml_conjunct.Pos (hml.Conj I \<psi>s))"
+    if "is_srbb \<phi>" and "\<forall>i \<in> I. is_srbb_conjunct (\<psi>s i)" |
+
+  pos_srbb_conjunct:
+    "is_srbb_conjunct (hml_conjunct.Pos (hml.Internal \<phi>))"
+    if "is_srbb_inner \<phi>" |
+  neg_srbb_conjunct:
+    "is_srbb_conjunct (hml_conjunct.Neg (hml.Internal \<phi>))"
+    if "is_srbb_inner \<phi>"
+
+\<comment> \<open>
+typedef ('a, 's) hml_srbb' = "{\<phi>::('a, 's) hml. is_srbb \<phi>}" sorry
+
+Unfortunately, using semantic subtype definition of the hml_srbb type from the is_srbb
+predicate does not work due to two conflicting constraints:
+1. is_srbb/is_srbb_inner/is_srbb_conjunct must be defined in the Inhabited_Tau_LTS
+   context, otherwise \<and>hml and HML_soft_poss would not be accessible.  More precisely,
+   HML_soft_poss requires the knowledge, that there is an action \<tau> and \<and>hml requires
+   that the index type must contain at least two elements.  These assumptions are
+   introduced via the locale Inhabited_Tau_LTS (at least two indices) which builds on
+   LTS_Tau (\<tau> action) locale.
+2. typedef's can not reference typenames introduced via a locale.
+   https://stackoverflow.com/questions/16556633/what-kind-of-type-definitions-are-legal-in-local-contexts
+\<close>
 
 primrec
   hml_srbb_to_hml
