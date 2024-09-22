@@ -136,12 +136,18 @@ Unfortunately, using semantic subtype definition of the hml_srbb type from the i
 predicate does not work due to two conflicting constraints:
 1. is_srbb/is_srbb_inner/is_srbb_conjunct must be defined in the Inhabited_Tau_LTS
    context, otherwise \<and>hml and HML_soft_poss would not be accessible.  More precisely,
-   HML_soft_poss requires the knowledge, that there is an action \<tau> and \<and>hml requires
-   that the index type must contain at least two elements.  These assumptions are
-   introduced via the locale Inhabited_Tau_LTS (at least two indices) which builds on
-   LTS_Tau (\<tau> action) locale.
+   HML_soft_poss requires the knowledge, that there is a special \<tau> in the action type and 
+   \<and>hml requires hat the index type must contain at least two elements.
+   These assumptions and corresponding types 'a (actions) and 's (indices) are introduced
+   via the locale Inhabited_Tau_LTS (at least two indices) which builds on the LTS_Tau
+   (\<tau> action) locale.
 2. typedef's can not reference typenames introduced via a locale.
-   https://stackoverflow.com/questions/16556633/what-kind-of-type-definitions-are-legal-in-local-contexts
+   Reference:
+     https://stackoverflow.com/questions/16556633/what-kind-of-type-definitions-are-legal-in-local-contexts
+   and The Isabelle/Isar Reference Manual III. Isabelle/HOL, Chapter 11.7, p.276 \<section> 3
+     "Within a local theory specification, the newly introduced type con-
+      structor cannot depend on parameters or assumptions of the context:
+      this is syntactically impossible in HOL. [...]"
 \<close>
 
 primrec
