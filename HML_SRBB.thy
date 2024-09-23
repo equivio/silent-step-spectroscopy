@@ -197,6 +197,158 @@ fun hml_srbb_inner_models :: "'s \<Rightarrow>('a, 's) hml_srbb_inner \<Rightarr
 fun hml_srbb_conjunct_models :: "'s \<Rightarrow> ('a, 's) hml_srbb_conjunct \<Rightarrow> bool" where
   "hml_srbb_conjunct_models s \<psi> = (hml_conjunct_models s (hml_srbb_conjunct_to_hml_conjunct \<psi>))"
 
+primrec 
+      hml_srbb_models' :: "'s \<Rightarrow> ('a, 's) hml_srbb \<Rightarrow> bool" 
+  and hml_srbb_inner_models' :: "'s \<Rightarrow> ('a, 's) hml_srbb_inner \<Rightarrow> bool"
+  and hml_srbb_conjunct_models' :: "'s \<Rightarrow> ('a, 's) hml_srbb_conjunct \<Rightarrow> bool" where
+  "hml_srbb_models' state TT =
+    True" |
+  "hml_srbb_models' state (Internal \<chi>) =
+    (\<exists>p'. state \<Zsurj> p' \<and> (hml_srbb_inner_models' p' \<chi>))" |
+  "hml_srbb_models' state (ImmConj I \<psi>s) =
+    (\<forall>i\<in>I. hml_srbb_conjunct_models' state (\<psi>s i))" |
+
+  "hml_srbb_inner_models' state (Obs a \<phi>) =
+    ((\<exists>p'. state \<mapsto> a p' \<and> hml_srbb_models' p' \<phi>) \<or> a = \<tau> \<and> hml_srbb_models' state \<phi>)" |
+  "hml_srbb_inner_models' state (Conj I \<psi>s) =
+    (\<forall>i\<in>I. hml_srbb_conjunct_models' state (\<psi>s i))" |
+  "hml_srbb_inner_models' state (StableConj I \<psi>s) =
+    ((\<nexists>p'. state \<mapsto> \<tau> p') \<and> (\<forall>i\<in>I. hml_srbb_conjunct_models' state (\<psi>s i)))" |
+  "hml_srbb_inner_models' state (BranchConj a \<phi> I \<psi>s) =
+    (((\<exists>p'. state \<mapsto> a p' \<and> hml_srbb_models' p' \<phi>) \<or> a = \<tau> \<and> hml_srbb_models' state \<phi>)
+    \<and> (\<forall>i\<in>I. hml_srbb_conjunct_models' state (\<psi>s i)))" |
+
+  "hml_srbb_conjunct_models' state (Pos \<chi>) =
+    (\<exists>p'. state \<Zsurj> p' \<and> hml_srbb_inner_models' p' \<chi>)" |
+  "hml_srbb_conjunct_models' state (Neg \<chi>) =
+    (\<nexists>p'. state \<Zsurj> p' \<and> hml_srbb_inner_models' p' \<chi>)"
+
+
+lemma "(\<forall>s. hml_srbb_models s \<phi> = hml_srbb_models' s \<phi>)
+     \<and> (\<forall>s. hml_srbb_inner_models s \<chi> = hml_srbb_inner_models' s \<chi>)
+     \<and> (\<forall>s. hml_srbb_conjunct_models s \<psi> = hml_srbb_conjunct_models' s \<psi>)"
+proof (rule hml_srbb_hml_srbb_inner_hml_srbb_conjunct.induct )
+  show "\<forall>s. s \<Turnstile>SRBB TT = hml_srbb_models' s TT"
+    unfolding hml_srbb_models.simps
+          and hml_srbb_models'.simps
+          and hml_srbb_to_hml.simps
+          and hml_models.simps by auto
+next
+  fix \<chi>
+  assume IH: "\<forall>s. hml_srbb_inner_models s \<chi> = hml_srbb_inner_models' s \<chi>"
+  then show "\<forall>s. s \<Turnstile>SRBB Internal \<chi> = hml_srbb_models' s (Internal \<chi>)"
+    unfolding hml_srbb_models'.simps
+          and hml_srbb_models.simps
+          and hml_srbb_to_hml.simps
+          and hml_models.simps
+    by simp
+next
+  fix I :: "'s set"
+  fix \<psi>s :: "'s \<Rightarrow> ('a, 's) hml_srbb_conjunct"
+  assume IH: "\<And>\<psi>. \<psi> \<in> range \<psi>s \<Longrightarrow>
+                 \<forall>s. hml_srbb_conjunct_models s \<psi> =
+                     hml_srbb_conjunct_models' s \<psi>"
+  then show "\<forall>s. s \<Turnstile>SRBB ImmConj I \<psi>s = hml_srbb_models' s (ImmConj I \<psi>s)"
+    unfolding hml_srbb_models'.simps
+          and hml_srbb_models.simps
+          and hml_srbb_to_hml.simps
+          and hml_models.simps
+    by auto
+next
+  fix a \<phi>
+  assume IH: "\<forall>s. s \<Turnstile>SRBB \<phi> = hml_srbb_models' s \<phi>"
+  then show "\<forall>s. hml_srbb_inner_models s (Obs a \<phi>) =
+                 hml_srbb_inner_models' s (Obs a \<phi>)"
+    unfolding hml_srbb_inner_models.simps
+          and hml_srbb_inner_models'.simps
+          and hml_srbb_inner_to_hml.simps
+          and soft_poss_to_or
+          and hml_models.simps
+    
+    by auto
+next
+  fix I :: "'s set"
+  fix \<psi>s :: "'s \<Rightarrow> ('a, 's) hml_srbb_conjunct"
+  assume IH: "\<And>\<psi>. \<psi> \<in> range \<psi>s \<Longrightarrow>
+               \<forall>s. hml_srbb_conjunct_models s \<psi> =
+                   hml_srbb_conjunct_models' s \<psi>"
+  then show "\<forall>s. hml_srbb_inner_models s (Conj I \<psi>s) =
+                 hml_srbb_inner_models' s (Conj I \<psi>s)"
+    unfolding hml_srbb_inner_models.simps
+          and hml_srbb_inner_models'.simps
+          and hml_srbb_inner_to_hml.simps
+          and hml_models.simps
+    by auto
+next
+  fix I :: "'s set"
+  fix \<psi>s :: "'s \<Rightarrow> ('a, 's) hml_srbb_conjunct"
+  assume IH: "\<And>\<psi>. \<psi> \<in> range \<psi>s \<Longrightarrow>
+               \<forall>s. hml_srbb_conjunct_models s \<psi> =
+                   hml_srbb_conjunct_models' s \<psi>"
+  then have "\<forall>s. (\<not> s \<Turnstile> hml.Obs \<tau> hml.TT
+                  \<and> s \<Turnstile> hml.Conj I (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s)) =
+                 (\<not> Ex (step s \<tau>)
+                  \<and> (\<forall>i\<in>I. hml_srbb_conjunct_models' s (\<psi>s i)))"
+    unfolding hml_models.simps
+    by simp
+  then show "\<forall>s. hml_srbb_inner_models s (StableConj I \<psi>s) =
+                 hml_srbb_inner_models' s (StableConj I \<psi>s)"
+    unfolding hml_srbb_inner_models.simps
+          and hml_srbb_inner_models'.simps
+          and hml_srbb_inner_to_hml.simps
+          and hml_and_and
+          and hml_conjunct_models.simps.
+next
+  fix a
+  fix \<phi>
+  fix I :: "'s set"
+  fix \<psi>s :: "'s \<Rightarrow> ('a, 's) hml_srbb_conjunct"
+  assume IH1: "\<forall>s. s \<Turnstile>SRBB \<phi> = hml_srbb_models' s \<phi>"
+     and IH2: "\<And>\<psi>. \<psi> \<in> range \<psi>s \<Longrightarrow>
+               \<forall>s. hml_srbb_conjunct_models s \<psi> =
+                   hml_srbb_conjunct_models' s \<psi>"
+  then have "\<forall>s. ((s \<Turnstile> hml.Obs a (hml_srbb_to_hml \<phi>)
+                   \<or> a = \<tau> \<and> s \<Turnstile> hml_srbb_to_hml \<phi>)
+                 \<and> s \<Turnstile> hml.Conj I (hml_srbb_conjunct_to_hml_conjunct \<circ> \<psi>s))
+               =
+                 (((\<exists>p'. s \<mapsto> a p' \<and> hml_srbb_models' p' \<phi>)
+                   \<or> a = \<tau> \<and> hml_srbb_models' s \<phi>)
+                 \<and> (\<forall>i\<in>I. hml_srbb_conjunct_models' s (\<psi>s i)))"
+    unfolding hml_models.simps
+    by auto
+  then show "\<forall>s. hml_srbb_inner_models s (BranchConj a \<phi> I \<psi>s) =
+                 hml_srbb_inner_models' s (BranchConj a \<phi> I \<psi>s)"
+    unfolding hml_srbb_inner_models.simps
+          and hml_srbb_inner_models'.simps
+          and hml_srbb_inner_to_hml.simps
+          and hml_and_and
+          and hml_conjunct_models.simps
+          and soft_poss_to_or.
+next
+  fix \<chi>
+  assume IH: "\<forall>s. hml_srbb_inner_models s \<chi> = hml_srbb_inner_models' s \<chi>"
+  then show "\<forall>s. hml_srbb_conjunct_models s (Pos \<chi>) =
+                 hml_srbb_conjunct_models' s (Pos \<chi>)"
+    unfolding hml_srbb_conjunct_models.simps
+          and hml_srbb_conjunct_models'.simps
+          and hml_srbb_conjunct_to_hml_conjunct.simps
+          and hml_conjunct_models.simps
+          and hml_models.simps
+    by auto
+next
+  fix \<chi>
+  assume "\<forall>s. hml_srbb_inner_models s \<chi> = hml_srbb_inner_models' s \<chi>"
+  then show "\<forall>s. hml_srbb_conjunct_models s (Neg \<chi>) =
+                 hml_srbb_conjunct_models' s (Neg \<chi>)"
+    unfolding hml_srbb_conjunct_models.simps
+          and hml_srbb_conjunct_models'.simps
+          and hml_srbb_conjunct_to_hml_conjunct.simps
+          and hml_conjunct_models.simps
+          and hml_models.simps
+    by auto
+qed
+
+
 sublocale lts_semantics \<open>step\<close> \<open>hml_srbb_models\<close> .
 sublocale hml_srbb_inner: lts_semantics where models = hml_srbb_inner_models .
 sublocale hml_srbb_conj: lts_semantics where models = hml_srbb_conjunct_models . 
