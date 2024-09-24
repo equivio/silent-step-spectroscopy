@@ -119,7 +119,8 @@ proof-
                 and hml_srbb_models.simps
                 and hml_srbb_to_hml.simps
                 and hml_models.simps
-          by blast
+          using hml_srbb_and_hml_semantics_match
+          by force
         then have "\<exists>p'. p \<Zsurj> p' \<and> p' \<Turnstile> hml_srbb_inner_to_hml \<chi>"
               and "\<forall>q \<in> Q. (\<nexists>q'. q \<Zsurj> q' \<and> q' \<Turnstile> hml_srbb_inner_to_hml \<chi>)"
           by auto
@@ -148,7 +149,7 @@ proof-
         from \<open>p' \<Turnstile> hml_srbb_inner_to_hml \<chi>\<close>
          and \<open>\<forall>q' \<in> Q\<tau>. \<not>(q' \<Turnstile> hml_srbb_inner_to_hml \<chi>)\<close>
         have "hml_srbb_inner.distinguishes_from \<chi> p' Q\<tau>" 
-          by simp
+          using hml_srbb_and_hml_semantics_match by simp
   
         with \<open>Q\<tau> \<Zsurj>S Q\<tau>\<close> \<open>Q\<tau> \<noteq> {}\<close> Internal
         have "attacker_wins (expr_pr_inner \<chi>) (Attacker_Delayed p' Q\<tau>)" 
@@ -238,7 +239,7 @@ proof-
           case True
           with \<open>hml_srbb_inner.distinguishes_from (hml_srbb_inner.Obs \<alpha> \<phi>) p Q\<close> have dist_unfold:
                "p \<Turnstile> Silent (hml_srbb_to_hml \<phi>) \<and> (\<forall>q\<in>Q. \<not> q \<Turnstile> Silent (hml_srbb_to_hml \<phi>))"
-            by simp
+            using hml_srbb_and_hml_semantics_match by simp
           hence "((\<exists>p'. p \<mapsto>\<tau> p' \<and> p' \<Turnstile> hml_srbb_to_hml \<phi>) \<or> p \<Turnstile> hml_srbb_to_hml \<phi>)"
             by simp
           then obtain p' where "p' \<Turnstile> hml_srbb_to_hml \<phi>" "p \<mapsto>a \<alpha> p'" 
@@ -250,7 +251,7 @@ proof-
           hence "\<forall>q\<in>Q. \<not>q \<Turnstile> hml_srbb_to_hml \<phi>" using \<open>\<forall>p\<in>Q. \<forall>q. p \<Zsurj> q \<longrightarrow> q \<in> Q\<close> by fastforce
   
           hence "distinguishes_from \<phi> p' Q"
-            by (simp add: \<open>p' \<Turnstile> hml_srbb_to_hml \<phi>\<close>)
+            using hml_srbb_and_hml_semantics_match by (simp add: \<open>p' \<Turnstile> hml_srbb_to_hml \<phi>\<close>)
           with Obs have "attacker_wins (expressiveness_price \<phi>) (Attacker_Immediate p' Q)" 
             using \<open>Q \<noteq> {}\<close> by blast
           moreover have "Q \<mapsto>aS \<alpha> Q"
@@ -261,17 +262,17 @@ proof-
           case False
           with \<open>hml_srbb_inner.distinguishes_from (hml_srbb_inner.Obs \<alpha> \<phi>) p Q\<close> 
           obtain p'' where "(p \<mapsto>\<alpha> p'') \<and> (p'' \<Turnstile> (hml_srbb_to_hml \<phi>))" 
-            by auto
+            using hml_srbb_and_hml_semantics_match by auto
   
           let ?Q' = "step_set Q \<alpha>"
           from \<open>hml_srbb_inner.distinguishes_from (hml_srbb_inner.Obs \<alpha> \<phi>) p Q\<close> 
           have "\<forall>q\<in>Q. \<not> q \<Turnstile> hml.Obs \<alpha> (hml_srbb_to_hml \<phi>)" 
-            using \<open>Q \<noteq> {}\<close> by simp
+            using \<open>Q \<noteq> {}\<close> and hml_srbb_and_hml_semantics_match by simp
           hence "\<forall>q\<in>?Q'. \<not> q \<Turnstile> hml_srbb_to_hml \<phi>"
             using step_set_is_step_set by fastforce
           from \<open>\<forall>q\<in>step_set Q \<alpha>. \<not> q \<Turnstile> hml_srbb_to_hml \<phi>\<close> \<open>p \<mapsto>\<alpha> p'' \<and> p'' \<Turnstile> hml_srbb_to_hml \<phi>\<close>
           have "distinguishes_from \<phi> p'' ?Q'"
-            by simp
+            using hml_srbb_and_hml_semantics_match by simp
           hence "attacker_wins (expressiveness_price \<phi>) (Attacker_Immediate p'' ?Q')"
             by (metis Obs distinction_implies_winning_budgets_empty_Q)
           moreover have "p \<mapsto>\<alpha> p''" using \<open>p \<mapsto>\<alpha> p'' \<and> p'' \<Turnstile> hml_srbb_to_hml \<phi>\<close> by simp
@@ -422,8 +423,8 @@ proof-
           \<open>hml_srbb_inner.distinguishes_from (StableConj I \<psi>s) p Q\<close>
           \<open>\<forall>q\<in>Q. \<nexists>q'. q \<mapsto>\<tau> q'\<close>
         hence distinctions: \<open>\<forall>q\<in>Q. \<exists>i\<in>I. hml_srbb_conj.distinguishes (\<psi>s i) p q\<close>
-          using srbb_dist_stable_conjunction_implies_dist_conjunct_or_stable
-          by (auto, blast)
+          using srbb_dist_stable_conjunction_implies_dist_conjunct_or_stable hml_srbb_and_hml_semantics_match
+          by (metis hml_srbb_conj.distinguishes_def hml_srbb_inner.distinguishes_from_def hml_srbb_inner_models.simps(3))
         hence inductive_wins: \<open>\<forall>q\<in>Q. \<exists>i\<in>I. hml_srbb_conj.distinguishes (\<psi>s i) p q
             \<and> attacker_wins (expr_pr_conjunct (\<psi>s i)) (Attacker_Clause p q)\<close>
           using StableConj by blast

@@ -741,8 +741,8 @@ next
     using spectroscopy_position.simps(53) by fastforce
   from IH have "p \<Zsurj>p'"
     by (metis option.discI silent_reachable.intros(1) silent_reachable_append_\<tau> spectroscopy_moves.simps(2)) 
-  hence "Q \<Zsurj>S Q \<longrightarrow> distinguishes_from (hml_srbb.Internal \<chi>) p Q" using D
-    by (smt (verit, del_insts) distinguishes_def distinguishes_from_def hml_models.simps(3) hml_srbb_models.elims(2) hml_srbb_models.elims(3) hml_srbb_to_hml.simps(2) silent_reachable_trans)
+  hence "Q \<Zsurj>S Q \<longrightarrow> distinguishes_from (hml_srbb.Internal \<chi>) p Q" using D 
+    by (smt (verit) LTS_Tau.silent_reachable_trans distinguishes_from_def hml_srbb_models.simps(2))
   then show ?case by simp
 next
   case (observation p Q e \<phi> \<alpha>)
@@ -777,10 +777,10 @@ next
     then obtain q' where X: "q \<Zsurj> q' \<and> hml_srbb_inner_models q' (Obs \<alpha> \<phi>)" by auto
     hence "hml_srbb_inner_models q' (Obs \<alpha> \<phi>)" by simp
     hence "q' \<Turnstile> (HML_soft_poss \<alpha> (hml_srbb_to_hml \<phi>))"
-      by simp
+      using hml_srbb_and_hml_semantics_match by simp
     from X have "q'\<in>Q" using \<open>Q \<Zsurj>S Q\<close> \<open>q \<in> Q\<close> by blast
     hence "\<exists>q''\<in>Q'. q' \<mapsto>a \<alpha> q'' \<and> q'' \<Turnstile>SRBB \<phi>" using \<open>Q \<mapsto>aS \<alpha> Q'\<close> \<open>q' \<Turnstile> (HML_soft_poss \<alpha> (hml_srbb_to_hml \<phi>))\<close>
-      by auto
+      using hml_srbb_and_hml_semantics_match by auto
     then obtain q'' where "q''\<in>Q'\<and> q' \<mapsto>a \<alpha> q'' \<and> q'' \<Turnstile>SRBB \<phi>" by auto
     thus "False" using D by auto
   qed
@@ -821,10 +821,8 @@ next
     by (metis (no_types, lifting) not_Some_eq) 
   have "P' \<Zsurj>S P' \<longrightarrow> p \<in> P'" using \<open>{p} \<Zsurj>S P'\<close>  by (simp add: silent_reachable.intros(1)) 
   hence "hml_srbb_conj.distinguishes (hml_srbb_conjunct.Neg \<chi>) p q" using D \<open>{p} \<Zsurj>S P'\<close>
-    unfolding hml_srbb_conj.distinguishes_def distinguishes_from_def
-    by (metis LTS_Tau.silent_reachable_trans hml_conjunct_models.simps(2)
-        hml_srbb_conjunct_models.elims(2,3) hml_srbb_conjunct_to_hml_conjunct.simps(2)
-        hml_srbb_models.elims(1) hml_srbb_to_hml.simps(2) silent_reachable.intros(1))
+    unfolding hml_srbb_conj.distinguishes_def distinguishes_from_def 
+    by (smt (verit) LTS_Tau.silent_reachable_trans hml_srbb_conjunct_models.simps(2) hml_srbb_models.simps(2) silent_reachable.refl)
   then show ?case by simp
 next
   case (stable p Q e \<chi>)
@@ -842,7 +840,7 @@ next
   hence "hml_srbb_inner.distinguishes_from \<chi> p Q'" using \<open>\<nexists>p''. p \<mapsto>\<tau> p''\<close> by auto
   hence "hml_srbb_inner_models p \<chi>" by simp
   hence "p \<Turnstile>SRBB (hml_srbb.Internal \<chi>)"
-    using pre_\<epsilon> by auto
+    using pre_\<epsilon> and hml_srbb_and_hml_semantics_match by auto
   have "Q \<Zsurj>S Q \<longrightarrow> distinguishes_from (hml_srbb.Internal \<chi>) p Q"
   proof
     assume "Q \<Zsurj>S Q"
@@ -850,8 +848,8 @@ next
     proof (clarify)
       fix q
       assume "q \<in> Q" "(q \<Turnstile>SRBB (hml_srbb.Internal \<chi>))"
-      hence "\<exists>q'. q \<Zsurj> q' \<and> (q' \<Turnstile> (hml_srbb_inner_to_hml \<chi>))" by auto
-      hence "\<exists>q'. q \<Zsurj> q' \<and> hml_srbb_inner_models q' \<chi>" by simp
+      hence "\<exists>q'. q \<Zsurj> q' \<and> (q' \<Turnstile> (hml_srbb_inner_to_hml \<chi>))" using hml_srbb_and_hml_semantics_match by auto
+      hence "\<exists>q'. q \<Zsurj> q' \<and> hml_srbb_inner_models q' \<chi>" using hml_srbb_and_hml_semantics_match by simp
       then obtain q' where X: "q \<Zsurj> q' \<and> hml_srbb_inner_models q' \<chi>" by auto
       hence "q' \<in> Q" using \<open>Q \<Zsurj>S Q\<close> \<open>q \<in> Q\<close> by blast
       then show "False"
@@ -901,7 +899,7 @@ next
     by (metis (no_types, lifting) br_conj option.discI)
   hence "Q=(Q' \<union> Q\<alpha>)" by auto
   then show ?case
-    using pre_\<epsilon> D by auto 
+    using pre_\<epsilon> D hml_srbb_and_hml_semantics_match by auto 
 next
   case (branch_conj p \<alpha> p' Q1 Q\<alpha> e \<psi> \<Phi>)
   hence A1: "\<forall>q\<in>Q1. hml_srbb_conjunct_models p (\<Phi> q)" by simp

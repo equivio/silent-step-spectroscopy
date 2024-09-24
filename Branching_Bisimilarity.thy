@@ -91,7 +91,8 @@ lemma sr_branching_bisimulated_sym:
 
 lemma sr_branching_bisimulated_symp:
   shows \<open>symp (~SRBB)\<close>
-  using sr_branching_bisimulated_sym symp_on_def by blast
+  using sr_branching_bisimulated_sym  
+  using sympI by blast
  
 lemma sr_branching_bisimulated_reflp:
   shows \<open>reflp (~SRBB)\<close>
@@ -283,8 +284,8 @@ proof -
     using assms(2) unfolding stability_respecting_def by blast
   moreover have \<open>sr_branching_bisimulated p q'\<close>
     using sr_branching_bisimulation_stuttering
-     assms(1) calculation(1) sr_branching_bisimulated_def sympD
-    by (metis LTS_Tau.silent_reachable.cases assms(2) silence_retains_branching_sim)
+     assms(1) calculation(1) sr_branching_bisimulated_def sympD hml_srbb_and_hml_semantics_match
+    by (metis assms(2) sr_branching_bisimulation_silently_retained stable_state_stable)
   ultimately show ?thesis by blast
 qed
 
