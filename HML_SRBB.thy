@@ -373,7 +373,7 @@ lemma srbb_dist_stable_conjunction_implies_dist_conjunct_or_stable:
   assumes "hml_srbb_inner.distinguishes (StableConj I \<psi>s) p q"
   shows "(\<exists>i\<in>I. hml_srbb_conj.distinguishes (\<psi>s i) p q)
        \<or> (p << HML_not (hml.Obs \<tau> hml.TT) >> q)"
-  using assms hml_and_and left_right_distinct by force
+  using assms hml_and_and by force
 
 text \<open>
 In the following, we replicate @{term "srbb_dist_conjunct_implies_dist_imm_conjunction"} for stable conjunctions
@@ -385,7 +385,7 @@ lemma srbb_dist_conjunct_or_stable_implies_dist_stable_conjunction:
       and "(\<exists>i\<in>I. hml_srbb_conj.distinguishes (\<psi>s i) p q)
          \<or> (p << HML_not (hml.Obs \<tau> hml.TT) >> q)"
   shows "hml_srbb_inner.distinguishes (StableConj I \<psi>s) p q"
-  using assms hml_and_and left_right_distinct by force
+  using assms hml_and_and by force
 
 text \<open>
 We also replicate @{term "srbb_dist_imm_conjunction_implies_dist_conjunct"} for branching conjunctions
@@ -397,7 +397,7 @@ lemma srbb_dist_branch_conjunction_implies_dist_conjunct_or_branch:
   assumes "hml_srbb_inner.distinguishes (BranchConj \<alpha> \<phi> I \<psi>s) p q"
   shows "(\<exists>i\<in>I. hml_srbb_conj.distinguishes (\<psi>s i) p q)
        \<or> (hml_srbb_inner.distinguishes (Obs \<alpha> \<phi>) p q)"
-  using assms hml_and_and left_right_distinct by force
+  using assms hml_and_and by force
 
 text \<open>
 In the following, we replicate @{term "srbb_dist_conjunct_implies_dist_imm_conjunction"} for branching conjunctions
@@ -409,7 +409,7 @@ lemma srbb_dist_conjunct_or_branch_implies_dist_branch_conjunction:
       and "(i\<in>I \<and> hml_srbb_conj.distinguishes (\<psi>s i) p q)
          \<or> (hml_srbb_inner.distinguishes (Obs \<alpha> \<phi>) p q)"
   shows "hml_srbb_inner.distinguishes (BranchConj \<alpha> \<phi> I \<psi>s) p q"
-  using assms hml_and_and left_right_distinct by force
+  using assms hml_and_and by force
 
 
 subsubsection \<open> Distinguishing Conjunction Thinning \<close>
@@ -898,22 +898,22 @@ lemma srbb_stable_Neg_normalizable:
     \<open>Internal (StableConj I \<Psi>) \<Lleftarrow>srbb\<Rrightarrow> Internal (StableConj I \<Psi>')\<close>
 proof (rule logical_eqI)
   fix p
-  assume \<open>p \<Turnstile>SRBB hml_srbb.Internal (StableConj I \<Psi>)\<close>
+  assume \<open>p \<Turnstile>SRBB Internal (StableConj I \<Psi>)\<close>
   then obtain p' where p'_spec: \<open>p \<Zsurj> p'\<close> \<open>hml_srbb_inner_models p' (StableConj I \<Psi>)\<close> by auto
   hence \<open>stable_state p'\<close> by auto
   from p'_spec have \<open>\<exists>p''. p' \<Zsurj> p'' \<and> hml_srbb_inner_models p'' \<chi>\<close>
-    using assms(1,2) left_right_distinct by auto
+    using assms(1,2) by auto
   with \<open>stable_state p'\<close> have \<open>hml_srbb_inner_models p' \<chi>\<close>
     using stable_state_stable by blast
   hence \<open>hml_srbb_conjunct_models p' (Neg (StableConj {left} (\<lambda>_. Neg \<chi>)))\<close>
-    using left_right_distinct \<open>stable_state p'\<close> stable_state_stable by (auto, blast)
+    using \<open>stable_state p'\<close> stable_state_stable by (auto, blast)
   hence \<open>hml_srbb_inner_models p' (StableConj I \<Psi>')\<close>
     unfolding assms(3) using p'_spec by auto
   thus \<open>p \<Turnstile>SRBB hml_srbb.Internal (StableConj I \<Psi>')\<close>
     using \<open>p \<Zsurj> p'\<close> by auto
 next
   fix p
-  assume \<open>p \<Turnstile>SRBB hml_srbb.Internal (StableConj I \<Psi>')\<close>
+  assume \<open>p \<Turnstile>SRBB Internal (StableConj I \<Psi>')\<close>
   then obtain p' where p'_spec: \<open>p \<Zsurj> p'\<close> \<open>hml_srbb_inner_models p' (StableConj I \<Psi>')\<close> by auto
   hence \<open>stable_state p'\<close> by auto
   from p'_spec(2) have other_conjuncts: \<open>\<forall>j\<in>I. i \<noteq> j \<longrightarrow> hml_srbb_conjunct_models p' (\<Psi> j)\<close>
@@ -923,9 +923,9 @@ next
   hence \<open>hml_srbb_conjunct_models p' (Neg (StableConj {left} (\<lambda>_. Neg \<chi>)))\<close>
     unfolding assms(3) by auto
   with \<open>stable_state p'\<close> have \<open>hml_srbb_inner_models p' \<chi>\<close>
-    using stable_state_stable left_right_distinct by (auto, metis silent_reachable.simps)
-  with \<open>stable_state p'\<close> have \<open>hml_srbb_conjunct_models p' (Pos \<chi>)\<close>
-    using pre_\<epsilon> and hml_srbb_and_hml_semantics_match by simp
+    using stable_state_stable by (auto, metis silent_reachable.simps)
+  then have \<open>hml_srbb_conjunct_models p' (Pos \<chi>)\<close>
+    using LTS_Tau.refl by fastforce
   hence \<open>hml_srbb_inner_models p' (StableConj I \<Psi>)\<close>
     using p'_spec assms other_conjuncts by auto
   thus \<open>p \<Turnstile>SRBB hml_srbb.Internal (StableConj I \<Psi>)\<close>
@@ -942,26 +942,26 @@ lemma srbb_stable_Neg_normalizable_set:
     \<open>Internal (StableConj I \<Psi>) \<Lleftarrow>srbb\<Rrightarrow> Internal (StableConj I \<Psi>')\<close>
 proof (rule logical_eqI)
   fix p
-  assume \<open>p \<Turnstile>SRBB hml_srbb.Internal (StableConj I \<Psi>)\<close>
+  assume \<open>p \<Turnstile>SRBB Internal (StableConj I \<Psi>)\<close>
   then obtain p' where p'_spec: \<open>p \<Zsurj> p'\<close> \<open>hml_srbb_inner_models p' (StableConj I \<Psi>)\<close> by auto
   hence \<open>stable_state p'\<close> by auto
   from p'_spec have
     \<open>\<forall>\<chi> i. i\<in>I \<and> \<Psi> i = Pos \<chi> \<longrightarrow> (\<exists>p''. p' \<Zsurj> p'' \<and> hml_srbb_inner_models p'' \<chi>)\<close>
-    using left_right_distinct by fastforce
+    by fastforce
   with \<open>stable_state p'\<close> have \<open>\<forall>\<chi> i. i\<in>I \<and> \<Psi> i = Pos \<chi> \<longrightarrow> hml_srbb_inner_models p' \<chi>\<close>
     using stable_state_stable by blast
   hence pos_rewrite: \<open>\<forall>\<chi> i. i\<in>I \<and> \<Psi> i = Pos \<chi> \<longrightarrow>
       hml_srbb_conjunct_models p' (Neg (StableConj {left} (\<lambda>_. Neg \<chi>)))\<close>
-    using left_right_distinct \<open>stable_state p'\<close> stable_state_stable by (auto, blast)
+    using \<open>stable_state p'\<close> stable_state_stable by (auto, blast)
   hence \<open>hml_srbb_inner_models p' (StableConj I \<Psi>')\<close>
     unfolding assms using p'_spec
     by (auto, metis (no_types, lifting) hml_srbb_conjunct.exhaust hml_srbb_conjunct.simps(5,6)
         pos_rewrite)
-  thus \<open>p \<Turnstile>SRBB hml_srbb.Internal (StableConj I \<Psi>')\<close>
+  thus \<open>p \<Turnstile>SRBB Internal (StableConj I \<Psi>')\<close>
     using \<open>p \<Zsurj> p'\<close> by auto
 next
   fix p
-  assume \<open>p \<Turnstile>SRBB hml_srbb.Internal (StableConj I \<Psi>')\<close>
+  assume \<open>p \<Turnstile>SRBB Internal (StableConj I \<Psi>')\<close>
   then obtain p' where p'_spec: \<open>p \<Zsurj> p'\<close> \<open>hml_srbb_inner_models p' (StableConj I \<Psi>')\<close> by auto
   hence \<open>stable_state p'\<close> by auto
   from p'_spec(2) have other_conjuncts:
@@ -973,14 +973,14 @@ next
       hml_srbb_conjunct_models p' (Neg (StableConj {left} (\<lambda>_. Neg \<chi>)))\<close>
     unfolding assms by auto
   with \<open>stable_state p'\<close> have \<open>\<forall>\<chi> i. i\<in>I \<and> \<Psi> i = Pos \<chi> \<longrightarrow> hml_srbb_inner_models p' \<chi>\<close>
-    using stable_state_stable left_right_distinct by (auto, metis silent_reachable.simps)
-  with \<open>stable_state p'\<close> have pos_conjuncts:
+    using stable_state_stable by (auto, metis silent_reachable.simps)
+  then have pos_conjuncts:
       \<open>\<forall>\<chi> i. i\<in>I \<and> \<Psi> i = Pos \<chi> \<longrightarrow>hml_srbb_conjunct_models p' (Pos \<chi>)\<close>
-    using pre_\<epsilon> and hml_srbb_and_hml_semantics_match by auto
+    using hml_srbb_conjunct_models.simps(1) silent_reachable.simps by blast
   hence \<open>hml_srbb_inner_models p' (StableConj I \<Psi>)\<close>
     using p'_spec assms other_conjuncts 
     by (auto, metis other_conjuncts pos_conjuncts hml_srbb_conjunct.exhaust)
-  thus \<open>p \<Turnstile>SRBB hml_srbb.Internal (StableConj I \<Psi>)\<close>
+  thus \<open>p \<Turnstile>SRBB Internal (StableConj I \<Psi>)\<close>
     using p'_spec(1) by auto
 qed
 

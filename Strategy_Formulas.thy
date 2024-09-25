@@ -776,11 +776,11 @@ next
     hence "\<exists>q'.  q \<Zsurj> q' \<and> hml_srbb_inner_models q' (Obs \<alpha> \<phi>)" by simp 
     then obtain q' where X: "q \<Zsurj> q' \<and> hml_srbb_inner_models q' (Obs \<alpha> \<phi>)" by auto
     hence "hml_srbb_inner_models q' (Obs \<alpha> \<phi>)" by simp
-    hence "q' \<Turnstile> (HML_soft_poss \<alpha> (hml_srbb_to_hml \<phi>))"
-      using hml_srbb_and_hml_semantics_match by simp
+
     from X have "q'\<in>Q" using \<open>Q \<Zsurj>S Q\<close> \<open>q \<in> Q\<close> by blast
-    hence "\<exists>q''\<in>Q'. q' \<mapsto>a \<alpha> q'' \<and> q'' \<Turnstile>SRBB \<phi>" using \<open>Q \<mapsto>aS \<alpha> Q'\<close> \<open>q' \<Turnstile> (HML_soft_poss \<alpha> (hml_srbb_to_hml \<phi>))\<close>
-      using hml_srbb_and_hml_semantics_match by auto
+
+    hence "\<exists>q''\<in>Q'. q' \<mapsto>a \<alpha> q'' \<and> q'' \<Turnstile>SRBB \<phi>"
+      using \<open>Q \<mapsto>aS \<alpha> Q'\<close> \<open>hml_srbb_inner_models q' (Obs \<alpha> \<phi>)\<close> by auto
     then obtain q'' where "q''\<in>Q'\<and> q' \<mapsto>a \<alpha> q'' \<and> q'' \<Turnstile>SRBB \<phi>" by auto
     thus "False" using D by auto
   qed
@@ -839,8 +839,8 @@ next
   from IH have "(\<forall>q. \<not> p \<mapsto>\<tau> q) \<longrightarrow> hml_srbb_inner.distinguishes_from \<chi> p Q'" by simp
   hence "hml_srbb_inner.distinguishes_from \<chi> p Q'" using \<open>\<nexists>p''. p \<mapsto>\<tau> p''\<close> by auto
   hence "hml_srbb_inner_models p \<chi>" by simp
-  hence "p \<Turnstile>SRBB (hml_srbb.Internal \<chi>)"
-    using pre_\<epsilon> and hml_srbb_and_hml_semantics_match by auto
+  hence "p \<Turnstile>SRBB (hml_srbb.Internal \<chi>)" 
+    using LTS_Tau.refl by force
   have "Q \<Zsurj>S Q \<longrightarrow> distinguishes_from (hml_srbb.Internal \<chi>) p Q"
   proof
     assume "Q \<Zsurj>S Q"
@@ -848,8 +848,7 @@ next
     proof (clarify)
       fix q
       assume "q \<in> Q" "(q \<Turnstile>SRBB (hml_srbb.Internal \<chi>))"
-      hence "\<exists>q'. q \<Zsurj> q' \<and> (q' \<Turnstile> (hml_srbb_inner_to_hml \<chi>))" using hml_srbb_and_hml_semantics_match by auto
-      hence "\<exists>q'. q \<Zsurj> q' \<and> hml_srbb_inner_models q' \<chi>" using hml_srbb_and_hml_semantics_match by simp
+      hence "\<exists>q'. q \<Zsurj> q' \<and> hml_srbb_inner_models q' \<chi>" by simp
       then obtain q' where X: "q \<Zsurj> q' \<and> hml_srbb_inner_models q' \<chi>" by auto
       hence "q' \<in> Q" using \<open>Q \<Zsurj>S Q\<close> \<open>q \<in> Q\<close> by blast
       then show "False"
