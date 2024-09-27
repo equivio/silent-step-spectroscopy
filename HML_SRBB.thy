@@ -90,7 +90,7 @@ forward when viewing above interpretation of the data constructors of HML$_\text
 clause of note is the translation of the @{term "Obs"} data constructor of type @{term "hml_srbb_inner"}.
 \<close>
 
-context Inhabited_Tau_LTS
+context LTS_Tau
 begin
 
 subsubsection \<open>Models Relation for HML$_\text{SRBB}$ \<close>

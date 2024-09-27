@@ -22,7 +22,7 @@ datatype ('s, 'a) spectroscopy_position =
          Defender_Conj (attacker_state: "'s") (defender_states: "'s set") |
          Defender_Stable_Conj (attacker_state: "'s") (defender_states: "'s set")
 
-context Inhabited_Tau_LTS begin
+context LTS_Tau begin
 
 text\<open>\label{specmoves}\<close>
 text\<open>We also define the moves of the weak spectroscopy game. Their names indicate the respective HML formulas they correspond to. This correspondence will be shown in section \ref{deviation:lemma3}. \<close>
@@ -315,11 +315,9 @@ end
 
 text \<open>Now, we are able to define the weak spectroscopy game on an arbitrary (but inhabited) LTS.\<close>
 locale full_spec_game =
-  Inhabited_Tau_LTS step left right \<tau>
+  LTS_Tau step \<tau>
   + energy_game "spectroscopy_moves" "spectroscopy_defender" "less_eq"
   for step :: \<open>'s \<Rightarrow> 'a \<Rightarrow> 's \<Rightarrow> bool\<close> (\<open>_ \<mapsto>_ _\<close> [70, 70, 70] 80) and
-      left :: 's and
-      right :: 's and
       \<tau> :: 'a
 
 end

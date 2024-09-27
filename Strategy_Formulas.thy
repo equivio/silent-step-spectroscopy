@@ -169,7 +169,7 @@ proof(induction rule: attacker_wins.induct)
       assume "\<exists>p' Q'. g' = Attacker_Delayed p' Q'"
       then obtain p' Q' where g'_att_del: "g' = Attacker_Delayed p' Q'" by blast
       have e_comp: "(the (spectroscopy_moves (Attacker_Immediate p Q) (Attacker_Delayed p' Q')) e) = (Some e)"
-        by (smt (verit, ccfv_threshold) Inhabited_Tau_LTS_axioms Spectroscopy_Game.Inhabited_Tau_LTS.delay g'_att_del Attacker_Immediate move option.exhaust_sel option.inject)
+        by (smt (verit, ccfv_threshold) Spectroscopy_Game.LTS_Tau.delay g'_att_del Attacker_Immediate move option.exhaust_sel option.inject)
       have "p' = p"
         by (metis g'_att_del Attacker_Immediate(2) spectroscopy_moves.simps(1))
       moreover have "(attacker_wins e (Attacker_Delayed p Q'))"
@@ -184,7 +184,7 @@ proof(induction rule: attacker_wins.induct)
       = (Some Some)) \<and> (attacker_wins e (Attacker_Delayed p Q')) 
         \<and> strategy_formula_inner (Attacker_Delayed p Q') e \<chi>))"
         using g'_att_del
-        by (smt (verit) Inhabited_Tau_LTS_axioms Spectroscopy_Game.Inhabited_Tau_LTS.delay \<open>attacker_wins e (Attacker_Delayed p Q')\<close> Attacker_Immediate)
+        by (smt (verit) Spectroscopy_Game.LTS_Tau.delay \<open>attacker_wins e (Attacker_Delayed p Q')\<close> Attacker_Immediate)
       hence "strategy_formula (Attacker_Immediate p Q) e (Internal \<chi>)"
         using strategy_formula_strategy_formula_inner_strategy_formula_conjunct.delay by blast
       moreover have "expressiveness_price (Internal \<chi>) \<le> e"
@@ -313,7 +313,7 @@ proof(induction rule: attacker_wins.induct)
       then obtain p' Q' where
         g'_att_del: "g' = Attacker_Delayed p' Q'" by blast
       have Qp': "Q' = Q" "p \<noteq> p'" "p \<mapsto> \<tau> p'"
-        using Attacker_Delayed g'_att_del Inhabited_Tau_LTS_axioms Spectroscopy_Game.Inhabited_Tau_LTS.procrastination
+        using Attacker_Delayed g'_att_del Spectroscopy_Game.LTS_Tau.procrastination
         by metis+
       hence e_comp: "(the (spectroscopy_moves (Attacker_Delayed p Q) g') e) = Some e"
         using g'_att_del
@@ -329,8 +329,8 @@ proof(induction rule: attacker_wins.induct)
          \<and>  attacker_wins e (Attacker_Delayed p' Q)
          \<and> strategy_formula_inner (Attacker_Delayed p' Q) e \<chi>"
         using e_comp g'_att_del Qp' local.procrastination Attack.hyps att_win
-          Spectroscopy_Game.Inhabited_Tau_LTS.procrastination
-        by (metis Inhabited_Tau_LTS_axioms)
+          Spectroscopy_Game.LTS_Tau.procrastination
+        by metis
       hence "strategy_formula_inner (Attacker_Delayed p Q) e \<chi>"
         using strategy_formula_strategy_formula_inner_strategy_formula_conjunct.procrastination by blast
       moreover have "expr_pr_inner \<chi> \<le> e"
@@ -878,7 +878,7 @@ next
   hence IH: "\<forall>q\<in> Q. hml_srbb_conj.distinguishes (\<Phi> q) p q" by simp
   hence Q: "\<forall>q \<in> Q. hml_srbb_conjunct_models p (\<Phi> q)" by simp
   hence "(\<forall>q. \<not> p \<mapsto>\<tau> q) \<longrightarrow> hml_srbb_inner.distinguishes_from (StableConj Q \<Phi>) p Q"
-    using IH left_right_distinct by auto
+    using IH by auto
   then show ?case by simp
 next
   case (branch p Q e \<chi>)

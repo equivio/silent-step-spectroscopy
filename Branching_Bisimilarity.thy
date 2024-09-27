@@ -4,7 +4,7 @@ theory Branching_Bisimilarity
   imports HML_SRBB Expressiveness_Price
 begin
 
-context Inhabited_Tau_LTS
+context LTS_Tau
 begin
 
 definition branching_simulation :: \<open>('s \<Rightarrow> 's \<Rightarrow> bool) \<Rightarrow> bool\<close> where
@@ -386,14 +386,14 @@ proof safe
     hence \<open>hml_srbb_inner.distinguishes_from
        (StableConj (silent_reachable_set {q} \<inter> {q'. stable_state q'}) (conjunctify_distinctions \<Phi> p))
        p (silent_reachable_set {q})\<close>
-      using left_right_distinct by (auto simp add: p_stability(2))
+      by (auto simp add: p_stability(2))
     hence
       \<open>distinguishes
         (Internal (StableConj (silent_reachable_set {q} \<inter> {q'. stable_state q'})
                 (conjunctify_distinctions \<Phi> p)))
         p q\<close>
       unfolding silent_reachable_set_def
-      using left_right_distinct silent_reachable.refl by auto
+      using silent_reachable.refl by auto
     thus False
       using p_stability(1) preordered_no_distinction by blast
   qed
@@ -484,7 +484,7 @@ proof -
           (ImmConj {q''. \<exists>q'''\<in>Q\<alpha>. q''' \<mapsto>a \<alpha> q''}
                    (conjunctify_distinctions \<Phi>\<alpha> p'))
           {q'. q \<Zsurj> q' \<and> (\<exists>\<phi>. distinguishes \<phi> p q')} \<Psi>\<eta>)\<close>
-      using left_right_distinct contradiction(1) silent_reachable.refl
+      using contradiction(1) silent_reachable.refl
       unfolding Q\<alpha>_def distinguishes_def hml_srbb_conj.distinguishes_def hml_srbb_inner.distinguishes_def preordered_def
       by simp force
     moreover have \<open>\<forall>q'. q \<Zsurj> q' \<longrightarrow> \<not> hml_srbb_inner_models q'
@@ -494,12 +494,13 @@ proof -
       assume contradiction: \<open>q \<Zsurj> q'\<close>
         \<open>hml_srbb_inner_models q' (BranchConj \<alpha> (ImmConj {q''. \<exists>q'''\<in>Q\<alpha>. q''' \<mapsto>a \<alpha> q''} (conjunctify_distinctions \<Phi>\<alpha> p')) {q'. q \<Zsurj> q' \<and> (\<exists>\<phi>. distinguishes \<phi> p q')} \<Psi>\<eta>)\<close>
       thus \<open>False\<close>
-        using obs_dist distinctions_\<eta> left_right_distinct unfolding distinguishes_def hml_srbb_conj.distinguishes_def hml_srbb_inner.distinguishes_def Q\<alpha>_def
+        using obs_dist distinctions_\<eta>
+        unfolding distinguishes_def hml_srbb_conj.distinguishes_def hml_srbb_inner.distinguishes_def Q\<alpha>_def
         by (auto) blast+
     qed
     ultimately have \<open>distinguishes (Internal (BranchConj \<alpha> (ImmConj {q''. \<exists>q'''\<in>Q\<alpha>. q''' \<mapsto>a \<alpha> q''} (conjunctify_distinctions \<Phi>\<alpha> p')) {q'. q \<Zsurj> q' \<and> (\<exists>\<phi>. distinguishes \<phi> p q')} \<Psi>\<eta>)) p q\<close>
       unfolding distinguishes_def Q\<alpha>_def
-      using left_right_distinct silent_reachable.refl by (auto) blast+
+      using silent_reachable.refl by (auto) blast+
     thus False using contradiction(1) preordered_no_distinction by blast
   qed
   thus ?thesis
