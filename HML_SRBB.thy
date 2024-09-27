@@ -407,6 +407,6 @@ next
     using p'_spec(1) by auto
 qed
 
-end (* Inhabited_Tau_LTS *)
+end (* LTS_Tau *)
 
 end
