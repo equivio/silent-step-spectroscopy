@@ -192,24 +192,28 @@ next
      and "hml_srbb_inner_models q (Obs \<alpha> \<phi>)"
   then show "\<exists>tr \<in> weak_traces q. wtrace_to_inner tr \<Lleftarrow>\<chi>\<Rrightarrow> Obs \<alpha> \<phi>"
   proof (cases "\<alpha> = \<tau>")
-    assume "\<alpha> = \<tau>"
+    case True
 
-    from \<open>is_trace_formula_inner (Obs \<alpha> \<phi>)\<close>
-    have "is_trace_formula \<phi>" 
-      using is_trace_formula_inner.cases by auto
+    with \<open>hml_srbb_inner_models q (Obs \<alpha> \<phi>)\<close> have \<open>q \<Turnstile>SRBB \<phi>\<close>
+      using Obs.prems(1) silent_reachable.step empty_conj_trivial(1)
+      by (metis (no_types, lifting) hml_srbb_inner.distinct(1) hml_srbb_inner.inject(1)
+          hml_srbb_inner_models.simps(1) hml_srbb_models.simps(1,2) is_trace_formula.cases
+          is_trace_formula_inner.cases)
 
-    from \<open>hml_srbb_inner_models q (Obs \<alpha> \<phi>)\<close>
-    show "\<exists>tr \<in> weak_traces q. wtrace_to_inner tr \<Lleftarrow>\<chi>\<Rrightarrow> Obs \<alpha> \<phi>"
-      by (metis LTS_Tau.refl Obs.IH \<open>\<alpha> = \<tau>\<close> \<open>is_trace_formula \<phi>\<close> hml_srbb_inner_models.simps(1) obs_srbb_cong prepend_\<tau>_weak_trace silent_prepend_weak_traces silent_reachable_append_\<tau> wtrace_to_inner.simps(2))
+    moreover have "is_trace_formula \<phi>" 
+      using \<open>is_trace_formula_inner (Obs \<alpha> \<phi>)\<close> is_trace_formula_inner.cases by auto
+
+    ultimately show "\<exists>tr \<in> weak_traces q. wtrace_to_inner tr \<Lleftarrow>\<chi>\<Rrightarrow> Obs \<alpha> \<phi>"
+      using Obs.IH
+      by (metis \<open>\<alpha> = \<tau>\<close> obs_srbb_cong prepend_\<tau>_weak_trace wtrace_to_inner.simps(2))
   next
-    assume "\<alpha> \<noteq> \<tau>"
+    case False
 
     from \<open>is_trace_formula_inner (Obs \<alpha> \<phi>)\<close>
     have "is_trace_formula \<phi>" 
       by (simp add: is_trace_formula_inner.simps)
 
-    from \<open>hml_srbb_inner_models q (Obs \<alpha> \<phi>)\<close>
-     and \<open>\<alpha> \<noteq> \<tau>\<close>
+    from \<open>hml_srbb_inner_models q (Obs \<alpha> \<phi>)\<close> and \<open>\<alpha> \<noteq> \<tau>\<close>
     have "\<exists>q'. q \<mapsto> \<alpha> q' \<and> q' \<Turnstile>SRBB \<phi>" by simp
     then obtain q' where "q \<mapsto> \<alpha> q'" and "q' \<Turnstile>SRBB \<phi>" by auto
 

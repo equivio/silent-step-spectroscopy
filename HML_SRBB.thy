@@ -223,13 +223,13 @@ primrec
   "hml_srbb_conjunct_models state (Neg \<chi>) =
     (\<nexists>p'. state \<Zsurj> p' \<and> hml_srbb_inner_models p' \<chi>)"
 
-\<comment> \<open> This proof shows that the direct semantic given with hml_srbb(_inner/_conjunct)_models' is
-exactly the same as the semantic derived from the the semantic of HML by translating hml_srbb to
-hml.
+\<comment> \<open> This proof shows that the direct semantic given with \<open>hml_srbb(_inner/_conjunct)_models'\<close> is
+exactly the same as the semantic derived from the the semantic of HML by translating \<open>hml_srbb\<close> to
+\<open>hml\<close>.
 
 This is by no means astonishing, since the the direct semantic as given above was constructed by 
-simply unfolding the translation functions and the hml_models function and then reintroducing
-recursive call to the hml_srbb(..)_models' function.
+simply unfolding the translation functions and the \<open>hml_models\<close> function and then reintroducing
+recursive call to the \<open>hml_srbb(..)_models'\<close> function.
 
 Therefore, the proof of equivalence of the two semantic functions is straight forward.
  \<close>
