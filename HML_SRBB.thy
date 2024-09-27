@@ -62,38 +62,17 @@ and
     Pos "('act, 'i) hml_srbb_inner" |
     Neg "('act, 'i) hml_srbb_inner"
 
-text \<open>
-In the beginning, instead of defining the subset as a new data type,  we considered defining the
-HML$_\text{SRBB}$ subset via a predicate on HML like \<open>is_srbb :: "('a,'s) hml \<Rightarrow> bool"\<close>.
-For a concrete instance of this approach reference \<open>is_trace_formula\<close> in appendix \ref{appndx:weakTraces}.
-We decided not to use this approach because we could not figure out how  define expressiveness prices (see section \ref{sect:ExpressivenessMeasure}) when using this option.
-\<close>
 
 subsection \<open> Semantics of HML$_\text{SRBB}$ Formulas \<close>
 
 text \<open>
 This section describes how semantic meaning is assigned to HML$_\text{SRBB}$ formulas in the context of a LTS.
 We define what it means for a process @{term "p"} to satisfy a HML$_\text{SRBB}$ formula @{term "\<phi>"},
-written as \<open>p \<Turnstile>SRBB \<phi>\<close>, by first translating this formula @{term "\<phi>"} into the corresponding HML formula
-(via @{term "hml_srbb_to_hml"}) and then appealing to HML's models function.
-This is in contrast to defining the function directly by inspecting the transitions possible from @{term "p"}.
-Defining it via translation to HML allows (and forces) us to reuse the definitions and
-properties of HML.
-\<close>
-
-subsubsection \<open> Mapping HML$_\text{SRBB}$ to HML \<close>
-
-text \<open>
-We ensure that HML$_\text{SRBB}$ is a subset of HML by mapping each constructor of
-HML$_\text{SRBB}$ to a composition of constructors of HML.  This mapping is straight
-forward when viewing above interpretation of the data constructors of HML$_\text{SRBB}$. The only
-clause of note is the translation of the @{term "Obs"} data constructor of type @{term "hml_srbb_inner"}.
+written as \<open>p \<Turnstile>SRBB \<phi>\<close>.
 \<close>
 
 context LTS_Tau
 begin
-
-subsubsection \<open>Models Relation for HML$_\text{SRBB}$ \<close>
 
 primrec 
       hml_srbb_models :: "'s \<Rightarrow> ('a, 's) hml_srbb \<Rightarrow> bool" (infixl "\<Turnstile>SRBB" 60)
@@ -167,8 +146,6 @@ satisfies \<open>T\<close>. Therefore, the second part of the definition of \<op
 lemma verum_never_distinguishes:
   "\<not> distinguishes TT p q"
   by simp
-
-subsubsection \<open> Distinguishing Conjunctions \<close>
 
 text \<open>
 If $\bigwedge\nolimits_{i \in I} {\psi s}(i)$ distinguishes @{term "p"} from @{term "q"},
