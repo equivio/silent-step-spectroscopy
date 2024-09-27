@@ -898,7 +898,7 @@ next
     by (metis (no_types, lifting) br_conj option.discI)
   hence "Q=(Q' \<union> Q\<alpha>)" by auto
   then show ?case
-    using pre_\<epsilon> D hml_srbb_and_hml_semantics_match by auto 
+    using D silent_reachable.refl by auto
 next
   case (branch_conj p \<alpha> p' Q1 Q\<alpha> e \<psi> \<Phi>)
   hence A1: "\<forall>q\<in>Q1. hml_srbb_conjunct_models p (\<Phi> q)" by simp

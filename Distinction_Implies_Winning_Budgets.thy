@@ -85,7 +85,7 @@ proof-
       \<and>
         (\<forall>p q. hml_srbb_conj.distinguishes \<psi> p q
                \<longrightarrow> attacker_wins (expr_pr_conjunct \<psi>) (Attacker_Clause p q))"
-    proof (induct rule: hml_srbb_hml_srbb_inner_hml_srbb_conjunct.induct)
+    proof (induct rule: hml_srbb_hml_srbb_inner_hml_srbb_conjunct.induct[of _ _ _ \<phi> \<chi> \<psi>])
       case TT
       then show ?case
       proof (clarify)
@@ -139,8 +139,7 @@ proof-
   
         from \<open>hml_srbb_inner_models p' \<chi>\<close>
          and \<open>\<forall>q' \<in> Q\<tau>. \<not>(hml_srbb_inner_models q' \<chi>)\<close>
-        have "hml_srbb_inner.distinguishes_from \<chi> p' Q\<tau>" 
-          using hml_srbb_and_hml_semantics_match by simp
+        have "hml_srbb_inner.distinguishes_from \<chi> p' Q\<tau>" by simp
   
         with \<open>Q\<tau> \<Zsurj>S Q\<tau>\<close> \<open>Q\<tau> \<noteq> {}\<close> Internal
         have "attacker_wins (expr_pr_inner \<chi>) (Attacker_Delayed p' Q\<tau>)" 
@@ -259,8 +258,7 @@ proof-
             using \<open>Q \<noteq> {}\<close> and step_set_is_step_set 
             by force
           from \<open>\<forall>q\<in>step_set Q \<alpha>. \<not> q \<Turnstile>SRBB \<phi>\<close> \<open>p \<mapsto>\<alpha> p'' \<and> p'' \<Turnstile>SRBB \<phi>\<close>
-          have "distinguishes_from \<phi> p'' ?Q'"
-            using hml_srbb_and_hml_semantics_match by simp
+          have "distinguishes_from \<phi> p'' ?Q'" by simp
           hence "attacker_wins (expressiveness_price \<phi>) (Attacker_Immediate p'' ?Q')"
             by (metis Obs distinction_implies_winning_budgets_empty_Q)
           moreover have "p \<mapsto>\<alpha> p''" using \<open>p \<mapsto>\<alpha> p'' \<and> p'' \<Turnstile>SRBB \<phi>\<close> by simp
@@ -411,7 +409,6 @@ proof-
           \<open>hml_srbb_inner.distinguishes_from (StableConj I \<psi>s) p Q\<close>
           \<open>\<forall>q\<in>Q. \<nexists>q'. q \<mapsto>\<tau> q'\<close>
         hence distinctions: \<open>\<forall>q\<in>Q. \<exists>i\<in>I. hml_srbb_conj.distinguishes (\<psi>s i) p q\<close>
-          using srbb_dist_stable_conjunction_implies_dist_conjunct_or_stable hml_srbb_and_hml_semantics_match
           by (metis hml_srbb_conj.distinguishes_def hml_srbb_inner.distinguishes_from_def hml_srbb_inner_models.simps(3))
         hence inductive_wins: \<open>\<forall>q\<in>Q. \<exists>i\<in>I. hml_srbb_conj.distinguishes (\<psi>s i) p q
             \<and> attacker_wins (expr_pr_conjunct (\<psi>s i)) (Attacker_Clause p q)\<close>
@@ -621,7 +618,7 @@ proof-
           by fastforce
         define Q' where \<open>Q' \<equiv> (soft_step_set Q_\<alpha> \<alpha>)\<close>
         hence \<open>distinguishes_from \<phi> p' Q'\<close>
-          using case_assms(2,3) no_q_way soft_step_set_is_soft_step_set mem_Collect_eq opt_\<tau>_is_or
+          using case_assms(2,3) no_q_way soft_step_set_is_soft_step_set mem_Collect_eq
           unfolding case_assms(4)
           by fastforce
         with BranchConj have win_a_branch:
@@ -739,8 +736,7 @@ proof-
           \<open>hml_srbb_inner.distinguishes_from (BranchConj \<alpha> \<phi> I \<psi>s) p Q\<close>
         from case_assms(1) obtain p' where p'_spec: \<open>p \<mapsto>a \<alpha> p'\<close> \<open>p' \<Turnstile>SRBB \<phi>\<close> 
           unfolding hml_srbb_inner.distinguishes_from_def
-              and distinguishes_def
-          using soft_poss_to_or hml_models.simps(2) by auto
+              and distinguishes_def by auto
         define Q_\<alpha> where \<open>Q_\<alpha> = Q - hml_srbb_inner.model_set (Obs \<alpha> \<phi>)\<close>
         have \<open>attacker_wins (expr_pr_inner (BranchConj \<alpha> \<phi> I \<psi>s)) (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>)\<close>
           using main_case case_assms(1) p'_spec Q_\<alpha>_def by blast

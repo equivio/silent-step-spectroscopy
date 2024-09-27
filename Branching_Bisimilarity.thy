@@ -284,7 +284,7 @@ proof -
     using assms(2) unfolding stability_respecting_def by blast
   moreover have \<open>sr_branching_bisimulated p q'\<close>
     using sr_branching_bisimulation_stuttering
-     assms(1) calculation(1) sr_branching_bisimulated_def sympD hml_srbb_and_hml_semantics_match
+     assms(1) calculation(1) sr_branching_bisimulated_def sympD
     by (metis assms(2) sr_branching_bisimulation_silently_retained stable_state_stable)
   ultimately show ?thesis by blast
 qed
