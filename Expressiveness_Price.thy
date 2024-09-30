@@ -427,7 +427,7 @@ text \<open>
 We demonstrate the pricing mechanisms for various formulas. These proofs operate under the assumption of an expressiveness price \<open>e\<close> for a given formula \<open>\<chi>\<close> and proceed to determine the price of a derived formula such as \<open>Pos \<chi>\<close>. 
 The proofs all are of a similar nature. They decompose the expression function(s) into their constituent parts and apply their definitions to the constructed formula (\<open>(Pos \<chi>)\<close>).\<close>
 
-context Inhabited_Tau_LTS
+context LTS_Tau
 begin
 
 text \<open>For example, here, we establish that the expressiveness price of \<open>Internal \<chi>\<close> is equal to the expressiveness price of \<open>\<chi>\<close>.\<close>
@@ -937,7 +937,12 @@ lemma expressiveness_price_ImmConj_geq_parts':
 end (* full_spec_game *)
 
 text \<open>Here, we show the prices for some specific formulas.\<close>
-context Inhabited_LTS
+locale Inhabited_LTS = LTS step
+  for step :: "'s \<Rightarrow> 'a \<Rightarrow> 's \<Rightarrow> bool" ("_ \<mapsto> _ _" [70,70,70] 80) +
+  fixes left :: 's
+    and right :: 's
+  assumes left_right_distinct: "(left::'s) \<noteq> (right::'s)"
+
 begin
 
 lemma example_\<phi>_cp:
@@ -975,6 +980,11 @@ lemma "expressiveness_price (Internal
                            else undefined)))))) = E 2 0 1 0 0 1 0 0"
   by simp
 
+end
+
+context LTS_Tau
+begin
+
 lemma "expressiveness_price TT = E 0 0 0 0 0 0 0 0"
   by simp
 
@@ -991,12 +1001,7 @@ lemma expr_obs_phi:
   shows "e1 (expr_pr_inner (Obs \<alpha> \<phi>)) = Some (expressiveness_price \<phi>)"
   by simp
 
-end
-
 subsection \<open>Characterizing Equivalence by Energy Coordinates\<close>
-
-context Inhabited_Tau_LTS
-begin
 
 text \<open>A state \<open>p\<close> pre-orders another state \<open>q\<close> with respect to some energy \<open>e\<close> if and only if \<open>p\<close> HML pre-orders \<open>q\<close> with respect to the HML sublanguage @{term "\<O>"} derived from \<open>e\<close>.\<close>
 definition expr_preord :: "'s \<Rightarrow> energy \<Rightarrow> 's \<Rightarrow> bool" ("_ \<preceq> _ _" 60) where
