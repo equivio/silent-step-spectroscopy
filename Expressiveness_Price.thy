@@ -998,7 +998,7 @@ lemma "expressiveness_price (Internal (BranchConj \<alpha> TT {} \<psi>s)) = E 1
   by (simp add: Sup_enat_def)
 
 lemma expr_obs_phi:
-  shows "e1 (expr_pr_inner (Obs \<alpha> \<phi>)) = Some (expressiveness_price \<phi>)"
+  shows "subtract_fn 1 0 0 0 0 0 0 0 (expr_pr_inner (Obs \<alpha> \<phi>)) = Some (expressiveness_price \<phi>)"
   by simp
 
 subsection \<open>Characterizing Equivalence by Energy Coordinates\<close>
