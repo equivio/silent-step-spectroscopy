@@ -352,20 +352,4 @@ lemma stable_state_stable:
 
 end (* locale LTS_Tau *)
 
-text \<open>@{term "Inhabited_LTS"} and @{term "Inhabited_Tau_LTS"} are extensions of @{term "LTS"} and @{term "LTS_Tau"} respectively.
-They ensure that the corresponding labelled transition systems have at least two states by fixing two different type variables, \<open>left\<close> and \<open>right\<close>.
-This ensures that the type \<open>'s\<close> has at least two distinct elements.
-We later use them in the formalization of binary Hennessy-Milner Logic conjunctions (\<open>\<and>\<close>), to ensure that the index set has at least two indices.\<close> 
-locale Inhabited_LTS = LTS step
-  for step :: "'s \<Rightarrow> 'a \<Rightarrow> 's \<Rightarrow> bool" ("_ \<mapsto> _ _" [70,70,70] 80) +
-  fixes left :: 's
-    and right :: 's
-  assumes left_right_distinct: "(left::'s) \<noteq> (right::'s)"
-
-locale Inhabited_Tau_LTS = Inhabited_LTS step left right + LTS_Tau step \<tau>
-  for step :: "'s \<Rightarrow> 'a \<Rightarrow> 's \<Rightarrow> bool" ("_ \<mapsto> _ _" [70,70,70] 80)
-  and left :: 's
-  and right :: 's
-  and \<tau> :: 'a
-
 end (* theory LTS *)

@@ -114,43 +114,34 @@ proof-
         fix Q p
         assume "Q \<noteq> {}"
            and "distinguishes_from (Internal \<chi>) p Q"
-        hence "(\<exists>p'. p \<Zsurj> p' \<and> (p' \<Turnstile> hml_srbb_inner_to_hml \<chi>))
-             \<and> (\<forall>q \<in> Q. (\<nexists>q'. q \<Zsurj> q' \<and> (q' \<Turnstile> hml_srbb_inner_to_hml \<chi>)))"
-          unfolding distinguishes_from_def
-                and distinguishes_def
-                and hml_srbb_models.simps
-                and hml_srbb_to_hml.simps
-                and hml_models.simps
-          by blast
-        then have "\<exists>p'. p \<Zsurj> p' \<and> p' \<Turnstile> hml_srbb_inner_to_hml \<chi>"
-              and "\<forall>q \<in> Q. (\<nexists>q'. q \<Zsurj> q' \<and> q' \<Turnstile> hml_srbb_inner_to_hml \<chi>)"
+        then have "\<exists>p'. p \<Zsurj> p' \<and> hml_srbb_inner_models p' \<chi>"
+              and "\<forall>q \<in> Q. (\<nexists>q'. q \<Zsurj> q' \<and> hml_srbb_inner_models q' \<chi>)"
           by auto
-        hence "\<forall>q \<in> Q. (\<forall>q'. q \<Zsurj> q' \<longrightarrow> \<not>(q' \<Turnstile> hml_srbb_inner_to_hml \<chi>))" by auto
-        then have "\<forall>q \<in> Q. (\<forall>q'\<in>Q'. q \<Zsurj> q' \<longrightarrow> \<not>(q' \<Turnstile> hml_srbb_inner_to_hml \<chi>))" 
+        hence "\<forall>q \<in> Q. (\<forall>q'. q \<Zsurj> q' \<longrightarrow> \<not>(hml_srbb_inner_models q' \<chi>))" by auto
+        then have "\<forall>q \<in> Q. (\<forall>q'\<in>Q'. q \<Zsurj> q' \<longrightarrow> \<not>(hml_srbb_inner_models q' \<chi>))"
           for Q' by blast
-        then have "Q \<Zsurj>S Q' \<longrightarrow> (\<forall>q' \<in> Q'. \<not>(q' \<Turnstile> hml_srbb_inner_to_hml \<chi>))"
+        then have "Q \<Zsurj>S Q' \<longrightarrow> (\<forall>q' \<in> Q'. \<not>(hml_srbb_inner_models q' \<chi>))"
           for Q' using \<open>Q \<noteq> {}\<close> by blast
   
         define Q\<tau> where "Q\<tau> \<equiv> silent_reachable_set Q"
-        with \<open>\<And>Q'. Q \<Zsurj>S Q' \<longrightarrow> (\<forall>q' \<in> Q'. \<not>(q' \<Turnstile> hml_srbb_inner_to_hml \<chi>))\<close>
-        have "\<forall>q' \<in> Q\<tau>. \<not>(q' \<Turnstile> hml_srbb_inner_to_hml \<chi>)" 
+        with \<open>\<And>Q'. Q \<Zsurj>S Q' \<longrightarrow> (\<forall>q' \<in> Q'. \<not>(hml_srbb_inner_models q' \<chi>))\<close>
+        have "\<forall>q' \<in> Q\<tau>. \<not>(hml_srbb_inner_models q' \<chi>)"
           using sreachable_set_is_sreachable by presburger
         have "Q\<tau> \<Zsurj>S Q\<tau>" unfolding Q\<tau>_def 
           by (metis silent_reachable_trans sreachable_set_is_sreachable 
               silent_reachable.intros(1))
   
-        from \<open>\<exists>p'. p \<Zsurj> p' \<and> (p' \<Turnstile> hml_srbb_inner_to_hml \<chi>)\<close>
-        obtain p' where "p \<Zsurj> p'" and "p' \<Turnstile> hml_srbb_inner_to_hml \<chi>" by auto
+        from \<open>\<exists>p'. p \<Zsurj> p' \<and> (hml_srbb_inner_models p' \<chi>)\<close>
+        obtain p' where "p \<Zsurj> p'" and "hml_srbb_inner_models p' \<chi>" by auto
         from this(1) have "p \<Zsurj>L p'" by(rule silent_reachable_impl_loopless)
   
         have "Q\<tau> \<noteq> {}"
           using silent_reachable.intros(1) sreachable_set_is_sreachable Q\<tau>_def \<open>Q \<noteq> {}\<close> 
           by fastforce
   
-        from \<open>p' \<Turnstile> hml_srbb_inner_to_hml \<chi>\<close>
-         and \<open>\<forall>q' \<in> Q\<tau>. \<not>(q' \<Turnstile> hml_srbb_inner_to_hml \<chi>)\<close>
-        have "hml_srbb_inner.distinguishes_from \<chi> p' Q\<tau>" 
-          by simp
+        from \<open>hml_srbb_inner_models p' \<chi>\<close>
+         and \<open>\<forall>q' \<in> Q\<tau>. \<not>(hml_srbb_inner_models q' \<chi>)\<close>
+        have "hml_srbb_inner.distinguishes_from \<chi> p' Q\<tau>" by simp
   
         with \<open>Q\<tau> \<Zsurj>S Q\<tau>\<close> \<open>Q\<tau> \<noteq> {}\<close> Internal
         have "attacker_wins (expr_pr_inner \<chi>) (Attacker_Delayed p' Q\<tau>)" 
@@ -238,21 +229,20 @@ proof-
         have "\<exists>p' Q'. p \<mapsto>a \<alpha> p' \<and> Q \<mapsto>aS \<alpha> Q' \<and> attacker_wins (expressiveness_price \<phi>) (Attacker_Immediate p' Q')" 
         proof(cases "\<alpha> = \<tau>")
           case True
-          with \<open>hml_srbb_inner.distinguishes_from (hml_srbb_inner.Obs \<alpha> \<phi>) p Q\<close> have dist_unfold:
-               "p \<Turnstile> Silent (hml_srbb_to_hml \<phi>) \<and> (\<forall>q\<in>Q. \<not> q \<Turnstile> Silent (hml_srbb_to_hml \<phi>))"
-            by simp
-          hence "((\<exists>p'. p \<mapsto>\<tau> p' \<and> p' \<Turnstile> hml_srbb_to_hml \<phi>) \<or> p \<Turnstile> hml_srbb_to_hml \<phi>)"
-            by simp
-          then obtain p' where "p' \<Turnstile> hml_srbb_to_hml \<phi>" "p \<mapsto>a \<alpha> p'" 
+          with \<open>hml_srbb_inner.distinguishes_from (hml_srbb_inner.Obs \<alpha> \<phi>) p Q\<close>
+          have dist_unfold:  "((\<exists>p'. p \<mapsto>\<tau> p' \<and> p' \<Turnstile>SRBB \<phi>) \<or> p \<Turnstile>SRBB \<phi>)" by simp
+          then obtain p' where "p' \<Turnstile>SRBB \<phi>" "p \<mapsto>a \<alpha> p'"
             unfolding True by blast
   
-          from dist_unfold have
-            "\<forall>q\<in>Q. (\<not> q \<Turnstile> hml_srbb_to_hml \<phi>) \<and> (\<nexists>q'. q \<mapsto>\<tau> q' \<and> q' \<Turnstile> hml_srbb_to_hml \<phi>)"
-            by simp
-          hence "\<forall>q\<in>Q. \<not>q \<Turnstile> hml_srbb_to_hml \<phi>" using \<open>\<forall>p\<in>Q. \<forall>q. p \<Zsurj> q \<longrightarrow> q \<in> Q\<close> by fastforce
+          from \<open>hml_srbb_inner.distinguishes_from (hml_srbb_inner.Obs \<alpha> \<phi>) p Q\<close> have
+            "\<forall>q\<in>Q. (\<not> q \<Turnstile>SRBB \<phi>) \<and> (\<nexists>q'. q \<mapsto>\<tau> q' \<and> q' \<Turnstile>SRBB \<phi>)"
+            using True by auto
+          hence "\<forall>q\<in>Q. \<not>q \<Turnstile>SRBB \<phi>"
+            using \<open>\<forall>p\<in>Q. \<forall>q. p \<Zsurj> q \<longrightarrow> q \<in> Q\<close> by fastforce
   
           hence "distinguishes_from \<phi> p' Q"
-            by (simp add: \<open>p' \<Turnstile> hml_srbb_to_hml \<phi>\<close>)
+            using \<open>p' \<Turnstile>SRBB \<phi>\<close> by auto
+
           with Obs have "attacker_wins (expressiveness_price \<phi>) (Attacker_Immediate p' Q)" 
             using \<open>Q \<noteq> {}\<close> by blast
           moreover have "Q \<mapsto>aS \<alpha> Q"
@@ -262,21 +252,18 @@ proof-
         next
           case False
           with \<open>hml_srbb_inner.distinguishes_from (hml_srbb_inner.Obs \<alpha> \<phi>) p Q\<close> 
-          obtain p'' where "(p \<mapsto>\<alpha> p'') \<and> (p'' \<Turnstile> (hml_srbb_to_hml \<phi>))" 
-            by auto
+          obtain p'' where "(p \<mapsto>\<alpha> p'') \<and> (p'' \<Turnstile>SRBB \<phi>)" by auto
   
           let ?Q' = "step_set Q \<alpha>"
           from \<open>hml_srbb_inner.distinguishes_from (hml_srbb_inner.Obs \<alpha> \<phi>) p Q\<close> 
-          have "\<forall>q\<in>Q. \<not> q \<Turnstile> hml.Obs \<alpha> (hml_srbb_to_hml \<phi>)" 
-            using \<open>Q \<noteq> {}\<close> by simp
-          hence "\<forall>q\<in>?Q'. \<not> q \<Turnstile> hml_srbb_to_hml \<phi>"
-            using step_set_is_step_set by fastforce
-          from \<open>\<forall>q\<in>step_set Q \<alpha>. \<not> q \<Turnstile> hml_srbb_to_hml \<phi>\<close> \<open>p \<mapsto>\<alpha> p'' \<and> p'' \<Turnstile> hml_srbb_to_hml \<phi>\<close>
-          have "distinguishes_from \<phi> p'' ?Q'"
-            by simp
+          have "\<forall>q\<in>?Q'. \<not> q \<Turnstile>SRBB \<phi>"
+            using \<open>Q \<noteq> {}\<close> and step_set_is_step_set 
+            by force
+          from \<open>\<forall>q\<in>step_set Q \<alpha>. \<not> q \<Turnstile>SRBB \<phi>\<close> \<open>p \<mapsto>\<alpha> p'' \<and> p'' \<Turnstile>SRBB \<phi>\<close>
+          have "distinguishes_from \<phi> p'' ?Q'" by simp
           hence "attacker_wins (expressiveness_price \<phi>) (Attacker_Immediate p'' ?Q')"
             by (metis Obs distinction_implies_winning_budgets_empty_Q)
-          moreover have "p \<mapsto>\<alpha> p''" using \<open>p \<mapsto>\<alpha> p'' \<and> p'' \<Turnstile> hml_srbb_to_hml \<phi>\<close> by simp
+          moreover have "p \<mapsto>\<alpha> p''" using \<open>p \<mapsto>\<alpha> p'' \<and> p'' \<Turnstile>SRBB \<phi>\<close> by simp
           moreover have "Q \<mapsto>aS \<alpha> ?Q'" by (simp add: False LTS.step_set_is_step_set)
           ultimately show ?thesis by blast
         qed
@@ -424,8 +411,7 @@ proof-
           \<open>hml_srbb_inner.distinguishes_from (StableConj I \<psi>s) p Q\<close>
           \<open>\<forall>q\<in>Q. \<nexists>q'. q \<mapsto>\<tau> q'\<close>
         hence distinctions: \<open>\<forall>q\<in>Q. \<exists>i\<in>I. hml_srbb_conj.distinguishes (\<psi>s i) p q\<close>
-          using srbb_dist_stable_conjunction_implies_dist_conjunct_or_stable
-          by (auto, blast)
+          by (metis hml_srbb_conj.distinguishes_def hml_srbb_inner.distinguishes_from_def hml_srbb_inner_models.simps(3))
         hence inductive_wins: \<open>\<forall>q\<in>Q. \<exists>i\<in>I. hml_srbb_conj.distinguishes (\<psi>s i) p q
             \<and> attacker_wins (expr_pr_conjunct (\<psi>s i)) (Attacker_Clause p q)\<close>
           using StableConj by blast
@@ -634,7 +620,7 @@ proof-
           by fastforce
         define Q' where \<open>Q' \<equiv> (soft_step_set Q_\<alpha> \<alpha>)\<close>
         hence \<open>distinguishes_from \<phi> p' Q'\<close>
-          using case_assms(2,3) no_q_way soft_step_set_is_soft_step_set mem_Collect_eq opt_\<tau>_is_or
+          using case_assms(2,3) no_q_way soft_step_set_is_soft_step_set mem_Collect_eq
           unfolding case_assms(4)
           by fastforce
         with BranchConj have win_a_branch:
@@ -752,8 +738,7 @@ proof-
           \<open>hml_srbb_inner.distinguishes_from (BranchConj \<alpha> \<phi> I \<psi>s) p Q\<close>
         from case_assms(1) obtain p' where p'_spec: \<open>p \<mapsto>a \<alpha> p'\<close> \<open>p' \<Turnstile>SRBB \<phi>\<close> 
           unfolding hml_srbb_inner.distinguishes_from_def
-              and distinguishes_def
-          using soft_poss_to_or hml_models.simps(2) by auto
+              and distinguishes_def by auto
         define Q_\<alpha> where \<open>Q_\<alpha> = Q - hml_srbb_inner.model_set (Obs \<alpha> \<phi>)\<close>
         have \<open>attacker_wins (expr_pr_inner (BranchConj \<alpha> \<phi> I \<psi>s)) (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>)\<close>
           using main_case case_assms(1) p'_spec Q_\<alpha>_def by blast
