@@ -359,6 +359,10 @@ lemma stable_state_stable:
   shows \<open>p = p'\<close>
   using assms(2,1) by (cases, blast+)
 
+definition stability_respecting :: \<open>('s \<Rightarrow> 's \<Rightarrow> bool) \<Rightarrow> bool\<close> where
+  \<open>stability_respecting R \<equiv> \<forall> p q. R p q \<and> stable_state p \<longrightarrow>
+    (\<exists>q'. q \<Zsurj> q' \<and> R p q' \<and> stable_state q')\<close>
+
 end (* locale LTS_Tau *)
 
 end (* theory LTS *)

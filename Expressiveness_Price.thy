@@ -1011,6 +1011,204 @@ text \<open>Conversely, \<open>p\<close> and \<open>q\<close> are equivalent wit
 definition expr_equiv :: "'s \<Rightarrow> energy \<Rightarrow> 's \<Rightarrow> bool" ("_ \<sim> _ _" 60) where
   "(p \<sim> e q) \<equiv> equivalent (\<O> e) p q"
 
+subsection \<open>Relational Effects of Prices\<close>
+
+
+lemma distinction_combination_eta:
+  fixes p q
+  defines \<open>Q\<alpha> \<equiv> {q'. q \<Zsurj> q' \<and>  (\<nexists>\<phi>. \<phi> \<in> \<O> (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> 0 0) \<and> distinguishes \<phi> p q')}\<close>
+  assumes
+    \<open>p \<mapsto>a \<alpha> p'\<close>
+    \<open>\<forall>q'\<in> Q\<alpha>.
+      \<forall>q'' q'''. q' \<mapsto>a \<alpha> q'' \<longrightarrow> q'' \<Zsurj> q''' \<longrightarrow> distinguishes (\<Phi> q''') p' q'''\<close>
+  shows
+    \<open>\<forall>q'\<in> Q\<alpha>. hml_srbb_inner.distinguishes (Obs \<alpha> (Internal (Conj
+      {q'''. \<exists>q'\<in> Q\<alpha>. \<exists>q''. q' \<mapsto>a \<alpha> q'' \<and> q'' \<Zsurj> q'''} (conjunctify_distinctions \<Phi> p')))) p q'\<close>
+proof -
+  have \<open>\<forall>q'\<in> Q\<alpha>. \<forall>q'''\<in>{q'''. \<exists>q'\<in> Q\<alpha>. \<exists>q''. q' \<mapsto>a \<alpha> q'' \<and> q'' \<Zsurj> q'''}.
+      hml_srbb_conj.distinguishes ((conjunctify_distinctions \<Phi> p') q''') p' q'''\<close>
+  proof clarify
+    fix q' q'' q'''
+    assume \<open>q' \<in> Q\<alpha>\<close> \<open>q' \<mapsto>a \<alpha> q''\<close> \<open>q'' \<Zsurj> q'''\<close>
+    thus \<open>hml_srbb_conj.distinguishes (conjunctify_distinctions \<Phi> p' q''') p' q'''\<close>
+       using assms(3)  distinction_conjunctification by blast
+  qed
+  hence \<open>\<forall>q'\<in> Q\<alpha>. \<forall>q''. q' \<mapsto>a \<alpha> q''
+    \<longrightarrow> distinguishes (Internal (Conj {q'''. \<exists>q'\<in> Q\<alpha>. \<exists>q''. q' \<mapsto>a \<alpha> q'' \<and> q'' \<Zsurj> q'''} (conjunctify_distinctions \<Phi> p')))  p' q''\<close>
+    using silent_reachable.refl unfolding Q\<alpha>_def by fastforce
+  thus \<open>\<forall>q'\<in> Q\<alpha>.
+     hml_srbb_inner.distinguishes (Obs \<alpha> (Internal (Conj
+        {q'''. \<exists>q'\<in> Q\<alpha>. \<exists>q''. q' \<mapsto>a \<alpha> q'' \<and> q'' \<Zsurj> q'''} (conjunctify_distinctions \<Phi> p')))) p q'\<close>
+    using assms(2) by (auto) (metis silent_reachable.refl)+
+qed
+
+lemma distinction_conjunctification_two_way_price:
+  assumes
+    \<open>\<forall>q\<in>I. distinguishes (\<Phi> q) p q \<or> distinguishes (\<Phi> q) q p\<close>
+    \<open>\<forall>q\<in>I. \<Phi> q \<in> \<O> (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> \<infinity> \<infinity>)\<close>
+  shows
+    \<open>\<forall>q\<in>I. 
+      (if distinguishes (\<Phi> q) p q then conjunctify_distinctions else conjunctify_distinctions_dual) \<Phi> p q 
+      \<in> \<O>_conjunct (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> \<infinity> \<infinity>)\<close>
+proof
+  fix q
+  assume \<open>q \<in> I\<close>
+  show \<open>(if distinguishes (\<Phi> q) p q then conjunctify_distinctions else conjunctify_distinctions_dual) \<Phi> p q \<in> \<O>_conjunct (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> \<infinity> \<infinity>)\<close>
+  proof (cases \<open>\<Phi> q\<close>)
+    case TT
+    then show ?thesis
+      using assms \<open>q \<in> I\<close>
+      by fastforce
+  next
+    case (Internal \<chi>)
+    then show ?thesis
+      using assms \<open>q \<in> I\<close>
+      unfolding conjunctify_distinctions_def conjunctify_distinctions_dual_def \<O>_def \<O>_conjunct_def
+      by fastforce
+  next
+    case (ImmConj J \<Psi>)
+    hence \<open>J = {}\<close>
+      using assms \<open>q \<in> I\<close> unfolding \<O>_def
+      by (simp, metis iadd_is_0 immediate_conjunction_depth.simps(3) zero_one_enat_neq(1))
+    then show ?thesis
+      using assms \<open>q \<in> I\<close> ImmConj by fastforce
+  qed
+qed
+
+lemma distinction_combination_eta_two_way:
+  fixes p q p' \<Phi>
+  defines
+    \<open>Q\<alpha> \<equiv> {q'. q \<Zsurj> q' \<and>  (\<nexists>\<phi>. \<phi> \<in> \<O> (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> \<infinity> \<infinity>) \<and> (distinguishes \<phi> p q' \<or> distinguishes \<phi> q' p))}\<close> and
+    \<open>\<Psi>\<alpha> \<equiv> \<lambda>q'''. (if distinguishes (\<Phi> q''') p' q''' then conjunctify_distinctions else conjunctify_distinctions_dual) \<Phi> p' q'''\<close>
+  assumes
+    \<open>p \<mapsto>a \<alpha> p'\<close>
+    \<open>\<forall>q'\<in> Q\<alpha>.
+      \<forall>q'' q'''. q' \<mapsto>a \<alpha> q'' \<longrightarrow> q'' \<Zsurj> q''' \<longrightarrow> distinguishes (\<Phi> q''') p' q''' \<or> distinguishes (\<Phi> q''') q''' p'\<close>
+  shows
+    \<open>\<forall>q'\<in> Q\<alpha>. hml_srbb_inner.distinguishes (Obs \<alpha> (Internal (Conj
+      {q'''. \<exists>q'\<in> Q\<alpha>. \<exists>q''. q' \<mapsto>a \<alpha> q'' \<and> q'' \<Zsurj> q'''}
+      \<Psi>\<alpha>))) p q'\<close>
+proof -
+  have \<open>\<forall>q'\<in> Q\<alpha>. \<forall>q'''\<in>{q'''. \<exists>q'\<in> Q\<alpha>. \<exists>q''. q' \<mapsto>a \<alpha> q'' \<and> q'' \<Zsurj> q'''}.
+      hml_srbb_conj.distinguishes (\<Psi>\<alpha> q''') p' q'''\<close>
+  proof clarify
+    fix q' q'' q'''
+    assume \<open>q' \<in> Q\<alpha>\<close> \<open>q' \<mapsto>a \<alpha> q''\<close> \<open>q'' \<Zsurj> q'''\<close>
+    thus \<open>hml_srbb_conj.distinguishes
+        (\<Psi>\<alpha> q''') p' q''' \<close>
+      using assms(4) distinction_conjunctification_two_way \<Psi>\<alpha>_def by blast
+  qed
+  hence \<open>\<forall>q'\<in> Q\<alpha>. \<forall>q'''\<in>{q'''. \<exists>q'\<in> Q\<alpha>. \<exists>q''. q' \<mapsto>a \<alpha> q'' \<and> q'' \<Zsurj> q'''}.
+    hml_srbb_inner.distinguishes (Conj {q'''. \<exists>q'\<in> Q\<alpha>. \<exists>q''. q' \<mapsto>a \<alpha> q'' \<and> q'' \<Zsurj> q'''}
+      \<Psi>\<alpha>)  p' q'''\<close>
+    using srbb_dist_conjunct_implies_dist_conjunction
+    unfolding lts_semantics.distinguishes_def
+    by (metis (no_types, lifting))
+  hence \<open>\<forall>q'\<in> Q\<alpha>. \<forall>q'''. (\<exists>q''. q' \<mapsto>a \<alpha> q'' \<and> q'' \<Zsurj> q''') \<longrightarrow>
+    hml_srbb_inner.distinguishes (Conj {q'''. \<exists>q'\<in> Q\<alpha>. \<exists>q''. q' \<mapsto>a \<alpha> q'' \<and> q'' \<Zsurj> q'''} \<Psi>\<alpha>)  p' q'''\<close>
+    by blast
+  hence \<open>\<forall>q'\<in> Q\<alpha>. \<forall>q''. q' \<mapsto>a \<alpha> q'' \<longrightarrow>
+    distinguishes (Internal  (Conj {q'''. \<exists>q'\<in> Q\<alpha>. \<exists>q''. q' \<mapsto>a \<alpha> q'' \<and> q'' \<Zsurj> q'''} \<Psi>\<alpha>)) p' q''\<close>
+    by (meson distinguishes_def hml_srbb_inner.distinguishes_def hml_srbb_models.simps(2) silent_reachable.refl)
+  thus \<open>\<forall>q'\<in> Q\<alpha>.
+     hml_srbb_inner.distinguishes (Obs \<alpha> (Internal (Conj
+        {q'''. \<exists>q'\<in> Q\<alpha>. \<exists>q''. q' \<mapsto>a \<alpha> q'' \<and> q'' \<Zsurj> q'''} \<Psi>\<alpha>))) p q'\<close>
+    using assms(3)
+    by auto (metis silent_reachable.refl)+
+qed
+
+lemma distinction_conjunctification_price:
+  assumes
+    \<open>\<forall>q\<in>I. distinguishes (\<Phi> q) p q\<close>
+    \<open>\<forall>q\<in>I. \<Phi> q \<in> \<O> pr\<close>
+    \<open>one pr \<le> six pr\<close>
+  shows
+    \<open>\<forall>q\<in>I. ((conjunctify_distinctions \<Phi> p) q) \<in> \<O>_conjunct pr\<close>
+proof
+  fix q
+  assume \<open>q \<in> I\<close>
+  show \<open>conjunctify_distinctions \<Phi> p q \<in> \<O>_conjunct pr\<close>
+  proof (cases \<open>\<Phi> q\<close>)
+    case TT
+    then show ?thesis
+      using assms \<open>q \<in> I\<close>
+      by fastforce
+  next
+    case (Internal \<chi>)
+    then show ?thesis
+      using assms \<open>q \<in> I\<close>
+      unfolding conjunctify_distinctions_def \<O>_def \<O>_conjunct_def
+      by fastforce
+  next
+    case (ImmConj J \<Psi>)
+    hence \<open>\<exists>i. i\<in>J \<and> hml_srbb_conj.distinguishes (\<Psi> i) p q\<close>
+      using \<open>q \<in> I\<close> assms(1) by fastforce
+    moreover have \<open>conjunctify_distinctions \<Phi> p q  = \<Psi> (SOME i. i\<in>J \<and> hml_srbb_conj.distinguishes (\<Psi> i) p q)\<close>
+      unfolding ImmConj conjunctify_distinctions_def by simp
+    ultimately have \<Psi>_i: \<open>\<exists>i\<in>J. hml_srbb_conj.distinguishes (\<Psi> i) p q \<and> conjunctify_distinctions \<Phi> p q = \<Psi> i\<close>
+      by (metis (no_types, lifting) some_eq_ex)
+    hence \<open>conjunctify_distinctions \<Phi> p q \<in> \<Psi>`J\<close>
+      unfolding image_iff by blast
+    hence \<open>expr_pr_conjunct (conjunctify_distinctions \<Phi> p q) \<le> expressiveness_price (ImmConj J \<Psi>)\<close>
+      by (smt (verit, best) \<Psi>_i dual_order.trans expressiveness_price_ImmConj_geq_parts gets_smaller)
+    then show ?thesis
+      using assms \<open>q \<in> I\<close> ImmConj
+      unfolding \<O>_def \<O>_conjunct_def
+      by auto
+  qed
+qed
+
+lemma modal_stability_respecting:
+  \<open>stability_respecting (preordered (\<O> (E e1 e2 e3 \<infinity> e5 \<infinity> e7 e8)))\<close>
+  unfolding stability_respecting_def
+proof safe
+  fix p q
+  assume p_stability:
+    \<open>preordered (\<O> (E e1 e2 e3 \<infinity> e5 \<infinity> e7 e8)) p q\<close>
+    \<open>stable_state p\<close>
+  have \<open>\<not>(\<forall>q'. q \<Zsurj> q' \<longrightarrow> \<not> preordered (\<O> (E e1 e2 e3 \<infinity> e5 \<infinity> e7 e8)) p q' \<or> \<not> stable_state q')\<close>
+  proof safe
+    assume \<open>\<forall>q'. q \<Zsurj> q' \<longrightarrow> \<not> preordered (\<O> (E e1 e2 e3 \<infinity> e5 \<infinity> e7 e8)) p q' \<or> \<not> stable_state q'\<close>
+    hence  \<open>\<forall>q'. q \<Zsurj> q' \<longrightarrow> stable_state q' \<longrightarrow> (\<exists>\<phi> \<in> \<O> (E e1 e2 e3 \<infinity> e5 \<infinity> e7 e8). distinguishes \<phi> p q')\<close> by auto
+    then obtain \<Phi> where \<Phi>_def:
+      \<open>\<forall>q'\<in>(silent_reachable_set {q}). stable_state q'
+      \<longrightarrow> distinguishes (\<Phi> q') p q' \<and> \<Phi> q' \<in> \<O> (E e1 e2 e3 \<infinity> e5 \<infinity> e7 e8)\<close>
+      using singleton_iff sreachable_set_is_sreachable by metis
+    hence distinctions:
+      \<open>\<forall>q'\<in>(silent_reachable_set {q} \<inter> {q'. stable_state q'}). distinguishes (\<Phi> q') p q'\<close>
+      \<open>\<forall>q'\<in>(silent_reachable_set {q} \<inter> {q'. stable_state q'}). \<Phi> q' \<in> \<O> (E e1 e2 e3 \<infinity> e5 \<infinity> e7 e8)\<close> by blast+
+    from distinction_conjunctification_price[OF this] have
+      \<open>\<forall>q'\<in>(silent_reachable_set {q} \<inter> {q'. stable_state q'}). conjunctify_distinctions \<Phi> p q' \<in> \<O>_conjunct (E e1 e2 e3 \<infinity> e5 \<infinity> e7 e8)\<close>
+      by fastforce
+    hence conj_price: \<open>StableConj (silent_reachable_set {q} \<inter> {q'. stable_state q'}) (conjunctify_distinctions \<Phi> p)
+        \<in> \<O>_inner (E e1 e2 e3 \<infinity> e5 \<infinity> e7 e8)\<close>
+      unfolding \<O>_inner_def \<O>_conjunct_def using SUP_le_iff by fastforce
+    from \<Phi>_def have
+      \<open>\<forall>q'\<in>(silent_reachable_set {q}). stable_state q' \<longrightarrow>
+         hml_srbb_conj.distinguishes (conjunctify_distinctions \<Phi> p q') p q'\<close>
+      using singleton_iff distinction_conjunctification by metis
+    hence \<open>hml_srbb_inner.distinguishes_from
+       (StableConj (silent_reachable_set {q} \<inter> {q'. stable_state q'}) (conjunctify_distinctions \<Phi> p))
+       p (silent_reachable_set {q})\<close>
+      using p_stability(2) by fastforce
+    hence
+      \<open>distinguishes
+        (Internal (StableConj (silent_reachable_set {q} \<inter> {q'. stable_state q'})
+                (conjunctify_distinctions \<Phi> p)))
+        p q\<close>
+      unfolding silent_reachable_set_def
+      using silent_reachable.refl by auto
+    moreover have
+      \<open>Internal (StableConj (silent_reachable_set {q} \<inter> {q'. stable_state q'}) (conjunctify_distinctions \<Phi> p))
+        \<in> \<O> (E e1 e2 e3 \<infinity> e5 \<infinity> e7 e8)\<close>
+      using conj_price unfolding \<O>_def \<O>_inner_def by simp
+    ultimately show False
+      using p_stability(1) preordered_no_distinction by blast
+  qed
+  thus \<open>\<exists>q'. q \<Zsurj> q' \<and> preordered (\<O> (E e1 e2 e3 \<infinity> e5 \<infinity> e7 e8)) p q' \<and> stable_state q'\<close>
+    by blast
+qed
+
 end
 
 end
