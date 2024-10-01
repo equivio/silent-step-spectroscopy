@@ -299,7 +299,8 @@ next
       using defender_win_min_assms by (cases g', auto) (metis not_None_eq)+
     hence \<open>(spectroscopy_moves g g') = (subtract 0 1 1 0 0 0 0 0) \<or>
       the (spectroscopy_moves g g') = (\<lambda>e. Option.bind ((subtract_fn 0 1 1 0 0 0 0 0) e) min1_6)\<close>
-      by (smt (verit) Defender_Branch defender_win_min_assms(2) local.br_answer local.br_obsv option.collapse option.inject)
+      using Defender_Branch option.collapse[OF defender_win_min_assms(2)]
+      by (smt (verit, best) local.br_answer local.br_obsv option.inject)
     thus ?thesis
       using defender_win_min_assms min_1_6_some
       by (smt (verit, best) bind.bind_lunit option.distinct(1) dual_order.trans option.sel)
