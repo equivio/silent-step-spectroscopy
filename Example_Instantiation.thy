@@ -66,13 +66,19 @@ datatype state = a | b1 | b2 | c | d1 | d2 | e
 fun weight_opt :: "state \<Rightarrow> state \<Rightarrow> energy update option" where
   "weight_opt a b1 = Some (\<lambda>x. minus_energy x (E 1 0))" |
   "weight_opt a b2 = Some (\<lambda>x. minus_energy x (E 0 1))" |
+  "weight_opt a _  = None"  |
   "weight_opt b1 c = Some Some" |
+  "weight_opt b1 _  = None"  |
   "weight_opt b2 c = Some min_update" |
+  "weight_opt b2 _  = None"  |
   "weight_opt c d1 = Some (\<lambda>x. minus_energy x (E 0 1))" |
   "weight_opt c d2 = Some (\<lambda>x. minus_energy x (E 1 0))" |
+  "weight_opt c _  = None"  |
   "weight_opt d1 e = Some Some" |
+  "weight_opt d1 _  = None"  |
   "weight_opt d2 e = Some Some" |
-  "weight_opt _ _ = None"
+  "weight_opt d2 _  = None" |
+  "weight_opt e _  = None"
 
 find_theorems weight_opt
 
@@ -187,7 +193,7 @@ lemma wina_of_c:
 proof -
   have A1: "defender c" by auto
   have A2: "\<forall>g'. (c \<Zinj> g') \<longrightarrow> (g' = d1 \<or> g' = d2)"
-    by (metis moves(9) state.exhaust weight_opt.simps(21) weight_opt.simps(22) weight_opt.simps(23) weight_opt.simps(24))
+    by (metis moves(9) state.exhaust weight_opt.simps(24,25,26,27))
   have A3: "Game.attacker_wins (E 9 8) d1" using wina_of_d1 by blast
   have A4: "Game.attacker_wins (E 8 9) d2" using wina_of_d2 by blast
 
@@ -229,7 +235,7 @@ proof -
   hence "minus_energy (E 0 0) (E 1 0) = None" by auto
   hence no_win_b: "(Game.weight c d2)(E 0 0) = None" by simp
   have "\<forall>g'. (c \<Zinj> g') \<longrightarrow> (g' = d1 \<or> g' = d2)"
-    by (metis moves(9) state.exhaust weight_opt.simps(21) weight_opt.simps(22) weight_opt.simps(23) weight_opt.simps(24))
+    by (metis defender.cases moves(9) weight_opt.simps(24,25,26,27))
   thus "\<not>Game.attacker_wins (E 0 0) c"
     using no_win_a no_win_b Game.attacker_wins.intros Game.attacker_wins.cases
     by (metis moves(5) option.distinct(1))
