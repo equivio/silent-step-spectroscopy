@@ -294,13 +294,13 @@ next
     qed
   next
     case (Defender_Branch p a p' Q' Qa)
-    then consider \<open>\<exists>q'\<in>Q'. g' = Attacker_Clause p q'\<close>
-      | \<open>\<exists>Qa'. Qa \<mapsto>aS a Qa' \<and> g' = Attacker_Branch p' Qa'\<close>
+    hence \<open>(\<exists>q'\<in>Q'. g' = Attacker_Clause p q')
+      \<or> (\<exists>Qa'. Qa \<mapsto>aS a Qa' \<and> g' = Attacker_Branch p' Qa')\<close>
       using defender_win_min_assms by (cases g', auto) (metis not_None_eq)+
     hence \<open>(spectroscopy_moves g g') = (subtract 0 1 1 0 0 0 0 0) \<or>
-      the (spectroscopy_moves g g') = (\<lambda>e. Option.bind ((subtract_fn 0 1 1 0 0 0 0 0) e) min1_6)\<close>
+      (spectroscopy_moves g g') = Some (\<lambda>e. Option.bind ((subtract_fn 0 1 1 0 0 0 0 0) e) min1_6)\<close>
       using Defender_Branch option.collapse[OF defender_win_min_assms(2)]
-      by (smt (verit, best) local.br_answer local.br_obsv option.inject)
+      by (cases g', auto)
     thus ?thesis
       using defender_win_min_assms min_1_6_some
       by (smt (verit, best) bind.bind_lunit option.distinct(1) dual_order.trans option.sel)
