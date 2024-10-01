@@ -39,8 +39,6 @@ proof-
     by (metis conj_win attacker_wins.Attack option.distinct(1) option.sel spectroscopy_defender.simps(4))
 qed
 
-thm hml_srbb_hml_srbb_inner_hml_srbb_conjunct.induct
-
 text \<open>Next, we show the statement for the case that @{term "Q \<noteq> {}"}. Following the proof of
       \cite[p. 20]{bisping2023lineartimebranchingtime}, we do this by induction on a more
       complex property.\<close>

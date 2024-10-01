@@ -75,8 +75,13 @@ inductive silent_reachable :: "'s \<Rightarrow> 's \<Rightarrow> bool"  (infix "
 
 text \<open>If \<open>p'\<close> is silent reachable from \<open>p\<close> and there is a \<open>\<tau>\<close>-transition from \<open>p'\<close> to \<open>p''\<close> then \<open>p''\<close> is silent reachable from \<open>p\<close>.\<close>
 lemma silent_reachable_append_\<tau>: "p \<Zsurj> p' \<Longrightarrow> p' \<mapsto> \<tau> p'' \<Longrightarrow> p \<Zsurj> p''"
-  apply (induct rule: silent_reachable.induct)
-  using silent_reachable.intros by blast+
+proof (induct rule: silent_reachable.induct)
+  case (refl p)
+  then show ?case using silent_reachable.intros by blast
+next
+  case (step p p' p'')
+  then show ?case using silent_reachable.intros by blast
+qed
 
 text \<open>The relation @{term "silent_reachable"} is transitive.\<close>
 lemma silent_reachable_trans:
@@ -187,10 +192,14 @@ lemma weak_step_sequence_trans:
   assumes "p \<Zsurj>\<mapsto>\<Zsurj>$ tr_1 p'" and "p' \<Zsurj>\<mapsto>\<Zsurj>$ tr_2 p''"
   shows "p \<Zsurj>\<mapsto>\<Zsurj>$ (tr_1 @ tr_2) p''"
   using assms weak_step_sequence.intros(2)
-  apply induct
-  using silent_prepend_weak_step
-  apply (smt (verit) LTS_Tau.weak_step_sequence.simps append_Nil silent_reachable_trans)
-  by force
+proof induct
+  case (1 p p')
+  then show ?case
+    by (metis LTS_Tau.weak_step_sequence.simps append_Nil silent_prepend_weak_step silent_reachable_trans)
+next
+  case (2 p \<alpha> p' rt p'')
+  then show ?case by fastforce
+qed
 
 text \<open>The weak traces of a state or all possible sequences of weak transitions that can be performed.
 In the context of labelled transition systems, weak traces capture the observable behaviour of a state.\<close>

@@ -372,19 +372,26 @@ lemma distinction_combination_eta_two_way:
       \<Psi>\<alpha>))) p q'\<close>
 proof -
   have \<open>\<forall>q'\<in> Q\<alpha>. \<forall>q'''\<in>{q'''. \<exists>q'\<in> Q\<alpha>. \<exists>q''. q' \<mapsto>a \<alpha> q'' \<and> q'' \<Zsurj> q'''}.
-      hml_srbb_conj.distinguishes ((if distinguishes (\<Phi> q''') p' q''' then conjunctify_distinctions else conjunctify_distinctions_dual) \<Phi> p' q''') p' q'''\<close>
+      hml_srbb_conj.distinguishes (\<Psi>\<alpha> q''') p' q'''\<close>
   proof clarify
     fix q' q'' q'''
     assume \<open>q' \<in> Q\<alpha>\<close> \<open>q' \<mapsto>a \<alpha> q''\<close> \<open>q'' \<Zsurj> q'''\<close>
     thus \<open>hml_srbb_conj.distinguishes
-        ((if distinguishes (\<Phi> q''') p' q''' then conjunctify_distinctions else conjunctify_distinctions_dual) \<Phi> p' q''') p' q''' \<close>
-      using assms(4) distinction_conjunctification_two_way by blast
+        (\<Psi>\<alpha> q''') p' q''' \<close>
+      using assms(4) distinction_conjunctification_two_way \<Psi>\<alpha>_def by blast
   qed
-  hence \<open>\<forall>q'\<in> Q\<alpha>. \<forall>q''. q' \<mapsto>a \<alpha> q''
-    \<longrightarrow> distinguishes (Internal (Conj {q'''. \<exists>q'\<in> Q\<alpha>. \<exists>q''. q' \<mapsto>a \<alpha> q'' \<and> q'' \<Zsurj> q'''}
-      \<Psi>\<alpha>))  p' q''\<close>
-    unfolding Q\<alpha>_def \<Psi>\<alpha>_def using silent_reachable.refl apply (auto) apply (fastforce)
-    apply (smt (verit)) apply (fastforce) by (smt (verit))
+  hence \<open>\<forall>q'\<in> Q\<alpha>. \<forall>q'''\<in>{q'''. \<exists>q'\<in> Q\<alpha>. \<exists>q''. q' \<mapsto>a \<alpha> q'' \<and> q'' \<Zsurj> q'''}.
+    hml_srbb_inner.distinguishes (Conj {q'''. \<exists>q'\<in> Q\<alpha>. \<exists>q''. q' \<mapsto>a \<alpha> q'' \<and> q'' \<Zsurj> q'''}
+      \<Psi>\<alpha>)  p' q'''\<close>
+    using srbb_dist_conjunct_implies_dist_conjunction
+    unfolding lts_semantics.distinguishes_def
+    by (metis (no_types, lifting))
+  hence \<open>\<forall>q'\<in> Q\<alpha>. \<forall>q'''. (\<exists>q''. q' \<mapsto>a \<alpha> q'' \<and> q'' \<Zsurj> q''') \<longrightarrow>
+    hml_srbb_inner.distinguishes (Conj {q'''. \<exists>q'\<in> Q\<alpha>. \<exists>q''. q' \<mapsto>a \<alpha> q'' \<and> q'' \<Zsurj> q'''} \<Psi>\<alpha>)  p' q'''\<close>
+    by blast
+  hence \<open>\<forall>q'\<in> Q\<alpha>. \<forall>q''. q' \<mapsto>a \<alpha> q'' \<longrightarrow>
+    distinguishes (Internal  (Conj {q'''. \<exists>q'\<in> Q\<alpha>. \<exists>q''. q' \<mapsto>a \<alpha> q'' \<and> q'' \<Zsurj> q'''} \<Psi>\<alpha>)) p' q''\<close>
+    by (meson distinguishes_def hml_srbb_inner.distinguishes_def hml_srbb_models.simps(2) silent_reachable.refl)
   thus \<open>\<forall>q'\<in> Q\<alpha>.
      hml_srbb_inner.distinguishes (Obs \<alpha> (Internal (Conj
         {q'''. \<exists>q'\<in> Q\<alpha>. \<exists>q''. q' \<mapsto>a \<alpha> q'' \<and> q'' \<Zsurj> q'''} \<Psi>\<alpha>))) p q'\<close>

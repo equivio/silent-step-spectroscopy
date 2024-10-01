@@ -37,13 +37,8 @@ fun wtrace_to_srbb :: "'act list \<Rightarrow> ('act, 'i) hml_srbb"
 text \<open>@{term "wtrace_to_srbb trace"} is in our modal-logical characterization of weak traces.\<close>
 lemma trace_to_srbb_is_trace_formula:
   "is_trace_formula (wtrace_to_srbb trace)"
-  apply (induct trace)
-  using is_trace_formula_is_trace_formula_inner.intros
-    and is_trace_formula.simps
-    and is_trace_formula_is_trace_formula_inner.intros(4)
-    and wtrace_to_inner.simps(2)
-    and wtrace_to_srbb.simps(2)
-  by fastforce+
+  by (induct trace,
+      auto simp add: is_trace_formula.simps is_trace_formula_is_trace_formula_inner.intros(1,4))
 
 text \<open>The following three lemmas show that the modal-logical characterization of HML$_{WT}$ corresponds to the sublanguage of HML$_\text{SRBB}$, obtain by the energy coordinates \<open>(\<infinity>, 0, 0, 0, 0, 0, 0, 0)\<close>.\<close>
 
