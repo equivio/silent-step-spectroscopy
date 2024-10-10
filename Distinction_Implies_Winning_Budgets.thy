@@ -199,10 +199,10 @@ proof-
         hence move_kind: "spectroscopy_moves (Defender_Conj p Q) N \<noteq> None \<Longrightarrow> \<exists>q\<in>Q. N = Attacker_Clause p q" for N
           using conj_answer by metis   
         hence update: "\<And>g'. spectroscopy_moves (Defender_Conj p Q) g' \<noteq> None \<Longrightarrow> 
-          weight (Defender_Conj p Q) g' = e3"
+          weight (Defender_Conj p Q) g' = subtract_fn 0 0 1 0 0 0 0 0"
           by fastforce
         hence move_wina: "\<And>g'. spectroscopy_moves (Defender_Conj p Q) g' \<noteq> None \<Longrightarrow>
-          e3 (expressiveness_price (ImmConj I \<psi>s) - E 0 0 0 0 1 0 0 0) = Some (expressiveness_price (ImmConj I \<psi>s) - E 0 0 1 0 1 0 0 0) \<and>
+          (subtract_fn 0 0 1 0 0 0 0 0) (expressiveness_price (ImmConj I \<psi>s) - E 0 0 0 0 1 0 0 0) = Some (expressiveness_price (ImmConj I \<psi>s) - E 0 0 1 0 1 0 0 0) \<and>
           attacker_wins (expressiveness_price (ImmConj I \<psi>s) - E 0 0 1 0 1 0 0 0) g'"
           using move_kind a_clause_wina subtracts by blast
         from attacker_wins_Gd[OF def_conj] update move_wina have def_conj_wina:
@@ -271,11 +271,11 @@ proof-
         have attacker: "attacker (Attacker_Delayed p Q)" by simp
   
         have "spectroscopy_moves (Attacker_Delayed p Q) (Attacker_Immediate p' Q') =
-              (if (\<exists>a. p \<mapsto>a a p' \<and> Q \<mapsto>aS a Q') then Some e1 else None)"
+              (if (\<exists>a. p \<mapsto>a a p' \<and> Q \<mapsto>aS a Q') then Some (subtract_fn 1 0 0 0 0 0 0 0) else None)"
           for p Q p' Q' by simp
         from this[of p Q p' Q'] have 
           "spectroscopy_moves (Attacker_Delayed p Q) (Attacker_Immediate p' Q') = 
-               Some e1" using p'_Q' by auto
+               Some (subtract_fn 1 0 0 0 0 0 0 0)" using p'_Q' by auto
        
         with expr_obs_phi[of \<alpha> \<phi>] show
           "attacker_wins (expr_pr_inner (hml_srbb_inner.Obs \<alpha> \<phi>)) (Attacker_Delayed p Q)"
@@ -344,34 +344,34 @@ proof-
           (seven e')
           (eight e')\<close>
         have \<open>e' = e - (E 0 0 1 0 0 0 0 0)\<close> unfolding e_def e'_def by simp
-        hence \<open>Some e' = e3 e\<close>
+        hence \<open>Some e' = (subtract_fn 0 0 1 0 0 0 0 0) e\<close>
           by (auto, smt (verit) add_increasing2 e_def energy.sel energy_leq_cases i0_lb le_numeral_extra(4))
         have expr_lower: \<open>(E 0 0 1 0 0 0 0 0) \<le> expr_pr_inner (Conj I \<psi>s)\<close>
           using case_assms(1) subset_form by auto
         have eu'_comp: \<open>eu' = (expr_pr_inner (Conj I \<psi>s)) - (E 0 0 1 0 0 0 0 0)\<close>
           unfolding eu'_def
-          by (auto simp add: bot_enat_def) (metis (no_types, lifting) SUP_cong energy.sel image_image)+
-        with expr_lower have eu'_characterization: \<open>Some eu' = e3 (expr_pr_inner (Conj I \<psi>s))\<close>
+          by (auto simp add: bot_enat_def image_image)
+        with expr_lower have eu'_characterization: \<open>Some eu' = (subtract_fn 0 0 1 0 0 0 0 0) (expr_pr_inner (Conj I \<psi>s))\<close>
           by presburger
         have \<open>\<forall>g'. spectroscopy_moves (Defender_Conj p Q) g' \<noteq> None
-        \<longrightarrow> (\<exists>q\<in>Q. (Attacker_Clause p q) = g') \<and> spectroscopy_moves (Defender_Conj p Q) g' = Some e3\<close>
+        \<longrightarrow> (\<exists>q\<in>Q. (Attacker_Clause p q) = g') \<and> spectroscopy_moves (Defender_Conj p Q) g' = Some (subtract_fn 0 0 1 0 0 0 0 0)\<close>
         proof clarify
           fix g' upd
           assume upd_def: \<open>spectroscopy_moves (Defender_Conj p Q) g' = Some upd\<close>
-          hence \<open>\<And>px q. g' = Attacker_Clause px q \<Longrightarrow> p = px \<and> q \<in> Q \<and> upd = e3\<close>
+          hence \<open>\<And>px q. g' = Attacker_Clause px q \<Longrightarrow> p = px \<and> q \<in> Q \<and> upd = (subtract_fn 0 0 1 0 0 0 0 0)\<close>
             by (metis (mono_tags, lifting) local.conj_answer option.sel option.simps(3))
-          with upd_def show \<open>(\<exists>q\<in>Q. Attacker_Clause p q = g') \<and> spectroscopy_moves (Defender_Conj p Q) g' = Some e3\<close> 
+          with upd_def show \<open>(\<exists>q\<in>Q. Attacker_Clause p q = g') \<and> spectroscopy_moves (Defender_Conj p Q) g' = Some (subtract_fn 0 0 1 0 0 0 0 0)\<close> 
             by (cases g', auto)
         qed
         hence "\<forall>g'. spectroscopy_moves (Defender_Conj p Q) g' \<noteq> None
           \<longrightarrow> (\<exists>e'. (the (spectroscopy_moves (Defender_Conj p Q) g')) e = Some e' \<and> attacker_wins e' g')"
           unfolding e_def
-          using clause_win \<open>Some e' = e3 e\<close> e_def by force
+          using clause_win \<open>Some e' = (subtract_fn 0 0 1 0 0 0 0 0) e\<close> e_def by force
         hence \<open>attacker_wins e (Defender_Conj p Q)\<close>
           unfolding e_def using attacker_wins.Defense
           by auto
         moreover have \<open>e \<le> expr_pr_inner (Conj I \<psi>s)\<close>
-          using \<open>e' \<le> eu'\<close> eu'_characterization \<open>Some e' = e3 e\<close> expr_lower case_assms(1) subset_form
+          using \<open>e' \<le> eu'\<close> eu'_characterization \<open>Some e' = (subtract_fn 0 0 1 0 0 0 0 0) e\<close> expr_lower case_assms(1) subset_form
           unfolding e_def
           by (smt (verit, ccfv_threshold) eu'_comp add_diff_cancel_enat
               add_mono_thms_linordered_semiring(1) enat.simps(3) enat_defs(2) energy.sel
@@ -625,10 +625,10 @@ proof-
           \<open>attacker_wins (expressiveness_price \<phi>) (Attacker_Immediate p' Q')\<close>
           using distinction_implies_winning_budgets_empty_Q by (cases \<open>Q' = {}\<close>) auto
         have \<open>expr_pr_inner (Obs \<alpha> \<phi>) \<ge> (E 1 0 0 0 0 0 0 0)\<close> by auto
-        hence \<open>e1 (expr_pr_inner (Obs \<alpha> \<phi>)) = Some (expressiveness_price \<phi>)\<close>
+        hence \<open>(subtract_fn 1 0 0 0 0 0 0 0) (expr_pr_inner (Obs \<alpha> \<phi>)) = Some (expressiveness_price \<phi>)\<close>
           using expr_obs_phi by auto
         with win_a_branch have win_a_step:
-          \<open>attacker_wins (the (e1 (expr_pr_inner (Obs \<alpha> \<phi>)))) (Attacker_Immediate p' Q')\<close> by auto
+          \<open>attacker_wins (the ((subtract_fn 1 0 0 0 0 0 0 0) (expr_pr_inner (Obs \<alpha> \<phi>)))) (Attacker_Immediate p' Q')\<close> by auto
         define e' where \<open>e' = E
           (Sup (one   ` ({expr_pr_inner (Obs \<alpha> \<phi>)} \<union> (expr_pr_conjunct ` (\<psi>s ` I)))))
           (Sup (two   ` ({expr_pr_inner (Obs \<alpha> \<phi>)} \<union> (expr_pr_conjunct ` (\<psi>s ` I)))))
@@ -641,7 +641,7 @@ proof-
           (Sup (eight ` ({expr_pr_inner (Obs \<alpha> \<phi>)} \<union> (expr_pr_conjunct ` (\<psi>s ` I)))))\<close>
         have \<open>eu'0 \<le> e'\<close> unfolding e'_def eu'0_def
           by (auto, meson sup.cobounded2 sup.coboundedI2)
-        have \<open>spectroscopy_moves (Attacker_Branch p' Q') (Attacker_Immediate p' Q') = Some e1\<close> by simp
+        have \<open>spectroscopy_moves (Attacker_Branch p' Q') (Attacker_Immediate p' Q') = Some (subtract_fn 1 0 0 0 0 0 0 0)\<close> by simp
         with win_a_step attacker_wins_Ga have obs_later_win: \<open>attacker_wins (expr_pr_inner (Obs \<alpha> \<phi>)) (Attacker_Branch p' Q')\<close>
           by force
         hence e'_win: \<open>attacker_wins e' (Attacker_Branch p' Q')\<close> 

@@ -156,9 +156,6 @@ lemma mono_subtract:
 text \<open>We also define abbreviations for performing subtraction.\<close>
 abbreviation "subtract_fn a b c d e f g h \<equiv>
   (\<lambda>x. if somewhere_larger x (E a b c d e f g h) then None else Some (x - (E a b c d e f g h)))"
-abbreviation "e1 \<equiv> subtract_fn 1 0 0 0 0 0 0 0"
-abbreviation "e3 \<equiv> subtract_fn 0 0 1 0 0 0 0 0"
-abbreviation "e5 \<equiv> subtract_fn 0 0 0 0 1 0 0 0"
 
 abbreviation "subtract a b c d e f g h \<equiv> Some (subtract_fn a b c d e f g h)"
 

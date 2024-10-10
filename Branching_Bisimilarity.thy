@@ -1,8 +1,10 @@
 section \<open>Branching Bisimilarity\<close>
 
 theory Branching_Bisimilarity
-  imports HML_SRBB Expressiveness_Price
+  imports Eta_Bisimilarity
 begin
+
+subsection \<open>Definitions of (Stability-Respecting) Branching Bisimilarity\<close>
 
 context LTS_Tau
 begin
@@ -19,42 +21,32 @@ lemma branching_simulation_intro:
     \<open>branching_simulation R\<close>
   using assms unfolding branching_simulation_def by simp
 
-lemma silence_retains_branching_sim:
-assumes 
-  \<open>branching_simulation R\<close>
-  \<open>R p q\<close>
-  \<open>p \<Zsurj> p'\<close>
-shows \<open>\<exists>q'. R p' q' \<and> q \<Zsurj> q'\<close>
-  using assms(3,2)
-proof (induct arbitrary: q)
-  case (refl p)
-  then show ?case
-    using silent_reachable.refl by blast
-next
-  case (step p p' p'')
-  then obtain q' where \<open>R p' q'\<close> \<open>q \<Zsurj> q'\<close>
-    using \<open>branching_simulation R\<close> silent_reachable.refl silent_reachable_append_\<tau> 
-    unfolding branching_simulation_def by blast
-  then obtain q'' where \<open>R p'' q''\<close> \<open>q' \<Zsurj> q''\<close> using step by blast
-  then show ?case
-    using \<open>q \<Zsurj> q'\<close> silent_reachable_trans by blast
-qed
-
 definition branching_simulated :: \<open>'s \<Rightarrow> 's \<Rightarrow> bool\<close> where
   \<open>branching_simulated p q \<equiv> \<exists>R. branching_simulation R \<and> R p q\<close>
 
 definition branching_bisimulated :: \<open>'s \<Rightarrow> 's \<Rightarrow> bool\<close> where
   \<open>branching_bisimulated p q \<equiv> \<exists>R. branching_simulation R \<and> symp R \<and> R p q\<close>
 
-definition stability_respecting :: \<open>('s \<Rightarrow> 's \<Rightarrow> bool) \<Rightarrow> bool\<close> where
-  \<open>stability_respecting R \<equiv> \<forall> p q. R p q \<and> stable_state p \<longrightarrow>
-    (\<exists>q'. q \<Zsurj> q' \<and> R p q' \<and> stable_state q')\<close>
-
 definition sr_branching_bisimulated :: \<open>'s \<Rightarrow> 's \<Rightarrow> bool\<close> (infix \<open>~SRBB\<close> 40) where
   \<open>p ~SRBB q \<equiv> \<exists>R. branching_simulation R \<and> symp R \<and> stability_respecting R \<and> R p q\<close>
 
+subsection \<open>Properties of Branching Bisimulation Equivalences\<close>
+
 lemma branching_bisimilarity_branching_sim: \<open>branching_simulation sr_branching_bisimulated\<close>
   unfolding sr_branching_bisimulated_def branching_simulation_def by blast
+
+lemma branching_sim_eta_sim:
+  assumes \<open>branching_simulation R\<close>
+  shows \<open>eta_simulation R\<close>
+  using assms silent_reachable.refl unfolding branching_simulation_def eta_simulation_def by blast
+
+lemma silence_retains_branching_sim:
+assumes 
+  \<open>branching_simulation R\<close>
+  \<open>R p q\<close>
+  \<open>p \<Zsurj> p'\<close>
+shows \<open>\<exists>q'. R p' q' \<and> q \<Zsurj> q'\<close>
+  using assms silence_retains_eta_sim branching_sim_eta_sim by blast
 
 lemma branching_bisimilarity_stability: \<open>stability_respecting sr_branching_bisimulated\<close>
   unfolding sr_branching_bisimulated_def stability_respecting_def by blast
@@ -296,110 +288,7 @@ lemma sr_branching_bisim_stronger:
     \<open>branching_bisimulated p q\<close>
   using assms unfolding sr_branching_bisimulated_def branching_bisimulated_def by auto
 
-definition conjunctify_distinctions ::
-  \<open>('s \<Rightarrow> ('a, 's) hml_srbb) \<Rightarrow> 's \<Rightarrow> ('s \<Rightarrow> ('a, 's) hml_srbb_conjunct)\<close> where
-  \<open>conjunctify_distinctions \<Phi> p \<equiv> \<lambda>q.
-    case (\<Phi> q) of
-      TT \<Rightarrow> undefined
-    | Internal \<chi> \<Rightarrow> Pos \<chi>
-    | ImmConj I \<Psi> \<Rightarrow> \<Psi> (SOME i. i\<in>I \<and> hml_srbb_conj.distinguishes (\<Psi> i) p q)\<close>
-
-lemma distinction_conjunctification:
-  assumes
-    \<open>\<forall>q\<in>I. distinguishes (\<Phi> q) p q\<close>
-  shows
-    \<open>\<forall>q\<in>I. hml_srbb_conj.distinguishes ((conjunctify_distinctions \<Phi> p) q) p q\<close>
-  unfolding conjunctify_distinctions_def
-proof
-  fix q
-  assume q_I: \<open>q\<in>I\<close>
-  show \<open>hml_srbb_conj.distinguishes
-          (case \<Phi> q of hml_srbb.Internal x \<Rightarrow> hml_srbb_conjunct.Pos x
-           | ImmConj I \<Psi> \<Rightarrow> \<Psi> (SOME i. i \<in> I \<and> hml_srbb_conj.distinguishes (\<Psi> i) p q))
-          p q\<close>
-  proof (cases \<open>\<Phi> q\<close>)
-    case TT
-    then show ?thesis using assms q_I by fastforce
-  next
-    case (Internal \<chi>)
-    then show ?thesis using assms q_I by auto
-  next
-    case (ImmConj J \<Psi>)
-    then have \<open>\<exists>i \<in> J. hml_srbb_conj.distinguishes (\<Psi> i) p q\<close>
-      using assms q_I by auto
-    then show ?thesis
-      by (metis (mono_tags, lifting) ImmConj hml_srbb.simps(11) someI)
-  qed
-qed
-
-lemma distinction_combination:
-  fixes p q
-  defines \<open>Q\<alpha> \<equiv> {q'. q \<Zsurj> q' \<and> (\<nexists>\<phi>. distinguishes \<phi> p q')}\<close>
-  assumes
-    \<open>p \<mapsto>a \<alpha> p'\<close>
-    \<open>\<forall>q'\<in> Q\<alpha>.
-      \<forall>q''. q' \<mapsto>a \<alpha> q'' \<longrightarrow> (distinguishes (\<Phi> q'') p' q'')\<close>
-  shows
-    \<open>\<forall>q'\<in>Q\<alpha>.
-      hml_srbb_inner.distinguishes (Obs \<alpha> (ImmConj {q''. \<exists>q'''\<in>Q\<alpha>. q''' \<mapsto>a \<alpha> q''}
-                                                   (conjunctify_distinctions \<Phi> p'))) p q'\<close>
-proof -
-  have \<open>\<forall>q'\<in> Q\<alpha>. \<forall>q''\<in>{q''. q' \<mapsto>a \<alpha> q''}.
-      hml_srbb_conj.distinguishes ((conjunctify_distinctions \<Phi> p') q'') p' q''\<close>
-  proof clarify
-    fix q' q''
-    assume \<open>q' \<in> Q\<alpha>\<close> \<open>q' \<mapsto>a \<alpha> q''\<close>
-    thus \<open>hml_srbb_conj.distinguishes (conjunctify_distinctions \<Phi> p' q'') p' q''\<close>
-      using distinction_conjunctification assms(3)
-      by (metis mem_Collect_eq)
-  qed
-  hence \<open>\<forall>q'\<in> Q\<alpha>. \<forall>q''\<in>{q''. \<exists>q1'\<in>Q\<alpha>. q1' \<mapsto>a \<alpha> q''}.
-      hml_srbb_conj.distinguishes ((conjunctify_distinctions \<Phi> p') q'') p' q''\<close> by blast
-  hence \<open>\<forall>q'\<in> Q\<alpha>. \<forall>q''. q' \<mapsto>a \<alpha> q''
-    \<longrightarrow> distinguishes (ImmConj {q''. \<exists>q1'\<in>Q\<alpha>. q1' \<mapsto>a \<alpha> q''}
-                               (conjunctify_distinctions \<Phi> p')) p' q''\<close> by auto
-  thus \<open>\<forall>q'\<in>Q\<alpha>.
-      hml_srbb_inner.distinguishes (Obs \<alpha> (ImmConj {q''. \<exists>q'''\<in>Q\<alpha>. q''' \<mapsto>a \<alpha> q''}
-                                                   (conjunctify_distinctions \<Phi> p'))) p q'\<close>
-    by (auto) (metis assms(2))+
-qed
-
-lemma modal_stability_respecting:
-  \<open>stability_respecting (preordered UNIV)\<close>
-  unfolding stability_respecting_def
-proof safe
-  fix p q
-  assume p_stability:
-    \<open>preordered UNIV p q\<close>
-    \<open>stable_state p\<close>
-  have \<open>\<not>(\<forall>q'. q \<Zsurj> q' \<longrightarrow> \<not> preordered UNIV p q' \<or> \<not> stable_state q')\<close>
-  proof safe
-    assume \<open>\<forall>q'. q \<Zsurj> q' \<longrightarrow> \<not> preordered UNIV p q' \<or> \<not> stable_state q'\<close>
-    hence  \<open>\<forall>q'. q \<Zsurj> q' \<longrightarrow> stable_state q' \<longrightarrow> (\<exists>\<phi>. distinguishes \<phi> p q')\<close> by auto
-    then obtain \<Phi> where
-      \<open>\<forall>q'\<in>(silent_reachable_set {q}). stable_state q' \<longrightarrow> distinguishes (\<Phi> q') p q'\<close>
-      using singleton_iff sreachable_set_is_sreachable by metis
-    then have
-      \<open>\<forall>q'\<in>(silent_reachable_set {q}). stable_state q' \<longrightarrow>
-         hml_srbb_conj.distinguishes (conjunctify_distinctions \<Phi> p q') p q'\<close>
-      using singleton_iff distinction_conjunctification by metis
-    hence \<open>hml_srbb_inner.distinguishes_from
-       (StableConj (silent_reachable_set {q} \<inter> {q'. stable_state q'}) (conjunctify_distinctions \<Phi> p))
-       p (silent_reachable_set {q})\<close>
-      by (auto simp add: p_stability(2))
-    hence
-      \<open>distinguishes
-        (Internal (StableConj (silent_reachable_set {q} \<inter> {q'. stable_state q'})
-                (conjunctify_distinctions \<Phi> p)))
-        p q\<close>
-      unfolding silent_reachable_set_def
-      using silent_reachable.refl by auto
-    thus False
-      using p_stability(1) preordered_no_distinction by blast
-  qed
-  thus \<open>\<exists>q'. q \<Zsurj> q' \<and> preordered UNIV p q' \<and> stable_state q'\<close>
-    by blast
-qed
+subsection \<open>\<open>HML_SRBB\<close> as Modal Characterization of Stability-Respecting Branching Bisimilarity\<close>
 
 lemma modal_sym: \<open>symp (preordered UNIV)\<close>
 proof-
@@ -416,7 +305,7 @@ proof-
       then show ?thesis using \<phi>_distinguishes by auto
     next
       case (Internal \<chi>)
-      hence \<open>distinguishes (ImmConj {left} (\<lambda>i. Neg \<chi>)) p q\<close>
+      hence \<open>distinguishes (ImmConj {undefined} (\<lambda>i. Neg \<chi>)) p q\<close>
         using \<phi>_distinguishes by simp
       then show ?thesis using contradiction preordered_no_distinction by blast
     next
@@ -426,7 +315,7 @@ proof-
       then show ?thesis
       proof (cases \<open>\<Psi> i\<close>)
         case (Pos \<chi>)
-        hence \<open>distinguishes (ImmConj {left} (\<lambda>i. Neg \<chi>)) p q\<close> using i_def by simp
+        hence \<open>distinguishes (ImmConj {undefined} (\<lambda>i. Neg \<chi>)) p q\<close> using i_def by simp
         thus ?thesis using contradiction preordered_no_distinction by blast
       next
         case (Neg \<chi>)
@@ -654,7 +543,8 @@ qed
 
 lemma sr_branching_bisim_is_hmlsrbb: \<open>sr_branching_bisimulated p q = preordered UNIV p q\<close>
   using modal_stability_respecting modal_sym modal_branching_sim logic_sr_branching_bisim_invariant
-  unfolding sr_branching_bisimulated_def by auto
+    \<O>_sup preordered_def
+  unfolding sr_branching_bisimulated_def by metis
 
 lemma sr_branching_bisimulated_transitive:
   assumes
@@ -684,7 +574,7 @@ lemma sr_branching_bisimulation_stuttering_all:
     sr_branching_bisimulation_stuttering
   by metis
 
-theorem \<open>sr_branching_bisimulated p q = (p \<preceq> (E \<infinity> \<infinity> \<infinity> \<infinity> \<infinity> \<infinity> \<infinity> \<infinity>) q)\<close>
+theorem \<open>(p ~SRBB q) = (p \<preceq> (E \<infinity> \<infinity> \<infinity> \<infinity> \<infinity> \<infinity> \<infinity> \<infinity>) q)\<close>
   using sr_branching_bisim_is_hmlsrbb \<O>_sup
   unfolding expr_preord_def by auto
 

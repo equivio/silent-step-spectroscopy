@@ -407,6 +407,151 @@ next
     using p'_spec(1) by auto
 qed
 
+definition conjunctify_distinctions ::
+  \<open>('s \<Rightarrow> ('a, 's) hml_srbb) \<Rightarrow> 's \<Rightarrow> ('s \<Rightarrow> ('a, 's) hml_srbb_conjunct)\<close> where
+  \<open>conjunctify_distinctions \<Phi> p \<equiv> \<lambda>q.
+    case (\<Phi> q) of
+      TT \<Rightarrow> undefined
+    | Internal \<chi> \<Rightarrow> Pos \<chi>
+    | ImmConj I \<Psi> \<Rightarrow> \<Psi> (SOME i. i\<in>I \<and> hml_srbb_conj.distinguishes (\<Psi> i) p q)\<close>
+
+lemma distinction_conjunctification:
+  assumes
+    \<open>\<forall>q\<in>I. distinguishes (\<Phi> q) p q\<close>
+  shows
+    \<open>\<forall>q\<in>I. hml_srbb_conj.distinguishes ((conjunctify_distinctions \<Phi> p) q) p q\<close>
+  unfolding conjunctify_distinctions_def
+proof
+  fix q
+  assume q_I: \<open>q\<in>I\<close>
+  show \<open>hml_srbb_conj.distinguishes
+          (case \<Phi> q of hml_srbb.Internal x \<Rightarrow> hml_srbb_conjunct.Pos x
+           | ImmConj I \<Psi> \<Rightarrow> \<Psi> (SOME i. i \<in> I \<and> hml_srbb_conj.distinguishes (\<Psi> i) p q))
+          p q\<close>
+  proof (cases \<open>\<Phi> q\<close>)
+    case TT
+    then show ?thesis using assms q_I by fastforce
+  next
+    case (Internal \<chi>)
+    then show ?thesis using assms q_I by auto
+  next
+    case (ImmConj J \<Psi>)
+    then have \<open>\<exists>i \<in> J. hml_srbb_conj.distinguishes (\<Psi> i) p q\<close>
+      using assms q_I by auto
+    then show ?thesis
+      by (metis (mono_tags, lifting) ImmConj hml_srbb.simps(11) someI)
+  qed
+qed
+
+lemma distinction_combination:
+  fixes p q
+  defines \<open>Q\<alpha> \<equiv> {q'. q \<Zsurj> q' \<and> (\<nexists>\<phi>. distinguishes \<phi> p q')}\<close>
+  assumes
+    \<open>p \<mapsto>a \<alpha> p'\<close>
+    \<open>\<forall>q'\<in> Q\<alpha>.
+      \<forall>q''. q' \<mapsto>a \<alpha> q'' \<longrightarrow> (distinguishes (\<Phi> q'') p' q'')\<close>
+  shows
+    \<open>\<forall>q'\<in>Q\<alpha>.
+      hml_srbb_inner.distinguishes (Obs \<alpha> (ImmConj {q''. \<exists>q'''\<in>Q\<alpha>. q''' \<mapsto>a \<alpha> q''}
+                                                   (conjunctify_distinctions \<Phi> p'))) p q'\<close>
+proof -
+  have \<open>\<forall>q'\<in> Q\<alpha>. \<forall>q''\<in>{q''. q' \<mapsto>a \<alpha> q''}.
+      hml_srbb_conj.distinguishes ((conjunctify_distinctions \<Phi> p') q'') p' q''\<close>
+  proof clarify
+    fix q' q''
+    assume \<open>q' \<in> Q\<alpha>\<close> \<open>q' \<mapsto>a \<alpha> q''\<close>
+    thus \<open>hml_srbb_conj.distinguishes (conjunctify_distinctions \<Phi> p' q'') p' q''\<close>
+      using distinction_conjunctification assms(3)
+      by (metis mem_Collect_eq)
+  qed
+  hence \<open>\<forall>q'\<in> Q\<alpha>. \<forall>q''\<in>{q''. \<exists>q1'\<in>Q\<alpha>. q1' \<mapsto>a \<alpha> q''}.
+      hml_srbb_conj.distinguishes ((conjunctify_distinctions \<Phi> p') q'') p' q''\<close> by blast
+  hence \<open>\<forall>q'\<in> Q\<alpha>. \<forall>q''. q' \<mapsto>a \<alpha> q''
+    \<longrightarrow> distinguishes (ImmConj {q''. \<exists>q1'\<in>Q\<alpha>. q1' \<mapsto>a \<alpha> q''}
+                               (conjunctify_distinctions \<Phi> p')) p' q''\<close> by auto
+  thus \<open>\<forall>q'\<in>Q\<alpha>.
+      hml_srbb_inner.distinguishes (Obs \<alpha> (ImmConj {q''. \<exists>q'''\<in>Q\<alpha>. q''' \<mapsto>a \<alpha> q''}
+                                                   (conjunctify_distinctions \<Phi> p'))) p q'\<close>
+    by (auto) (metis assms(2))+
+qed
+
+definition conjunctify_distinctions_dual ::
+  \<open>('s \<Rightarrow> ('a, 's) hml_srbb) \<Rightarrow> 's \<Rightarrow> ('s \<Rightarrow> ('a, 's) hml_srbb_conjunct)\<close> where
+  \<open>conjunctify_distinctions_dual \<Phi> p \<equiv> \<lambda>q.
+    case (\<Phi> q) of
+      TT \<Rightarrow> undefined
+    | Internal \<chi> \<Rightarrow> Neg \<chi>
+    | ImmConj I \<Psi> \<Rightarrow> 
+      (case \<Psi> (SOME i. i\<in>I \<and> hml_srbb_conj.distinguishes (\<Psi> i) q p) of
+        Pos \<chi> \<Rightarrow> Neg \<chi> | Neg \<chi> \<Rightarrow> Pos \<chi>)\<close>
+
+lemma dual_conjunct:
+  assumes
+    \<open>hml_srbb_conj.distinguishes \<psi> p q\<close>
+  shows
+    \<open>hml_srbb_conj.distinguishes (case \<psi> of
+               hml_srbb_conjunct.Pos \<chi> \<Rightarrow> hml_srbb_conjunct.Neg \<chi>
+               | hml_srbb_conjunct.Neg \<chi> \<Rightarrow> hml_srbb_conjunct.Pos \<chi>) q p\<close>
+  using assms
+  by (cases \<psi>, auto)
+
+lemma distinction_conjunctification_dual:
+  assumes
+    \<open>\<forall>q\<in>I. distinguishes (\<Phi> q) q p\<close>
+  shows
+    \<open>\<forall>q\<in>I. hml_srbb_conj.distinguishes (conjunctify_distinctions_dual \<Phi> p q) p q\<close>
+  unfolding conjunctify_distinctions_dual_def
+proof
+  fix q
+  assume q_I: \<open>q\<in>I\<close>
+  show \<open>hml_srbb_conj.distinguishes
+          (case \<Phi> q of hml_srbb.Internal x \<Rightarrow> hml_srbb_conjunct.Neg x
+           | ImmConj I \<Psi> \<Rightarrow>
+               ( case \<Psi> (SOME i. i \<in> I \<and> hml_srbb_conj.distinguishes (\<Psi> i) q p) of
+                  hml_srbb_conjunct.Pos x \<Rightarrow> hml_srbb_conjunct.Neg x
+               | hml_srbb_conjunct.Neg x \<Rightarrow> hml_srbb_conjunct.Pos x))
+          p q\<close>
+  proof (cases \<open>\<Phi> q\<close>)
+    case TT
+    then show ?thesis using assms q_I by fastforce
+  next
+    case (Internal \<chi>)
+    then show ?thesis using assms q_I by auto
+  next
+    case (ImmConj J \<Psi>)
+    then have \<open>\<exists>i \<in> J. hml_srbb_conj.distinguishes (\<Psi> i) q p\<close>
+      using assms q_I by auto
+    hence \<open>hml_srbb_conj.distinguishes (case \<Psi>
+      (SOME i. i \<in> J \<and> hml_srbb_conj.distinguishes (\<Psi> i) q p) of
+               hml_srbb_conjunct.Pos x \<Rightarrow> hml_srbb_conjunct.Neg x
+               | hml_srbb_conjunct.Neg x \<Rightarrow> hml_srbb_conjunct.Pos x) p q\<close> 
+      by (metis (no_types, lifting) dual_conjunct someI_ex)
+    then show ?thesis unfolding ImmConj by auto
+  qed
+qed
+
+lemma distinction_conjunctification_two_way:
+  assumes
+    \<open>\<forall>q\<in>I. distinguishes (\<Phi> q) p q \<or> distinguishes (\<Phi> q) q p\<close>
+  shows
+    \<open>\<forall>q\<in>I. hml_srbb_conj.distinguishes ((if distinguishes (\<Phi> q) p q then conjunctify_distinctions else conjunctify_distinctions_dual) \<Phi> p q) p q\<close>
+proof safe
+  fix q
+  assume \<open>q \<in> I\<close>
+  then consider \<open>distinguishes (\<Phi> q) p q\<close> | \<open>distinguishes (\<Phi> q) q p\<close> using assms by blast
+  thus \<open>hml_srbb_conj.distinguishes ((if distinguishes (\<Phi> q) p q then conjunctify_distinctions else conjunctify_distinctions_dual) \<Phi> p q) p q\<close>
+  proof cases
+    case 1
+    then show ?thesis using distinction_conjunctification
+      by (smt (verit) singleton_iff)
+  next
+    case 2
+    then show ?thesis using distinction_conjunctification_dual singleton_iff
+      unfolding distinguishes_def
+      by (smt (verit, ccfv_threshold))
+  qed
+qed
+
 end (* LTS_Tau *)
 
 end

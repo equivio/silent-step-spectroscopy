@@ -294,10 +294,16 @@ next
     qed
   next
     case (Defender_Branch p a p' Q' Qa)
-    with defender_win_min_assms show ?thesis
-      using min_1_6_subtr_simp
-      by (cases g', auto simp del: leq_components)
-         (metis (no_types, lifting) le_zero_eq leq_components option.distinct(1) option.inject dual_order.trans)+
+    hence \<open>(\<exists>q'\<in>Q'. g' = Attacker_Clause p q')
+      \<or> (\<exists>Qa'. Qa \<mapsto>aS a Qa' \<and> g' = Attacker_Branch p' Qa')\<close>
+      using defender_win_min_assms by (cases g', auto) (metis not_None_eq)+
+    hence \<open>(spectroscopy_moves g g') = (subtract 0 1 1 0 0 0 0 0) \<or>
+      (spectroscopy_moves g g') = Some (\<lambda>e. Option.bind ((subtract_fn 0 1 1 0 0 0 0 0) e) min1_6)\<close>
+      using Defender_Branch option.collapse[OF defender_win_min_assms(2)]
+      by (cases g', auto)
+    thus ?thesis
+      using defender_win_min_assms min_1_6_some
+      by (smt (verit, best) bind.bind_lunit option.distinct(1) dual_order.trans option.sel)
   next
     case (Defender_Conj p Q)
     with defender_win_min_assms show ?thesis

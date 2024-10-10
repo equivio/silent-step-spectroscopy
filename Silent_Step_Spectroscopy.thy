@@ -18,6 +18,7 @@ the constructive proof of \<open>winning_budget_implies_strategy_formula\<close>
 \<open>strategy_formulas_distinguish\<close> we then know that this formula actually distinguishes \<open>p\<close> from \<open>Q\<close>.
 \<close>
 text \<open>\label{th1}\<close>
+
 theorem spectroscopy_game_correctness:
   fixes e p Q
   shows "(\<exists>\<phi>. distinguishes_from \<phi> p Q \<and> expressiveness_price \<phi> \<le> e)
@@ -32,9 +33,11 @@ proof
   thus "attacker_wins e (Attacker_Immediate p Q)" using win_a_upwards_closure le by simp
 next
   assume "attacker_wins e (Attacker_Immediate p Q)"
-  with winning_budget_implies_strategy_formula
-    have "\<exists>\<phi>. strategy_formula (Attacker_Immediate p Q) e \<phi> \<and> expressiveness_price \<phi> \<le> e" by force
-  hence "\<exists>\<phi>. strategy_formula (Attacker_Immediate p Q) e \<phi> \<and> expressiveness_price \<phi> \<le> e" unfolding \<O>_def by blast
+  with winning_budget_implies_strategy_formula have
+    "\<exists>\<phi>. strategy_formula (Attacker_Immediate p Q) e \<phi> \<and> expressiveness_price \<phi> \<le> e"
+    by force
+  hence "\<exists>\<phi>. strategy_formula (Attacker_Immediate p Q) e \<phi> \<and> expressiveness_price \<phi> \<le> e"
+    unfolding \<O>_def by blast
   thus "\<exists>\<phi>. distinguishes_from \<phi> p Q \<and> expressiveness_price \<phi> \<le> e"
     using strategy_formulas_distinguish by fastforce
 qed
