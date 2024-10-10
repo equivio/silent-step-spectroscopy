@@ -934,7 +934,7 @@ lemma expressiveness_price_ImmConj_geq_parts':
     less_eq_energy_def minus_energy_def
   by (smt (z3) energy.sel idiff_0_right)
 
-end (* full_spec_game *)
+end (* LTS_Tau *)
 
 text \<open>Here, we show the prices for some specific formulas.\<close>
 locale Inhabited_LTS = LTS step
@@ -980,7 +980,7 @@ lemma "expressiveness_price (Internal
                            else undefined)))))) = E 2 0 1 0 0 1 0 0"
   by simp
 
-end
+end (* Inhabited_LTS *)
 
 context LTS_Tau
 begin

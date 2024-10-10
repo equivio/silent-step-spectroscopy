@@ -4,7 +4,7 @@ theory Distinction_Implies_Winning_Budgets
   imports Spectroscopy_Game Expressiveness_Price
 begin
 
-context full_spec_game
+context weak_spectroscopy_game
 begin
 
 text \<open>In this section, we prove that if a formula distinguishes a process @{term "p"}
@@ -819,6 +819,6 @@ proof-
     by (metis assms distinction_implies_winning_budgets_empty_Q)
 qed
 
-end (* context full_spec_game *)
+end (* context weak_spectroscopy_game *)
 
 end

@@ -5,7 +5,7 @@ theory Silent_Step_Spectroscopy
   imports Strategy_Formulas Distinction_Implies_Winning_Budgets
 begin
 
-context full_spec_game 
+context weak_spectroscopy_game 
 begin
 
 text \<open>As in theorem 1 of \cite[p. 14]{bisping2023lineartimebranchingtime} we state in what sense winning energy levels and equivalences coincide as the theorem \<open>spectroscopy_game_correctness\<close>:
@@ -42,6 +42,6 @@ next
     using strategy_formulas_distinguish by fastforce
 qed
 
-end (* context full_spec_game *)
+end (* context weak_spectroscopy_game *)
 
 end

@@ -11,7 +11,7 @@ spectroscopy game and winning budgets. We then show that for some energy \<open>
 exists a strategy formula with expressiveness price \<open>\<le> e\<close>. Afterwards, we prove that this formula 
 actually distinguishes the corresponding processes.\<close>
 
-context full_spec_game
+context weak_spectroscopy_game
 begin
 text \<open>\label{stratFormula}\<close>
 text \<open>We define strategy formulas inductively. For example for \<open>\<langle>\<alpha>\<rangle>\<phi>\<close> to be a strategy formula for some attacker
@@ -383,8 +383,8 @@ proof(induction rule: attacker_wins.induct)
         \<and> strategy_formula_inner (Defender_Conj p' Q') e \<chi>"
         by (simp add: \<open>Q = Q'\<close> \<open>attacker_wins e (Defender_Conj p' Q')\<close> \<open>p = p'\<close>)
       then show ?thesis
-        using \<chi>_prop \<open>Q = Q'\<close> \<open>attacker_wins e (Defender_Conj p' Q')\<close> \<open>p = p'\<close>
-          full_spec_game.late_conj full_spec_game_axioms by fastforce
+        using \<chi>_prop \<open>Q = Q'\<close> \<open>attacker_wins e (Defender_Conj p' Q')\<close> \<open>p = p'\<close> late_conj
+        by fastforce
     next
       case Def_St_Conj
       then obtain p' Q' where g'_def: "g' = Defender_Stable_Conj p' Q'" by blast
@@ -680,8 +680,8 @@ next
       hence "expr_pr_inner (StableConj Q \<Phi>) \<le> e"
         using expr_st_conj e'_spec \<Phi>_prop False by metis
       moreover have \<open>strategy_formula_inner (Defender_Stable_Conj p Q) e (StableConj Q \<Phi>)\<close>
-        using \<Phi>_prop e'_spec full_spec_game_axioms full_spec_game.stable_conj
-        unfolding e'_spec  by fastforce
+        using \<Phi>_prop e'_spec stable_conj
+        unfolding e'_spec by fastforce
       ultimately show ?thesis by auto
     qed
   qed
@@ -857,7 +857,7 @@ next
         thus "False" using X \<open>hml_srbb_inner.distinguishes_from \<chi> p Q'\<close>
           by simp
       next
-        case False (* instable cases *)
+        case False (* unstable cases *)
         from IH have "strategy_formula_inner (Defender_Stable_Conj p Q') e \<chi>" by simp
         hence "\<exists>\<Phi>. \<chi>=(StableConj Q' \<Phi>)" using strategy_formula_inner.simps
           by (smt (verit) spectroscopy_position.distinct(35) spectroscopy_position.distinct(39) spectroscopy_position.distinct(41) spectroscopy_position.inject(7))
@@ -946,6 +946,6 @@ next
   then show ?case by simp
 qed
 
-end (* context full_spec_game *)
+end (* context weak_spectroscopy_game *)
 
 end
