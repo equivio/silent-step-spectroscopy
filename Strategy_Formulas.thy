@@ -518,7 +518,7 @@ next
 
     have \<open>E 1 0 0 0 0 0 0 0 \<le> e''\<close> using win_branch g''_spec
       by (metis option.distinct(1) win_immediate(1))
-    hence above_one: \<open>0 < min (one e) (six e)\<close>
+    hence above_one: \<open>0 < min (modal_depth e) (six e)\<close>
       using win_immediate win_branch
       by (metis energy.sel(1) energy.sel(6) gr_zeroI idiff_0_right leq_components
             min_1_6_simps(1) minus_energy_def not_one_le_zero option.sel)
@@ -526,9 +526,9 @@ next
       using \<Phi>_spec e'_def by blast
     moreover have "expressiveness_price \<phi> \<le> the (min1_6 (e - E 0 1 1 0 0 0 0 0)) - E 1 0 0 0 0 0 0 0"
       using obs_strat(2) by blast
-    moreover hence \<open>modal_depth_srbb \<phi> \<le> min (one e) (six e) - 1\<close>
+    moreover hence \<open>modal_depth_srbb \<phi> \<le> min (modal_depth e) (six e) - 1\<close>
       by simp
-    hence \<open>1 + modal_depth_srbb \<phi> \<le> min (one e) (six e)\<close>
+    hence \<open>1 + modal_depth_srbb \<phi> \<le> min (modal_depth e) (six e)\<close>
       by (metis above_one add.right_neutral add_diff_cancel_enat add_mono_thms_linordered_semiring(1) enat.simps(3) enat_defs(2) ileI1 le_iff_add plus_1_eSuc(1))
     moreover hence \<open>1 + modal_depth_srbb \<phi> \<le> six e\<close> by simp
     ultimately have "expr_pr_inner (BranchConj \<alpha> \<phi> Q \<Phi>) \<le> e"

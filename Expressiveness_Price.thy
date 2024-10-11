@@ -115,7 +115,7 @@ lemma "modal_depth_srbb (ImmConj \<nat> (\<lambda>n. Pos (Obs \<alpha> (observe_
 subsection \<open>Depth of Branching Conjunctions\<close>
 
 text \<open>
-The depth of branching conjunctions (with one observation clause not starting with $\langle\varepsilon\rangle$) is increased on each:
+The depth of branching conjunctions (with modal_depth observation clause not starting with $\langle\varepsilon\rangle$) is increased on each:
 \begin{itemize}
   \item \<open>BranchConj\<close> if there are other conjuncts besides the branching conjunct
 \end{itemize}
@@ -770,7 +770,7 @@ lemma expr_br_conj:
     \<open>subtract_fn 1 0 0 0 0 0 0 0 e'' = Some e'''\<close>
     "expressiveness_price \<phi> \<le> e'''"
     "\<forall>q \<in> Q. expr_pr_conjunct (\<Phi> q) \<le> e'"
-    "1 + modal_depth_srbb \<phi> \<le> six e"
+    "1 + modal_depth_srbb \<phi> \<le> pos_conjuncts e"
   shows "expr_pr_inner (BranchConj \<alpha> \<phi> Q \<Phi>) \<le> e"
 proof-
   obtain e1 e2 e3 e4 e5 e6 e7 e8 where e_def: "e = E e1 e2 e3 e4 e5 e6 e7 e8"
@@ -1121,7 +1121,7 @@ lemma distinction_conjunctification_price:
   assumes
     \<open>\<forall>q\<in>I. distinguishes (\<Phi> q) p q\<close>
     \<open>\<forall>q\<in>I. \<Phi> q \<in> \<O> pr\<close>
-    \<open>one pr \<le> six pr\<close>
+    \<open>modal_depth pr \<le> pos_conjuncts pr\<close>
   shows
     \<open>\<forall>q\<in>I. ((conjunctify_distinctions \<Phi> p) q) \<in> \<O>_conjunct pr\<close>
 proof

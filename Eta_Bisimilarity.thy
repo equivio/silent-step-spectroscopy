@@ -394,7 +394,7 @@ proof -
       (\<forall>q' q'' q'''. q \<Zsurj> q' \<longrightarrow> q' \<mapsto> \<alpha> q'' \<longrightarrow> q'' \<Zsurj> q''' \<longrightarrow>
     \<not> preordered (\<O> (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> 0 0)) p q' \<or> \<not> preordered (\<O> (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> 0 0)) p' q''')\<close>
   proof clarify
-    have less_obs: \<open>one (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> 0 0) \<le> six (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> 0 0)\<close> by simp
+    have less_obs: \<open>modal_depth (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> 0 0) \<le> pos_conjuncts (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> 0 0)\<close> by simp
     fix p \<alpha> p' q
     define Q\<alpha> where \<open>Q\<alpha> \<equiv> {q'. q \<Zsurj> q' \<and> (\<nexists>\<phi>. \<phi>\<in>\<O> (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> 0 0) \<and> distinguishes \<phi> p q')}\<close>
     assume contradiction:

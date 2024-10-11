@@ -8,8 +8,8 @@ text \<open>Following the paper \cite[p. 5]{bisping2023lineartimebranchingtime},
       But deviate from \cite{bisping2023lineartimebranchingtime} in also defining
       an energy @{text "eneg"} that represents negative energy. This allows us to
       express energy updates (cf. \cite[p. 8]{bisping2023lineartimebranchingtime}) as total functions\label{deviation:eneg}.\<close>
-datatype energy = E (one: "enat") (two: "enat") (three: "enat") (four: "enat")
-                    (five: "enat") (six: "enat") (seven: "enat") (eight: "enat")
+datatype energy = E (modal_depth: "enat") (br_conj_depth: "enat") (conj_depth: "enat") (st_conj_depth: "enat")
+                    (imm_conj_depth: "enat") (pos_conjuncts: "enat") (neg_conjuncts: "enat") (neg_depth: "enat")
 
 subsection \<open>Ordering Energies\<close>
 text \<open>In order to define subtraction on energies, we first lift the orderings
@@ -38,15 +38,15 @@ qed
 
 
 lemma leq_components[simp]:
-  shows "e1 \<le> e2 \<equiv> (one e1 \<le> one e2 \<and> two e1 \<le> two e2 \<and> three e1 \<le> three e2 \<and>
-                     four e1 \<le> four e2 \<and> five e1 \<le> five e2 \<and> six e1 \<le> six e2 \<and>
-                     seven e1 \<le> seven e2 \<and> eight e1 \<le> eight e2)"
+  shows "e1 \<le> e2 \<equiv> (modal_depth e1 \<le> modal_depth e2 \<and> br_conj_depth e1 \<le> br_conj_depth e2 \<and> conj_depth e1 \<le> conj_depth e2 \<and>
+                     st_conj_depth e1 \<le> st_conj_depth e2 \<and> imm_conj_depth e1 \<le> imm_conj_depth e2 \<and> pos_conjuncts e1 \<le> pos_conjuncts e2 \<and>
+                     neg_conjuncts e1 \<le> neg_conjuncts e2 \<and> neg_depth e1 \<le> neg_depth e2)"
   unfolding less_eq_energy_def by (simp add: energy.case_eq_if)
 
 lemma energy_leq_cases:
-  assumes "one e1 \<le> one e2" "two e1 \<le> two e2" "three e1 \<le> three e2"
-          "four e1 \<le> four e2" "five e1 \<le> five e2" "six e1 \<le> six e2"
-          "seven e1 \<le> seven e2" "eight e1 \<le> eight e2"
+  assumes "modal_depth e1 \<le> modal_depth e2" "br_conj_depth e1 \<le> br_conj_depth e2" "conj_depth e1 \<le> conj_depth e2"
+          "st_conj_depth e1 \<le> st_conj_depth e2" "imm_conj_depth e1 \<le> imm_conj_depth e2" "pos_conjuncts e1 \<le> pos_conjuncts e2"
+          "neg_conjuncts e1 \<le> neg_conjuncts e2" "neg_depth e1 \<le> neg_depth e2"
   shows "e1 \<le> e2" using assms unfolding leq_components by blast
 
 end
@@ -58,9 +58,9 @@ abbreviation somewhere_larger where "somewhere_larger e1 e2 \<equiv> \<not>(e1 \
 
 lemma somewhere_larger_eq:
   assumes "somewhere_larger e1 e2"
-  shows "one e1 < one e2 \<or> two e1 < two e2 
-         \<or> three e1 < three e2 \<or> four e1 < four e2 \<or> five e1 < five e2 
-         \<or> six e1 < six e2 \<or> seven e1 < seven e2 \<or> eight e1 < eight e2"
+  shows "modal_depth e1 < modal_depth e2 \<or> br_conj_depth e1 < br_conj_depth e2 
+         \<or> conj_depth e1 < conj_depth e2 \<or> st_conj_depth e1 < st_conj_depth e2 \<or> imm_conj_depth e1 < imm_conj_depth e2 
+         \<or> pos_conjuncts e1 < pos_conjuncts e2 \<or> neg_conjuncts e1 < neg_conjuncts e2 \<or> neg_depth e1 < neg_depth e2"
   by (smt (z3) assms energy.case_eq_if less_eq_energy_def linorder_le_less_linear)
 
 subsection \<open>Subtracting Energies\<close>
@@ -71,14 +71,14 @@ instantiation energy :: minus
 begin
 
 definition minus_energy_def[simp]: "e1 - e2 \<equiv> E
-  ((one e1) - (one e2)) 
-  ((two e1) - (two e2)) 
-  ((three e1) - (three e2)) 
-  ((four e1) - (four e2)) 
-  ((five e1) - (five e2)) 
-  ((six e1) - (six e2))
-  ((seven e1) - (seven e2))
-  ((eight e1) - (eight e2))"
+  ((modal_depth e1) - (modal_depth e2)) 
+  ((br_conj_depth e1) - (br_conj_depth e2)) 
+  ((conj_depth e1) - (conj_depth e2)) 
+  ((st_conj_depth e1) - (st_conj_depth e2)) 
+  ((imm_conj_depth e1) - (imm_conj_depth e2)) 
+  ((pos_conjuncts e1) - (pos_conjuncts e2))
+  ((neg_conjuncts e1) - (neg_conjuncts e2))
+  ((neg_depth e1) - (neg_depth e2))"
 
 instance ..
 
@@ -94,24 +94,24 @@ lemma energy_minus[simp]:
 
 lemma minus_component_leq:
   assumes "s \<le> x" "x \<le> y"
-  shows "one (x - s) \<le> one (y - s)" "two (x - s) \<le> two (y - s)"
-        "three (x - s) \<le> three (y - s)" "four (x - s) \<le> four (y - s)"
-        "five (x - s) \<le> five (y - s)" "six (x - s) \<le> six (y -s)"
-        "seven (x - s) \<le> seven (y - s)" "eight (x - s) \<le> eight (y - s)"
+  shows "modal_depth (x - s) \<le> modal_depth (y - s)" "br_conj_depth (x - s) \<le> br_conj_depth (y - s)"
+        "conj_depth (x - s) \<le> conj_depth (y - s)" "st_conj_depth (x - s) \<le> st_conj_depth (y - s)"
+        "imm_conj_depth (x - s) \<le> imm_conj_depth (y - s)" "pos_conjuncts (x - s) \<le> pos_conjuncts (y -s)"
+        "neg_conjuncts (x - s) \<le> neg_conjuncts (y - s)" "neg_depth (x - s) \<le> neg_depth (y - s)"
 proof-
   from assms have "s \<le> y" by (simp del: leq_components)
   with assms leq_components have
-    "one (x - s) \<le> one (y - s) \<and> two (x - s) \<le> two (y - s) \<and>
-    three (x - s) \<le> three (y - s) \<and> four (x - s) \<le> four (y - s) \<and>
-    five (x - s) \<le> five (y - s) \<and> six (x - s) \<le> six (y -s) \<and>
-    seven (x - s) \<le> seven (y - s) \<and> eight (x - s) \<le> eight (y - s)"
+    "modal_depth (x - s) \<le> modal_depth (y - s) \<and> br_conj_depth (x - s) \<le> br_conj_depth (y - s) \<and>
+    conj_depth (x - s) \<le> conj_depth (y - s) \<and> st_conj_depth (x - s) \<le> st_conj_depth (y - s) \<and>
+    imm_conj_depth (x - s) \<le> imm_conj_depth (y - s) \<and> pos_conjuncts (x - s) \<le> pos_conjuncts (y -s) \<and>
+    neg_conjuncts (x - s) \<le> neg_conjuncts (y - s) \<and> neg_depth (x - s) \<le> neg_depth (y - s)"
     by (smt (verit, del_insts) add_diff_cancel_enat enat_add_left_cancel_le energy.sel
         leD le_iff_add le_less minus_energy_def)+
   thus
-    "one (x - s) \<le> one (y - s)" "two (x - s) \<le> two (y - s)"
-    "three (x - s) \<le> three (y - s)" "four (x - s) \<le> four (y - s)"
-    "five (x - s) \<le> five (y - s)" "six (x - s) \<le> six (y -s)"
-    "seven (x - s) \<le> seven (y - s)" "eight (x - s) \<le> eight (y - s)" by auto
+    "modal_depth (x - s) \<le> modal_depth (y - s)" "br_conj_depth (x - s) \<le> br_conj_depth (y - s)"
+    "conj_depth (x - s) \<le> conj_depth (y - s)" "st_conj_depth (x - s) \<le> st_conj_depth (y - s)"
+    "imm_conj_depth (x - s) \<le> imm_conj_depth (y - s)" "pos_conjuncts (x - s) \<le> pos_conjuncts (y -s)"
+    "neg_conjuncts (x - s) \<le> neg_conjuncts (y - s)" "neg_depth (x - s) \<le> neg_depth (y - s)" by auto
 qed
 
 lemma enat_diff_mono:
@@ -207,25 +207,25 @@ end
 text \<open>Again, we prove that these updates only decrease energies.\<close>
 
 lemma min_1_6_simps[simp]:
-  shows "one (the (min1_6 e)) = min (one e) (six e)"
-        "two (the (min1_6 e)) = two e" 
-        "three (the (min1_6 e)) = three e"
-        "four (the (min1_6 e)) = four e"
-        "five (the (min1_6 e)) = five e"
-        "six (the (min1_6 e)) = six e"
-        "seven (the (min1_6 e)) = seven e"
-        "eight (the (min1_6 e)) = eight e"
+  shows "modal_depth (the (min1_6 e)) = min (modal_depth e) (pos_conjuncts e)"
+        "br_conj_depth (the (min1_6 e)) = br_conj_depth e" 
+        "conj_depth (the (min1_6 e)) = conj_depth e"
+        "st_conj_depth (the (min1_6 e)) = st_conj_depth e"
+        "imm_conj_depth (the (min1_6 e)) = imm_conj_depth e"
+        "pos_conjuncts (the (min1_6 e)) = pos_conjuncts e"
+        "neg_conjuncts (the (min1_6 e)) = neg_conjuncts e"
+        "neg_depth (the (min1_6 e)) = neg_depth e"
   unfolding min1_6_def by (simp_all add: energy.case_eq_if)
 
 lemma min_1_7_simps[simp]:
-  shows "one (the (min1_7 e)) = min (one e) (seven e)"
-        "two (the (min1_7 e)) = two e" 
-        "three (the (min1_7 e)) = three e"
-        "four (the (min1_7 e)) = four e"
-        "five (the (min1_7 e)) = five e"
-        "six (the (min1_7 e)) = six e"
-        "seven (the (min1_7 e)) = seven e"
-        "eight (the (min1_7 e)) = eight e"
+  shows "modal_depth (the (min1_7 e)) = min (modal_depth e) (neg_conjuncts e)"
+        "br_conj_depth (the (min1_7 e)) = br_conj_depth e" 
+        "conj_depth (the (min1_7 e)) = conj_depth e"
+        "st_conj_depth (the (min1_7 e)) = st_conj_depth e"
+        "imm_conj_depth (the (min1_7 e)) = imm_conj_depth e"
+        "pos_conjuncts (the (min1_7 e)) = pos_conjuncts e"
+        "neg_conjuncts (the (min1_7 e)) = neg_conjuncts e"
+        "neg_depth (the (min1_7 e)) = neg_depth e"
   unfolding min1_7_def by (simp_all add: energy.case_eq_if)
 
 lemma min_1_6_some:
@@ -267,14 +267,14 @@ lemma gets_smaller_min_1_7:
 
 lemma min_1_7_lower_end:
   assumes \<open>(Option.bind ((subtract_fn 0 0 0 0 0 0 0 1) e) min1_7) = None\<close>
-  shows \<open>eight e = 0\<close>
+  shows \<open>neg_depth e = 0\<close>
   using assms
   by (smt (verit) bind.bind_lunit energy.sel ileI1 leq_components min_1_7_some not_gr_zero one_eSuc zero_le)
 
 lemma min_1_7_subtr_simp:
   shows \<open>(Option.bind ((subtract_fn 0 0 0 0 0 0 0 1) e) min1_7)
-    = (if eight e = 0 then None
-        else Some (E (min (one e) (seven e)) (two e) (three e) (four e) (five e) (six e) (seven e) (eight e - 1)))\<close>
+    = (if neg_depth e = 0 then None
+        else Some (E (min (modal_depth e) (neg_conjuncts e)) (br_conj_depth e) (conj_depth e) (st_conj_depth e) (imm_conj_depth e) (pos_conjuncts e) (neg_conjuncts e) (neg_depth e - 1)))\<close>
   using min_1_7_lower_end
   by (auto simp add: min1_7_def)
 
@@ -291,15 +291,15 @@ qed
 
 lemma min_1_6_subtr_simp:
   shows \<open>(Option.bind ((subtract_fn 0 1 1 0 0 0 0 0) e) min1_6)
-    = (if two e = 0 \<or> three e = 0 then None
-        else Some (E (min (one e) (six e)) (two e - 1) (three e - 1) (four e) (five e) (six e) (seven e) (eight e)))\<close>
+    = (if br_conj_depth e = 0 \<or> conj_depth e = 0 then None
+        else Some (E (min (modal_depth e) (pos_conjuncts e)) (br_conj_depth e - 1) (conj_depth e - 1) (st_conj_depth e) (imm_conj_depth e) (pos_conjuncts e) (neg_conjuncts e) (neg_depth e)))\<close>
   by (auto simp add: min1_6_def ileI1 one_eSuc)
 
 instantiation energy :: Sup
 begin
 
-definition "Sup ee \<equiv> E (Sup (one ` ee)) (Sup (two ` ee )) (Sup (three ` ee)) (Sup (four ` ee))
-  (Sup (five ` ee)) (Sup (six ` ee)) (Sup (seven ` ee)) (Sup (eight ` ee))"
+definition "Sup ee \<equiv> E (Sup (modal_depth ` ee)) (Sup (br_conj_depth ` ee )) (Sup (conj_depth ` ee)) (Sup (st_conj_depth ` ee))
+  (Sup (imm_conj_depth ` ee)) (Sup (pos_conjuncts ` ee)) (Sup (neg_conjuncts ` ee)) (Sup (neg_depth ` ee))"
 
 instance ..
 end

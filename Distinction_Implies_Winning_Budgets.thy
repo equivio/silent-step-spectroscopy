@@ -308,41 +308,41 @@ proof-
         have conjuncts_present: \<open>\<forall>q\<in>Q. expr_pr_conjunct (\<psi>qs q) \<in> expr_pr_conjunct ` (\<psi>qs ` Q)\<close>
           using \<open>Q \<noteq> {}\<close> by blast
         define e' where \<open>e' = E
-          (Sup (one   ` (expr_pr_conjunct ` (\<psi>qs ` Q))))
-          (Sup (two   ` (expr_pr_conjunct ` (\<psi>qs ` Q))))
-          (Sup (three ` (expr_pr_conjunct ` (\<psi>qs ` Q))))
-          (Sup (four  ` (expr_pr_conjunct ` (\<psi>qs ` Q))))
-          (Sup (five  ` (expr_pr_conjunct ` (\<psi>qs ` Q))))
-          (Sup (six   ` (expr_pr_conjunct ` (\<psi>qs ` Q))))
-          (Sup (seven ` (expr_pr_conjunct ` (\<psi>qs ` Q))))
-          (Sup (eight ` (expr_pr_conjunct ` (\<psi>qs ` Q))))\<close>
+          (Sup (modal_depth   ` (expr_pr_conjunct ` (\<psi>qs ` Q))))
+          (Sup (br_conj_depth   ` (expr_pr_conjunct ` (\<psi>qs ` Q))))
+          (Sup (conj_depth ` (expr_pr_conjunct ` (\<psi>qs ` Q))))
+          (Sup (st_conj_depth  ` (expr_pr_conjunct ` (\<psi>qs ` Q))))
+          (Sup (imm_conj_depth  ` (expr_pr_conjunct ` (\<psi>qs ` Q))))
+          (Sup (pos_conjuncts   ` (expr_pr_conjunct ` (\<psi>qs ` Q))))
+          (Sup (neg_conjuncts ` (expr_pr_conjunct ` (\<psi>qs ` Q))))
+          (Sup (neg_depth ` (expr_pr_conjunct ` (\<psi>qs ` Q))))\<close>
         from conjuncts_present have \<open>\<forall>q\<in>Q. (expr_pr_conjunct (\<psi>qs q)) \<le> e'\<close>
           unfolding e'_def
           by (metis SUP_upper energy.sel leq_components)
         with \<psi>qs_spec win_a_upwards_closure
           have clause_win: \<open>\<forall>q\<in>Q. attacker_wins e' (Attacker_Clause p q)\<close> by blast
         define eu' where \<open>eu' = E
-          (Sup (one   ` (expr_pr_conjunct ` (\<psi>s ` I))))
-          (Sup (two   ` (expr_pr_conjunct ` (\<psi>s ` I))))
-          (Sup (three ` (expr_pr_conjunct ` (\<psi>s ` I))))
-          (Sup (four  ` (expr_pr_conjunct ` (\<psi>s ` I))))
-          (Sup (five  ` (expr_pr_conjunct ` (\<psi>s ` I))))
-          (Sup (six   ` (expr_pr_conjunct ` (\<psi>s ` I))))
-          (Sup (seven ` (expr_pr_conjunct ` (\<psi>s ` I))))
-          (Sup (eight ` (expr_pr_conjunct ` (\<psi>s ` I))))\<close>
+          (Sup (modal_depth   ` (expr_pr_conjunct ` (\<psi>s ` I))))
+          (Sup (br_conj_depth   ` (expr_pr_conjunct ` (\<psi>s ` I))))
+          (Sup (conj_depth ` (expr_pr_conjunct ` (\<psi>s ` I))))
+          (Sup (st_conj_depth  ` (expr_pr_conjunct ` (\<psi>s ` I))))
+          (Sup (imm_conj_depth  ` (expr_pr_conjunct ` (\<psi>s ` I))))
+          (Sup (pos_conjuncts   ` (expr_pr_conjunct ` (\<psi>s ` I))))
+          (Sup (neg_conjuncts ` (expr_pr_conjunct ` (\<psi>s ` I))))
+          (Sup (neg_depth ` (expr_pr_conjunct ` (\<psi>s ` I))))\<close>
         have subset_form: \<open>\<psi>qs ` Q \<subseteq> \<psi>s ` I\<close>
           using \<psi>qs_spec by fastforce
         hence \<open>e' \<le> eu'\<close> unfolding e'_def eu'_def leq_components
           by (simp add: Sup_subset_mono image_mono)
         define e where \<open>e = E
-          (one e')
-          (two e')
-          (1 + three e')
-          (four e')
-          (five e')
-          (six e')
-          (seven e')
-          (eight e')\<close>
+          (modal_depth e')
+          (br_conj_depth e')
+          (1 + conj_depth e')
+          (st_conj_depth e')
+          (imm_conj_depth e')
+          (pos_conjuncts e')
+          (neg_conjuncts e')
+          (neg_depth e')\<close>
         have \<open>e' = e - (E 0 0 1 0 0 0 0 0)\<close> unfolding e_def e'_def by simp
         hence \<open>Some e' = (subtract_fn 0 0 1 0 0 0 0 0) e\<close>
           by (auto, smt (verit) add_increasing2 e_def energy.sel energy_leq_cases i0_lb le_numeral_extra(4))
@@ -423,40 +423,40 @@ proof-
         have conjuncts_present: \<open>\<forall>q\<in>Q. expr_pr_conjunct (\<psi>qs q) \<in> expr_pr_conjunct ` (\<psi>qs ` Q)\<close>
           using \<open>Q \<noteq> {}\<close> by blast
         define e' where \<open>e' = E
-          (Sup (one   ` (expr_pr_conjunct ` (\<psi>qs ` Q))))
-          (Sup (two   ` (expr_pr_conjunct ` (\<psi>qs ` Q))))
-          (Sup (three ` (expr_pr_conjunct ` (\<psi>qs ` Q))))
-          (Sup (four  ` (expr_pr_conjunct ` (\<psi>qs ` Q))))
-          (Sup (five  ` (expr_pr_conjunct ` (\<psi>qs ` Q))))
-          (Sup (six   ` (expr_pr_conjunct ` (\<psi>qs ` Q))))
-          (Sup (seven ` (expr_pr_conjunct ` (\<psi>qs ` Q))))
-          (Sup (eight ` (expr_pr_conjunct ` (\<psi>qs ` Q))))\<close>
+          (Sup (modal_depth   ` (expr_pr_conjunct ` (\<psi>qs ` Q))))
+          (Sup (br_conj_depth   ` (expr_pr_conjunct ` (\<psi>qs ` Q))))
+          (Sup (conj_depth ` (expr_pr_conjunct ` (\<psi>qs ` Q))))
+          (Sup (st_conj_depth  ` (expr_pr_conjunct ` (\<psi>qs ` Q))))
+          (Sup (imm_conj_depth  ` (expr_pr_conjunct ` (\<psi>qs ` Q))))
+          (Sup (pos_conjuncts   ` (expr_pr_conjunct ` (\<psi>qs ` Q))))
+          (Sup (neg_conjuncts ` (expr_pr_conjunct ` (\<psi>qs ` Q))))
+          (Sup (neg_depth ` (expr_pr_conjunct ` (\<psi>qs ` Q))))\<close>
         from conjuncts_present have \<open>\<forall>q\<in>Q. (expr_pr_conjunct (\<psi>qs q)) \<le> e'\<close> unfolding e'_def
           by (smt (verit, best) SUP_upper energy.sel energy.simps(3) energy_leq_cases image_iff)
         with \<psi>qs_spec win_a_upwards_closure
           have clause_win: \<open>\<forall>q\<in>Q. attacker_wins e' (Attacker_Clause p q)\<close> by blast
         define eu' where \<open>eu' = E
-          (Sup (one   ` (expr_pr_conjunct ` (\<psi>s ` I))))
-          (Sup (two   ` (expr_pr_conjunct ` (\<psi>s ` I))))
-          (Sup (three ` (expr_pr_conjunct ` (\<psi>s ` I))))
-          (Sup (four  ` (expr_pr_conjunct ` (\<psi>s ` I))))
-          (Sup (five  ` (expr_pr_conjunct ` (\<psi>s ` I))))
-          (Sup (six   ` (expr_pr_conjunct ` (\<psi>s ` I))))
-          (Sup (seven ` (expr_pr_conjunct ` (\<psi>s ` I))))
-          (Sup (eight ` (expr_pr_conjunct ` (\<psi>s ` I))))\<close>
+          (Sup (modal_depth   ` (expr_pr_conjunct ` (\<psi>s ` I))))
+          (Sup (br_conj_depth   ` (expr_pr_conjunct ` (\<psi>s ` I))))
+          (Sup (conj_depth ` (expr_pr_conjunct ` (\<psi>s ` I))))
+          (Sup (st_conj_depth  ` (expr_pr_conjunct ` (\<psi>s ` I))))
+          (Sup (imm_conj_depth  ` (expr_pr_conjunct ` (\<psi>s ` I))))
+          (Sup (pos_conjuncts   ` (expr_pr_conjunct ` (\<psi>s ` I))))
+          (Sup (neg_conjuncts ` (expr_pr_conjunct ` (\<psi>s ` I))))
+          (Sup (neg_depth ` (expr_pr_conjunct ` (\<psi>s ` I))))\<close>
         have subset_form: \<open>\<psi>qs ` Q \<subseteq> \<psi>s ` I\<close>
           using \<psi>qs_spec by fastforce
         hence \<open>e' \<le> eu'\<close> unfolding e'_def eu'_def
           by (simp add: Sup_subset_mono image_mono)
         define e where \<open>e = E
-          (one e')
-          (two e')
-          (three e')
-          (1 + four e')
-          (five e')
-          (six e')
-          (seven e')
-          (eight e')\<close>
+          (modal_depth e')
+          (br_conj_depth e')
+          (conj_depth e')
+          (1 + st_conj_depth e')
+          (imm_conj_depth e')
+          (pos_conjuncts e')
+          (neg_conjuncts e')
+          (neg_depth e')\<close>
         have \<open>e' = e - (E 0 0 0 1 0 0 0 0)\<close> unfolding e_def e'_def by auto
         hence \<open>Some e' = (subtract_fn 0 0 0 1 0 0 0 0) e\<close>
           by (metis e_def energy.sel energy_leq_cases i0_lb le_iff_add)
@@ -586,14 +586,14 @@ proof-
             \<in> expr_pr_conjunct ` (\<psi>qs ` (Q \<inter> hml_srbb_inner.model_set (Obs \<alpha> \<phi>)))\<close>
           by blast
         define e'0 where \<open>e'0 = E
-          (Sup (one   ` (expr_pr_conjunct ` (\<psi>qs ` (Q \<inter> hml_srbb_inner.model_set (Obs \<alpha> \<phi>))))))
-          (Sup (two   ` (expr_pr_conjunct ` (\<psi>qs ` (Q \<inter> hml_srbb_inner.model_set (Obs \<alpha> \<phi>))))))
-          (Sup (three ` (expr_pr_conjunct ` (\<psi>qs ` (Q \<inter> hml_srbb_inner.model_set (Obs \<alpha> \<phi>))))))
-          (Sup (four  ` (expr_pr_conjunct ` (\<psi>qs ` (Q \<inter> hml_srbb_inner.model_set (Obs \<alpha> \<phi>))))))
-          (Sup (five  ` (expr_pr_conjunct ` (\<psi>qs ` (Q \<inter> hml_srbb_inner.model_set (Obs \<alpha> \<phi>))))))
-          (Sup (six   ` (expr_pr_conjunct ` (\<psi>qs ` (Q \<inter> hml_srbb_inner.model_set (Obs \<alpha> \<phi>))))))
-          (Sup (seven ` (expr_pr_conjunct ` (\<psi>qs ` (Q \<inter> hml_srbb_inner.model_set (Obs \<alpha> \<phi>))))))
-          (Sup (eight ` (expr_pr_conjunct ` (\<psi>qs ` (Q \<inter> hml_srbb_inner.model_set (Obs \<alpha> \<phi>))))))\<close>
+          (Sup (modal_depth   ` (expr_pr_conjunct ` (\<psi>qs ` (Q \<inter> hml_srbb_inner.model_set (Obs \<alpha> \<phi>))))))
+          (Sup (br_conj_depth   ` (expr_pr_conjunct ` (\<psi>qs ` (Q \<inter> hml_srbb_inner.model_set (Obs \<alpha> \<phi>))))))
+          (Sup (conj_depth ` (expr_pr_conjunct ` (\<psi>qs ` (Q \<inter> hml_srbb_inner.model_set (Obs \<alpha> \<phi>))))))
+          (Sup (st_conj_depth  ` (expr_pr_conjunct ` (\<psi>qs ` (Q \<inter> hml_srbb_inner.model_set (Obs \<alpha> \<phi>))))))
+          (Sup (imm_conj_depth  ` (expr_pr_conjunct ` (\<psi>qs ` (Q \<inter> hml_srbb_inner.model_set (Obs \<alpha> \<phi>))))))
+          (Sup (pos_conjuncts   ` (expr_pr_conjunct ` (\<psi>qs ` (Q \<inter> hml_srbb_inner.model_set (Obs \<alpha> \<phi>))))))
+          (Sup (neg_conjuncts ` (expr_pr_conjunct ` (\<psi>qs ` (Q \<inter> hml_srbb_inner.model_set (Obs \<alpha> \<phi>))))))
+          (Sup (neg_depth ` (expr_pr_conjunct ` (\<psi>qs ` (Q \<inter> hml_srbb_inner.model_set (Obs \<alpha> \<phi>))))))\<close>
         from conjuncts_present have branch_answer_bound:
             \<open>\<forall>q\<in>(Q \<inter> hml_srbb_inner.model_set (Obs \<alpha> \<phi>)). (expr_pr_conjunct (\<psi>qs q)) \<le> e'0\<close>
           unfolding e'0_def using SUP_upper energy.sel energy.simps(3) energy_leq_cases image_iff
@@ -601,14 +601,14 @@ proof-
         with \<psi>qs_spec win_a_upwards_closure have
           conj_wins: \<open>\<forall>q\<in>(Q \<inter> hml_srbb_inner.model_set (Obs \<alpha> \<phi>)). attacker_wins e'0 (Attacker_Clause p q)\<close> by blast
         define eu'0 where \<open>eu'0 = E
-          (Sup (one   ` (expr_pr_conjunct ` (\<psi>s ` I))))
-          (Sup (two   ` (expr_pr_conjunct ` (\<psi>s ` I))))
-          (Sup (three ` (expr_pr_conjunct ` (\<psi>s ` I))))
-          (Sup (four  ` (expr_pr_conjunct ` (\<psi>s ` I))))
-          (Sup (five  ` (expr_pr_conjunct ` (\<psi>s ` I))))
-          (Sup (six   ` (expr_pr_conjunct ` (\<psi>s ` I))))
-          (Sup (seven ` (expr_pr_conjunct ` (\<psi>s ` I))))
-          (Sup (eight ` (expr_pr_conjunct ` (\<psi>s ` I))))\<close>
+          (Sup (modal_depth   ` (expr_pr_conjunct ` (\<psi>s ` I))))
+          (Sup (br_conj_depth   ` (expr_pr_conjunct ` (\<psi>s ` I))))
+          (Sup (conj_depth ` (expr_pr_conjunct ` (\<psi>s ` I))))
+          (Sup (st_conj_depth  ` (expr_pr_conjunct ` (\<psi>s ` I))))
+          (Sup (imm_conj_depth  ` (expr_pr_conjunct ` (\<psi>s ` I))))
+          (Sup (pos_conjuncts   ` (expr_pr_conjunct ` (\<psi>s ` I))))
+          (Sup (neg_conjuncts ` (expr_pr_conjunct ` (\<psi>s ` I))))
+          (Sup (neg_depth ` (expr_pr_conjunct ` (\<psi>s ` I))))\<close>
         have subset_form: \<open>\<psi>qs ` (Q \<inter> hml_srbb_inner.model_set (Obs \<alpha> \<phi>)) \<subseteq> \<psi>s ` I\<close>
           using \<psi>qs_spec by fastforce
         hence \<open>e'0 \<le> eu'0\<close> unfolding e'0_def eu'0_def
@@ -630,15 +630,15 @@ proof-
         with win_a_branch have win_a_step:
           \<open>attacker_wins (the ((subtract_fn 1 0 0 0 0 0 0 0) (expr_pr_inner (Obs \<alpha> \<phi>)))) (Attacker_Immediate p' Q')\<close> by auto
         define e' where \<open>e' = E
-          (Sup (one   ` ({expr_pr_inner (Obs \<alpha> \<phi>)} \<union> (expr_pr_conjunct ` (\<psi>s ` I)))))
-          (Sup (two   ` ({expr_pr_inner (Obs \<alpha> \<phi>)} \<union> (expr_pr_conjunct ` (\<psi>s ` I)))))
-          (Sup (three ` ({expr_pr_inner (Obs \<alpha> \<phi>)} \<union> (expr_pr_conjunct ` (\<psi>s ` I)))))
-          (Sup (four  ` ({expr_pr_inner (Obs \<alpha> \<phi>)} \<union> (expr_pr_conjunct ` (\<psi>s ` I)))))
-          (Sup (five  ` ({expr_pr_inner (Obs \<alpha> \<phi>)} \<union> (expr_pr_conjunct ` (\<psi>s ` I)))))
+          (Sup (modal_depth   ` ({expr_pr_inner (Obs \<alpha> \<phi>)} \<union> (expr_pr_conjunct ` (\<psi>s ` I)))))
+          (Sup (br_conj_depth   ` ({expr_pr_inner (Obs \<alpha> \<phi>)} \<union> (expr_pr_conjunct ` (\<psi>s ` I)))))
+          (Sup (conj_depth ` ({expr_pr_inner (Obs \<alpha> \<phi>)} \<union> (expr_pr_conjunct ` (\<psi>s ` I)))))
+          (Sup (st_conj_depth  ` ({expr_pr_inner (Obs \<alpha> \<phi>)} \<union> (expr_pr_conjunct ` (\<psi>s ` I)))))
+          (Sup (imm_conj_depth  ` ({expr_pr_inner (Obs \<alpha> \<phi>)} \<union> (expr_pr_conjunct ` (\<psi>s ` I)))))
           (Sup ({1 + modal_depth_srbb \<phi>} 
-             \<union> (six   ` ({expr_pr_inner (Obs \<alpha> \<phi>)} \<union> (expr_pr_conjunct ` (\<psi>s ` I))))))
-          (Sup (seven ` ({expr_pr_inner (Obs \<alpha> \<phi>)} \<union> (expr_pr_conjunct ` (\<psi>s ` I)))))
-          (Sup (eight ` ({expr_pr_inner (Obs \<alpha> \<phi>)} \<union> (expr_pr_conjunct ` (\<psi>s ` I)))))\<close>
+             \<union> (pos_conjuncts   ` ({expr_pr_inner (Obs \<alpha> \<phi>)} \<union> (expr_pr_conjunct ` (\<psi>s ` I))))))
+          (Sup (neg_conjuncts ` ({expr_pr_inner (Obs \<alpha> \<phi>)} \<union> (expr_pr_conjunct ` (\<psi>s ` I)))))
+          (Sup (neg_depth ` ({expr_pr_inner (Obs \<alpha> \<phi>)} \<union> (expr_pr_conjunct ` (\<psi>s ` I)))))\<close>
         have \<open>eu'0 \<le> e'\<close> unfolding e'_def eu'0_def
           by (auto, meson sup.cobounded2 sup.coboundedI2)
         have \<open>spectroscopy_moves (Attacker_Branch p' Q') (Attacker_Immediate p' Q') = Some (subtract_fn 1 0 0 0 0 0 0 0)\<close> by simp
@@ -647,25 +647,25 @@ proof-
         hence e'_win: \<open>attacker_wins e' (Attacker_Branch p' Q')\<close> 
           unfolding e'_def using win_a_upwards_closure
           by auto
-        have depths: \<open>1 + modal_depth_srbb \<phi> = one (expr_pr_inner (Obs \<alpha> \<phi>))\<close> by simp
-        have six_e': \<open>six e' = Sup ({1 + modal_depth_srbb \<phi>} \<union> (six ` ({expr_pr_inner (Obs \<alpha> \<phi>)} \<union> (expr_pr_conjunct ` (\<psi>s ` I)))))\<close>
+        have depths: \<open>1 + modal_depth_srbb \<phi> = modal_depth (expr_pr_inner (Obs \<alpha> \<phi>))\<close> by simp
+        have six_e': \<open>pos_conjuncts e' = Sup ({1 + modal_depth_srbb \<phi>} \<union> (pos_conjuncts ` ({expr_pr_inner (Obs \<alpha> \<phi>)} \<union> (expr_pr_conjunct ` (\<psi>s ` I)))))\<close>
           using energy.sel(6) unfolding e'_def by blast
-        hence six_e'_simp: \<open>six e' = Sup ({1 + modal_depth_srbb \<phi>} \<union> (six ` (expr_pr_conjunct ` (\<psi>s ` I))))\<close>
+        hence six_e'_simp: \<open>pos_conjuncts e' = Sup ({1 + modal_depth_srbb \<phi>} \<union> (pos_conjuncts ` (expr_pr_conjunct ` (\<psi>s ` I))))\<close>
           by (auto simp add: modal_depth_dominates_pos_conjuncts add_increasing  sup.absorb2 sup.coboundedI1)
-        hence \<open>six e' \<le> one e'\<close>
+        hence \<open>pos_conjuncts e' \<le> modal_depth e'\<close>
           unfolding e'_def
           by (auto, smt (verit) SUP_mono energy.sel(1) energy.sel(6) image_iff modal_depth_dominates_pos_conjuncts sup.coboundedI2)
-        hence \<open>one (the (min1_6 e')) = (six e')\<close>
+        hence \<open>modal_depth (the (min1_6 e')) = (pos_conjuncts e')\<close>
           by simp
         with six_e' have min_e'_def: \<open>min1_6 e' = Some (E
-          (Sup ({1 + modal_depth_srbb \<phi>} \<union> six ` (expr_pr_conjunct ` (\<psi>s ` I))))
-          (Sup (two   ` ({expr_pr_inner (Obs \<alpha> \<phi>)} \<union> (expr_pr_conjunct ` (\<psi>s ` I)))))
-          (Sup (three ` ({expr_pr_inner (Obs \<alpha> \<phi>)} \<union> (expr_pr_conjunct ` (\<psi>s ` I)))))
-          (Sup (four  ` ({expr_pr_inner (Obs \<alpha> \<phi>)} \<union> (expr_pr_conjunct ` (\<psi>s ` I)))))
-          (Sup (five  ` ({expr_pr_inner (Obs \<alpha> \<phi>)} \<union> (expr_pr_conjunct ` (\<psi>s ` I)))))
-          (Sup ({1 + modal_depth_srbb \<phi>} \<union> (six ` ({expr_pr_inner (Obs \<alpha> \<phi>)} \<union> (expr_pr_conjunct ` (\<psi>s ` I))))))
-          (Sup (seven ` ({expr_pr_inner (Obs \<alpha> \<phi>)} \<union> (expr_pr_conjunct ` (\<psi>s ` I)))))
-          (Sup (eight ` ({expr_pr_inner (Obs \<alpha> \<phi>)} \<union> (expr_pr_conjunct ` (\<psi>s ` I))))))\<close>
+          (Sup ({1 + modal_depth_srbb \<phi>} \<union> pos_conjuncts ` (expr_pr_conjunct ` (\<psi>s ` I))))
+          (Sup (br_conj_depth   ` ({expr_pr_inner (Obs \<alpha> \<phi>)} \<union> (expr_pr_conjunct ` (\<psi>s ` I)))))
+          (Sup (conj_depth ` ({expr_pr_inner (Obs \<alpha> \<phi>)} \<union> (expr_pr_conjunct ` (\<psi>s ` I)))))
+          (Sup (st_conj_depth  ` ({expr_pr_inner (Obs \<alpha> \<phi>)} \<union> (expr_pr_conjunct ` (\<psi>s ` I)))))
+          (Sup (imm_conj_depth  ` ({expr_pr_inner (Obs \<alpha> \<phi>)} \<union> (expr_pr_conjunct ` (\<psi>s ` I)))))
+          (Sup ({1 + modal_depth_srbb \<phi>} \<union> (pos_conjuncts ` ({expr_pr_inner (Obs \<alpha> \<phi>)} \<union> (expr_pr_conjunct ` (\<psi>s ` I))))))
+          (Sup (neg_conjuncts ` ({expr_pr_inner (Obs \<alpha> \<phi>)} \<union> (expr_pr_conjunct ` (\<psi>s ` I)))))
+          (Sup (neg_depth ` ({expr_pr_inner (Obs \<alpha> \<phi>)} \<union> (expr_pr_conjunct ` (\<psi>s ` I))))))\<close>
           using e'_def min1_6_def six_e'_simp
           by (smt (z3) energy.case_eq_if energy.sel min_1_6_simps(1))
         hence \<open>expr_pr_inner (Obs \<alpha> \<phi>) \<le> the (min1_6 e')\<close>
@@ -673,14 +673,14 @@ proof-
         hence obs_win: \<open>attacker_wins (the (min1_6 e')) (Attacker_Branch p' Q')\<close>
           using obs_later_win win_a_upwards_closure by blast
         define e where \<open>e = E
-          (one e')
-          (1 + two e')
-          (1 + three e')
-          (four e')
-          (five e')
-          (six e')
-          (seven e')
-          (eight e')\<close>
+          (modal_depth e')
+          (1 + br_conj_depth e')
+          (1 + conj_depth e')
+          (st_conj_depth e')
+          (imm_conj_depth e')
+          (pos_conjuncts e')
+          (neg_conjuncts e')
+          (neg_depth e')\<close>
         have \<open>e' = e - (E 0 1 1 0 0 0 0 0)\<close> unfolding e_def e'_def by auto
         hence e'_comp: \<open>Some e' = (subtract_fn 0 1 1 0 0 0 0 0) e\<close>
           by (metis e_def energy.sel energy_leq_cases i0_lb le_iff_add)
