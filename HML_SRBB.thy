@@ -11,110 +11,110 @@ we do not provide a formal proof. From this sublanguage smaller subsets are deri
 via the notion of expressiveness prices (\ref{sect:ExpressivenessMeasure}). \<close>
 
 text \<open>
-The mutually recursive data types @{term "hml_srbb"}, @{term "hml_srbb_inner"} and @{term "hml_srbb_conjunct"}
-represent the subset of all @{term "hml"} formulas, which characterize stability-respecting branching
+The mutually recursive data types @{term \<open>hml_srbb\<close>}, @{term \<open>hml_srbb_inner\<close>} and @{term \<open>hml_srbb_conjunct\<close>}
+represent the subset of all @{term \<open>hml\<close>} formulas, which characterize stability-respecting branching
 bisimilarity (abbreviated to 'SRBB').
 \\\\
-When a parameter is of type @{term "hml_srbb"} we typically use \<open>\<phi>\<close> as a name,
-for type @{term "hml_srbb_inner"} we use \<open>\<chi>\<close> and for type @{term "hml_srbb_conjunct"} we use \<open>\<psi>\<close>.
+When a parameter is of type @{term \<open>hml_srbb\<close>} we typically use \<open>\<phi>\<close> as a name,
+for type @{term \<open>hml_srbb_inner\<close>} we use \<open>\<chi>\<close> and for type @{term \<open>hml_srbb_conjunct\<close>} we use \<open>\<psi>\<close>.
 
 The data constructors are to be interpreted as follows:
 \begin{itemize}
-  \item in @{term "hml_srbb"}:
+  \item in @{term \<open>hml_srbb\<close>}:
   \begin{itemize}
-    \item @{term "TT"} encodes \<open>\<top>\<close>
+    \item @{term \<open>TT\<close>} encodes \<open>\<top>\<close>
     \item \<open>(Internal \<chi>)\<close> encodes \<open>\<langle>\<epsilon>\<rangle>\<chi>\<close>
     \item \<open>(ImmConj I \<psi>s)\<close> encodes $\bigwedge\nolimits_{i \in \mathrm{\texttt{I}}} {\psi s}(i)$
   \end{itemize}
-  \item in @{term "hml_srbb_inner"}
+  \item in @{term \<open>hml_srbb_inner\<close>}
   \begin{itemize}
     \item \<open>(Obs \<alpha> \<phi>)\<close> encodes \<open>(\<alpha>)\<phi>\<close> (Note the difference to \cite{bisping2023lineartimebranchingtime})
     \item \<open>(Conj I \<psi>s)\<close> encode $\bigwedge\nolimits_{i \in \mathrm{\texttt{I}}} {\psi s}(i)$
     \item \<open>(StableConj I \<psi>s)\<close> encodes $\neg\langle\tau\rangle\top \land \bigwedge\nolimits_{i \in \mathrm{\texttt{I}}} {\psi s}(i)$
     \item \<open>(BranchConj \<alpha> \<phi> I \<psi>s)\<close> encodes $(\alpha)\varphi \land \bigwedge\nolimits_{i \in \mathrm{\texttt{I}}} {\psi s}(i)$
   \end{itemize}
-  \item in @{term "hml_srbb_conjunct"}
+  \item in @{term \<open>hml_srbb_conjunct\<close>}
   \begin{itemize}
     \item \<open>(Pos \<chi>)\<close> encodes \<open>\<langle>\<epsilon>\<rangle>\<chi>\<close>
     \item \<open>(Neg \<chi>)\<close> encodes \<open>\<not>\<langle>\<epsilon>\<rangle>\<chi>\<close>
   \end{itemize}
 \end{itemize}
 
-For justifications regarding the explicit inclusion of @{term "TT"} and
-the encoding of conjunctions via index sets @{term "I"} and mapping from indices to conjuncts @{term "\<psi>s"},
-reference the @{term "TT"} and @{term "Conj"} data constructors of the type @{term "hml"} in section \ref{sect:HML}.
+For justifications regarding the explicit inclusion of @{term \<open>TT\<close>} and
+the encoding of conjunctions via index sets @{term \<open>I\<close>} and mapping from indices to conjuncts @{term \<open>\<psi>s\<close>},
+reference the @{term \<open>TT\<close>} and @{term \<open>Conj\<close>} data constructors of the type @{term \<open>hml\<close>} in section \ref{sect:HML}.
 \<close>
 
-datatype 
+datatype
   ('act, 'i) hml_srbb =
     TT |
-    Internal "('act, 'i) hml_srbb_inner" |
-    ImmConj "'i set" "'i \<Rightarrow> ('act, 'i) hml_srbb_conjunct"
+    Internal \<open>('act, 'i) hml_srbb_inner\<close> |
+    ImmConj \<open>'i set\<close> \<open>'i \<Rightarrow> ('act, 'i) hml_srbb_conjunct\<close>
 and
   ('act, 'i) hml_srbb_inner =
-    Obs 'act "('act, 'i) hml_srbb" |
-    Conj "'i set" "'i \<Rightarrow> ('act, 'i) hml_srbb_conjunct" |
-    StableConj "'i set" "'i \<Rightarrow> ('act, 'i) hml_srbb_conjunct" |
-    BranchConj 'act "('act, 'i) hml_srbb"
-               "'i set" "'i \<Rightarrow> ('act, 'i) hml_srbb_conjunct"
+    Obs 'act \<open>('act, 'i) hml_srbb\<close> |
+    Conj \<open>'i set\<close> \<open>'i \<Rightarrow> ('act, 'i) hml_srbb_conjunct\<close> |
+    StableConj \<open>'i set\<close> \<open>'i \<Rightarrow> ('act, 'i) hml_srbb_conjunct\<close> |
+    BranchConj 'act \<open>('act, 'i) hml_srbb\<close>
+               \<open>'i set\<close> \<open>'i \<Rightarrow> ('act, 'i) hml_srbb_conjunct\<close>
 and
   ('act, 'i) hml_srbb_conjunct =
-    Pos "('act, 'i) hml_srbb_inner" |
-    Neg "('act, 'i) hml_srbb_inner"
+    Pos \<open>('act, 'i) hml_srbb_inner\<close> |
+    Neg \<open>('act, 'i) hml_srbb_inner\<close>
 
 
 subsection \<open> Semantics of HML$_\text{SRBB}$ Formulas \<close>
 
 text \<open>
 This section describes how semantic meaning is assigned to HML$_\text{SRBB}$ formulas in the context of a LTS.
-We define what it means for a process @{term "p"} to satisfy a HML$_\text{SRBB}$ formula @{term "\<phi>"},
+We define what it means for a process @{term \<open>p\<close>} to satisfy a HML$_\text{SRBB}$ formula @{term \<open>\<phi>\<close>},
 written as \<open>p \<Turnstile>SRBB \<phi>\<close>.
 \<close>
 
 context LTS_Tau
 begin
 
-primrec 
-      hml_srbb_models :: "'s \<Rightarrow> ('a, 's) hml_srbb \<Rightarrow> bool" (infixl "\<Turnstile>SRBB" 60)
-  and hml_srbb_inner_models :: "'s \<Rightarrow> ('a, 's) hml_srbb_inner \<Rightarrow> bool"
-  and hml_srbb_conjunct_models :: "'s \<Rightarrow> ('a, 's) hml_srbb_conjunct \<Rightarrow> bool" where
-  "hml_srbb_models state TT =
-    True" |
-  "hml_srbb_models state (Internal \<chi>) =
-    (\<exists>p'. state \<Zsurj> p' \<and> (hml_srbb_inner_models p' \<chi>))" |
-  "hml_srbb_models state (ImmConj I \<psi>s) =
-    (\<forall>i\<in>I. hml_srbb_conjunct_models state (\<psi>s i))" |
+primrec
+      hml_srbb_models :: \<open>'s \<Rightarrow> ('a, 's) hml_srbb \<Rightarrow> bool\<close> (infixl \<open>\<Turnstile>SRBB\<close> 60)
+  and hml_srbb_inner_models :: \<open>'s \<Rightarrow> ('a, 's) hml_srbb_inner \<Rightarrow> bool\<close>
+  and hml_srbb_conjunct_models :: \<open>'s \<Rightarrow> ('a, 's) hml_srbb_conjunct \<Rightarrow> bool\<close> where
+  \<open>hml_srbb_models state TT =
+    True\<close> |
+  \<open>hml_srbb_models state (Internal \<chi>) =
+    (\<exists>p'. state \<Zsurj> p' \<and> (hml_srbb_inner_models p' \<chi>))\<close> |
+  \<open>hml_srbb_models state (ImmConj I \<psi>s) =
+    (\<forall>i\<in>I. hml_srbb_conjunct_models state (\<psi>s i))\<close> |
 
-  "hml_srbb_inner_models state (Obs a \<phi>) =
-    ((\<exists>p'. state \<mapsto> a p' \<and> hml_srbb_models p' \<phi>) \<or> a = \<tau> \<and> hml_srbb_models state \<phi>)" |
-  "hml_srbb_inner_models state (Conj I \<psi>s) =
-    (\<forall>i\<in>I. hml_srbb_conjunct_models state (\<psi>s i))" |
-  "hml_srbb_inner_models state (StableConj I \<psi>s) =
-    ((\<nexists>p'. state \<mapsto> \<tau> p') \<and> (\<forall>i\<in>I. hml_srbb_conjunct_models state (\<psi>s i)))" |
-  "hml_srbb_inner_models state (BranchConj a \<phi> I \<psi>s) =
+  \<open>hml_srbb_inner_models state (Obs a \<phi>) =
+    ((\<exists>p'. state \<mapsto> a p' \<and> hml_srbb_models p' \<phi>) \<or> a = \<tau> \<and> hml_srbb_models state \<phi>)\<close> |
+  \<open>hml_srbb_inner_models state (Conj I \<psi>s) =
+    (\<forall>i\<in>I. hml_srbb_conjunct_models state (\<psi>s i))\<close> |
+  \<open>hml_srbb_inner_models state (StableConj I \<psi>s) =
+    ((\<nexists>p'. state \<mapsto> \<tau> p') \<and> (\<forall>i\<in>I. hml_srbb_conjunct_models state (\<psi>s i)))\<close> |
+  \<open>hml_srbb_inner_models state (BranchConj a \<phi> I \<psi>s) =
     (((\<exists>p'. state \<mapsto> a p' \<and> hml_srbb_models p' \<phi>) \<or> a = \<tau> \<and> hml_srbb_models state \<phi>)
-    \<and> (\<forall>i\<in>I. hml_srbb_conjunct_models state (\<psi>s i)))" |
+    \<and> (\<forall>i\<in>I. hml_srbb_conjunct_models state (\<psi>s i)))\<close> |
 
-  "hml_srbb_conjunct_models state (Pos \<chi>) =
-    (\<exists>p'. state \<Zsurj> p' \<and> hml_srbb_inner_models p' \<chi>)" |
-  "hml_srbb_conjunct_models state (Neg \<chi>) =
-    (\<nexists>p'. state \<Zsurj> p' \<and> hml_srbb_inner_models p' \<chi>)"
+  \<open>hml_srbb_conjunct_models state (Pos \<chi>) =
+    (\<exists>p'. state \<Zsurj> p' \<and> hml_srbb_inner_models p' \<chi>)\<close> |
+  \<open>hml_srbb_conjunct_models state (Neg \<chi>) =
+    (\<nexists>p'. state \<Zsurj> p' \<and> hml_srbb_inner_models p' \<chi>)\<close>
 
 sublocale lts_semantics \<open>step\<close> \<open>hml_srbb_models\<close> .
 sublocale hml_srbb_inner: lts_semantics where models = hml_srbb_inner_models .
-sublocale hml_srbb_conj: lts_semantics where models = hml_srbb_conjunct_models . 
+sublocale hml_srbb_conj: lts_semantics where models = hml_srbb_conjunct_models .
 
 subsection \<open> Different Variants of Verum \<close>
 
 lemma empty_conj_trivial[simp]:
-  "state \<Turnstile>SRBB ImmConj {} \<psi>s"
-  "hml_srbb_inner_models state (Conj {} \<psi>s)"
-  "hml_srbb_inner_models state (Obs \<tau> TT)"
+  \<open>state \<Turnstile>SRBB ImmConj {} \<psi>s\<close>
+  \<open>hml_srbb_inner_models state (Conj {} \<psi>s)\<close>
+  \<open>hml_srbb_inner_models state (Obs \<tau> TT)\<close>
   by simp+
 
 text \<open>\<open>\<And>{(\<tau>)\<top>}\<close> is trivially true. \<close>
 lemma empty_branch_conj_tau:
-  "hml_srbb_inner_models state (BranchConj \<tau> TT {} \<psi>s)"
+  \<open>hml_srbb_inner_models state (BranchConj \<tau> TT {} \<psi>s)\<close>
   by auto
 
 lemma stable_conj_parts:
@@ -144,95 +144,95 @@ text \<open>Now, we take a look at some basic properties of the \<open>distingui
 text \<open> \<open>\<top>\<close> can never distinguish two processes. This is due to the fact that every process
 satisfies \<open>T\<close>. Therefore, the second part of the definition of \<open>distinguishes\<close> never holds. \<close>
 lemma verum_never_distinguishes:
-  "\<not> distinguishes TT p q"
+  \<open>\<not> distinguishes TT p q\<close>
   by simp
 
 text \<open>
-If $\bigwedge\nolimits_{i \in I} {\psi s}(i)$ distinguishes @{term "p"} from @{term "q"},
-then there must be at least one conjunct in this conjunction that distinguishes @{term "p"} from @{term "q"}.
+If $\bigwedge\nolimits_{i \in I} {\psi s}(i)$ distinguishes @{term \<open>p\<close>} from @{term \<open>q\<close>},
+then there must be at least one conjunct in this conjunction that distinguishes @{term \<open>p\<close>} from @{term \<open>q\<close>}.
 \<close>
 lemma srbb_dist_imm_conjunction_implies_dist_conjunct:
-  assumes "distinguishes (ImmConj I \<psi>s) p q"
-  shows "\<exists>i\<in>I. hml_srbb_conj.distinguishes (\<psi>s i) p q"
+  assumes \<open>distinguishes (ImmConj I \<psi>s) p q\<close>
+  shows \<open>\<exists>i\<in>I. hml_srbb_conj.distinguishes (\<psi>s i) p q\<close>
   using assms by auto
 
 text \<open>
-If there is one conjunct in that distinguishes @{term "p"} from @{term "q"}
-and @{term "p"} satisfies all other conjuncts in a conjunction
+If there is one conjunct in that distinguishes @{term \<open>p\<close>} from @{term \<open>q\<close>}
+and @{term \<open>p\<close>} satisfies all other conjuncts in a conjunction
 then $\bigwedge\nolimits_{i \in I} {\psi s}(i)$ (where $\psi s$ ranges over the previously mentioned
-conjunctions) distinguishes @{term "p"} from @{term "q"}.
+conjunctions) distinguishes @{term \<open>p\<close>} from @{term \<open>q\<close>}.
 \<close>
 lemma srbb_dist_conjunct_implies_dist_imm_conjunction:
-  assumes "i\<in>I"
-      and "hml_srbb_conj.distinguishes (\<psi>s i) p q"
-      and "\<forall>i\<in>I. hml_srbb_conjunct_models p (\<psi>s i)"
-    shows "distinguishes (ImmConj I \<psi>s) p q"
+  assumes \<open>i\<in>I\<close>
+      and \<open>hml_srbb_conj.distinguishes (\<psi>s i) p q\<close>
+      and \<open>\<forall>i\<in>I. hml_srbb_conjunct_models p (\<psi>s i)\<close>
+    shows \<open>distinguishes (ImmConj I \<psi>s) p q\<close>
   using assms by auto
 
 text \<open>
-If $\bigwedge\nolimits_{i \in I} {\psi s}(i)$ distinguishes @{term "p"} from @{term "q"},
-then there must be at least one conjunct in this conjunction that distinguishes @{term "p"} from @{term "q"}.
+If $\bigwedge\nolimits_{i \in I} {\psi s}(i)$ distinguishes @{term \<open>p\<close>} from @{term \<open>q\<close>},
+then there must be at least one conjunct in this conjunction that distinguishes @{term \<open>p\<close>} from @{term \<open>q\<close>}.
 \<close>
 lemma srbb_dist_conjunction_implies_dist_conjunct:
-  assumes "hml_srbb_inner.distinguishes (Conj I \<psi>s) p q"
-  shows "\<exists>i\<in>I. hml_srbb_conj.distinguishes (\<psi>s i) p q"
+  assumes \<open>hml_srbb_inner.distinguishes (Conj I \<psi>s) p q\<close>
+  shows \<open>\<exists>i\<in>I. hml_srbb_conj.distinguishes (\<psi>s i) p q\<close>
   using assms by auto
 
 text \<open>
-In the following, we replicate @{term "srbb_dist_conjunct_implies_dist_imm_conjunction"} for simple conjunctions
-in @{term "hml_srbb_inner"}.
+In the following, we replicate @{term \<open>srbb_dist_conjunct_implies_dist_imm_conjunction\<close>} for simple conjunctions
+in @{term \<open>hml_srbb_inner\<close>}.
 \<close>
 lemma srbb_dist_conjunct_implies_dist_conjunction:
-  assumes "i\<in>I"
-      and "hml_srbb_conj.distinguishes (\<psi>s i) p q"
-      and "\<forall>i\<in>I. hml_srbb_conjunct_models p (\<psi>s i)"
-  shows "hml_srbb_inner.distinguishes (Conj I \<psi>s) p q"
+  assumes \<open>i\<in>I\<close>
+      and \<open>hml_srbb_conj.distinguishes (\<psi>s i) p q\<close>
+      and \<open>\<forall>i\<in>I. hml_srbb_conjunct_models p (\<psi>s i)\<close>
+  shows \<open>hml_srbb_inner.distinguishes (Conj I \<psi>s) p q\<close>
   using assms by auto
 
 text \<open>
-We also replicate @{term "srbb_dist_imm_conjunction_implies_dist_conjunct"} for branching conjunctions
+We also replicate @{term \<open>srbb_dist_imm_conjunction_implies_dist_conjunct\<close>} for branching conjunctions
 $(\alpha)\varphi\land\bigwedge\nolimits_{i \in I} {\psi s}(i)$.
-Here, either the branching condition distinguishes @{term "p"} from @{term "q"} or there must be
+Here, either the branching condition distinguishes @{term \<open>p\<close>} from @{term \<open>q\<close>} or there must be
 a distinguishing conjunct.
 \<close>
 lemma srbb_dist_branch_conjunction_implies_dist_conjunct_or_branch:
-  assumes "hml_srbb_inner.distinguishes (BranchConj \<alpha> \<phi> I \<psi>s) p q"
-  shows "(\<exists>i\<in>I. hml_srbb_conj.distinguishes (\<psi>s i) p q)
-       \<or> (hml_srbb_inner.distinguishes (Obs \<alpha> \<phi>) p q)"
+  assumes \<open>hml_srbb_inner.distinguishes (BranchConj \<alpha> \<phi> I \<psi>s) p q\<close>
+  shows \<open>(\<exists>i\<in>I. hml_srbb_conj.distinguishes (\<psi>s i) p q)
+       \<or> (hml_srbb_inner.distinguishes (Obs \<alpha> \<phi>) p q)\<close>
   using assms by force
 
 text \<open>
-In the following, we replicate @{term "srbb_dist_conjunct_implies_dist_imm_conjunction"} for branching conjunctions
-in @{term "hml_srbb_inner"}.
+In the following, we replicate @{term \<open>srbb_dist_conjunct_implies_dist_imm_conjunction\<close>} for branching conjunctions
+in @{term \<open>hml_srbb_inner\<close>}.
 \<close>
 lemma srbb_dist_conjunct_or_branch_implies_dist_branch_conjunction:
-  assumes "\<forall>i \<in> I. hml_srbb_conjunct_models p (\<psi>s i)"
-      and "hml_srbb_inner_models p (Obs \<alpha> \<phi>)"
-      and "(i\<in>I \<and> hml_srbb_conj.distinguishes (\<psi>s i) p q)
-         \<or> (hml_srbb_inner.distinguishes (Obs \<alpha> \<phi>) p q)"
-  shows "hml_srbb_inner.distinguishes (BranchConj \<alpha> \<phi> I \<psi>s) p q"
+  assumes \<open>\<forall>i \<in> I. hml_srbb_conjunct_models p (\<psi>s i)\<close>
+      and \<open>hml_srbb_inner_models p (Obs \<alpha> \<phi>)\<close>
+      and \<open>(i\<in>I \<and> hml_srbb_conj.distinguishes (\<psi>s i) p q)
+         \<or> (hml_srbb_inner.distinguishes (Obs \<alpha> \<phi>) p q)\<close>
+  shows \<open>hml_srbb_inner.distinguishes (BranchConj \<alpha> \<phi> I \<psi>s) p q\<close>
   using assms by force
 
 subsection \<open> HML$_\text{SRBB}$ Implication \<close>
 
 abbreviation hml_srbb_impl
-  :: "('a, 's) hml_srbb \<Rightarrow> ('a, 's) hml_srbb \<Rightarrow> bool"  (infixr "\<Rrightarrow>" 70)
+  :: \<open>('a, 's) hml_srbb \<Rightarrow> ('a, 's) hml_srbb \<Rightarrow> bool\<close>  (infixr \<open>\<Rrightarrow>\<close> 70)
 where
-  "hml_srbb_impl \<equiv> entails"
+  \<open>hml_srbb_impl \<equiv> entails\<close>
 
 abbreviation
   hml_srbb_impl_inner
-  :: "('a, 's) hml_srbb_inner \<Rightarrow> ('a, 's) hml_srbb_inner \<Rightarrow> bool"
-  (infix "\<chi>\<Rrightarrow>" 70)
+  :: \<open>('a, 's) hml_srbb_inner \<Rightarrow> ('a, 's) hml_srbb_inner \<Rightarrow> bool\<close>
+  (infix \<open>\<chi>\<Rrightarrow>\<close> 70)
 where
-  "(\<chi>\<Rrightarrow>) \<equiv> hml_srbb_inner.entails"
+  \<open>(\<chi>\<Rrightarrow>) \<equiv> hml_srbb_inner.entails\<close>
 
 abbreviation
   hml_srbb_impl_conjunct
-  :: "('a, 's) hml_srbb_conjunct \<Rightarrow> ('a, 's) hml_srbb_conjunct \<Rightarrow> bool"
-  (infix "\<psi>\<Rrightarrow>" 70)
+  :: \<open>('a, 's) hml_srbb_conjunct \<Rightarrow> ('a, 's) hml_srbb_conjunct \<Rightarrow> bool\<close>
+  (infix \<open>\<psi>\<Rrightarrow>\<close> 70)
 where
-  "(\<psi>\<Rrightarrow>) \<equiv> hml_srbb_conj.entails"
+  \<open>(\<psi>\<Rrightarrow>) \<equiv> hml_srbb_conj.entails\<close>
 
 subsection \<open> HML$_\text{SRBB}$ Equivalence \<close>
 
@@ -243,31 +243,31 @@ A HML$_\text{SRBB}$ formula is equivalent to another formula if both imply each 
 
 abbreviation
   hml_srbb_eq
-  :: "('a, 's) hml_srbb \<Rightarrow> ('a, 's) hml_srbb \<Rightarrow> bool"
-  (infix "\<Lleftarrow>srbb\<Rrightarrow>" 70)
+  :: \<open>('a, 's) hml_srbb \<Rightarrow> ('a, 's) hml_srbb \<Rightarrow> bool\<close>
+  (infix \<open>\<Lleftarrow>srbb\<Rrightarrow>\<close> 70)
 where
-  "(\<Lleftarrow>srbb\<Rrightarrow>) \<equiv> logical_eq"
+  \<open>(\<Lleftarrow>srbb\<Rrightarrow>) \<equiv> logical_eq\<close>
 
 abbreviation
   hml_srbb_eq_inner
-  :: "('a, 's) hml_srbb_inner \<Rightarrow> ('a, 's) hml_srbb_inner \<Rightarrow> bool"
-  (infix "\<Lleftarrow>\<chi>\<Rrightarrow>" 70)
+  :: \<open>('a, 's) hml_srbb_inner \<Rightarrow> ('a, 's) hml_srbb_inner \<Rightarrow> bool\<close>
+  (infix \<open>\<Lleftarrow>\<chi>\<Rrightarrow>\<close> 70)
 where
-  "(\<Lleftarrow>\<chi>\<Rrightarrow>) \<equiv> hml_srbb_inner.logical_eq"
+  \<open>(\<Lleftarrow>\<chi>\<Rrightarrow>) \<equiv> hml_srbb_inner.logical_eq\<close>
 
 abbreviation
   hml_srbb_eq_conjunct
-  :: "('a, 's) hml_srbb_conjunct \<Rightarrow> ('a, 's) hml_srbb_conjunct \<Rightarrow> bool"
-  (infix "\<Lleftarrow>\<psi>\<Rrightarrow>" 70)
+  :: \<open>('a, 's) hml_srbb_conjunct \<Rightarrow> ('a, 's) hml_srbb_conjunct \<Rightarrow> bool\<close>
+  (infix \<open>\<Lleftarrow>\<psi>\<Rrightarrow>\<close> 70)
   where
-  "(\<Lleftarrow>\<psi>\<Rrightarrow>) \<equiv> hml_srbb_conj.logical_eq"
+  \<open>(\<Lleftarrow>\<psi>\<Rrightarrow>) \<equiv> hml_srbb_conj.logical_eq\<close>
 
 subsection \<open> Substitution \<close>
 
 lemma srbb_internal_subst:
-  assumes "\<chi>l \<Lleftarrow>\<chi>\<Rrightarrow> \<chi>r"
-      and "\<phi> \<Lleftarrow>srbb\<Rrightarrow> (Internal \<chi>l)"
-    shows "\<phi> \<Lleftarrow>srbb\<Rrightarrow> (Internal \<chi>r)"
+  assumes \<open>\<chi>l \<Lleftarrow>\<chi>\<Rrightarrow> \<chi>r\<close>
+      and \<open>\<phi> \<Lleftarrow>srbb\<Rrightarrow> (Internal \<chi>l)\<close>
+    shows \<open>\<phi> \<Lleftarrow>srbb\<Rrightarrow> (Internal \<chi>r)\<close>
   using assms by force
 
 subsection \<open> Congruence \<close>
@@ -276,40 +276,40 @@ text \<open> This section provides means to derive new equivalences by extending
 
 text \<open> Prepending $\langle\varepsilon\rangle\dots$ preserves equivalence. \<close>
 lemma internal_srbb_cong:
-  assumes "\<chi>l \<Lleftarrow>\<chi>\<Rrightarrow> \<chi>r"
-  shows "(Internal \<chi>l) \<Lleftarrow>srbb\<Rrightarrow> (Internal \<chi>r)"
+  assumes \<open>\<chi>l \<Lleftarrow>\<chi>\<Rrightarrow> \<chi>r\<close>
+  shows \<open>(Internal \<chi>l) \<Lleftarrow>srbb\<Rrightarrow> (Internal \<chi>r)\<close>
   using assms by auto
 
 text \<open>If equivalent conjuncts are included in an otherwise identical conjunction, the equivalence is preserved.  \<close>
 lemma immconj_cong:
-  assumes "\<psi>sl ` I = \<psi>sr ` I"
-      and "\<psi>sl s \<Lleftarrow>\<psi>\<Rrightarrow> \<psi>sr s"
-  shows "ImmConj (I \<union> {s}) \<psi>sl \<Lleftarrow>srbb\<Rrightarrow> ImmConj (I \<union> {s}) \<psi>sr"
-  using assms 
+  assumes \<open>\<psi>sl ` I = \<psi>sr ` I\<close>
+      and \<open>\<psi>sl s \<Lleftarrow>\<psi>\<Rrightarrow> \<psi>sr s\<close>
+  shows \<open>ImmConj (I \<union> {s}) \<psi>sl \<Lleftarrow>srbb\<Rrightarrow> ImmConj (I \<union> {s}) \<psi>sr\<close>
+  using assms
   by (auto) (metis (mono_tags, lifting) image_iff)+
 
 text \<open> Prepending $(\alpha)\dots$ preserves equivalence. \<close>
 lemma obs_srbb_cong:
-  assumes "\<phi>l \<Lleftarrow>srbb\<Rrightarrow> \<phi>r"
-  shows "(Obs \<alpha> \<phi>l) \<Lleftarrow>\<chi>\<Rrightarrow> (Obs \<alpha> \<phi>r)"
+  assumes \<open>\<phi>l \<Lleftarrow>srbb\<Rrightarrow> \<phi>r\<close>
+  shows \<open>(Obs \<alpha> \<phi>l) \<Lleftarrow>\<chi>\<Rrightarrow> (Obs \<alpha> \<phi>r)\<close>
   using assms by auto
 
 subsection \<open> Known Equivalence Elements \<close>
 
 text \<open>The formula $(\tau)\top$ is equivalent to $\bigwedge\{\}$. \<close>
-lemma srbb_obs_\<tau>_is_\<chi>TT: "Obs \<tau> TT \<Lleftarrow>\<chi>\<Rrightarrow> Conj {} \<psi>s"
+lemma srbb_obs_\<tau>_is_\<chi>TT: \<open>Obs \<tau> TT \<Lleftarrow>\<chi>\<Rrightarrow> Conj {} \<psi>s\<close>
   by simp
 
 text \<open>The formula $(\alpha)\varphi$ is equivalent to $(\alpha)\varphi \land \bigwedge\{\}$. \<close>
-lemma srbb_obs_is_empty_branch_conj: "Obs \<alpha> \<phi> \<Lleftarrow>\<chi>\<Rrightarrow> BranchConj \<alpha> \<phi> {} \<psi>s"
+lemma srbb_obs_is_empty_branch_conj: \<open>Obs \<alpha> \<phi> \<Lleftarrow>\<chi>\<Rrightarrow> BranchConj \<alpha> \<phi> {} \<psi>s\<close>
   by auto
 
 text \<open> The formula $\top$ is equivalent to $\langle\varepsilon\rangle\bigwedge\{\}$.\<close>
-lemma srbb_TT_is_\<chi>TT: "TT \<Lleftarrow>srbb\<Rrightarrow> Internal (Conj {} \<psi>s)"
+lemma srbb_TT_is_\<chi>TT: \<open>TT \<Lleftarrow>srbb\<Rrightarrow> Internal (Conj {} \<psi>s)\<close>
   using LTS_Tau.refl by force
 
 text \<open> The formula $\top$ is equivalent to $\bigwedge\{\}$.\<close>
-lemma srbb_TT_is_empty_conj: "TT \<Lleftarrow>srbb\<Rrightarrow> ImmConj {} \<psi>s"
+lemma srbb_TT_is_empty_conj: \<open>TT \<Lleftarrow>srbb\<Rrightarrow> ImmConj {} \<psi>s\<close>
   by simp
 
 text \<open>Positive conjuncts in stable conjunctions can be replaced by negative ones.\<close>
@@ -358,7 +358,7 @@ qed
 text \<open>All positive conjuncts in stable conjunctions can be replaced by negative ones at once.\<close>
 lemma srbb_stable_Neg_normalizable_set:
   assumes
-    \<open>\<Psi>' = (\<lambda>i. case (\<Psi> i) of 
+    \<open>\<Psi>' = (\<lambda>i. case (\<Psi> i) of
       Pos \<chi> \<Rightarrow> Neg (StableConj {left} (\<lambda>_. Neg \<chi>)) |
       Neg \<chi> \<Rightarrow> Neg \<chi>)\<close>
   shows
@@ -401,7 +401,7 @@ next
       \<open>\<forall>\<chi> i. i\<in>I \<and> \<Psi> i = Pos \<chi> \<longrightarrow>hml_srbb_conjunct_models p' (Pos \<chi>)\<close>
     using hml_srbb_conjunct_models.simps(1) silent_reachable.simps by blast
   hence \<open>hml_srbb_inner_models p' (StableConj I \<Psi>)\<close>
-    using p'_spec assms other_conjuncts 
+    using p'_spec assms other_conjuncts
     by (auto, metis other_conjuncts pos_conjuncts hml_srbb_conjunct.exhaust)
   thus \<open>p \<Turnstile>SRBB Internal (StableConj I \<Psi>)\<close>
     using p'_spec(1) by auto
@@ -481,7 +481,7 @@ definition conjunctify_distinctions_dual ::
     case (\<Phi> q) of
       TT \<Rightarrow> undefined
     | Internal \<chi> \<Rightarrow> Neg \<chi>
-    | ImmConj I \<Psi> \<Rightarrow> 
+    | ImmConj I \<Psi> \<Rightarrow>
       (case \<Psi> (SOME i. i\<in>I \<and> hml_srbb_conj.distinguishes (\<Psi> i) q p) of
         Pos \<chi> \<Rightarrow> Neg \<chi> | Neg \<chi> \<Rightarrow> Pos \<chi>)\<close>
 
@@ -524,7 +524,7 @@ proof
     hence \<open>hml_srbb_conj.distinguishes (case \<Psi>
       (SOME i. i \<in> J \<and> hml_srbb_conj.distinguishes (\<Psi> i) q p) of
                hml_srbb_conjunct.Pos x \<Rightarrow> hml_srbb_conjunct.Neg x
-               | hml_srbb_conjunct.Neg x \<Rightarrow> hml_srbb_conjunct.Pos x) p q\<close> 
+               | hml_srbb_conjunct.Neg x \<Rightarrow> hml_srbb_conjunct.Pos x) p q\<close>
       by (metis (no_types, lifting) dual_conjunct someI_ex)
     then show ?thesis unfolding ImmConj by auto
   qed

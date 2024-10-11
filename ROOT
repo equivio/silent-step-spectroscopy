@@ -11,13 +11,9 @@ chapter AFP
 *)
 
 (* Session name, list base session: *)
-session LinearTimeBranchingTimeSpectroscopyAccountingForSilentSteps = HOL +
+session Weak_Spectroscopy = "HOL-Library" +
   (* Timeout (in sec) in case of non-termination problems *)
   options [timeout = 600, quick_and_dirty = false]
-
-  sessions
-    "HOL-Lattice"
-    "HOL-Library"
 
 (* To suppress document generation of some theories: *)
 (*
@@ -35,9 +31,7 @@ session LinearTimeBranchingTimeSpectroscopyAccountingForSilentSteps = HOL +
 
 (* Dependencies on document source files: *)
   document_files
-    "change_index.tex"
-    "conclusion.tex"
     "introduction.tex"
-    "outcomes.tex"
+    "conclusion.tex"
     "root.bib"
     "root.tex"

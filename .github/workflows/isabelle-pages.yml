@@ -15,13 +15,13 @@ permissions:
 jobs:
   isabelle-build:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v3.4.0
+      - uses: actions/checkout@v4
 
       - name: chache output
         id: cache-output
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ./out
           key: ${{ runner.os }}-out
@@ -30,21 +30,20 @@ jobs:
         uses: 'docker://hllm/isabelle-docker'
         with:
           entrypoint: /bin/bash
-          args: > 
+          args: >
             -c "/home/isabelle/Isabelle/bin/isabelle build
             -v
             -o document=pdf
             -o document_variants=document:outline=/proof,/ML
             -P out
             -d .
-            LinearTimeBranchingTimeSpectroscopyAccountingForSilentSteps"
-      
+            Weak_Spectroscopy"
       - name: Setup Pages
-        uses: actions/configure-pages@v2
+        uses: actions/configure-pages@v5
       - name: Copy documentation
         run: "cp -r ./out/ ./_site/"
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v1
+        uses: actions/upload-pages-artifact@v4
 
   deploy:
     environment:
@@ -55,4 +54,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v2
+        uses: actions/deploy-pages@v4

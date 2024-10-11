@@ -41,7 +41,7 @@ lemma branching_sim_eta_sim:
   using assms silent_reachable.refl unfolding branching_simulation_def eta_simulation_def by blast
 
 lemma silence_retains_branching_sim:
-assumes 
+assumes
   \<open>branching_simulation R\<close>
   \<open>R p q\<close>
   \<open>p \<Zsurj> p'\<close>
@@ -83,9 +83,9 @@ lemma sr_branching_bisimulated_sym:
 
 lemma sr_branching_bisimulated_symp:
   shows \<open>symp (~SRBB)\<close>
-  using sr_branching_bisimulated_sym  
+  using sr_branching_bisimulated_sym
   using sympI by blast
- 
+
 lemma sr_branching_bisimulated_reflp:
   shows \<open>reflp (~SRBB)\<close>
     unfolding sr_branching_bisimulated_def stability_respecting_def reflp_def
@@ -152,7 +152,7 @@ proof -
         using bc assms(1) bisim_extension by blast
     next
       case 3
-      then show ?thesis 
+      then show ?thesis
         using bc assms(2) bisim_extension sr_branching_bisimulated_sym by metis
     qed
   qed
@@ -207,7 +207,7 @@ proof -
       hence \<open>\<exists>q' q''. last pp \<Zsurj> q' \<and> q' \<mapsto> \<alpha> q'' \<and> R (hd pp) q' \<and> R p' q''\<close>
         unfolding R_def by blast
       moreover have \<open>i < length pp\<close> using case_assm by auto
-      ultimately show \<open>\<exists>q' q''. pp ! i \<Zsurj> q' \<and> q' \<mapsto> \<alpha> q'' \<and> R (hd pp) q' \<and> R p' q''\<close> 
+      ultimately show \<open>\<exists>q' q''. pp ! i \<Zsurj> q' \<and> q' \<mapsto> \<alpha> q'' \<and> R (hd pp) q' \<and> R p' q''\<close>
         using chain_hd_last silent_reachable_trans by blast
     qed
   qed
@@ -443,7 +443,7 @@ proof-
           by blast
         hence \<open>q'' \<Turnstile>SRBB \<phi>\<close> using \<open>p' \<Turnstile>SRBB \<phi>\<close> Obs by blast
         hence \<open>hml_srbb_inner_models q' (hml_srbb_inner.Obs \<alpha> \<phi>)\<close>
-          using \<open>q' \<mapsto>a \<alpha> q''\<close> by auto 
+          using \<open>q' \<mapsto>a \<alpha> q''\<close> by auto
         thus \<open>\<exists>q'. q \<Zsurj> q' \<and> hml_srbb_inner_models q' (hml_srbb_inner.Obs \<alpha> \<phi>)\<close>
           using \<open>q \<Zsurj> q'\<close> by blast
       qed

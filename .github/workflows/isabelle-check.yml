@@ -11,9 +11,16 @@ permissions:
 jobs:
   isabelle-build:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v3.4.0
+      - uses: actions/checkout@v4
+
+      - name: chache output
+        id: cache-output
+        uses: actions/cache@v4
+        with:
+          path: ./out
+          key: ${{ runner.os }}-out
 
       - name: Isabelle
         uses: 'docker://hllm/isabelle-docker'

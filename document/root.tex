@@ -31,15 +31,14 @@
 
 \begin{document}
 
-\title{Formalization of a Weak Spectroscopy Game deciding Behavioural Equivalences}
+\title{A Weak Spectroscopy Game to Characterize Behavioral Equivalences}
 \author{Lisa Annett Barthel \and Benjamin Bisping \and Leonard Moritz Hübner \and Caroline Lemke \and Karl Parvis Philipp Mattes \and Lenard Mollenkopf}
 \maketitle
 
 \begin{abstract}
-\noindent We provide an Isabelle/HOL formalization of Bisping and Jansen's \cite{bisping2023lineartimebranchingtime} weak spectroscopy game, which can be used to decide
-a range of behavioural equivalences simultaneously, spanning from stability-respecting branching bisimilarity to weak trace equivalence.
-We outline the proof of correctness by relating distinguishing sublanguages of Hennessy-Milner Logic and attacker-winning budgets by an eight-dimensional 
-measure of formula expressiveness (cf.\cite[Abstract]{bisping2023lineartimebranchingtime}). We provide small but necessary adaptations to the game and the proof.
+\noindent We provide an Isabelle/HOL formalization of Bisping and Jansen's \cite{bisping2023lineartimebranchingtime} weak spectroscopy game, which can be used to characterize
+a range of behavioral equivalences simultaneously, spanning from stability-respecting branching bisimilarity to weak trace equivalence.
+We relate distinguishing sublanguages of Hennessy-Milner Logic and attacker-winning budgets in an energy game by an eight-dimensional measure of formula expressiveness.
 \end{abstract}
 
 \tableofcontents
@@ -47,26 +46,22 @@ measure of formula expressiveness (cf.\cite[Abstract]{bisping2023lineartimebranc
 % include generated text of all theories
 \input{introduction}
 \input{LTS}
+\input{LTS_Semantics}
 \input{HML_SRBB}
 \input{Energy}
 \input{Expressiveness_Price}
+\input{Weak_Traces}
 \input{Eta_Bisimilarity}
 \input{Branching_Bisimilarity}
 \input{Energy_Games}
+\input{Example_Instantiation}
 \input{Spectroscopy_Game}
-\input{Silent_Step_Spectroscopy}
 \input{Distinction_Implies_Winning_Budgets}
 \input{Strategy_Formulas}
-\input{outcomes}
+\input{Silent_Step_Spectroscopy}
 \input{conclusion}
 
 \bibliographystyle{abbrv}
 \bibliography{root}
-
-\newpage
-\appendix
-\input{change_index}
-\input{Example_Instantiation}
-\input{Weak_Traces}
 
 \end{document}
