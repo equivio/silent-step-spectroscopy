@@ -115,7 +115,7 @@ lemma "modal_depth_srbb (ImmConj \<nat> (\<lambda>n. Pos (Obs \<alpha> (observe_
 subsection \<open>Depth of Branching Conjunctions\<close>
 
 text \<open>
-The depth of branching conjunctions (with modal_depth observation clause not starting with $\langle\varepsilon\rangle$) is increased on each:
+The depth of branching conjunctions (with one observation clause not starting with $\langle\varepsilon\rangle$) is increased on each:
 \begin{itemize}
   \item \<open>BranchConj\<close> if there are other conjuncts besides the branching conjunct
 \end{itemize}

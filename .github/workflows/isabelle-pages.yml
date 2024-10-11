@@ -30,15 +30,14 @@ jobs:
         uses: 'docker://hllm/isabelle-docker'
         with:
           entrypoint: /bin/bash
-          args: > 
+          args: >
             -c "/home/isabelle/Isabelle/bin/isabelle build
             -v
             -o document=pdf
             -o document_variants=document:outline=/proof,/ML
             -P out
             -d .
-            LinearTimeBranchingTimeSpectroscopyAccountingForSilentSteps"
-      
+            Weak_Spectroscopy"
       - name: Setup Pages
         uses: actions/configure-pages@v2
       - name: Copy documentation

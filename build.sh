@@ -2,7 +2,7 @@
 
 set -e
 
-SESSION_NAME=LinearTimeBranchingTimeSpectroscopyAccountingForSilentSteps
+SESSION_NAME=Weak_Spectroscopy
 
 if test $# -ge 1 && test $1 == -c; then
     BUILD_CLEAN_AND_CHECK=true
