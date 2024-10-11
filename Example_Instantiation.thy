@@ -1,20 +1,16 @@
-section\<open>Instantiation of an Energy Game\<close>
+subsection \<open>Instantiation of an Energy Game\<close>
 
 theory Example_Instantiation
   imports Energy_Games "HOL-Library.Extended_Nat"
 begin
+
 text \<open>In this theory, we create an instantiation of a two-dimensional energy game to test our definitions.\<close>
 
-subsection\<open>Two-Dimensional Energies\<close>
-
-text \<open>We first define energies in a similar manner to our definition of energies with eight dimensions.
-We use \<open>eneg\<close> when the energy level is equal to or lower than the \<open>defender_win_level\<close>. We define 
-component-wise subtraction and the update \<open>min_update\<close> where the first component is replaced by the minimum of both entries.\<close>
+text \<open>We first define energies in a similar manner to our definition of energies with two dimensions. We define component-wise subtraction.\<close>
 
 datatype energy = E (one: "enat") (two: "enat")
 
 abbreviation "direct_minus e1 e2 \<equiv> E ((one e1) - (one e2)) ((two e1) - (two e2))"
-
 
 instantiation energy :: order
 begin
@@ -57,8 +53,6 @@ lemma energy_minus[simp]:
   shows "minus_energy (E a b) (E c d) = Some (E (a - c) (b - d))" using assms by auto
 
 definition min_update_def[simp]: "min_update e1 \<equiv> Some (E (min (one e1) (two e1)) (two e1))"
-
-subsection\<open>Energy Game Example\<close>
 
 text \<open>In preparation for our instantiation, we define our states, the updates for our energy levels and which states are defender positions.\<close>
 datatype state = a | b1 | b2 | c | d1 | d2 | e
@@ -143,8 +137,6 @@ lemma moves:
        "d1 \<Zinj> e" "d2 \<Zinj> e"
        "\<not>(c \<Zinj> e)" "\<not>(e \<Zinj> d1)"
   by simp+
-
-subsection\<open>Checking Definitions\<close>
 
 text \<open>Our definition of winning budgets.\<close>
 

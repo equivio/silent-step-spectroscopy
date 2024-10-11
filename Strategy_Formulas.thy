@@ -1,5 +1,5 @@
-text \<open>\newpage\<close>
-section \<open>Strategy Formulas\<close>
+subsection \<open>Strategy Formulas\<close>
+
 theory Strategy_Formulas
     imports Spectroscopy_Game Expressiveness_Price
 begin

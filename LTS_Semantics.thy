@@ -1,3 +1,5 @@
+subsection \<open>Modal Logics on LTS\<close>
+
 theory LTS_Semantics
   imports
     LTS
@@ -72,7 +74,7 @@ lemma dist_equal_dist:
 abbreviation model_set :: "'formula \<Rightarrow> 's set" where
   "model_set \<phi> \<equiv> {p. models p \<phi>}"
 
-subsection \<open>Formula Set derived Pre-Order on Processes\<close>
+subsection \<open>Preorders and Equivalences on Processes Derived from Formula Sets\<close>
 
 text \<open> A set of formulas pre-orders two processes @{term "p"} and @{term "q"} if
 for all formulas in this set the fact that @{term "p"} satisfies a formula means that also
@@ -94,8 +96,6 @@ lemma preordered_preord:
   "reflp (preordered \<phi>s)"
   "transp (preordered \<phi>s)"
   unfolding reflp_def transp_def by auto
-
-subsection \<open>Formula Set derived Equivalence of Processes \<close>
 
 text \<open>A set of formulas equates two processes @{term "p"} and @{term "q"} if
 this set of formulas pre-orders these two processes in both directions. \<close>
