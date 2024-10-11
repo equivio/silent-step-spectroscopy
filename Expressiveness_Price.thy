@@ -32,7 +32,7 @@ The eight dimensions are intended to measure the following properties of formula
   \item Modal depth (of observations $\langle\alpha\rangle$, $(\alpha)$),
   \item Depth of branching conjunctions (with one observation clause not starting with $\langle\varepsilon\rangle$),
   \item Depth of stable conjunctions (that do enforce stability by a $\neg\langle\tau\rangle\top$-conjunct),
-  \item Depth of instable conjunctions (that do not enforce stability by a $\neg\langle\tau\rangle\top$-conjunct),
+  \item Depth of unstable conjunctions (that do not enforce stability by a $\neg\langle\tau\rangle\top$-conjunct),
   \item Depth of immediate conjunctions (that are not preceded by $\langle\varepsilon\rangle$),
   \item Maximal modal depth of positive clauses in conjunctions,
   \item Maximal modal depth of negative clauses in conjunctions,
@@ -173,7 +173,7 @@ primrec
 subsection \<open>Depth of Instable Conjunctions\<close>
 
 text \<open>
-The depth of instable conjunctions (that do not enforce stability by a $\neg\langle\tau\rangle\top$-conjunct)
+The depth of unstable conjunctions (that do not enforce stability by a $\neg\langle\tau\rangle\top$-conjunct)
 is increased on each:
 \begin{itemize}
   \item \<open>ImmConj\<close> if there are conjuncts (i.e. $\bigwedge\{\}$ is not counted)
@@ -186,24 +186,24 @@ then it is treated like a simple \<open>Obs\<close>.
 \<close>
 
 primrec
-      instable_conjunction_depth :: "('a, 's) hml_srbb \<Rightarrow> enat"
+      unstable_conjunction_depth :: "('a, 's) hml_srbb \<Rightarrow> enat"
   and inst_conj_depth_inner :: "('a, 's) hml_srbb_inner \<Rightarrow> enat"
   and inst_conj_depth_conjunct :: "('a, 's) hml_srbb_conjunct \<Rightarrow> enat" where
-  "instable_conjunction_depth TT = 0" |
-  "instable_conjunction_depth (Internal \<chi>) = inst_conj_depth_inner \<chi>" |
-  "instable_conjunction_depth (ImmConj I \<psi>s) =
+  "unstable_conjunction_depth TT = 0" |
+  "unstable_conjunction_depth (Internal \<chi>) = inst_conj_depth_inner \<chi>" |
+  "unstable_conjunction_depth (ImmConj I \<psi>s) =
     (if I = {}
      then 0
      else 1 + Sup ((inst_conj_depth_conjunct \<circ> \<psi>s) ` I))" |
 
-  "inst_conj_depth_inner (Obs _ \<phi>) = instable_conjunction_depth \<phi>" |
+  "inst_conj_depth_inner (Obs _ \<phi>) = unstable_conjunction_depth \<phi>" |
   "inst_conj_depth_inner (Conj I \<psi>s) =
     (if I = {} 
      then 0
      else 1 + Sup ((inst_conj_depth_conjunct \<circ> \<psi>s) ` I))" |
   "inst_conj_depth_inner (StableConj I \<psi>s) = Sup ((inst_conj_depth_conjunct \<circ> \<psi>s) ` I)" |
   "inst_conj_depth_inner (BranchConj _ \<phi> I \<psi>s) =
-    1 + Sup ({instable_conjunction_depth \<phi>} \<union> ((inst_conj_depth_conjunct \<circ> \<psi>s) ` I))" |
+    1 + Sup ({unstable_conjunction_depth \<phi>} \<union> ((inst_conj_depth_conjunct \<circ> \<psi>s) ` I))" |
 
   "inst_conj_depth_conjunct (Pos \<chi>) = inst_conj_depth_inner \<chi>" |
   "inst_conj_depth_conjunct (Neg \<chi>) = inst_conj_depth_inner \<chi>" 
@@ -350,7 +350,7 @@ text \<open>The @{term "expressiveness_price"} function combines the eight funct
 fun expressiveness_price :: "('a, 's) hml_srbb \<Rightarrow> energy" where
   "expressiveness_price \<phi> = E (modal_depth_srbb            \<phi>)
                               (branching_conjunction_depth \<phi>)
-                              (instable_conjunction_depth  \<phi>)
+                              (unstable_conjunction_depth  \<phi>)
                               (stable_conjunction_depth    \<phi>)
                               (immediate_conjunction_depth \<phi>)
                               (max_positive_conjunct_depth \<phi>)
@@ -437,7 +437,7 @@ lemma expr_internal_eq:
 proof-
   have expr_internal: "expressiveness_price (Internal \<chi>) = E (modal_depth_srbb (Internal \<chi>))
                               (branching_conjunction_depth (Internal \<chi>))
-                              (instable_conjunction_depth  (Internal \<chi>))
+                              (unstable_conjunction_depth  (Internal \<chi>))
                               (stable_conjunction_depth    (Internal \<chi>))
                               (immediate_conjunction_depth (Internal \<chi>))
                               (max_positive_conjunct_depth (Internal \<chi>))
@@ -446,7 +446,7 @@ proof-
             using expressiveness_price.simps by blast
           have "modal_depth_srbb (Internal \<chi>) = modal_depth_srbb_inner \<chi>"
             "(branching_conjunction_depth (Internal \<chi>)) = branch_conj_depth_inner \<chi>"
-            "(instable_conjunction_depth  (Internal \<chi>)) = inst_conj_depth_inner \<chi>"
+            "(unstable_conjunction_depth  (Internal \<chi>)) = inst_conj_depth_inner \<chi>"
             "(stable_conjunction_depth    (Internal \<chi>)) = st_conj_depth_inner \<chi>"
             "(immediate_conjunction_depth (Internal \<chi>)) = imm_conj_depth_inner \<chi>"
             "max_positive_conjunct_depth (Internal \<chi>) = max_pos_conj_depth_inner \<chi>"
@@ -559,7 +559,7 @@ proof-
   have obs_upds:
     "modal_depth_srbb_inner (Obs \<alpha> \<phi>) = 1 + modal_depth_srbb \<phi>" 
     "branch_conj_depth_inner (Obs \<alpha> \<phi>) = branching_conjunction_depth \<phi>"
-    "inst_conj_depth_inner (Obs \<alpha> \<phi>) = instable_conjunction_depth \<phi>"
+    "inst_conj_depth_inner (Obs \<alpha> \<phi>) = unstable_conjunction_depth \<phi>"
     "st_conj_depth_inner (Obs \<alpha> \<phi>) = stable_conjunction_depth \<phi>"
     "imm_conj_depth_inner (Obs \<alpha> \<phi>) = immediate_conjunction_depth \<phi>"
     "max_pos_conj_depth_inner (Obs \<alpha> \<phi>) = max_positive_conjunct_depth \<phi>"
@@ -657,7 +657,7 @@ proof-
   have imm_conj_upds:
     "modal_depth_srbb (ImmConj I \<psi>s) = Sup ((modal_depth_srbb_conjunct \<circ> \<psi>s) ` I)"
     "branching_conjunction_depth (ImmConj I \<psi>s) = Sup ((branch_conj_depth_conjunct \<circ> \<psi>s) ` I)"
-    "instable_conjunction_depth (ImmConj I \<psi>s) = 1 + Sup ((inst_conj_depth_conjunct \<circ> \<psi>s) ` I)"
+    "unstable_conjunction_depth (ImmConj I \<psi>s) = 1 + Sup ((inst_conj_depth_conjunct \<circ> \<psi>s) ` I)"
     "stable_conjunction_depth (ImmConj I \<psi>s) = Sup ((st_conj_depth_conjunct \<circ> \<psi>s) ` I)"
     "immediate_conjunction_depth (ImmConj I \<psi>s) = 1 + Sup ((imm_conj_depth_conjunct \<circ> \<psi>s) ` I)"
     "max_positive_conjunct_depth (ImmConj I \<psi>s) = Sup ((max_pos_conj_depth_conjunct \<circ> \<psi>s) ` I)"
@@ -790,7 +790,7 @@ proof-
   have conj:
     "E (modal_depth_srbb            \<phi>)
        (branching_conjunction_depth \<phi>)
-       (instable_conjunction_depth  \<phi>)
+       (unstable_conjunction_depth  \<phi>)
        (stable_conjunction_depth    \<phi>)
        (immediate_conjunction_depth \<phi>)
        (max_positive_conjunct_depth \<phi>)
@@ -801,7 +801,7 @@ proof-
   hence conj_single:
     "modal_depth_srbb \<phi>              \<le> ((min e1 e6)-1)"
     "branching_conjunction_depth  \<phi>  \<le> e2 -1"
-    "(instable_conjunction_depth  \<phi>) \<le> e3-1"
+    "(unstable_conjunction_depth  \<phi>) \<le> e3-1"
     "(stable_conjunction_depth    \<phi>) \<le> e4"
     "(immediate_conjunction_depth \<phi>) \<le> e5"
     "(max_positive_conjunct_depth \<phi>) \<le> e6"
@@ -817,7 +817,7 @@ proof-
     using min.bounded_iff by blast+
   from conj have "1 + branching_conjunction_depth \<phi> \<le> e2"
     by (metis \<open>0 < e2\<close> add.commute add_diff_assoc_enat add_diff_cancel_enat add_right_mono conj_single(2) i1_ne_infinity ileI1 one_eSuc)
-  from conj_single have "1 + instable_conjunction_depth \<phi> \<le> e3"
+  from conj_single have "1 + unstable_conjunction_depth \<phi> \<le> e3"
     using \<open>0 < e3\<close> add.commute add_diff_assoc_enat add_diff_cancel_enat add_right_mono conj_single(2) i1_ne_infinity ileI1 one_eSuc
     by (metis (no_types, lifting))
   have branch: "\<forall>q\<in>Q.
@@ -861,7 +861,7 @@ proof-
     "expr_pr_inner (BranchConj \<alpha> \<phi> Q \<Phi>)
     = E (Sup ({1 + modal_depth_srbb \<phi>} \<union> ((modal_depth_srbb_conjunct \<circ> \<Phi>) ` Q)))
       (1 + Sup ({branching_conjunction_depth \<phi>} \<union> ((branch_conj_depth_conjunct \<circ> \<Phi>) ` Q)))
-      (1 + Sup ({instable_conjunction_depth \<phi>} \<union> ((inst_conj_depth_conjunct \<circ> \<Phi>) ` Q)))
+      (1 + Sup ({unstable_conjunction_depth \<phi>} \<union> ((inst_conj_depth_conjunct \<circ> \<Phi>) ` Q)))
       (Sup ({stable_conjunction_depth \<phi>} \<union> ((st_conj_depth_conjunct \<circ> \<Phi>) ` Q)))
       (Sup ({immediate_conjunction_depth \<phi>} \<union> ((imm_conj_depth_conjunct \<circ> \<Phi>) ` Q)))
       (Sup ({1 + modal_depth_srbb \<phi>, max_positive_conjunct_depth \<phi>} \<union> ((max_pos_conj_depth_conjunct \<circ> \<Phi>) ` Q)))
@@ -877,10 +877,10 @@ proof-
   hence e2_le: "1 + Sup ({branching_conjunction_depth \<phi>} \<union> ((branch_conj_depth_conjunct \<circ> \<Phi>) ` Q)) \<le> e2"
     using Sup_least 
     by (metis Un_insert_left \<open>0 < e2\<close> add.commute eSuc_minus_1 enat_add_left_cancel_le ileI1 le_iff_add one_eSuc plus_1_eSuc(2) sup_bot_left)
-  have "\<forall>x \<in> ({instable_conjunction_depth \<phi>} \<union> ((inst_conj_depth_conjunct \<circ> \<Phi>) ` Q)). x \<le> e3-1"
+  have "\<forall>x \<in> ({unstable_conjunction_depth \<phi>} \<union> ((inst_conj_depth_conjunct \<circ> \<Phi>) ` Q)). x \<le> e3-1"
     using conj_single branch_single
     using comp_apply image_iff insertE by auto
-  hence e3_le: "1 + Sup ({instable_conjunction_depth \<phi>} \<union> ((inst_conj_depth_conjunct \<circ> \<Phi>) ` Q)) \<le> e3"
+  hence e3_le: "1 + Sup ({unstable_conjunction_depth \<phi>} \<union> ((inst_conj_depth_conjunct \<circ> \<Phi>) ` Q)) \<le> e3"
     using Un_insert_left \<open>0<e3\<close>  add.commute eSuc_minus_1 enat_add_left_cancel_le ileI1 le_iff_add one_eSuc plus_1_eSuc(2) sup_bot_left
     by (metis Sup_least)
   have fa:
@@ -960,7 +960,7 @@ lemma example_\<phi>_cp:
   shows
       "modal_depth_srbb            \<phi> = 2"
   and "branching_conjunction_depth \<phi> = 0"
-  and "instable_conjunction_depth  \<phi> = 1"
+  and "unstable_conjunction_depth  \<phi> = 1"
   and "stable_conjunction_depth    \<phi> = 0"
   and "immediate_conjunction_depth \<phi> = 0"
   and "max_positive_conjunct_depth \<phi> = 1"
