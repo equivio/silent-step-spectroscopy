@@ -45,7 +45,7 @@ the encoding of conjunctions via index sets @{term \<open>I\<close>} and mapping
 reference the @{term \<open>TT\<close>} and @{term \<open>Conj\<close>} data constructors of the type @{term \<open>hml\<close>} in section \ref{sect:HML}.
 \<close>
 
-datatype 
+datatype
   ('act, 'i) hml_srbb =
     TT |
     Internal \<open>('act, 'i) hml_srbb_inner\<close> |
@@ -74,7 +74,7 @@ written as \<open>p \<Turnstile>SRBB \<phi>\<close>.
 context LTS_Tau
 begin
 
-primrec 
+primrec
       hml_srbb_models :: \<open>'s \<Rightarrow> ('a, 's) hml_srbb \<Rightarrow> bool\<close> (infixl \<open>\<Turnstile>SRBB\<close> 60)
   and hml_srbb_inner_models :: \<open>'s \<Rightarrow> ('a, 's) hml_srbb_inner \<Rightarrow> bool\<close>
   and hml_srbb_conjunct_models :: \<open>'s \<Rightarrow> ('a, 's) hml_srbb_conjunct \<Rightarrow> bool\<close> where
@@ -102,7 +102,7 @@ primrec
 
 sublocale lts_semantics \<open>step\<close> \<open>hml_srbb_models\<close> .
 sublocale hml_srbb_inner: lts_semantics where models = hml_srbb_inner_models .
-sublocale hml_srbb_conj: lts_semantics where models = hml_srbb_conjunct_models . 
+sublocale hml_srbb_conj: lts_semantics where models = hml_srbb_conjunct_models .
 
 subsection \<open> Different Variants of Verum \<close>
 
@@ -285,7 +285,7 @@ lemma immconj_cong:
   assumes \<open>\<psi>sl ` I = \<psi>sr ` I\<close>
       and \<open>\<psi>sl s \<Lleftarrow>\<psi>\<Rrightarrow> \<psi>sr s\<close>
   shows \<open>ImmConj (I \<union> {s}) \<psi>sl \<Lleftarrow>srbb\<Rrightarrow> ImmConj (I \<union> {s}) \<psi>sr\<close>
-  using assms 
+  using assms
   by (auto) (metis (mono_tags, lifting) image_iff)+
 
 text \<open> Prepending $(\alpha)\dots$ preserves equivalence. \<close>
@@ -358,7 +358,7 @@ qed
 text \<open>All positive conjuncts in stable conjunctions can be replaced by negative ones at once.\<close>
 lemma srbb_stable_Neg_normalizable_set:
   assumes
-    \<open>\<Psi>' = (\<lambda>i. case (\<Psi> i) of 
+    \<open>\<Psi>' = (\<lambda>i. case (\<Psi> i) of
       Pos \<chi> \<Rightarrow> Neg (StableConj {left} (\<lambda>_. Neg \<chi>)) |
       Neg \<chi> \<Rightarrow> Neg \<chi>)\<close>
   shows
@@ -401,7 +401,7 @@ next
       \<open>\<forall>\<chi> i. i\<in>I \<and> \<Psi> i = Pos \<chi> \<longrightarrow>hml_srbb_conjunct_models p' (Pos \<chi>)\<close>
     using hml_srbb_conjunct_models.simps(1) silent_reachable.simps by blast
   hence \<open>hml_srbb_inner_models p' (StableConj I \<Psi>)\<close>
-    using p'_spec assms other_conjuncts 
+    using p'_spec assms other_conjuncts
     by (auto, metis other_conjuncts pos_conjuncts hml_srbb_conjunct.exhaust)
   thus \<open>p \<Turnstile>SRBB Internal (StableConj I \<Psi>)\<close>
     using p'_spec(1) by auto
@@ -481,7 +481,7 @@ definition conjunctify_distinctions_dual ::
     case (\<Phi> q) of
       TT \<Rightarrow> undefined
     | Internal \<chi> \<Rightarrow> Neg \<chi>
-    | ImmConj I \<Psi> \<Rightarrow> 
+    | ImmConj I \<Psi> \<Rightarrow>
       (case \<Psi> (SOME i. i\<in>I \<and> hml_srbb_conj.distinguishes (\<Psi> i) q p) of
         Pos \<chi> \<Rightarrow> Neg \<chi> | Neg \<chi> \<Rightarrow> Pos \<chi>)\<close>
 
@@ -524,7 +524,7 @@ proof
     hence \<open>hml_srbb_conj.distinguishes (case \<Psi>
       (SOME i. i \<in> J \<and> hml_srbb_conj.distinguishes (\<Psi> i) q p) of
                hml_srbb_conjunct.Pos x \<Rightarrow> hml_srbb_conjunct.Neg x
-               | hml_srbb_conjunct.Neg x \<Rightarrow> hml_srbb_conjunct.Pos x) p q\<close> 
+               | hml_srbb_conjunct.Neg x \<Rightarrow> hml_srbb_conjunct.Pos x) p q\<close>
       by (metis (no_types, lifting) dual_conjunct someI_ex)
     then show ?thesis unfolding ImmConj by auto
   qed

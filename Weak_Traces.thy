@@ -53,7 +53,7 @@ lemma expressiveness_to_trace_formula:
   fixes \<phi> :: \<open>('act, 'i) hml_srbb\<close>
   fixes \<chi> :: \<open>('act, 'i) hml_srbb_inner\<close>
   shows \<open>(\<phi> \<in> \<O> (E \<infinity> 0 0 0 0 0 0 0) \<longrightarrow> is_trace_formula \<phi>)
-       \<and> (\<chi> \<in> \<O>_inner (E \<infinity> 0 0 0 0 0 0 0) \<longrightarrow> is_trace_formula_inner \<chi>) 
+       \<and> (\<chi> \<in> \<O>_inner (E \<infinity> 0 0 0 0 0 0 0) \<longrightarrow> is_trace_formula_inner \<chi>)
        \<and> True\<close>
 proof (induct rule: hml_srbb_hml_srbb_inner_hml_srbb_conjunct.induct)
   case TT
@@ -79,7 +79,7 @@ next
     hence \<open>I = {}\<close>
       unfolding \<O>_inner_def
       by (metis bot.extremum_uniqueI bot_enat_def energy.sel(3) expr_pr_inner.simps inst_conj_depth_inner.simps(2) le_iff_add leq_components mem_Collect_eq not_one_le_zero)
-    then show \<open>is_trace_formula_inner (Conj I \<psi>s)\<close> 
+    then show \<open>is_trace_formula_inner (Conj I \<psi>s)\<close>
       by (simp add: is_trace_formula_is_trace_formula_inner.intros(5))
   qed
 next
@@ -87,7 +87,7 @@ next
   show ?case
   proof (rule impI)
     assume \<open>StableConj I \<psi>s \<in> \<O>_inner (E \<infinity> 0 0 0 0 0 0 0)\<close>
-    have \<open>StableConj I \<psi>s \<notin> \<O>_inner (E \<infinity> 0 0 0 0 0 0 0)\<close> 
+    have \<open>StableConj I \<psi>s \<notin> \<O>_inner (E \<infinity> 0 0 0 0 0 0 0)\<close>
       by (simp add: \<O>_inner_def)
     with \<open>StableConj I \<psi>s \<in> \<O>_inner (E \<infinity> 0 0 0 0 0 0 0)\<close>
     show \<open>is_trace_formula_inner (StableConj I \<psi>s)\<close> by contradiction
@@ -107,12 +107,12 @@ next
   then show ?case by auto
 qed
 
-lemma modal_depth_only_is_trace_form: 
+lemma modal_depth_only_is_trace_form:
   \<open>(is_trace_formula \<phi>) = (\<phi> \<in> \<O> (E \<infinity> 0 0 0 0 0 0 0))\<close>
   using expressiveness_to_trace_formula trace_formula_to_expressiveness by blast
 
 context LTS_Tau
-begin                 
+begin
 
 text \<open>If a formula \<open>\<phi>\<close> is in HML$_{WT}$ and a state \<open>p\<close> models \<open>\<phi>\<close>, then there exists a weak trace \<open>tr\<close> of \<open>p\<close> such that @{term \<open>wtrace_to_srbb tr\<close>} is equivalent to \<open>\<phi>\<close>.\<close>
 lemma trace_formula_implies_trace:
@@ -123,7 +123,7 @@ lemma trace_formula_implies_trace:
     and            True
 proof (induction \<phi> and \<chi> and \<psi> arbitrary: p and q)
   case TT
-  then have \<open>[] \<in> weak_traces p\<close> 
+  then have \<open>[] \<in> weak_traces p\<close>
     using weak_step_sequence.intros(1) silent_reachable.intros(1) by fastforce
   moreover have \<open>wtrace_to_srbb [] \<Lleftarrow>srbb\<Rrightarrow> TT\<close>
     unfolding wtrace_to_srbb.simps
@@ -133,7 +133,7 @@ next
   case (Internal \<chi>)
 
   from \<open>is_trace_formula (Internal \<chi>)\<close>
-  have \<open>is_trace_formula_inner \<chi>\<close> 
+  have \<open>is_trace_formula_inner \<chi>\<close>
     using is_trace_formula.cases by auto
 
   from \<open>p \<Turnstile>SRBB Internal \<chi>\<close>
@@ -166,10 +166,10 @@ next
   case (ImmConj I \<psi>s)
 
   from \<open>is_trace_formula (ImmConj I \<psi>s)\<close>
-  have \<open>I = {}\<close> 
+  have \<open>I = {}\<close>
     by (simp add: is_trace_formula.simps)
 
-  have \<open>[] \<in> weak_traces p\<close> 
+  have \<open>[] \<in> weak_traces p\<close>
     using silent_reachable.intros(1) weak_step_sequence.intros(1) by auto
 
   from srbb_TT_is_empty_conj
@@ -195,7 +195,7 @@ next
           hml_srbb_inner_models.simps(1) hml_srbb_models.simps(1,2) is_trace_formula.cases
           is_trace_formula_inner.cases)
 
-    moreover have \<open>is_trace_formula \<phi>\<close> 
+    moreover have \<open>is_trace_formula \<phi>\<close>
       using \<open>is_trace_formula_inner (Obs \<alpha> \<phi>)\<close> is_trace_formula_inner.cases by auto
 
     ultimately show \<open>\<exists>tr \<in> weak_traces q. wtrace_to_inner tr \<Lleftarrow>\<chi>\<Rrightarrow> Obs \<alpha> \<phi>\<close>
@@ -205,7 +205,7 @@ next
     case False
 
     from \<open>is_trace_formula_inner (Obs \<alpha> \<phi>)\<close>
-    have \<open>is_trace_formula \<phi>\<close> 
+    have \<open>is_trace_formula \<phi>\<close>
       by (simp add: is_trace_formula_inner.simps)
 
     from \<open>hml_srbb_inner_models q (Obs \<alpha> \<phi>)\<close> and \<open>\<alpha> \<noteq> \<tau>\<close>
@@ -238,7 +238,7 @@ next
      and \<open>hml_srbb_inner_models q (Conj I \<psi>s)\<close>
 
   from \<open>is_trace_formula_inner (Conj I \<psi>s)\<close>
-  have \<open>I = {}\<close> 
+  have \<open>I = {}\<close>
     by (simp add: is_trace_formula_inner.simps)
 
   have \<open>[] \<in> weak_traces q\<close> by (rule empty_trace_allways_weak_trace)
@@ -255,7 +255,7 @@ next
   show ?case by auto
 next
   case (StableConj I \<psi>s)
-  have \<open>\<not>is_trace_formula_inner (StableConj I \<psi>s)\<close> 
+  have \<open>\<not>is_trace_formula_inner (StableConj I \<psi>s)\<close>
     by (simp add: is_trace_formula_inner.simps)
   with \<open>is_trace_formula_inner (StableConj I \<psi>s)\<close>
   show ?case by contradiction
@@ -263,7 +263,7 @@ next
   case (BranchConj \<alpha> \<phi> I \<psi>s)
   assume IH: \<open>\<And>p1. is_trace_formula \<phi> \<Longrightarrow> p1 \<Turnstile>SRBB \<phi> \<Longrightarrow> \<exists>tr\<in>weak_traces p1. wtrace_to_srbb tr \<Lleftarrow>srbb\<Rrightarrow> \<phi>\<close>
   from \<open>is_trace_formula_inner (BranchConj \<alpha> \<phi> I \<psi>s)\<close>
-  have \<open>is_trace_formula \<phi> \<and> I = {}\<close> 
+  have \<open>is_trace_formula \<phi> \<and> I = {}\<close>
     by (simp add: is_trace_formula_inner.simps)
   hence \<open>is_trace_formula \<phi>\<close> and \<open>I = {}\<close> by auto
   from \<open>hml_srbb_inner_models q (BranchConj \<alpha> \<phi> I \<psi>s)\<close>
@@ -324,7 +324,7 @@ next
 qed
 
 text \<open>\<open>t\<close> is a weak trace of a state \<open>p\<close> if and only if \<open>p\<close> models the formula obtained from @{term \<open>wtrace_to_srbb t\<close>}.\<close>
-lemma trace_equals_trace_to_formula: 
+lemma trace_equals_trace_to_formula:
   \<open>t \<in> weak_traces p = (p \<Turnstile>SRBB (wtrace_to_srbb t))\<close>
 proof
   assume \<open>t \<in> weak_traces p\<close>
@@ -332,12 +332,12 @@ proof
     using \<open>t \<in> weak_traces p\<close>
   proof(induction t arbitrary: p)
     case Nil
-    then show ?case 
+    then show ?case
       by simp
   next
     case (Cons a tail)
-    from Cons obtain p'' p' where \<open>p \<Zsurj>\<mapsto>\<Zsurj> a p''\<close> \<open>p'' \<Zsurj>\<mapsto>\<Zsurj>$ tail p'\<close> using weak_step_sequence.simps 
-      by (smt (verit, best) list.discI list.inject mem_Collect_eq) 
+    from Cons obtain p'' p' where \<open>p \<Zsurj>\<mapsto>\<Zsurj> a p''\<close> \<open>p'' \<Zsurj>\<mapsto>\<Zsurj>$ tail p'\<close> using weak_step_sequence.simps
+      by (smt (verit, best) list.discI list.inject mem_Collect_eq)
     with Cons(1) have IS: \<open>p'' \<Turnstile>SRBB wtrace_to_srbb tail\<close>
       by blast
     from Cons have goal_eq: \<open>wtrace_to_srbb (a # tail) = (Internal (Obs a (wtrace_to_srbb tail)))\<close>
@@ -358,7 +358,7 @@ next
     case (Cons a tail)
     hence \<open>p \<Turnstile>SRBB (Internal (Obs a (wtrace_to_srbb tail)))\<close>
       by simp
-    show ?case 
+    show ?case
       using Cons.IH \<open>p \<Turnstile>SRBB hml_srbb.Internal (hml_srbb_inner.Obs a (wtrace_to_srbb tail))\<close> prepend_\<tau>_weak_trace silent_prepend_weak_traces step_prepend_weak_traces by fastforce
   qed
 qed
@@ -373,19 +373,19 @@ proof -
   assume \<phi>_trace: \<open>is_trace_formula \<phi>\<close> and p_sat_srbb: \<open>p \<Turnstile>SRBB \<phi>\<close> and assms: \<open>p \<lesssim>WT q\<close>
   show \<open>q \<Turnstile>SRBB \<phi>\<close>
   proof-
-    from assms have p_trace_implies_q_trace: \<open>\<forall>tr p'. (p \<Zsurj>\<mapsto>\<Zsurj>$ tr p') \<longrightarrow> (\<exists>q'. q \<Zsurj>\<mapsto>\<Zsurj>$ tr q')\<close> 
+    from assms have p_trace_implies_q_trace: \<open>\<forall>tr p'. (p \<Zsurj>\<mapsto>\<Zsurj>$ tr p') \<longrightarrow> (\<exists>q'. q \<Zsurj>\<mapsto>\<Zsurj>$ tr q')\<close>
       unfolding weakly_trace_preordered_def by auto
-    from p_sat_srbb trace_formula_implies_trace obtain tr p' where 
+    from p_sat_srbb trace_formula_implies_trace obtain tr p' where
       \<open>(p \<Zsurj>\<mapsto>\<Zsurj>$ tr p')\<close> \<open>wtrace_to_srbb tr \<Lleftarrow>srbb\<Rrightarrow> \<phi>\<close>
       using \<phi>_trace by blast
-    with p_trace_implies_q_trace obtain q' where \<open>q \<Zsurj>\<mapsto>\<Zsurj>$ tr q'\<close> 
+    with p_trace_implies_q_trace obtain q' where \<open>q \<Zsurj>\<mapsto>\<Zsurj>$ tr q'\<close>
       by blast
-    with trace_equals_trace_to_formula show ?thesis 
+    with trace_equals_trace_to_formula show ?thesis
       using \<open>wtrace_to_srbb tr \<Lleftarrow>srbb\<Rrightarrow> \<phi>\<close> by auto
   qed
-qed 
+qed
 
-text \<open>These are the main lemmas of this theory. They establish that the colloquial, relational notion of of weak trace pre-order/equivalence 
+text \<open>These are the main lemmas of this theory. They establish that the colloquial, relational notion of of weak trace pre-order/equivalence
 has the same distinctive power as the one derived from the coordinate (\<open>\<infinity>, 0, 0, 0, 0, 0, 0, 0\<close>).
 \\\\
 A state \<open>p\<close> weakly trace-pre-orders a state \<open>q\<close> iff and only if it also pre-orders \<open>q\<close> with respect to the coordinate (\<open>\<infinity>, 0, 0, 0, 0, 0, 0, 0\<close>).\<close>
@@ -396,7 +396,7 @@ proof
   assume \<open>p \<lesssim>WT q\<close>
   thus \<open>\<forall>\<phi>\<in>\<O> (E \<infinity> 0 0 0 0 0 0 0). p \<Turnstile>SRBB \<phi> \<longrightarrow> q \<Turnstile>SRBB \<phi>\<close>
     using aux expressiveness_to_trace_formula weakly_trace_preordered_def
-    by blast+ 
+    by blast+
 next
   assume \<phi>_eneg: \<open>\<forall>\<phi>\<in>\<O> (E \<infinity> 0 0 0 0 0 0 0). p \<Turnstile>SRBB \<phi> \<longrightarrow> q \<Turnstile>SRBB \<phi>\<close>
   thus \<open>p \<lesssim>WT q\<close>

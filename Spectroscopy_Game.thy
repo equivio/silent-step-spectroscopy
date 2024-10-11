@@ -10,14 +10,14 @@ We play the weak spectroscopy game to compare the behaviour of processes and ana
 The moves of a weak spectroscopy game depend on the transitions of the processes and the available energy.
 So in other words: If the defender wins the weak spectroscopy game starting with a certain energy, the corresponding behavioural equivalence applies.
 \\ Since we added adding stable and branching conjunctions to a delay bisimulation game, we differentiate the positions accordingly.\<close>
-datatype ('s, 'a) spectroscopy_position = 
+datatype ('s, 'a) spectroscopy_position =
          Attacker_Immediate (attacker_state: \<open>'s\<close>) (defender_states: \<open>'s set\<close>) |
          Attacker_Branch (attacker_state: \<open>'s\<close>) (defender_states: \<open>'s set\<close>) |
          Attacker_Clause (attacker_state: \<open>'s\<close>) (defender_state: \<open>'s\<close>) |
          Attacker_Delayed (attacker_state: \<open>'s\<close>) (defender_states: \<open>'s set\<close>) |
 
-         Defender_Branch (attacker_state: \<open>'s\<close>) (attack_action: \<open>'a\<close>) 
-                         (attacker_state_succ: \<open>'s\<close>) (defender_states: \<open>'s set\<close>) 
+         Defender_Branch (attacker_state: \<open>'s\<close>) (attack_action: \<open>'a\<close>)
+                         (attacker_state_succ: \<open>'s\<close>) (defender_states: \<open>'s set\<close>)
                          (defender_branch_states: \<open>'s set\<close>) |
          Defender_Conj (attacker_state: \<open>'s\<close>) (defender_states: \<open>'s set\<close>) |
          Defender_Stable_Conj (attacker_state: \<open>'s\<close>) (defender_states: \<open>'s set\<close>)
@@ -26,18 +26,18 @@ context LTS_Tau begin
 
 text\<open>\label{specmoves}\<close>
 text\<open>We also define the moves of the weak spectroscopy game. Their names indicate the respective HML formulas they correspond to. This correspondence will be shown in section \ref{deviation:lemma3}. \<close>
-fun spectroscopy_moves :: \<open>('s, 'a) spectroscopy_position \<Rightarrow> ('s, 'a) spectroscopy_position \<Rightarrow> energy update option\<close> where 
-  delay: 
+fun spectroscopy_moves :: \<open>('s, 'a) spectroscopy_position \<Rightarrow> ('s, 'a) spectroscopy_position \<Rightarrow> energy update option\<close> where
+  delay:
     \<open>spectroscopy_moves (Attacker_Immediate p Q) (Attacker_Delayed p' Q')
      = (if p' = p \<and> Q \<Zsurj>S Q' then Some Some else None)\<close> |
 
-  procrastination: 
+  procrastination:
     \<open>spectroscopy_moves (Attacker_Delayed p Q) (Attacker_Delayed p' Q')
       = (if (Q' = Q \<and> p \<noteq> p' \<and> p \<mapsto> \<tau> p') then Some Some else None)\<close> |
 
-  observation: 
+  observation:
     \<open>spectroscopy_moves (Attacker_Delayed p Q) (Attacker_Immediate p' Q')
-      = (if (\<exists>a. p \<mapsto>a a p' \<and> Q \<mapsto>aS a Q') then (subtract 1 0 0 0 0 0 0 0) 
+      = (if (\<exists>a. p \<mapsto>a a p' \<and> Q \<mapsto>aS a Q') then (subtract 1 0 0 0 0 0 0 0)
          else None)\<close> |
 
   f_or_early_conj:
@@ -45,52 +45,52 @@ fun spectroscopy_moves :: \<open>('s, 'a) spectroscopy_position \<Rightarrow> ('
       =(if (Q\<noteq>{} \<and> Q = Q' \<and> p = p') then (subtract 0 0 0 0 1 0 0 0)
         else None)\<close> |
 
-  late_inst_conj: 
+  late_inst_conj:
     \<open>spectroscopy_moves (Attacker_Delayed p Q) (Defender_Conj p' Q')
       = (if p = p' \<and> Q = Q' then Some Some else None)\<close> |
 
   conj_answer:
-    \<open>spectroscopy_moves (Defender_Conj p Q) (Attacker_Clause p' q) 
+    \<open>spectroscopy_moves (Defender_Conj p Q) (Attacker_Clause p' q)
       = (if p = p' \<and> q \<in> Q then (subtract 0 0 1 0 0 0 0 0) else None)\<close> |
-  
-  pos_neg_clause: 
+
+  pos_neg_clause:
     \<open>spectroscopy_moves (Attacker_Clause p q) (Attacker_Delayed p' Q')
-      = (if (p = p') then 
+      = (if (p = p') then
           (if {q} \<Zsurj>S Q' then Some min1_6 else None)
-         else (if ({p} \<Zsurj>S Q'\<and> q=p') 
+         else (if ({p} \<Zsurj>S Q'\<and> q=p')
                then Some (\<lambda>e. Option.bind ((subtract_fn 0 0 0 0 0 0 0 1) e) min1_7) else None))\<close> |
 
-  late_stbl_conj: 
-    \<open>spectroscopy_moves (Attacker_Delayed p Q) (Defender_Stable_Conj p' Q') 
-      = (if (p = p' \<and> Q' = { q \<in> Q. (\<nexists>q'. q \<mapsto>\<tau> q')} \<and> (\<nexists>p''. p \<mapsto>\<tau> p'')) 
+  late_stbl_conj:
+    \<open>spectroscopy_moves (Attacker_Delayed p Q) (Defender_Stable_Conj p' Q')
+      = (if (p = p' \<and> Q' = { q \<in> Q. (\<nexists>q'. q \<mapsto>\<tau> q')} \<and> (\<nexists>p''. p \<mapsto>\<tau> p''))
           then Some Some else None)\<close> |
 
-  conj_s_answer: 
-    \<open>spectroscopy_moves (Defender_Stable_Conj p Q) (Attacker_Clause p' q) 
-      = (if p = p' \<and> q \<in> Q then (subtract 0 0 0 1 0 0 0 0) 
+  conj_s_answer:
+    \<open>spectroscopy_moves (Defender_Stable_Conj p Q) (Attacker_Clause p' q)
+      = (if p = p' \<and> q \<in> Q then (subtract 0 0 0 1 0 0 0 0)
          else None)\<close> |
 
-  empty_stbl_conj_answer: 
-    \<open>spectroscopy_moves (Defender_Stable_Conj p Q) (Defender_Conj p' Q') 
-      = (if Q = {} \<and> Q = Q' \<and> p = p' then (subtract 0 0 0 1 0 0 0 0) 
+  empty_stbl_conj_answer:
+    \<open>spectroscopy_moves (Defender_Stable_Conj p Q) (Defender_Conj p' Q')
+      = (if Q = {} \<and> Q = Q' \<and> p = p' then (subtract 0 0 0 1 0 0 0 0)
          else None)\<close> |
 
-  br_conj: 
+  br_conj:
     \<open>spectroscopy_moves (Attacker_Delayed p Q) (Defender_Branch p' \<alpha> p'' Q' Q\<alpha>)
       = (if (p = p' \<and> Q' = Q - Q\<alpha> \<and> p \<mapsto>a \<alpha> p'' \<and> Q\<alpha> \<subseteq> Q) then Some Some
          else None)\<close> |
 
-  br_answer: 
-    \<open>spectroscopy_moves (Defender_Branch p \<alpha> p' Q Q\<alpha>) (Attacker_Clause p'' q) 
+  br_answer:
+    \<open>spectroscopy_moves (Defender_Branch p \<alpha> p' Q Q\<alpha>) (Attacker_Clause p'' q)
       = (if (p = p'' \<and> q \<in> Q) then (subtract 0 1 1 0 0 0 0 0) else None)\<close> |
 
-  br_obsv: 
-    \<open>spectroscopy_moves (Defender_Branch p \<alpha> p' Q Q\<alpha>) (Attacker_Branch p'' Q') 
-      = (if (p' = p'' \<and> Q\<alpha> \<mapsto>aS \<alpha> Q') 
+  br_obsv:
+    \<open>spectroscopy_moves (Defender_Branch p \<alpha> p' Q Q\<alpha>) (Attacker_Branch p'' Q')
+      = (if (p' = p'' \<and> Q\<alpha> \<mapsto>aS \<alpha> Q')
          then Some (\<lambda>e. Option.bind ((subtract_fn 0 1 1 0 0 0 0 0) e) min1_6) else None)\<close> |
 
-  br_acct: 
-    \<open>spectroscopy_moves (Attacker_Branch p Q) (Attacker_Immediate p' Q') 
+  br_acct:
+    \<open>spectroscopy_moves (Attacker_Branch p Q) (Attacker_Immediate p' Q')
       = (if p = p' \<and> Q = Q' then subtract 1 0 0 0 0 0 0 0 else None)\<close> |
 
   others: \<open>spectroscopy_moves _ _ = None\<close>
@@ -105,7 +105,7 @@ fun spectroscopy_defender where
   \<open>spectroscopy_defender (Defender_Stable_Conj _ _) = True\<close>
 
 interpretation Game: energy_game \<open>spectroscopy_moves\<close> \<open>spectroscopy_defender\<close> \<open>(\<le>)\<close>
-proof 
+proof
   fix e e' ::energy
   show \<open>e \<le> e' \<Longrightarrow> e' \<le> e \<Longrightarrow> e = e'\<close> unfolding less_eq_energy_def
     by (smt (z3) energy.case_eq_if energy.expand nle_le)

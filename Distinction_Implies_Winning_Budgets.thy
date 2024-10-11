@@ -1,12 +1,12 @@
 section \<open>Correctness\<close>
 
 text \<open>As in the main theorem of \cite{bisping2023lineartimebranchingtime}, we state in what sense winning energy levels and equivalences coincide as the theorem \<open>spectroscopy_game_correctness\<close>:
-There exists a formula \<open>\<phi>\<close> distinguishing a process \<open>p\<close> from a set of processes \<open>Q\<close> with 
+There exists a formula \<open>\<phi>\<close> distinguishing a process \<open>p\<close> from a set of processes \<open>Q\<close> with
 expressiveness price of at most \<open>e\<close> if and only if \<open>e\<close> is in the winning budget of \<open>Attacker_Immediate p Q\<close>.
 
-The proof is split into three lemmas. The forward direction is given by the lemma \<open>distinction_implies_winning_budgets\<close> combined with the upwards closure of winning budgets. 
-To show the other direction one can construct a (strategy) formula with an appropriate price using 
-the constructive proof of \<open>winning_budget_implies_strategy_formula\<close>. From lemma 
+The proof is split into three lemmas. The forward direction is given by the lemma \<open>distinction_implies_winning_budgets\<close> combined with the upwards closure of winning budgets.
+To show the other direction one can construct a (strategy) formula with an appropriate price using
+the constructive proof of \<open>winning_budget_implies_strategy_formula\<close>. From lemma
 \<open>strategy_formulas_distinguish\<close> we then know that this formula actually distinguishes \<open>p\<close> from \<open>Q\<close>.
 \<close>
 
@@ -23,9 +23,9 @@ text \<open>In this section, we prove that if a formula distinguishes a process 
       from a set of process @{term \<open>Q\<close>}, then the price of this formula is in the attackers-winning
       budget. This is the same statement as that of lemma $1$ in the paper \cite[p. 20]{bisping2023lineartimebranchingtime}.
       We likewise also prove it in the same manner.
-      
+
       First, we show that the statement holds if @{term \<open>Q = {}\<close>}. This is the case, as the
-      attacker can move, at no cost, from the starting position, @{term \<open>Attacker_Immediate p {}\<close>}, 
+      attacker can move, at no cost, from the starting position, @{term \<open>Attacker_Immediate p {}\<close>},
       to the defender position @{term \<open>Defender_Conj p {}\<close>}. In this position the defender is then
       unable to make any further moves. Hence, the attacker wins the game with any budget.\<close>
 
@@ -33,16 +33,16 @@ lemma distinction_implies_winning_budgets_empty_Q:
   assumes \<open>distinguishes_from \<phi> p {}\<close>
   shows \<open>attacker_wins (expressiveness_price \<phi>) (Attacker_Immediate p {})\<close>
 proof-
-  have is_last_move: \<open>spectroscopy_moves (Defender_Conj p {}) p' = None\<close> for p' 
+  have is_last_move: \<open>spectroscopy_moves (Defender_Conj p {}) p' = None\<close> for p'
     by(rule spectroscopy_moves.elims, auto)
   moreover have \<open>spectroscopy_defender (Defender_Conj p {})\<close> by simp
-  ultimately have conj_win: \<open>attacker_wins (expressiveness_price \<phi>) (Defender_Conj p {})\<close> 
+  ultimately have conj_win: \<open>attacker_wins (expressiveness_price \<phi>) (Defender_Conj p {})\<close>
     by (simp add: attacker_wins.Defense)
 
-  from late_inst_conj[of p \<open>{}\<close> p \<open>{}\<close>] have next_move0: 
+  from late_inst_conj[of p \<open>{}\<close> p \<open>{}\<close>] have next_move0:
     \<open>spectroscopy_moves (Attacker_Delayed p {}) (Defender_Conj p {}) = Some Some\<close> by force
 
-  from delay[of p \<open>{}\<close> p \<open>{}\<close>] have next_move1: 
+  from delay[of p \<open>{}\<close> p \<open>{}\<close>] have next_move1:
     \<open>spectroscopy_moves (Attacker_Immediate p {}) (Attacker_Delayed p {}) = Some Some\<close> by force
 
   moreover have \<open>attacker (Attacker_Immediate p {})\<close> by simp
@@ -104,17 +104,17 @@ proof-
         fix Q p
         assume \<open>Q \<noteq> {}\<close>
           and \<open>distinguishes_from TT p Q\<close>
-        hence \<open>\<exists>q. q \<in> Q\<close> 
+        hence \<open>\<exists>q. q \<in> Q\<close>
           by blast
         then obtain q where \<open>q \<in> Q\<close> by auto
-  
+
         from \<open>distinguishes_from TT p Q\<close>
          and \<open>q \<in> Q\<close>
-        have \<open>distinguishes TT p q\<close> 
+        have \<open>distinguishes TT p q\<close>
           using distinguishes_from_def by auto
-  
+
         with verum_never_distinguishes
-        show \<open>attacker_wins (expressiveness_price TT) (Attacker_Immediate p Q)\<close> 
+        show \<open>attacker_wins (expressiveness_price TT) (Attacker_Immediate p Q)\<close>
           by blast
       qed
     next
@@ -132,35 +132,35 @@ proof-
           for Q' by blast
         then have \<open>Q \<Zsurj>S Q' \<longrightarrow> (\<forall>q' \<in> Q'. \<not>(hml_srbb_inner_models q' \<chi>))\<close>
           for Q' using \<open>Q \<noteq> {}\<close> by blast
-  
+
         define Q\<tau> where \<open>Q\<tau> \<equiv> silent_reachable_set Q\<close>
         with \<open>\<And>Q'. Q \<Zsurj>S Q' \<longrightarrow> (\<forall>q' \<in> Q'. \<not>(hml_srbb_inner_models q' \<chi>))\<close>
         have \<open>\<forall>q' \<in> Q\<tau>. \<not>(hml_srbb_inner_models q' \<chi>)\<close>
           using sreachable_set_is_sreachable by presburger
-        have \<open>Q\<tau> \<Zsurj>S Q\<tau>\<close> unfolding Q\<tau>_def 
-          by (metis silent_reachable_trans sreachable_set_is_sreachable 
+        have \<open>Q\<tau> \<Zsurj>S Q\<tau>\<close> unfolding Q\<tau>_def
+          by (metis silent_reachable_trans sreachable_set_is_sreachable
               silent_reachable.intros(1))
-  
+
         from \<open>\<exists>p'. p \<Zsurj> p' \<and> (hml_srbb_inner_models p' \<chi>)\<close>
         obtain p' where \<open>p \<Zsurj> p'\<close> and \<open>hml_srbb_inner_models p' \<chi>\<close> by auto
         from this(1) have \<open>p \<Zsurj>L p'\<close> by(rule silent_reachable_impl_loopless)
-  
+
         have \<open>Q\<tau> \<noteq> {}\<close>
-          using silent_reachable.intros(1) sreachable_set_is_sreachable Q\<tau>_def \<open>Q \<noteq> {}\<close> 
+          using silent_reachable.intros(1) sreachable_set_is_sreachable Q\<tau>_def \<open>Q \<noteq> {}\<close>
           by fastforce
-  
+
         from \<open>hml_srbb_inner_models p' \<chi>\<close>
          and \<open>\<forall>q' \<in> Q\<tau>. \<not>(hml_srbb_inner_models q' \<chi>)\<close>
         have \<open>hml_srbb_inner.distinguishes_from \<chi> p' Q\<tau>\<close> by simp
-  
+
         with \<open>Q\<tau> \<Zsurj>S Q\<tau>\<close> \<open>Q\<tau> \<noteq> {}\<close> Internal
-        have \<open>attacker_wins (expr_pr_inner \<chi>) (Attacker_Delayed p' Q\<tau>)\<close> 
+        have \<open>attacker_wins (expr_pr_inner \<chi>) (Attacker_Delayed p' Q\<tau>)\<close>
           by blast
-  
+
         moreover have \<open>expr_pr_inner \<chi> = expressiveness_price (Internal \<chi>)\<close> by simp
-        ultimately have \<open>attacker_wins (expressiveness_price (Internal \<chi>)) 
+        ultimately have \<open>attacker_wins (expressiveness_price (Internal \<chi>))
             (Attacker_Delayed p' Q\<tau>)\<close> by simp
-  
+
         hence \<open>attacker_wins (expressiveness_price (Internal \<chi>)) (Attacker_Delayed p Q\<tau>)\<close>
         proof(induct rule: silent_reachable_loopless.induct[of \<open>p\<close> \<open>p'\<close>, OF \<open>p \<Zsurj>L p'\<close>])
           case (1 p)
@@ -169,17 +169,17 @@ proof-
           case (2 p p' p'')
           hence \<open>attacker_wins (expressiveness_price (Internal \<chi>)) (Attacker_Delayed p' Q\<tau>)\<close>
             by simp
-          moreover have \<open>spectroscopy_moves (Attacker_Delayed p Q\<tau>) (Attacker_Delayed p' Q\<tau>) 
+          moreover have \<open>spectroscopy_moves (Attacker_Delayed p Q\<tau>) (Attacker_Delayed p' Q\<tau>)
             = Some Some\<close> using spectroscopy_moves.simps(2) \<open>p \<noteq> p'\<close> \<open>p \<mapsto>\<tau> p'\<close> by auto
           moreover have \<open>attacker (Attacker_Delayed p Q\<tau>)\<close> by simp
           ultimately show ?case using attacker_wins_Ga_with_id_step by auto
         qed
-        have  \<open>Q \<Zsurj>S Q\<tau>\<close> 
+        have  \<open>Q \<Zsurj>S Q\<tau>\<close>
           using Q\<tau>_def sreachable_set_is_sreachable by simp
         hence \<open>spectroscopy_moves (Attacker_Immediate p Q) (Attacker_Delayed p Q\<tau>) = Some Some\<close>
           using spectroscopy_moves.simps(1) by simp
         with \<open>attacker_wins (expressiveness_price (Internal \<chi>)) (Attacker_Delayed p Q\<tau>)\<close>
-        show \<open>attacker_wins (expressiveness_price (Internal \<chi>)) (Attacker_Immediate p Q)\<close> 
+        show \<open>attacker_wins (expressiveness_price (Internal \<chi>)) (Attacker_Immediate p Q)\<close>
           using attacker_wins_Ga_with_id_step
           by (metis option.discI option.sel spectroscopy_defender.simps(1))
         qed
@@ -189,7 +189,7 @@ proof-
       proof (clarify)
         fix Q p
         assume \<open>Q \<noteq> {}\<close> and \<open>distinguishes_from (ImmConj I \<psi>s) p Q\<close>
-        from this(2) have \<open>\<forall>q\<in>Q. p \<Turnstile>SRBB ImmConj I \<psi>s \<and> \<not> q \<Turnstile>SRBB ImmConj I \<psi>s\<close> 
+        from this(2) have \<open>\<forall>q\<in>Q. p \<Turnstile>SRBB ImmConj I \<psi>s \<and> \<not> q \<Turnstile>SRBB ImmConj I \<psi>s\<close>
           unfolding distinguishes_from_def distinguishes_def by blast
         hence \<open>\<forall>q\<in>Q. \<exists>i\<in>I. hml_srbb_conjunct_models p (\<psi>s i) \<and> \<not>hml_srbb_conjunct_models q (\<psi>s i)\<close>
           by simp
@@ -205,12 +205,12 @@ proof-
           \<open>subtract_fn 0 0 1 0 0 0 0 0 (expressiveness_price (ImmConj I \<psi>s) - E 0 0 0 0 1 0 0 0) = Some (expressiveness_price (ImmConj I \<psi>s) - E 0 0 1 0 1 0 0 0)\<close>
           by (simp add: \<open>I \<noteq> {}\<close>)+
         have def_conj: \<open>spectroscopy_defender (Defender_Conj p Q)\<close> by simp
-        have \<open>spectroscopy_moves (Defender_Conj p Q) N \<noteq> None 
+        have \<open>spectroscopy_moves (Defender_Conj p Q) N \<noteq> None
               \<Longrightarrow> N = Attacker_Clause (attacker_state N) (defender_state N)\<close> for N
           by (metis spectroscopy_moves.simps(34,35,36,38,64,74) spectroscopy_position.exhaust_sel)
         hence move_kind: \<open>spectroscopy_moves (Defender_Conj p Q) N \<noteq> None \<Longrightarrow> \<exists>q\<in>Q. N = Attacker_Clause p q\<close> for N
-          using conj_answer by metis   
-        hence update: \<open>\<And>g'. spectroscopy_moves (Defender_Conj p Q) g' \<noteq> None \<Longrightarrow> 
+          using conj_answer by metis
+        hence update: \<open>\<And>g'. spectroscopy_moves (Defender_Conj p Q) g' \<noteq> None \<Longrightarrow>
           weight (Defender_Conj p Q) g' = subtract_fn 0 0 1 0 0 0 0 0\<close>
           by fastforce
         hence move_wina: \<open>\<And>g'. spectroscopy_moves (Defender_Conj p Q) g' \<noteq> None \<Longrightarrow>
@@ -220,7 +220,7 @@ proof-
         from attacker_wins_Gd[OF def_conj] update move_wina have def_conj_wina:
           \<open>attacker_wins (expressiveness_price (ImmConj I \<psi>s) - E 0 0 0 0 1 0 0 0) (Defender_Conj p Q)\<close>
           by blast
-        have imm_to_conj: \<open>spectroscopy_moves (Attacker_Immediate p Q) (Defender_Conj p Q) \<noteq> None\<close> 
+        have imm_to_conj: \<open>spectroscopy_moves (Attacker_Immediate p Q) (Defender_Conj p Q) \<noteq> None\<close>
           by (simp add: \<open>Q \<noteq> {}\<close>)
         have imm_to_conj_wgt: \<open>weight (Attacker_Immediate p Q) (Defender_Conj p Q) (expressiveness_price (ImmConj I \<psi>s))
           = Some (expressiveness_price (ImmConj I \<psi>s) - E 0 0 0 0 1 0 0 0)\<close>
@@ -232,28 +232,28 @@ proof-
     next
       case (Obs \<alpha> \<phi>)
       have \<open>\<forall>p Q. Q \<noteq> {} \<longrightarrow> hml_srbb_inner.distinguishes_from (hml_srbb_inner.Obs \<alpha> \<phi>) p Q \<longrightarrow> Q \<Zsurj>S Q
-                \<longrightarrow> attacker_wins (expr_pr_inner (hml_srbb_inner.Obs \<alpha> \<phi>)) (Attacker_Delayed p Q)\<close> 
+                \<longrightarrow> attacker_wins (expr_pr_inner (hml_srbb_inner.Obs \<alpha> \<phi>)) (Attacker_Delayed p Q)\<close>
       proof(clarify)
         fix p Q
         assume \<open>Q \<noteq> {}\<close> \<open>hml_srbb_inner.distinguishes_from (hml_srbb_inner.Obs \<alpha> \<phi>) p Q\<close> \<open> \<forall>p\<in>Q. \<forall>q. p \<Zsurj> q \<longrightarrow> q \<in> Q\<close>
-        have \<open>\<exists>p' Q'. p \<mapsto>a \<alpha> p' \<and> Q \<mapsto>aS \<alpha> Q' \<and> attacker_wins (expressiveness_price \<phi>) (Attacker_Immediate p' Q')\<close> 
+        have \<open>\<exists>p' Q'. p \<mapsto>a \<alpha> p' \<and> Q \<mapsto>aS \<alpha> Q' \<and> attacker_wins (expressiveness_price \<phi>) (Attacker_Immediate p' Q')\<close>
         proof(cases \<open>\<alpha> = \<tau>\<close>)
           case True
           with \<open>hml_srbb_inner.distinguishes_from (hml_srbb_inner.Obs \<alpha> \<phi>) p Q\<close>
           have dist_unfold:  \<open>((\<exists>p'. p \<mapsto>\<tau> p' \<and> p' \<Turnstile>SRBB \<phi>) \<or> p \<Turnstile>SRBB \<phi>)\<close> by simp
           then obtain p' where \<open>p' \<Turnstile>SRBB \<phi>\<close> \<open>p \<mapsto>a \<alpha> p'\<close>
             unfolding True by blast
-  
+
           from \<open>hml_srbb_inner.distinguishes_from (hml_srbb_inner.Obs \<alpha> \<phi>) p Q\<close> have
             \<open>\<forall>q\<in>Q. (\<not> q \<Turnstile>SRBB \<phi>) \<and> (\<nexists>q'. q \<mapsto>\<tau> q' \<and> q' \<Turnstile>SRBB \<phi>)\<close>
             using True by auto
           hence \<open>\<forall>q\<in>Q. \<not>q \<Turnstile>SRBB \<phi>\<close>
             using \<open>\<forall>p\<in>Q. \<forall>q. p \<Zsurj> q \<longrightarrow> q \<in> Q\<close> by fastforce
-  
+
           hence \<open>distinguishes_from \<phi> p' Q\<close>
             using \<open>p' \<Turnstile>SRBB \<phi>\<close> by auto
 
-          with Obs have \<open>attacker_wins (expressiveness_price \<phi>) (Attacker_Immediate p' Q)\<close> 
+          with Obs have \<open>attacker_wins (expressiveness_price \<phi>) (Attacker_Immediate p' Q)\<close>
             using \<open>Q \<noteq> {}\<close> by blast
           moreover have \<open>Q \<mapsto>aS \<alpha> Q\<close>
             unfolding True
@@ -261,13 +261,13 @@ proof-
           ultimately show ?thesis using \<open>p \<mapsto>a \<alpha> p'\<close> by blast
         next
           case False
-          with \<open>hml_srbb_inner.distinguishes_from (hml_srbb_inner.Obs \<alpha> \<phi>) p Q\<close> 
+          with \<open>hml_srbb_inner.distinguishes_from (hml_srbb_inner.Obs \<alpha> \<phi>) p Q\<close>
           obtain p'' where \<open>(p \<mapsto>\<alpha> p'') \<and> (p'' \<Turnstile>SRBB \<phi>)\<close> by auto
-  
+
           let ?Q' = \<open>step_set Q \<alpha>\<close>
-          from \<open>hml_srbb_inner.distinguishes_from (hml_srbb_inner.Obs \<alpha> \<phi>) p Q\<close> 
+          from \<open>hml_srbb_inner.distinguishes_from (hml_srbb_inner.Obs \<alpha> \<phi>) p Q\<close>
           have \<open>\<forall>q\<in>?Q'. \<not> q \<Turnstile>SRBB \<phi>\<close>
-            using \<open>Q \<noteq> {}\<close> and step_set_is_step_set 
+            using \<open>Q \<noteq> {}\<close> and step_set_is_step_set
             by force
           from \<open>\<forall>q\<in>step_set Q \<alpha>. \<not> q \<Turnstile>SRBB \<phi>\<close> \<open>p \<mapsto>\<alpha> p'' \<and> p'' \<Turnstile>SRBB \<phi>\<close>
           have \<open>distinguishes_from \<phi> p'' ?Q'\<close> by simp
@@ -279,16 +279,13 @@ proof-
         qed
         then obtain p' Q' where p'_Q': \<open>p \<mapsto>a \<alpha> p'\<close> \<open>Q \<mapsto>aS \<alpha> Q'\<close> and
           wina: \<open>attacker_wins (expressiveness_price \<phi>) (Attacker_Immediate p' Q')\<close> by blast
-  
         have attacker: \<open>attacker (Attacker_Delayed p Q)\<close> by simp
-  
         have \<open>spectroscopy_moves (Attacker_Delayed p Q) (Attacker_Immediate p' Q') =
               (if (\<exists>a. p \<mapsto>a a p' \<and> Q \<mapsto>aS a Q') then Some (subtract_fn 1 0 0 0 0 0 0 0) else None)\<close>
           for p Q p' Q' by simp
-        from this[of p Q p' Q'] have 
-          \<open>spectroscopy_moves (Attacker_Delayed p Q) (Attacker_Immediate p' Q') = 
+        from this[of p Q p' Q'] have
+          \<open>spectroscopy_moves (Attacker_Delayed p Q) (Attacker_Immediate p' Q') =
                Some (subtract_fn 1 0 0 0 0 0 0 0)\<close> using p'_Q' by auto
-       
         with expr_obs_phi[of \<alpha> \<phi>] show
           \<open>attacker_wins (expr_pr_inner (hml_srbb_inner.Obs \<alpha> \<phi>)) (Attacker_Delayed p Q)\<close>
           using Attack[OF attacker _ _ wina]
@@ -372,7 +369,7 @@ proof-
           assume upd_def: \<open>spectroscopy_moves (Defender_Conj p Q) g' = Some upd\<close>
           hence \<open>\<And>px q. g' = Attacker_Clause px q \<Longrightarrow> p = px \<and> q \<in> Q \<and> upd = (subtract_fn 0 0 1 0 0 0 0 0)\<close>
             by (metis (mono_tags, lifting) local.conj_answer option.sel option.simps(3))
-          with upd_def show \<open>(\<exists>q\<in>Q. Attacker_Clause p q = g') \<and> spectroscopy_moves (Defender_Conj p Q) g' = Some (subtract_fn 0 0 1 0 0 0 0 0)\<close> 
+          with upd_def show \<open>(\<exists>q\<in>Q. Attacker_Clause p q = g') \<and> spectroscopy_moves (Defender_Conj p Q) g' = Some (subtract_fn 0 0 1 0 0 0 0 0)\<close>
             by (cases g', auto)
         qed
         hence \<open>\<forall>g'. spectroscopy_moves (Defender_Conj p Q) g' \<noteq> None
@@ -413,7 +410,7 @@ proof-
       \<comment>\<open>The following proof is virtually the same as for \<open>Conj I \<psi>s\<close>\<close>
       have main_case: \<open>(\<forall>\<Psi>_I \<Psi> p Q. StableConj I \<psi>s = StableConj \<Psi>_I \<Psi> \<longrightarrow>
              Q \<noteq> {} \<longrightarrow> hml_srbb_inner.distinguishes_from (StableConj I \<psi>s) p Q \<longrightarrow> (\<forall>q\<in>Q. \<nexists>q'. q \<mapsto>\<tau> q')
-             \<longrightarrow> attacker_wins (expr_pr_inner (StableConj I \<psi>s)) (Defender_Stable_Conj p Q))\<close> 
+             \<longrightarrow> attacker_wins (expr_pr_inner (StableConj I \<psi>s)) (Defender_Stable_Conj p Q))\<close>
       proof clarify
         fix p Q
         assume case_assms:
@@ -487,7 +484,7 @@ proof-
           hence \<open>\<And>px q. g' = Attacker_Clause px q \<Longrightarrow> p = px \<and> q \<in> Q \<and> upd = (subtract_fn 0 0 0 1 0 0 0 0)\<close>
             by (metis (no_types, lifting) local.conj_s_answer option.discI option.inject)
           with upd_def case_assms(1) show
-            \<open>(\<exists>q\<in>Q. Attacker_Clause p q = g') \<and> spectroscopy_moves (Defender_Stable_Conj p Q) g' = (subtract 0 0 0 1 0 0 0 0)\<close> 
+            \<open>(\<exists>q\<in>Q. Attacker_Clause p q = g') \<and> spectroscopy_moves (Defender_Stable_Conj p Q) g' = (subtract 0 0 0 1 0 0 0 0)\<close>
             by (cases g', auto)
         qed
         hence \<open>\<forall>g'. spectroscopy_moves (Defender_Stable_Conj p Q) g' \<noteq> None
@@ -647,7 +644,7 @@ proof-
           (Sup (conj_depth ` ({expr_pr_inner (Obs \<alpha> \<phi>)} \<union> (expr_pr_conjunct ` (\<psi>s ` I)))))
           (Sup (st_conj_depth  ` ({expr_pr_inner (Obs \<alpha> \<phi>)} \<union> (expr_pr_conjunct ` (\<psi>s ` I)))))
           (Sup (imm_conj_depth  ` ({expr_pr_inner (Obs \<alpha> \<phi>)} \<union> (expr_pr_conjunct ` (\<psi>s ` I)))))
-          (Sup ({1 + modal_depth_srbb \<phi>} 
+          (Sup ({1 + modal_depth_srbb \<phi>}
              \<union> (pos_conjuncts   ` ({expr_pr_inner (Obs \<alpha> \<phi>)} \<union> (expr_pr_conjunct ` (\<psi>s ` I))))))
           (Sup (neg_conjuncts ` ({expr_pr_inner (Obs \<alpha> \<phi>)} \<union> (expr_pr_conjunct ` (\<psi>s ` I)))))
           (Sup (neg_depth ` ({expr_pr_inner (Obs \<alpha> \<phi>)} \<union> (expr_pr_conjunct ` (\<psi>s ` I)))))\<close>
@@ -656,7 +653,7 @@ proof-
         have \<open>spectroscopy_moves (Attacker_Branch p' Q') (Attacker_Immediate p' Q') = Some (subtract_fn 1 0 0 0 0 0 0 0)\<close> by simp
         with win_a_step attacker_wins_Ga have obs_later_win: \<open>attacker_wins (expr_pr_inner (Obs \<alpha> \<phi>)) (Attacker_Branch p' Q')\<close>
           by force
-        hence e'_win: \<open>attacker_wins e' (Attacker_Branch p' Q')\<close> 
+        hence e'_win: \<open>attacker_wins e' (Attacker_Branch p' Q')\<close>
           unfolding e'_def using win_a_upwards_closure
           by auto
         have depths: \<open>1 + modal_depth_srbb \<phi> = modal_depth (expr_pr_inner (Obs \<alpha> \<phi>))\<close> by simp
@@ -717,7 +714,7 @@ proof-
             \<open>\<not> (\<exists>q\<in>Q - Q_\<alpha>. Attacker_Clause p q = g' \<and> spectroscopy_moves (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>) g' = subtract 0 1 1 0 0 0 0 0)\<close>
           hence \<open>g' = Attacker_Branch p' Q'\<close>
             unfolding Q'_def using soft_step_set_is_soft_step_set no_subtr_move local.br_answer
-            by (cases g', auto, (metis (no_types, lifting)  option.discI)+)  
+            by (cases g', auto, (metis (no_types, lifting)  option.discI)+)
           moreover have \<open>Attacker_Branch p' Q' = g' \<longrightarrow> spectroscopy_moves (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>) g' =  Some (\<lambda>e. Option.bind ((subtract_fn 0 1 1 0 0 0 0 0) e) min1_6)\<close>
             unfolding Q'_def using soft_step_set_is_soft_step_set by auto
           ultimately show \<open>Attacker_Branch p' Q' = g' \<and> spectroscopy_moves (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>) g' =  Some (\<lambda>e. Option.bind ((subtract_fn 0 1 1 0 0 0 0 0) e) min1_6)\<close>
@@ -738,7 +735,7 @@ proof-
         ultimately show \<open>attacker_wins (expr_pr_inner (BranchConj \<alpha> \<phi> I \<psi>s)) (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>)\<close>
         using attacker_wins.Defense spectroscopy_defender.simps(5)
           by metis
-      qed 
+      qed
       moreover have
         \<open>\<forall>p Q. Q \<noteq> {} \<longrightarrow> hml_srbb_inner.distinguishes_from (BranchConj \<alpha> \<phi> I \<psi>s) p Q
              \<longrightarrow> attacker_wins (expr_pr_inner (BranchConj \<alpha> \<phi> I \<psi>s)) (Attacker_Delayed p Q)\<close>
@@ -746,7 +743,7 @@ proof-
         fix p Q
         assume case_assms:
           \<open>hml_srbb_inner.distinguishes_from (BranchConj \<alpha> \<phi> I \<psi>s) p Q\<close>
-        from case_assms(1) obtain p' where p'_spec: \<open>p \<mapsto>a \<alpha> p'\<close> \<open>p' \<Turnstile>SRBB \<phi>\<close> 
+        from case_assms(1) obtain p' where p'_spec: \<open>p \<mapsto>a \<alpha> p'\<close> \<open>p' \<Turnstile>SRBB \<phi>\<close>
           unfolding hml_srbb_inner.distinguishes_from_def
               and distinguishes_def by auto
         define Q_\<alpha> where \<open>Q_\<alpha> = Q - hml_srbb_inner.model_set (Obs \<alpha> \<phi>)\<close>

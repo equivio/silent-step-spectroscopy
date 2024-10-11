@@ -6,7 +6,7 @@ theory Silent_Step_Spectroscopy
     Strategy_Formulas
 begin
 
-context weak_spectroscopy_game 
+context weak_spectroscopy_game
 begin
 
 text \<open>\label{th1}\<close>
@@ -19,7 +19,7 @@ proof
   assume \<open>\<exists>\<phi>. distinguishes_from \<phi> p Q \<and> expressiveness_price \<phi> \<le> e\<close>
   then obtain \<phi> where
     \<open>distinguishes_from \<phi> p Q\<close> and le: \<open>expressiveness_price \<phi> \<le> e\<close>
-    unfolding \<O>_def by blast 
+    unfolding \<O>_def by blast
   from distinction_implies_winning_budgets this(1)
     have budget: \<open>attacker_wins (expressiveness_price \<phi>) (Attacker_Immediate p Q)\<close> .
   thus \<open>attacker_wins e (Attacker_Immediate p Q)\<close> using win_a_upwards_closure le by simp

@@ -15,7 +15,7 @@ lemma pairs_is_zip:
 lemma %invisible \<open>pairs [1,2,3] = [(1,2), (2,3)]\<close> by simp
 lemma %invisible empty_pair: \<open>pairs [] = []\<close> by simp
 lemma %invisible single_pair: \<open>pairs [x] = []\<close> by simp
-lemma %invisible pairs_append_single: \<open>pairs (p @ [gn]) = (if length p \<ge> 1 then (pairs p) @ [(last p, gn)] else [])\<close> 
+lemma %invisible pairs_append_single: \<open>pairs (p @ [gn]) = (if length p \<ge> 1 then (pairs p) @ [(last p, gn)] else [])\<close>
   by (induct p, simp_all add: not_less_eq_eq)
 
 end

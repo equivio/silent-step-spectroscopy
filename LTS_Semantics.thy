@@ -87,7 +87,7 @@ text \<open>
 If a set of formulas pre-orders two processes @{term \<open>p\<close>} and @{term \<open>q\<close>}, then no formula in that set
 may distinguish @{term \<open>p\<close>} from @{term \<open>q\<close>}.
 \<close>
-lemma preordered_no_distinction: 
+lemma preordered_no_distinction:
   \<open>preordered \<phi>s p q = (\<forall>\<phi> \<in> \<phi>s. \<not>(distinguishes \<phi> p q))\<close>
   by simp
 

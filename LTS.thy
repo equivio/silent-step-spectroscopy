@@ -7,9 +7,9 @@ begin
 subsection \<open>Labelled Transition Systems\<close>
 
 text \<open>
-The locale @{term \<open>LTS\<close>} represents a labelled transition system consisting of a set of states $\mathcal{P}$, 
-a set of actions $\Sigma$, and a transition relation $\mapsto \subseteq \mathcal{P}\times\Sigma\times\mathcal{P}$ (cf. \cite[defintion 1]{bisping2023lineartimebranchingtime}). 
-We formalize the sets of states and actions by the type variables \<open>'s\<close> and \<open>'a\<close>. An LTS is then determined by the transition relation @{term \<open>step\<close>}. 
+The locale @{term \<open>LTS\<close>} represents a labelled transition system consisting of a set of states $\mathcal{P}$,
+a set of actions $\Sigma$, and a transition relation $\mapsto \subseteq \mathcal{P}\times\Sigma\times\mathcal{P}$ (cf. \cite[defintion 1]{bisping2023lineartimebranchingtime}).
+We formalize the sets of states and actions by the type variables \<open>'s\<close> and \<open>'a\<close>. An LTS is then determined by the transition relation @{term \<open>step\<close>}.
 Due to technical limitations we use the notation \<open>p \<mapsto>\<alpha> p'\<close> which has same meaing as $p \xrightarrow{\alpha} p'$ has in \cite{bisping2023lineartimebranchingtime}.
 
 \<close>
@@ -61,10 +61,10 @@ locale LTS_Tau =
     fixes \<tau> :: 'a
 begin
 
-text \<open>The paper introduces a transition $p \xrightarrow{(\alpha)}p'$ if $p \xrightarrow{\alpha} p'$, or if $\alpha = \tau$ and $p = p'$ (cf. \cite[defintion 2]{bisping2023lineartimebranchingtime}). 
+text \<open>The paper introduces a transition $p \xrightarrow{(\alpha)}p'$ if $p \xrightarrow{\alpha} p'$, or if $\alpha = \tau$ and $p = p'$ (cf. \cite[defintion 2]{bisping2023lineartimebranchingtime}).
 We define @{term \<open>soft_step\<close>} analagously and provide the notation \<open>p \<mapsto>a \<alpha> p'\<close>.\<close>
 abbreviation soft_step (\<open>_ \<mapsto>a _ _\<close> [70,70,70] 80) where
-  \<open>p \<mapsto>a \<alpha> q \<equiv> p \<mapsto>\<alpha> q \<or> (\<alpha> = \<tau> \<and> p = q)\<close> 
+  \<open>p \<mapsto>a \<alpha> q \<equiv> p \<mapsto>\<alpha> q \<or> (\<alpha> = \<tau> \<and> p = q)\<close>
 
 text \<open>A state \<open>p\<close> is @{term \<open>silent_reachable\<close>}, represented by the symbol \<open>\<Zsurj>\<close>, from another state \<open>p'\<close> iff there exists a path of \<open>\<tau>\<close>-transitions.
 from \<open>p'\<close> to \<open>p\<close>.\<close>
@@ -147,7 +147,7 @@ qed
 text \<open>In the following, we define @{term \<open>weak_step\<close>} as a new notion of transition relation between states. A state \<open>p\<close> can reach
 \<open>p'\<close> by performing an \<open>\<alpha>\<close>-transition, possibly proceeded and followed by any number of \<open>\<tau>\<close>-transitions.\<close>
 definition weak_step (\<open>_ \<Zsurj>\<mapsto>\<Zsurj> _ _\<close> [70, 70, 70] 80) where
-  \<open>p  \<Zsurj>\<mapsto>\<Zsurj> \<alpha> p' \<equiv> if \<alpha> = \<tau> 
+  \<open>p  \<Zsurj>\<mapsto>\<Zsurj> \<alpha> p' \<equiv> if \<alpha> = \<tau>
                     then p \<Zsurj> p'
                     else \<exists>p1 p2. p \<Zsurj> p1 \<and> p1 \<mapsto> \<alpha> p2 \<and> p2 \<Zsurj> p'\<close>
 
@@ -160,7 +160,7 @@ proof (cases \<open>\<alpha> = \<tau>\<close>)
   hence \<open>p' \<Zsurj>\<mapsto>\<Zsurj> \<tau> p''\<close> by auto
   then have \<open>p' \<Zsurj> p''\<close> unfolding weak_step_def by auto
   with \<open>p \<Zsurj> p'\<close>
-  have \<open>p \<Zsurj> p''\<close> using silent_reachable_trans 
+  have \<open>p \<Zsurj> p''\<close> using silent_reachable_trans
     by blast
   then have \<open>p \<Zsurj>\<mapsto>\<Zsurj> \<tau> p''\<close> unfolding weak_step_def by auto
   with \<open>\<alpha> = \<tau>\<close>
@@ -170,7 +170,7 @@ next
   assume \<open>p \<Zsurj> p'\<close>
     and \<open>p' \<Zsurj>\<mapsto>\<Zsurj> \<alpha> p''\<close>
     and \<open>\<alpha> \<noteq> \<tau>\<close>
-  then have \<open>\<exists>p1 p2. p' \<Zsurj> p1 \<and> p1 \<mapsto> \<alpha> p2 \<and> p2 \<Zsurj> p''\<close> 
+  then have \<open>\<exists>p1 p2. p' \<Zsurj> p1 \<and> p1 \<mapsto> \<alpha> p2 \<and> p2 \<Zsurj> p''\<close>
     using weak_step_def by auto
   then obtain p1 and p2 where \<open>p' \<Zsurj> p1\<close> and \<open>p1 \<mapsto> \<alpha> p2\<close> and \<open>p2 \<Zsurj> p''\<close> by auto
 
@@ -178,7 +178,7 @@ next
   have \<open>p \<Zsurj> p1\<close> by (rule silent_reachable_trans)
 
   with \<open>p1 \<mapsto> \<alpha> p2\<close> and \<open>p2 \<Zsurj> p''\<close> and \<open>\<alpha> \<noteq> \<tau>\<close>
-  show \<open>p \<Zsurj>\<mapsto>\<Zsurj> \<alpha> p''\<close> 
+  show \<open>p \<Zsurj>\<mapsto>\<Zsurj> \<alpha> p''\<close>
     using weak_step_def by auto
 qed
 
@@ -235,18 +235,18 @@ proof-
      and \<open>tr \<in> weak_traces p'\<close>
   hence \<open>\<exists>p''. p' \<Zsurj>\<mapsto>\<Zsurj>$ tr p''\<close> by auto
   then obtain p'' where \<open>p' \<Zsurj>\<mapsto>\<Zsurj>$ tr p''\<close> by auto
-  
+
   from \<open>p' \<Zsurj>\<mapsto>\<Zsurj>$ tr p''\<close>
     and \<open>p \<Zsurj> p'\<close>
-  have \<open>p \<Zsurj>\<mapsto>\<Zsurj>$ tr p''\<close> 
+  have \<open>p \<Zsurj>\<mapsto>\<Zsurj>$ tr p''\<close>
     by (metis append_self_conv2 weak_step_sequence.intros(1) weak_step_sequence_trans)
 
   hence \<open>\<exists>p''. p \<Zsurj>\<mapsto>\<Zsurj>$ tr p''\<close> by auto
-  then show \<open>tr \<in> weak_traces p\<close> 
+  then show \<open>tr \<in> weak_traces p\<close>
     by blast
 qed
 
-text \<open>If there is an \<open>\<alpha>\<close>-transition from \<open>p\<close> to \<open>p'\<close>, and \<open>p'\<close> has a weak trace \<open>tr\<close>, then the sequence \<open>(\<alpha> # tr)\<close> 
+text \<open>If there is an \<open>\<alpha>\<close>-transition from \<open>p\<close> to \<open>p'\<close>, and \<open>p'\<close> has a weak trace \<open>tr\<close>, then the sequence \<open>(\<alpha> # tr)\<close>
 is a valid (weak) trace of \<open>p\<close>.\<close>
 lemma step_prepend_weak_traces:
   assumes \<open>p \<mapsto> \<alpha> p'\<close>
@@ -258,7 +258,7 @@ proof -
   have \<open>\<exists>p''. p' \<Zsurj>\<mapsto>\<Zsurj>$ tr p''\<close> by auto
   then obtain p'' where \<open>p' \<Zsurj>\<mapsto>\<Zsurj>$ tr p''\<close> by auto
   with \<open>p \<mapsto> \<alpha> p'\<close>
-  have \<open>p \<Zsurj>\<mapsto>\<Zsurj>$ (\<alpha> # tr) p''\<close> 
+  have \<open>p \<Zsurj>\<mapsto>\<Zsurj>$ (\<alpha> # tr) p''\<close>
     by (metis LTS_Tau.silent_reachable.intros(1) LTS_Tau.silent_reachable_append_\<tau> LTS_Tau.weak_step_def LTS_Tau.weak_step_sequence.intros(2))
   then have \<open>\<exists>p''. p \<Zsurj>\<mapsto>\<Zsurj>$ (\<alpha> # tr) p''\<close> by auto
   then show \<open>(\<alpha> # tr) \<in> weak_traces p\<close> by auto
@@ -294,7 +294,7 @@ proof -
     assume \<open>P \<Zsurj>S Q\<close>
 
     with sreachable_set_is_sreachable
-    have \<open>\<forall>q \<in> Q. q \<in> (silent_reachable_set P)\<close> 
+    have \<open>\<forall>q \<in> Q. q \<in> (silent_reachable_set P)\<close>
       by meson
 
     from \<open>P \<Zsurj>S Q\<close>
@@ -307,8 +307,8 @@ proof -
     show \<open>Q = (silent_reachable_set P)\<close> by auto
   qed
 
-  with \<open>P \<Zsurj>S (silent_reachable_set P)\<close> 
-  show \<open>\<exists>!Q. P \<Zsurj>S Q\<close> 
+  with \<open>P \<Zsurj>S (silent_reachable_set P)\<close>
+  show \<open>\<exists>!Q. P \<Zsurj>S Q\<close>
     by blast
 qed
 
@@ -344,12 +344,12 @@ proof -
     from \<open>\<And>Q. P \<mapsto>aS \<alpha> Q \<Longrightarrow> Q = (soft_step_set P \<alpha>)\<close>
     show \<open>\<And>Q. P \<mapsto>aS \<alpha> Q \<Longrightarrow> Q = (soft_step_set P \<alpha>)\<close> .
   qed
-qed  
+qed
 
 lemma soft_step_set_eq:
   assumes \<open>P \<mapsto>aS \<alpha> Q\<close>
   shows \<open>Q = soft_step_set P \<alpha>\<close>
-  using exactly_one_soft_step_set soft_step_set_is_soft_step_set assms 
+  using exactly_one_soft_step_set soft_step_set_is_soft_step_set assms
   by fastforce
 
 abbreviation \<open>stable_state p \<equiv> \<forall>p'. \<not>(p \<mapsto> \<tau> p')\<close>

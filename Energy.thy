@@ -18,8 +18,8 @@ instantiation energy :: order begin
 
 definition \<open>e1 \<le> e2 \<equiv>
   (case e1 of E a1 b1 c1 d1 e1 f1 g1 h1 \<Rightarrow> (
-    case e2 of E a2 b2 c2 d2 e2 f2 g2 h2 \<Rightarrow> 
-      (a1 \<le> a2 \<and> b1 \<le> b2 \<and> c1 \<le> c2 \<and> d1 \<le> d2 \<and> e1 \<le> e2 \<and> f1 \<le> f2 \<and> g1 \<le> g2 \<and> h1 \<le> h2) 
+    case e2 of E a2 b2 c2 d2 e2 f2 g2 h2 \<Rightarrow>
+      (a1 \<le> a2 \<and> b1 \<le> b2 \<and> c1 \<le> c2 \<and> d1 \<le> d2 \<and> e1 \<le> e2 \<and> f1 \<le> f2 \<and> g1 \<le> g2 \<and> h1 \<le> h2)
     ))\<close>
 
 definition \<open>(x::energy) < y = (x \<le> y \<and> \<not> y \<le> x)\<close>
@@ -29,7 +29,7 @@ text \<open>Next, we show that this yields a reflexive transitive antisymmetric 
 instance proof
   fix e1 e2 e3 :: energy
   show \<open>e1 \<le> e1\<close> unfolding less_eq_energy_def by (simp add: energy.case_eq_if)
-  show \<open>e1 \<le> e2 \<Longrightarrow> e2 \<le> e3 \<Longrightarrow> e1 \<le> e3\<close> unfolding less_eq_energy_def 
+  show \<open>e1 \<le> e2 \<Longrightarrow> e2 \<le> e3 \<Longrightarrow> e1 \<le> e3\<close> unfolding less_eq_energy_def
     by (smt (z3) energy.case_eq_if order_trans)
   show \<open>e1 < e2 = (e1 \<le> e2 \<and> \<not> e2 \<le> e1)\<close> using less_energy_def .
   show \<open>e1 \<le> e2 \<Longrightarrow> e2 \<le> e1 \<Longrightarrow> e1 = e2\<close> unfolding less_eq_energy_def
@@ -51,31 +51,31 @@ lemma energy_leq_cases:
 
 end
 
-text \<open>We then use this order to define a predicate that decides if an @{term \<open>e1 :: energy\<close>} 
+text \<open>We then use this order to define a predicate that decides if an @{term \<open>e1 :: energy\<close>}
       may be subtracted from another @{term \<open>e2 :: energy\<close>} without the result being negative. We encode this by @{term \<open>e1\<close>} being @{text \<open>somewhere_larger\<close>} than @{term \<open>e2\<close>}.\<close>
 
 abbreviation somewhere_larger where \<open>somewhere_larger e1 e2 \<equiv> \<not>(e1 \<ge> e2)\<close>
 
 lemma somewhere_larger_eq:
   assumes \<open>somewhere_larger e1 e2\<close>
-  shows \<open>modal_depth e1 < modal_depth e2 \<or> br_conj_depth e1 < br_conj_depth e2 
-         \<or> conj_depth e1 < conj_depth e2 \<or> st_conj_depth e1 < st_conj_depth e2 \<or> imm_conj_depth e1 < imm_conj_depth e2 
+  shows \<open>modal_depth e1 < modal_depth e2 \<or> br_conj_depth e1 < br_conj_depth e2
+         \<or> conj_depth e1 < conj_depth e2 \<or> st_conj_depth e1 < st_conj_depth e2 \<or> imm_conj_depth e1 < imm_conj_depth e2
          \<or> pos_conjuncts e1 < pos_conjuncts e2 \<or> neg_conjuncts e1 < neg_conjuncts e2 \<or> neg_depth e1 < neg_depth e2\<close>
   by (smt (z3) assms energy.case_eq_if less_eq_energy_def linorder_le_less_linear)
 
 subsection \<open>Subtracting Energies\<close>
-text \<open>Using \<open>somewhere_larger\<close> we define subtraction as 
+text \<open>Using \<open>somewhere_larger\<close> we define subtraction as
   the @{text \<open>minus\<close>} operator on energies.\<close>
 
 instantiation energy :: minus
 begin
 
 definition minus_energy_def[simp]: \<open>e1 - e2 \<equiv> E
-  ((modal_depth e1) - (modal_depth e2)) 
-  ((br_conj_depth e1) - (br_conj_depth e2)) 
-  ((conj_depth e1) - (conj_depth e2)) 
-  ((st_conj_depth e1) - (st_conj_depth e2)) 
-  ((imm_conj_depth e1) - (imm_conj_depth e2)) 
+  ((modal_depth e1) - (modal_depth e2))
+  ((br_conj_depth e1) - (br_conj_depth e2))
+  ((conj_depth e1) - (conj_depth e2))
+  ((st_conj_depth e1) - (st_conj_depth e2))
+  ((imm_conj_depth e1) - (imm_conj_depth e2))
   ((pos_conjuncts e1) - (pos_conjuncts e2))
   ((neg_conjuncts e1) - (neg_conjuncts e2))
   ((neg_depth e1) - (neg_depth e2))\<close>
@@ -84,11 +84,11 @@ instance ..
 
 end
 
-text \<open>Afterwards, we prove some lemmas to ease the manipulation of expressions 
+text \<open>Afterwards, we prove some lemmas to ease the manipulation of expressions
   using subtraction on energies.\<close>
 lemma energy_minus[simp]:
   shows \<open>E a1 b1 c1 d1 e1 f1 g1 h1 - E a2 b2 c2 d2 e2 f2 g2 h2
-         = E (a1 - a2) (b1 - b2) (c1 - c2) (d1 - d2) 
+         = E (a1 - a2) (b1 - b2) (c1 - c2) (d1 - d2)
              (e1 - e2) (f1 - f2) (g1 - g2) (h1 - h2)\<close>
   unfolding minus_energy_def somewhere_larger_eq by simp
 
@@ -148,7 +148,7 @@ lemma gets_smaller:
   by (auto)
      (metis add.commute add_diff_cancel_enat enat_diff_mono idiff_infinity idiff_infinity_right le_iff_add not_infinity_eq zero_le)+
 
-lemma mono_subtract: 
+lemma mono_subtract:
   assumes \<open>x \<le> x'\<close>
   shows \<open>(\<lambda>x. x - (E a b c d e f g h)) x \<le> (\<lambda>x. x - (E a b c d e f g h)) x'\<close>
   using assms enat_diff_mono by force
@@ -208,7 +208,7 @@ text \<open>Again, we prove that these updates only decrease energies.\<close>
 
 lemma min_1_6_simps[simp]:
   shows \<open>modal_depth (the (min1_6 e)) = min (modal_depth e) (pos_conjuncts e)\<close>
-        \<open>br_conj_depth (the (min1_6 e)) = br_conj_depth e\<close> 
+        \<open>br_conj_depth (the (min1_6 e)) = br_conj_depth e\<close>
         \<open>conj_depth (the (min1_6 e)) = conj_depth e\<close>
         \<open>st_conj_depth (the (min1_6 e)) = st_conj_depth e\<close>
         \<open>imm_conj_depth (the (min1_6 e)) = imm_conj_depth e\<close>
@@ -219,7 +219,7 @@ lemma min_1_6_simps[simp]:
 
 lemma min_1_7_simps[simp]:
   shows \<open>modal_depth (the (min1_7 e)) = min (modal_depth e) (neg_conjuncts e)\<close>
-        \<open>br_conj_depth (the (min1_7 e)) = br_conj_depth e\<close> 
+        \<open>br_conj_depth (the (min1_7 e)) = br_conj_depth e\<close>
         \<open>conj_depth (the (min1_7 e)) = conj_depth e\<close>
         \<open>st_conj_depth (the (min1_7 e)) = st_conj_depth e\<close>
         \<open>imm_conj_depth (the (min1_7 e)) = imm_conj_depth e\<close>
@@ -256,12 +256,12 @@ proof
     using min.mono min_1_7_simps min1_7_def by auto
 qed
 
-lemma gets_smaller_min_1_6: 
+lemma gets_smaller_min_1_6:
   shows \<open>the (min1_6 x) \<le> x\<close>
   using min_1_6_simps min_less_iff_conj somewhere_larger_eq by fastforce
 
 
-lemma gets_smaller_min_1_7: 
+lemma gets_smaller_min_1_7:
   shows \<open>the (min1_7 x) \<le> x\<close>
   using min_1_7_simps min_less_iff_conj somewhere_larger_eq by fastforce
 
