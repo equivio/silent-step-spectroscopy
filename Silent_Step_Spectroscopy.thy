@@ -1,7 +1,9 @@
 subsection \<open>Correctness Theorem\<close>
 
 theory Silent_Step_Spectroscopy
-  imports Strategy_Formulas Distinction_Implies_Winning_Budgets
+  imports
+    Distinction_Implies_Winning_Budgets
+    Strategy_Formulas
 begin
 
 context weak_spectroscopy_game 
@@ -11,24 +13,24 @@ text \<open>\label{th1}\<close>
 
 theorem spectroscopy_game_correctness:
   fixes e p Q
-  shows "(\<exists>\<phi>. distinguishes_from \<phi> p Q \<and> expressiveness_price \<phi> \<le> e)
-       = (attacker_wins e (Attacker_Immediate p Q))"
+  shows \<open>(\<exists>\<phi>. distinguishes_from \<phi> p Q \<and> expressiveness_price \<phi> \<le> e)
+       = (attacker_wins e (Attacker_Immediate p Q))\<close>
 proof
-  assume "\<exists>\<phi>. distinguishes_from \<phi> p Q \<and> expressiveness_price \<phi> \<le> e"
+  assume \<open>\<exists>\<phi>. distinguishes_from \<phi> p Q \<and> expressiveness_price \<phi> \<le> e\<close>
   then obtain \<phi> where
-    "distinguishes_from \<phi> p Q" and le: "expressiveness_price \<phi> \<le> e"
+    \<open>distinguishes_from \<phi> p Q\<close> and le: \<open>expressiveness_price \<phi> \<le> e\<close>
     unfolding \<O>_def by blast 
   from distinction_implies_winning_budgets this(1)
-    have budget: "attacker_wins (expressiveness_price \<phi>) (Attacker_Immediate p Q)" .
-  thus "attacker_wins e (Attacker_Immediate p Q)" using win_a_upwards_closure le by simp
+    have budget: \<open>attacker_wins (expressiveness_price \<phi>) (Attacker_Immediate p Q)\<close> .
+  thus \<open>attacker_wins e (Attacker_Immediate p Q)\<close> using win_a_upwards_closure le by simp
 next
-  assume "attacker_wins e (Attacker_Immediate p Q)"
+  assume \<open>attacker_wins e (Attacker_Immediate p Q)\<close>
   with winning_budget_implies_strategy_formula have
-    "\<exists>\<phi>. strategy_formula (Attacker_Immediate p Q) e \<phi> \<and> expressiveness_price \<phi> \<le> e"
+    \<open>\<exists>\<phi>. strategy_formula (Attacker_Immediate p Q) e \<phi> \<and> expressiveness_price \<phi> \<le> e\<close>
     by force
-  hence "\<exists>\<phi>. strategy_formula (Attacker_Immediate p Q) e \<phi> \<and> expressiveness_price \<phi> \<le> e"
+  hence \<open>\<exists>\<phi>. strategy_formula (Attacker_Immediate p Q) e \<phi> \<and> expressiveness_price \<phi> \<le> e\<close>
     unfolding \<O>_def by blast
-  thus "\<exists>\<phi>. distinguishes_from \<phi> p Q \<and> expressiveness_price \<phi> \<le> e"
+  thus \<open>\<exists>\<phi>. distinguishes_from \<phi> p Q \<and> expressiveness_price \<phi> \<le> e\<close>
     using strategy_formulas_distinguish by fastforce
 qed
 
