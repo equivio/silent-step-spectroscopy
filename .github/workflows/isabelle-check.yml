@@ -15,6 +15,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: chache output
+        id: cache-output
+        uses: actions/cache@v4
+        with:
+          path: ./out
+          key: ${{ runner.os }}-out
+
       - name: Isabelle
         uses: 'docker://hllm/isabelle-docker'
         with:
