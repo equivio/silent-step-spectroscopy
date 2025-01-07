@@ -277,6 +277,85 @@ lemma modal_depth_dominates_pos_conjuncts:
         \<open>\<lambda>\<psi>. max_pos_conj_depth_conjunct \<psi> \<le> modal_depth_srbb_conjunct \<psi>\<close>]
   by (auto simp add: SUP_mono' add_increasing sup.coboundedI1 sup.coboundedI2)
 
+\<comment>\<open>Supremum after some maximal element has been removed\<close>
+definition revival_conjunct_index :: \<open>'s set \<Rightarrow> ('s \<Rightarrow> ('a, 's) hml_srbb_conjunct) \<Rightarrow> 's set\<close> where
+  \<open>revival_conjunct_index I \<psi>s \<equiv>
+    if (\<exists>i\<in>I. is_pos (\<psi>s i) \<and> (\<forall>j\<in>I. is_pos (\<psi>s j) \<longrightarrow>
+        modal_depth_srbb_conjunct (\<psi>s j) \<le> modal_depth_srbb_conjunct (\<psi>s i))) then
+      {SOME i. i\<in>I \<and> is_pos (\<psi>s i) \<and> (\<forall>j\<in>I. is_pos (\<psi>s j) \<longrightarrow>
+        modal_depth_srbb_conjunct (\<psi>s j) \<le> modal_depth_srbb_conjunct (\<psi>s i))}
+    else {}\<close>
+
+
+(*lemma
+  assumes \<open>\<exists>j\<in>I. is_pos (\<psi>s j)\<close>
+  shows \<open>\<exists>r\<in>I. (revival_conjunct_index I \<psi>s) = {r} \<and> is_pos (\<psi>s r) \<and> 
+    (\<forall>j\<in>I. is_pos (\<psi>s j) \<longrightarrow> modal_depth_srbb_conjunct (\<psi>s j) \<le> modal_depth_srbb_conjunct (\<psi>s r))\<close>
+proof -
+  from assms obtain r where
+    \<open>r\<in>I\<close> \<open>is_pos (\<psi>s r)\<close> \<open>modal_depth_srbb_conjunct (\<psi>s r) = (Sup {modal_depth_srbb_conjunct (\<psi>s j)| j. j\<in>I \<and> is_pos (\<psi>s j)})\<close>
+    sledgehammer
+  hence
+    \<open>(\<forall>j\<in>I. is_pos (\<psi>s j) \<longrightarrow>
+        modal_depth_srbb_conjunct (\<psi>s j) \<le> modal_depth_srbb_conjunct (\<psi>s r))\<close>
+    sledgehammer
+*)
+  
+primrec
+      max_positive_conjunct_secondary_depth :: \<open>('a, 's) hml_srbb \<Rightarrow> enat\<close>
+  and max_pos_conj_secondary_depth_inner :: \<open>('a, 's) hml_srbb_inner \<Rightarrow> enat\<close>
+  and max_pos_conj_secondary_depth_conjunct :: \<open>('a, 's) hml_srbb_conjunct \<Rightarrow> enat\<close> where
+  \<open>max_positive_conjunct_secondary_depth TT = 0\<close> |
+  \<open>max_positive_conjunct_secondary_depth (Internal \<chi>) = max_pos_conj_secondary_depth_inner \<chi>\<close> |
+  \<open>max_positive_conjunct_secondary_depth (ImmConj I \<psi>s) = Sup ((max_pos_conj_secondary_depth_conjunct \<circ> \<psi>s) ` I)\<close> |
+
+  \<open>max_pos_conj_secondary_depth_inner (Obs _ \<phi>) = max_positive_conjunct_secondary_depth \<phi>\<close> |
+  \<open>max_pos_conj_secondary_depth_inner (Conj I \<psi>s) = 
+    Sup ((max_pos_conj_secondary_depth_conjunct \<circ> \<psi>s) ` I)\<close> |
+  \<open>max_pos_conj_secondary_depth_inner (StableConj I \<psi>s) =
+    Sup (((\<lambda>\<psi>. case \<psi> of (Pos \<chi>) \<Rightarrow> modal_depth_srbb_inner \<chi> | _ \<Rightarrow> max_pos_conj_secondary_depth_conjunct \<psi>) \<circ> \<psi>s)
+     ` (I - (revival_conjunct_index I \<psi>s)))\<close> |
+  \<open>max_pos_conj_secondary_depth_inner (BranchConj _ \<phi> I \<psi>s) =
+    Sup ({max_positive_conjunct_secondary_depth \<phi>} \<union> ((max_pos_conj_secondary_depth_conjunct \<circ> \<psi>s) ` I))\<close> |
+
+  \<open>max_pos_conj_secondary_depth_conjunct (Pos \<chi>) = max_pos_conj_secondary_depth_inner \<chi>\<close> |
+  \<open>max_pos_conj_secondary_depth_conjunct (Neg \<chi>) = max_pos_conj_secondary_depth_inner \<chi>\<close>
+
+(* 
+  and max_pos_stable_conj_secondary_depth_conjunct :: \<open>('a, 's) hml_srbb_conjunct \<Rightarrow> enat\<close>
+
+  \<open>max_pos_stable_conj_secondary_depth_conjunct (Pos \<chi>) = modal_depth_srbb_inner \<chi>\<close> |
+  \<open>max_pos_stable_conj_secondary_depth_conjunct (Neg \<chi>) = max_pos_conj_secondary_depth_inner \<chi>\<close>*)
+
+lemma modal_depth_srbb_rewrite: \<open>modal_depth_srbb_inner \<chi> = modal_depth_srbb_conjunct (Pos \<chi>)\<close>
+  by simp
+
+lemma max_positive_conjunct_depth_dominates_secondary:
+  fixes
+    \<phi>::\<open>('a, 's) hml_srbb\<close> and
+    \<chi>::\<open>('a, 's) hml_srbb_inner\<close> and
+    \<psi>::\<open>('a, 's) hml_srbb_conjunct\<close>
+  shows
+    \<open>max_positive_conjunct_secondary_depth \<phi> \<le> max_positive_conjunct_depth \<phi>\<close>
+    \<open>max_pos_conj_secondary_depth_inner \<chi> \<le> max_pos_conj_depth_inner \<chi>\<close>
+    \<open>max_pos_conj_secondary_depth_conjunct \<psi> \<le> max_pos_conj_depth_conjunct \<psi>\<close>
+    apply (induct \<phi> and \<chi> and \<psi>)
+          apply   (auto simp add: SUP_mono' revival_conjunct_index_def Sup_subset_mono image_mono le_supI1 le_supI2 SUP_subset_mono)
+    apply (smt (verit, ccfv_threshold) Diff_subset SUP_subset_mono hml_srbb_conjunct.case_eq_if hml_srbb_conjunct.simps(5) is_pos_def max_pos_conj_depth_conjunct.simps(1) nle_le rangeI)
+  apply (simp add: SUP_mono' hml_srbb_conjunct.case_eq_if) defer
+  using modal_depth_dominates_pos_conjuncts order_trans  apply blast
+proof -
+  fix x1 :: "'s set" and x2 :: "'s \<Rightarrow> ('a, 's) hml_srbb_conjunct"
+  assume a1: "\<And>x2a. x2a \<in> range x2 \<Longrightarrow> max_pos_conj_secondary_depth_conjunct x2a \<le> max_pos_conj_depth_conjunct x2a"
+  obtain ss :: "('s \<Rightarrow> enat) \<Rightarrow> ('s \<Rightarrow> enat) \<Rightarrow> 's" where
+    "\<And>f fa S. \<not> f (ss f fa) \<le> fa (ss f fa) \<or> Sup (f ` S) \<le> Sup (fa ` S)"
+    by (meson SUP_mono')
+  then have "(SUP s\<in>x1. if is_pos (x2 s) then modal_depth_srbb_inner (un_Pos (x2 s)) else max_pos_conj_secondary_depth_conjunct (x2 s)) \<le> (SUP s\<in>x1. max_pos_conj_depth_conjunct (x2 s))"
+    using a1 by (smt (z3) hml_srbb_conjunct.collapse(1) max_pos_conj_depth_conjunct.simps(1) modal_depth_dominates_pos_conjuncts modal_depth_srbb_rewrite rangeI)
+  then show "Sup ((\<lambda>s. modal_depth_srbb_inner (un_Pos (x2 s))) ` (x1 \<inter> {s. is_pos (x2 s)}) \<union> (\<lambda>s. max_pos_conj_secondary_depth_conjunct (x2 s)) ` (x1 \<inter> {s. \<not> is_pos (x2 s)})) \<le> (SUP s\<in>x1. max_pos_conj_depth_conjunct (x2 s))"
+    by simp
+qed
+  
 subsection \<open>Maximal Modal Depth of Negative Clauses in Conjunctions\<close>
 
 text \<open>
@@ -300,8 +379,6 @@ primrec
 
   \<open>max_neg_conj_depth_conjunct (Pos \<chi>) = max_neg_conj_depth_inner \<chi>\<close> |
   \<open>max_neg_conj_depth_conjunct (Neg \<chi>) = modal_depth_srbb_inner \<chi>\<close>
-
-
 
 lemma modal_depth_dominates_neg_conjuncts:
   fixes
@@ -354,6 +431,7 @@ fun expressiveness_price :: \<open>('a, 's) hml_srbb \<Rightarrow> energy\<close
                               (stable_conjunction_depth    \<phi>)
                               (immediate_conjunction_depth \<phi>)
                               (max_positive_conjunct_depth \<phi>)
+                              (max_positive_conjunct_secondary_depth \<phi>)
                               (max_negative_conjunct_depth \<phi>)
                               (negation_depth              \<phi>)\<close>
 
@@ -366,6 +444,7 @@ lemma expressiveness_price_ImmConj_def:
     (Sup ((st_conj_depth_conjunct \<circ> \<psi>s) ` I))
     (if I = {} then 0 else 1 + Sup ((imm_conj_depth_conjunct \<circ> \<psi>s) ` I))
     (Sup ((max_pos_conj_depth_conjunct \<circ> \<psi>s) ` I))
+    (Sup ((max_pos_conj_secondary_depth_conjunct \<circ> \<psi>s) ` I))
     (Sup ((max_neg_conj_depth_conjunct \<circ> \<psi>s) ` I))
     (Sup ((neg_depth_conjunct \<circ> \<psi>s) ` I))\<close> by simp
 
@@ -378,19 +457,20 @@ lemma expressiveness_price_ImmConj_non_empty_def:
     (Sup ((st_conj_depth_conjunct \<circ> \<psi>s) ` I))
     (1 + Sup ((imm_conj_depth_conjunct \<circ> \<psi>s) ` I))
     (Sup ((max_pos_conj_depth_conjunct \<circ> \<psi>s) ` I))
+    (Sup ((max_pos_conj_secondary_depth_conjunct \<circ> \<psi>s) ` I))
     (Sup ((max_neg_conj_depth_conjunct \<circ> \<psi>s) ` I))
     (Sup ((neg_depth_conjunct \<circ> \<psi>s) ` I))\<close> using assms  by simp
 
 lemma expressiveness_price_ImmConj_empty_def:
   assumes \<open>I = {}\<close>
-  shows \<open>expressiveness_price (ImmConj I \<psi>s) = E 0 0 0 0 0 0 0 0\<close> using assms
+  shows \<open>expressiveness_price (ImmConj I \<psi>s) = E 0 0 0 0 0 0 0 0 0\<close> using assms
   unfolding expressiveness_price_ImmConj_def by (simp add: bot_enat_def)
 
 text \<open>We can now define a sublanguage of Hennessy-Milner Logic @{term \<open>\<O>\<close>} by the set of formulas with prices below an energy coordinate.\<close>
 definition \<O> :: \<open>energy \<Rightarrow> (('a, 's) hml_srbb) set\<close> where
   \<open>\<O> energy \<equiv> {\<phi> . expressiveness_price \<phi> \<le> energy}\<close>
 
-lemma \<O>_sup: \<open>UNIV = \<O> (E \<infinity> \<infinity> \<infinity> \<infinity> \<infinity> \<infinity> \<infinity> \<infinity>)\<close> unfolding \<O>_def by auto
+lemma \<O>_sup: \<open>UNIV = \<O> (E \<infinity> \<infinity> \<infinity> \<infinity> \<infinity> \<infinity> \<infinity> \<infinity> \<infinity>)\<close> unfolding \<O>_def by auto
 
 text \<open>Formalizing HML$_{SRBB}$ by mutually recursive data types leads to expressiveness price functions of these other types,
 namely @{term \<open>expr_pr_inner\<close>} and @{term \<open>expr_pr_conjunct\<close>}, and corresponding definitions and lemmas.\<close>
@@ -402,6 +482,7 @@ fun expr_pr_inner :: \<open>('a, 's) hml_srbb_inner \<Rightarrow> energy\<close>
                  (st_conj_depth_inner \<chi>)
                  (imm_conj_depth_inner \<chi>)
                  (max_pos_conj_depth_inner \<chi>)
+                 (max_pos_conj_secondary_depth_inner \<chi>)
                  (max_neg_conj_depth_inner \<chi>)
                  (neg_depth_inner \<chi>)\<close>
 
@@ -415,6 +496,7 @@ fun expr_pr_conjunct :: \<open>('a, 's) hml_srbb_conjunct \<Rightarrow> energy\<
                  (st_conj_depth_conjunct \<psi>)
                  (imm_conj_depth_conjunct \<psi>)
                  (max_pos_conj_depth_conjunct \<psi>)
+                 (max_pos_conj_secondary_depth_conjunct \<psi>)
                  (max_neg_conj_depth_conjunct \<psi>)
                  (neg_depth_conjunct \<psi>)\<close>
 
@@ -434,34 +516,16 @@ text \<open>For example, here, we establish that the expressiveness price of \<o
 
 lemma expr_internal_eq:
   shows \<open>expressiveness_price (Internal \<chi>) = expr_pr_inner \<chi>\<close>
-proof-
-  have expr_internal: \<open>expressiveness_price (Internal \<chi>) = E (modal_depth_srbb (Internal \<chi>))
-                              (branching_conjunction_depth (Internal \<chi>))
-                              (unstable_conjunction_depth  (Internal \<chi>))
-                              (stable_conjunction_depth    (Internal \<chi>))
-                              (immediate_conjunction_depth (Internal \<chi>))
-                              (max_positive_conjunct_depth (Internal \<chi>))
-                              (max_negative_conjunct_depth (Internal \<chi>))
-                              (negation_depth              (Internal \<chi>))\<close>
-            using expressiveness_price.simps by blast
-          have \<open>modal_depth_srbb (Internal \<chi>) = modal_depth_srbb_inner \<chi>\<close>
-            \<open>(branching_conjunction_depth (Internal \<chi>)) = branch_conj_depth_inner \<chi>\<close>
-            \<open>(unstable_conjunction_depth  (Internal \<chi>)) = inst_conj_depth_inner \<chi>\<close>
-            \<open>(stable_conjunction_depth    (Internal \<chi>)) = st_conj_depth_inner \<chi>\<close>
-            \<open>(immediate_conjunction_depth (Internal \<chi>)) = imm_conj_depth_inner \<chi>\<close>
-            \<open>max_positive_conjunct_depth (Internal \<chi>) = max_pos_conj_depth_inner \<chi>\<close>
-            \<open>max_negative_conjunct_depth (Internal \<chi>) = max_neg_conj_depth_inner \<chi>\<close>
-            \<open>negation_depth (Internal \<chi>) = neg_depth_inner \<chi>\<close>
-            by simp+
-          with expr_internal show ?thesis
-            by auto
-        qed
+  by auto
 
-text \<open>If the price of a formula \<open>\<chi>\<close> is not greater than the minimum update @{term \<open>min1_6\<close>} apllied to some energy $e$,
+text \<open>If the price of a formula \<open>\<chi>\<close> is not greater than the minimum update @{term \<open>min1_7\<close>} applied to some energy $e$,
 then \<open>Pos \<chi>\<close> is not greater than \<open>e\<close>.\<close>
 lemma expr_pos:
-  assumes \<open>expr_pr_inner \<chi> \<le> the (min1_6 e)\<close>
-  shows \<open>expr_pr_conjunct (Pos \<chi>) \<le> e\<close>
+  assumes
+    \<open>expr_pr_inner \<chi> \<le> the (min1_7 e)\<close>
+    \<open>pos_conjuncts_sec e \<le> pos_conjuncts e\<close>
+  shows
+    \<open>expr_pr_conjunct (Pos \<chi>) \<le> e\<close>
 proof-
   have expr_internal: \<open>expr_pr_conjunct (Pos \<chi>) = E (modal_depth_srbb_conjunct (Pos \<chi>))
                               (branch_conj_depth_conjunct (Pos \<chi>))
@@ -469,6 +533,7 @@ proof-
                               (st_conj_depth_conjunct    (Pos \<chi>))
                               (imm_conj_depth_conjunct (Pos \<chi>))
                               (max_pos_conj_depth_conjunct (Pos \<chi>))
+                              (max_pos_conj_secondary_depth_conjunct (Pos \<chi>))
                               (max_neg_conj_depth_conjunct (Pos \<chi>))
                               (neg_depth_conjunct            (Pos \<chi>))\<close>
             using expr_pr_conjunct.simps by blast
@@ -478,25 +543,26 @@ proof-
                 \<open>(st_conj_depth_conjunct    (Pos \<chi>)) = st_conj_depth_inner \<chi>\<close>
                 \<open>(imm_conj_depth_conjunct (Pos \<chi>)) = imm_conj_depth_inner \<chi>\<close>
                 \<open>(max_pos_conj_depth_conjunct (Pos \<chi>)) = modal_depth_srbb_inner \<chi>\<close>
+                \<open>(max_pos_conj_secondary_depth_conjunct (Pos \<chi>)) = max_pos_conj_secondary_depth_inner \<chi>\<close>
                 \<open>(max_neg_conj_depth_conjunct (Pos \<chi>)) = max_neg_conj_depth_inner \<chi>\<close>
                 \<open>(neg_depth_conjunct            (Pos \<chi>)) = neg_depth_inner \<chi>\<close>
     by simp+
-  obtain e1 e2 e3 e4 e5 e6 e7 e8 where \<open>e = E e1 e2 e3 e4 e5 e6 e7 e8\<close>
+  obtain e1 e2 e3 e4 e5 e6 e7 e8 e9 where \<open>e = E e1 e2 e3 e4 e5 e6 e7 e8 e9\<close>
     by (metis energy.exhaust_sel)
-  hence \<open>min1_6 e = Some (E (min e1 e6) e2 e3 e4 e5 e6 e7 e8)\<close>
-    by (simp add: min1_6_def)
-  hence \<open>modal_depth_srbb_inner \<chi> \<le> (min e1 e6)\<close>
+  hence \<open>min1_7 e = Some (E (min e1 e7) e2 e3 e4 e5 e6 e7 e8 e9)\<close>
+    by (simp add: min1_7_def)
+  hence \<open>modal_depth_srbb_inner \<chi> \<le> (min e1 e7)\<close>
     using assms leq_components by fastforce
-  hence \<open>modal_depth_srbb_inner \<chi> \<le> e6\<close>
+  hence \<open>modal_depth_srbb_inner \<chi> \<le> e7\<close>
     using min.boundedE by blast
   thus \<open>expr_pr_conjunct (Pos \<chi>) \<le> e\<close>
-    using expr_internal pos_upd \<open>e = E e1 e2 e3 e4 e5 e6 e7 e8\<close> assms leq_components by auto
+    using expr_internal pos_upd \<open>e = E e1 e2 e3 e4 e5 e6 e7 e8 e9\<close> assms leq_components by auto
 qed
 
 lemma expr_neg:
   assumes
     \<open>expr_pr_inner \<chi> \<le> e'\<close>
-    \<open>(Option.bind ((subtract_fn 0 0 0 0 0 0 0 1) e) min1_7) = Some e'\<close>
+    \<open>(Option.bind ((subtract_fn 0 0 0 0 0 0 0 0 1) e) min1_8) = Some e'\<close>
   shows \<open>expr_pr_conjunct (Neg \<chi>) \<le> e\<close>
 proof-
   have expr_neg: \<open>expr_pr_conjunct (Neg \<chi>) =
@@ -506,6 +572,7 @@ proof-
       (st_conj_depth_conjunct (Neg \<chi>))
       (imm_conj_depth_conjunct (Neg \<chi>))
       (max_pos_conj_depth_conjunct (Neg \<chi>))
+      (max_pos_conj_secondary_depth_conjunct (Neg \<chi>))
       (max_neg_conj_depth_conjunct (Neg \<chi>))
       (neg_depth_conjunct (Neg \<chi>))\<close>
     using expr_pr_conjunct.simps by blast
@@ -516,33 +583,34 @@ proof-
     \<open>st_conj_depth_conjunct (Neg \<chi>) = st_conj_depth_inner \<chi>\<close>
     \<open>imm_conj_depth_conjunct (Neg \<chi>) = imm_conj_depth_inner \<chi>\<close>
     \<open>max_pos_conj_depth_conjunct (Neg \<chi>) = max_pos_conj_depth_inner \<chi>\<close>
+    \<open>max_pos_conj_secondary_depth_conjunct (Neg \<chi>) = max_pos_conj_secondary_depth_inner \<chi>\<close>
     \<open>max_neg_conj_depth_conjunct (Neg \<chi>) = modal_depth_srbb_inner \<chi>\<close>
     \<open>neg_depth_conjunct (Neg \<chi>) = 1 + neg_depth_inner \<chi>\<close>
     by simp+
-  obtain e1 e2 e3 e4 e5 e6 e7 e8 where e_def: \<open>e = E e1 e2 e3 e4 e5 e6 e7 e8\<close>
+  obtain e1 e2 e3 e4 e5 e6 e7 e8 e9 where e_def: \<open>e = E e1 e2 e3 e4 e5 e6 e7 e8 e9\<close>
     by (metis energy.exhaust_sel)
-  hence is_some: \<open>(subtract_fn 0 0 0 0 0 0 0 1 e = Some (E e1 e2 e3 e4 e5 e6 e7 (e8-1)))\<close>
+  hence is_some: \<open>(subtract_fn 0 0 0 0 0 0 0 0 1 e = Some (E e1 e2 e3 e4 e5 e6 e7 e8 (e9-1)))\<close>
     using assms bind_eq_None_conv by fastforce
-  hence \<open>modal_depth_srbb_inner \<chi> \<le> (min e1 e7)\<close>
-    using assms expr_pr_inner.simps leq_components min_1_7_subtr_simp e_def
-    by (metis energy.sel(1) energy.sel(7) option.discI option.inject)
-  moreover have \<open>neg_depth_inner \<chi> \<le> (e8-1)\<close>
-    using e_def is_some energy_minus leq_components min_1_7_simps assms
-    by (smt (verit, ccfv_threshold) bind.bind_lunit energy.sel(8) expr_pr_inner.simps option.sel)
-  moreover hence \<open>neg_depth_conjunct (Neg \<chi>) \<le> e8\<close>
+  hence \<open>modal_depth_srbb_inner \<chi> \<le> (min e1 e8)\<close>
+    using assms expr_pr_inner.simps leq_components min_1_8_subtr_simp e_def
+    by (metis energy.sel(1) energy.sel(8) option.discI option.inject)
+  moreover have \<open>neg_depth_inner \<chi> \<le> (e9-1)\<close>
+    using e_def is_some energy_minus leq_components min_1_8_simps assms
+    by (smt (verit, ccfv_threshold) bind.bind_lunit energy.sel(9) expr_pr_inner.simps option.sel)
+  moreover hence \<open>neg_depth_conjunct (Neg \<chi>) \<le> e9\<close>
     using \<open>neg_depth_conjunct (Neg \<chi>) = 1 + neg_depth_inner \<chi>\<close>
     by (metis is_some add_diff_assoc_enat add_diff_cancel_enat e_def enat.simps(3)
-        enat_defs(2) enat_diff_mono energy.sel(8) leq_components linorder_not_less
+        enat_defs(2) enat_diff_mono energy.sel(9) leq_components linorder_not_less
         option.distinct(1) order_le_less)
   ultimately show \<open>expr_pr_conjunct (Neg \<chi>) \<le> e\<close>
-    using expr_neg e_def is_some assms neg_ups assms leq_components min_1_7_subtr_simp
+    using expr_neg e_def is_some assms neg_ups assms leq_components min_1_8_subtr_simp
     by (metis energy.sel expr_pr_inner.simps min.bounded_iff option.distinct(1) option.inject)
 qed
 
 lemma expr_obs:
   assumes
     \<open>expressiveness_price \<phi> \<le> e'\<close>
-    \<open>subtract_fn 1 0 0 0 0 0 0 0 e = Some e'\<close>
+    \<open>subtract_fn 1 0 0 0 0 0 0 0 0 e = Some e'\<close>
   shows \<open>expr_pr_inner (Obs \<alpha> \<phi>) \<le> e\<close>
 proof-
   have expr_pr_obs:
@@ -553,6 +621,7 @@ proof-
       (st_conj_depth_inner (Obs \<alpha> \<phi>))
       (imm_conj_depth_inner (Obs \<alpha> \<phi>))
       (max_pos_conj_depth_inner (Obs \<alpha> \<phi>))
+      (max_pos_conj_secondary_depth_inner (Obs \<alpha> \<phi>))
       (max_neg_conj_depth_inner (Obs \<alpha> \<phi>))
       (neg_depth_inner (Obs \<alpha> \<phi>)))\<close>
     using expr_pr_inner.simps by blast
@@ -562,13 +631,13 @@ proof-
     \<open>inst_conj_depth_inner (Obs \<alpha> \<phi>) = unstable_conjunction_depth \<phi>\<close>
     \<open>st_conj_depth_inner (Obs \<alpha> \<phi>) = stable_conjunction_depth \<phi>\<close>
     \<open>imm_conj_depth_inner (Obs \<alpha> \<phi>) = immediate_conjunction_depth \<phi>\<close>
-    \<open>max_pos_conj_depth_inner (Obs \<alpha> \<phi>) = max_positive_conjunct_depth \<phi>\<close>
+    \<open>max_pos_conj_secondary_depth_inner (Obs \<alpha> \<phi>) = max_positive_conjunct_secondary_depth \<phi>\<close>
     \<open>max_neg_conj_depth_inner (Obs \<alpha> \<phi>) = max_negative_conjunct_depth \<phi>\<close>
     \<open>neg_depth_inner (Obs \<alpha> \<phi>) = negation_depth \<phi>\<close>
     by simp_all
-  obtain e1 e2 e3 e4 e5 e6 e7 e8 where e_def: \<open>e = E e1 e2 e3 e4 e5 e6 e7 e8\<close>
+  obtain e1 e2 e3 e4 e5 e6 e7 e8 e9 where e_def: \<open>e = E e1 e2 e3 e4 e5 e6 e7 e8 e9\<close>
     by (metis energy.exhaust_sel)
-  then have is_some: \<open>(subtract_fn 1 0 0 0 0 0 0 0 e = Some (E (e1-1) e2 e3 e4 e5 e6 e7 e8))\<close>
+  then have is_some: \<open>(subtract_fn 1 0 0 0 0 0 0 0 0 e = Some (E (e1-1) e2 e3 e4 e5 e6 e7 e8 e9))\<close>
     using energy_minus idiff_0_right assms
     by (metis option.discI)
   hence \<open>modal_depth_srbb \<phi> \<le> (e1 - 1)\<close>
@@ -587,9 +656,10 @@ qed
 
 lemma expr_st_conj:
   assumes
-    \<open>subtract_fn  0 0 0 1 0 0 0 0 e = Some e'\<close>
+    \<open>subtract_fn  0 0 0 1 0 0 0 0 0 e = Some e'\<close>
     \<open>I \<noteq> {}\<close>
     \<open>\<forall>q \<in> I. expr_pr_conjunct (\<psi>s q) \<le> e'\<close>
+    \<open>pos_conjuncts_sec e' \<le> modal_depth e'\<close>
   shows
     \<open>expr_pr_inner (StableConj I \<psi>s) \<le> e\<close>
 proof -
@@ -600,24 +670,30 @@ proof -
     \<open>st_conj_depth_inner (StableConj I \<psi>s) = 1 + Sup ((st_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close>
     \<open>imm_conj_depth_inner (StableConj I \<psi>s) = Sup ((imm_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close>
     \<open>max_pos_conj_depth_inner (StableConj I \<psi>s) = Sup ((max_pos_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close>
+    \<open>max_pos_conj_secondary_depth_inner (StableConj I \<psi>s) = 
+      Sup (((\<lambda>\<psi>. case \<psi> of (Pos \<chi>) \<Rightarrow> modal_depth_srbb_inner \<chi> | _ \<Rightarrow> max_pos_conj_secondary_depth_conjunct \<psi>) \<circ> \<psi>s)
+        ` (I - (revival_conjunct_index I \<psi>s)))\<close>
     \<open>max_neg_conj_depth_inner (StableConj I \<psi>s) = Sup ((max_neg_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close>
     \<open>neg_depth_inner (StableConj I \<psi>s) = Sup ((neg_depth_conjunct \<circ> \<psi>s) ` I)\<close>
     by force+
-  obtain e1 e2 e3 e4 e5 e6 e7 e8 where e_def: \<open>e = E e1 e2 e3 e4 e5 e6 e7 e8\<close>
+  obtain e1 e2 e3 e4 e5 e6 e7 e8 e9 where e_def: \<open>e = E e1 e2 e3 e4 e5 e6 e7 e8 e9\<close>
     using energy.exhaust_sel by blast
-  hence is_some: \<open>subtract_fn  0 0 0 1 0 0 0 0 e = Some (E e1 e2 e3 (e4-1) e5 e6 e7 e8)\<close>
+  hence is_some: \<open>subtract_fn  0 0 0 1 0 0 0 0 0 e = Some (E e1 e2 e3 (e4-1) e5 e6 e7 e8 e9)\<close>
     using assms minus_energy_def
     by (smt (verit, del_insts) energy_minus idiff_0_right option.distinct(1))
-  hence
+  hence min_e1_e7: \<open>min e1 e7 = e7\<close> using is_some assms by auto
+  from is_some have
     \<open>\<forall>i \<in> I. modal_depth_srbb_conjunct (\<psi>s i) \<le> e1\<close>
     \<open>\<forall>i \<in> I. branch_conj_depth_conjunct (\<psi>s i) \<le> e2\<close>
     \<open>\<forall>i \<in> I. inst_conj_depth_conjunct (\<psi>s i) \<le> e3\<close>
     \<open>\<forall>i \<in> I. st_conj_depth_conjunct (\<psi>s i) \<le> (e4 - 1)\<close>
     \<open>\<forall>i \<in> I. imm_conj_depth_conjunct (\<psi>s i) \<le> e5\<close>
     \<open>\<forall>i \<in> I. max_pos_conj_depth_conjunct (\<psi>s i) \<le> e6\<close>
-    \<open>\<forall>i \<in> I. max_neg_conj_depth_conjunct (\<psi>s i) \<le> e7\<close>
-    \<open>\<forall>i \<in> I. neg_depth_conjunct (\<psi>s i) \<le> e8\<close>
-    using assms unfolding leq_components by auto
+    \<open>\<forall>i \<in> I. max_pos_conj_secondary_depth_conjunct (\<psi>s i) \<le> e7\<close>
+    \<open>\<forall>i \<in> I. max_neg_conj_depth_conjunct (\<psi>s i) \<le> e8\<close>
+    \<open>\<forall>i \<in> I. neg_depth_conjunct (\<psi>s i) \<le> e9\<close>
+    using assms unfolding leq_components
+    by auto
   hence sups:
     \<open>Sup ((modal_depth_srbb_conjunct \<circ> \<psi>s) ` I) \<le> e1\<close>
     \<open>Sup ((branch_conj_depth_conjunct \<circ> \<psi>s) ` I) \<le> e2\<close>
@@ -625,20 +701,26 @@ proof -
     \<open>Sup ((st_conj_depth_conjunct \<circ> \<psi>s) ` I) \<le> (e4 - 1)\<close>
     \<open>Sup ((imm_conj_depth_conjunct \<circ> \<psi>s) ` I) \<le> e5\<close>
     \<open>Sup ((max_pos_conj_depth_conjunct \<circ> \<psi>s) ` I) \<le> e6\<close>
-    \<open>Sup ((max_neg_conj_depth_conjunct \<circ> \<psi>s) ` I) \<le> e7\<close>
-    \<open>Sup ((neg_depth_conjunct \<circ> \<psi>s) ` I) \<le> e8\<close>
+    \<open>Sup ((max_pos_conj_secondary_depth_conjunct \<circ> \<psi>s) ` I) \<le> e7\<close>
+    \<open>Sup ((max_neg_conj_depth_conjunct \<circ> \<psi>s) ` I) \<le> e8\<close>
+    \<open>Sup ((neg_depth_conjunct \<circ> \<psi>s) ` I) \<le> e9\<close>
     by (simp add: Sup_le_iff)+
   hence \<open>st_conj_depth_inner (StableConj I \<psi>s) \<le> e4\<close>
     using e_def is_some minus_energy_def leq_components st_conj_upds(4)
     by (metis add_diff_cancel_enat add_left_mono enat.simps(3) enat_defs(2) energy.sel(4) le_iff_add option.distinct(1))
-  then show ?thesis
-    using st_conj_upds sups
-    by (simp add: e_def)
+  moreover have \<open>\<forall>i \<in> I. i \<notin> revival_conjunct_index I \<psi>s \<longrightarrow>
+    (case \<psi>s i of Pos \<chi> \<Rightarrow> modal_depth_srbb_inner \<chi> | _ \<Rightarrow> max_pos_conj_secondary_depth_conjunct (\<psi>s i)) \<le> e7\<close>
+    using sups st_conj_upds unfolding e_def revival_conjunct_index_def max_def
+    sorry
+  ultimately show ?thesis
+    using st_conj_upds sups \<open>subtract_fn  0 0 0 1 0 0 0 0 0 e = Some e'\<close>
+    unfolding e_def
+    by (auto simp add:  SUP_le_iff)    
 qed
 
 lemma expr_imm_conj:
   assumes
-    \<open>subtract_fn  0 0 0 0 1 0 0 0 e = Some e'\<close>
+    \<open>subtract_fn  0 0 0 0 1 0 0 0 0 e = Some e'\<close>
     \<open>I \<noteq> {}\<close>
     \<open>expr_pr_inner (Conj I \<psi>s) \<le> e'\<close>
   shows \<open>expressiveness_price (ImmConj I \<psi>s) \<le> e\<close>
@@ -650,6 +732,7 @@ proof-
     \<open>st_conj_depth_inner (Conj I \<psi>s) = Sup ((st_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close>
     \<open>imm_conj_depth_inner (Conj I \<psi>s) = Sup ((imm_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close>
     \<open>max_pos_conj_depth_inner (Conj I \<psi>s) = Sup ((max_pos_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close>
+    \<open>max_pos_conj_secondary_depth_inner (Conj I \<psi>s) = Sup ((max_pos_conj_secondary_depth_conjunct \<circ> \<psi>s) ` I)\<close>
     \<open>max_neg_conj_depth_inner (Conj I \<psi>s) = Sup ((max_neg_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close>
     \<open>neg_depth_inner (Conj I \<psi>s) = Sup ((neg_depth_conjunct \<circ> \<psi>s) ` I)\<close>
     using assms
@@ -661,16 +744,17 @@ proof-
     \<open>stable_conjunction_depth (ImmConj I \<psi>s) = Sup ((st_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close>
     \<open>immediate_conjunction_depth (ImmConj I \<psi>s) = 1 + Sup ((imm_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close>
     \<open>max_positive_conjunct_depth (ImmConj I \<psi>s) = Sup ((max_pos_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close>
+    \<open>max_positive_conjunct_secondary_depth (ImmConj I \<psi>s) = Sup ((max_pos_conj_secondary_depth_conjunct \<circ> \<psi>s) ` I)\<close>
     \<open>max_negative_conjunct_depth (ImmConj I \<psi>s) = Sup ((max_neg_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close>
     \<open>negation_depth (ImmConj I \<psi>s) = Sup ((neg_depth_conjunct \<circ> \<psi>s) ` I)\<close>
     using assms
     by force+
-  obtain e1 e2 e3 e4 e5 e6 e7 e8 where e_def: \<open>e = E e1 e2 e3 e4 e5 e6 e7 e8\<close>
+  obtain e1 e2 e3 e4 e5 e6 e7 e8 e9 where e_def: \<open>e = E e1 e2 e3 e4 e5 e6 e7 e8 e9\<close>
     using assms by (metis energy.exhaust_sel)
-  hence is_some: \<open>(e - (E 0 0 0 0 1 0 0 0)) = (E e1 e2 e3 e4 (e5-1) e6 e7 e8)\<close>
+  hence is_some: \<open>(e - (E 0 0 0 0 1 0 0 0 0)) = (E e1 e2 e3 e4 (e5-1) e6 e7 e8 e9)\<close>
     using minus_energy_def
     by simp
-  hence \<open>e5>0\<close> using assms(1) e_def leq_components by auto
+  hence \<open>e5 > 0\<close> using assms(1) e_def leq_components by auto
   have
     \<open>E (modal_depth_srbb_inner (Conj I \<psi>s))
        (branch_conj_depth_inner (Conj I \<psi>s))
@@ -678,8 +762,9 @@ proof-
        (st_conj_depth_inner (Conj I \<psi>s))
        (imm_conj_depth_inner (Conj I \<psi>s))
        (max_pos_conj_depth_inner (Conj I \<psi>s))
+       (max_pos_conj_secondary_depth_inner (Conj I \<psi>s))
        (max_neg_conj_depth_inner (Conj I \<psi>s))
-       (neg_depth_inner (Conj I \<psi>s)) \<le> (E e1 e2 e3 e4 (e5-1) e6 e7 e8)\<close>
+       (neg_depth_inner (Conj I \<psi>s)) \<le> (E e1 e2 e3 e4 (e5-1) e6 e7 e8 e9)\<close>
     using is_some assms
     by (metis expr_pr_inner.simps option.discI option.inject)
   hence
@@ -689,8 +774,9 @@ proof-
     \<open>(st_conj_depth_inner (Conj I \<psi>s))\<le> e4\<close>
     \<open>(imm_conj_depth_inner (Conj I \<psi>s))\<le> (e5-1)\<close>
     \<open>(max_pos_conj_depth_inner (Conj I \<psi>s)) \<le> e6\<close>
-    \<open>(max_neg_conj_depth_inner (Conj I \<psi>s)) \<le> e7\<close>
-    \<open>(neg_depth_inner (Conj I \<psi>s))\<le> e8\<close>
+    \<open>(max_pos_conj_secondary_depth_inner (Conj I \<psi>s)) \<le> e7\<close>
+    \<open>(max_neg_conj_depth_inner (Conj I \<psi>s)) \<le> e8\<close>
+    \<open>(neg_depth_inner (Conj I \<psi>s))\<le> e9\<close>
     by auto
   hence E:
     \<open>Sup ((modal_depth_srbb_conjunct \<circ> \<psi>s) ` I) \<le> e1\<close>
@@ -699,20 +785,21 @@ proof-
     \<open>Sup ((st_conj_depth_conjunct \<circ> \<psi>s) ` I) \<le> e4\<close>
     \<open>Sup ((imm_conj_depth_conjunct \<circ> \<psi>s) ` I) \<le> (e5-1)\<close>
     \<open>Sup ((max_pos_conj_depth_conjunct \<circ> \<psi>s) ` I) \<le> e6\<close>
-    \<open>Sup ((max_neg_conj_depth_conjunct \<circ> \<psi>s) ` I) \<le> e7\<close>
-    \<open>Sup ((neg_depth_conjunct \<circ> \<psi>s) ` I) \<le> e8\<close>
+    \<open>Sup ((max_pos_conj_secondary_depth_conjunct \<circ> \<psi>s) ` I) \<le> e7\<close>
+    \<open>Sup ((max_neg_conj_depth_conjunct \<circ> \<psi>s) ` I) \<le> e8\<close>
+    \<open>Sup ((neg_depth_conjunct \<circ> \<psi>s) ` I) \<le> e9\<close>
     using conj_upds by force+
-  from \<open>Sup ((imm_conj_depth_conjunct \<circ> \<psi>s) ` I) \<le> (e5-1)\<close> have \<open>(1 + Sup ((imm_conj_depth_conjunct \<circ> \<psi>s) ` I)) \<le> e5\<close>
-    using assms(1) \<open>e5>0\<close> is_some e_def add.right_neutral add_diff_cancel_enat enat_add_left_cancel_le ileI1 le_iff_add plus_1_eSuc(1)
+  hence \<open>(1 + Sup ((imm_conj_depth_conjunct \<circ> \<psi>s) ` I)) \<le> e5\<close>
+    using assms(1) \<open>e5>0\<close> is_some e_def add.right_neutral add_diff_cancel_enat
+      enat_add_left_cancel_le ileI1 le_iff_add plus_1_eSuc(1)
     by metis
   thus \<open>expressiveness_price (ImmConj I \<psi>s) \<le> e\<close> using imm_conj_upds E
     by (metis e_def  energy.sel expressiveness_price.elims leD somewhere_larger_eq)
-
 qed
 
 lemma expr_conj:
   assumes
-    \<open>subtract_fn 0 0 1 0 0 0 0 0 e = Some e'\<close>
+    \<open>subtract_fn 0 0 1 0 0 0 0 0 0 e = Some e'\<close>
     \<open>I \<noteq> {}\<close>
     \<open>\<forall>q \<in> I. expr_pr_conjunct (\<psi>s q) \<le> e'\<close>
   shows \<open>expr_pr_inner (Conj I \<psi>s) \<le> e\<close>
@@ -724,12 +811,13 @@ proof-
     \<open>st_conj_depth_inner (Conj I \<psi>s) = Sup ((st_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close>
     \<open>imm_conj_depth_inner (Conj I \<psi>s) = Sup ((imm_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close>
     \<open>max_pos_conj_depth_inner (Conj I \<psi>s) = Sup ((max_pos_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close>
+    \<open>max_pos_conj_secondary_depth_inner (Conj I \<psi>s) = Sup ((max_pos_conj_secondary_depth_conjunct \<circ> \<psi>s) ` I)\<close>
     \<open>max_neg_conj_depth_inner (Conj I \<psi>s) = Sup ((max_neg_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close>
     \<open>neg_depth_inner (Conj I \<psi>s) = Sup ((neg_depth_conjunct \<circ> \<psi>s) ` I)\<close>
     using assms by force+
-  obtain e1 e2 e3 e4 e5 e6 e7 e8 where e_def: \<open>e = E e1 e2 e3 e4 e5 e6 e7 e8\<close>
+  obtain e1 e2 e3 e4 e5 e6 e7 e8 e9 where e_def: \<open>e = E e1 e2 e3 e4 e5 e6 e7 e8 e9\<close>
     using energy.exhaust_sel by metis
-  hence is_some: \<open>e - (E 0 0 1 0 0 0 0 0) = E e1 e2 (e3-1) e4 e5 e6 e7 e8\<close>
+  hence is_some: \<open>e - (E 0 0 1 0 0 0 0 0 0) = E e1 e2 (e3-1) e4 e5 e6 e7 e8 e9\<close>
     using minus_energy_def by simp
   hence \<open>e3>0\<close> using assms(1) e_def leq_components by auto
   hence
@@ -739,8 +827,9 @@ proof-
     \<open>\<forall>i \<in> I. st_conj_depth_conjunct (\<psi>s i) \<le> e4\<close>
     \<open>\<forall>i \<in> I. imm_conj_depth_conjunct (\<psi>s i) \<le> e5\<close>
     \<open>\<forall>i \<in> I. max_pos_conj_depth_conjunct (\<psi>s i) \<le> e6\<close>
-    \<open>\<forall>i \<in> I. max_neg_conj_depth_conjunct (\<psi>s i) \<le> e7\<close>
-    \<open>\<forall>i \<in> I. neg_depth_conjunct (\<psi>s i) \<le> e8\<close>
+    \<open>\<forall>i \<in> I. max_pos_conj_secondary_depth_conjunct (\<psi>s i) \<le> e7\<close>
+    \<open>\<forall>i \<in> I. max_neg_conj_depth_conjunct (\<psi>s i) \<le> e8\<close>
+    \<open>\<forall>i \<in> I. neg_depth_conjunct (\<psi>s i) \<le> e9\<close>
     using assms is_some energy.sel leq_components
     by (metis expr_pr_conjunct.elims option.distinct(1) option.inject)+
   hence sups:
@@ -750,8 +839,9 @@ proof-
     \<open>Sup ((st_conj_depth_conjunct \<circ> \<psi>s) ` I) \<le> e4\<close>
     \<open>Sup ((imm_conj_depth_conjunct \<circ> \<psi>s) ` I) \<le> e5\<close>
     \<open>Sup ((max_pos_conj_depth_conjunct \<circ> \<psi>s) ` I) \<le> e6\<close>
-    \<open>Sup ((max_neg_conj_depth_conjunct \<circ> \<psi>s) ` I) \<le> e7\<close>
-    \<open>Sup ((neg_depth_conjunct \<circ> \<psi>s) ` I) \<le> e8\<close>
+    \<open>Sup ((max_pos_conj_secondary_depth_conjunct \<circ> \<psi>s) ` I) \<le> e7\<close>
+    \<open>Sup ((max_neg_conj_depth_conjunct \<circ> \<psi>s) ` I) \<le> e8\<close>
+    \<open>Sup ((neg_depth_conjunct \<circ> \<psi>s) ` I) \<le> e9\<close>
     by (simp add: Sup_le_iff)+
   hence \<open>inst_conj_depth_inner (Conj I \<psi>s) \<le> e3\<close>
     using \<open>e3>0\<close> is_some e_def
@@ -765,27 +855,27 @@ qed
 
 lemma expr_br_conj:
   assumes
-    \<open>subtract_fn 0 1 1 0 0 0 0 0 e = Some e'\<close>
+    \<open>subtract_fn 0 1 1 0 0 0 0 0 0 e = Some e'\<close>
     \<open>min1_6 e' = Some e''\<close>
-    \<open>subtract_fn 1 0 0 0 0 0 0 0 e'' = Some e'''\<close>
+    \<open>subtract_fn 1 0 0 0 0 0 0 0 0 e'' = Some e'''\<close>
     \<open>expressiveness_price \<phi> \<le> e'''\<close>
     \<open>\<forall>q \<in> Q. expr_pr_conjunct (\<Phi> q) \<le> e'\<close>
     \<open>1 + modal_depth_srbb \<phi> \<le> pos_conjuncts e\<close>
   shows \<open>expr_pr_inner (BranchConj \<alpha> \<phi> Q \<Phi>) \<le> e\<close>
 proof-
-  obtain e1 e2 e3 e4 e5 e6 e7 e8 where e_def: \<open>e = E e1 e2 e3 e4 e5 e6 e7 e8\<close>
-    by (smt (z3) energy.exhaust)
-  hence e'''_def: \<open>e''' = (E ((min e1 e6)-1) (e2-1) (e3-1) e4 e5 e6 e7 e8)\<close>
+  obtain e1 e2 e3 e4 e5 e6 e7 e8 e9 where e_def: \<open>e = E e1 e2 e3 e4 e5 e6 e7 e8 e9\<close>
+    using energy.exhaust by blast
+  hence e'''_def: \<open>e''' = (E ((min e1 e6)-1) (e2-1) (e3-1) e4 e5 e6 e7 e8 e9)\<close>
     using minus_energy_def
     by (smt (z3) assms energy.sel idiff_0_right min_1_6_simps option.distinct(1) option.sel)
-  hence min_vals: \<open>the (min1_6 (e - E 0 1 1 0 0 0 0 0)) - (E 1 0 0 0 0 0 0 0) = (E ((min e1 e6)-1) (e2-1) (e3-1) e4 e5 e6 e7 e8)\<close>
+  hence min_vals: \<open>the (min1_6 (e - E 0 1 1 0 0 0 0 0 0)) - (E 1 0 0 0 0 0 0 0 0) = (E ((min e1 e6)-1) (e2-1) (e3-1) e4 e5 e6 e7 e8 e9)\<close>
     using assms
     by (metis not_Some_eq option.sel)
   hence \<open>0 < e1\<close> \<open>0 < e2\<close> \<open>0 < e3\<close> \<open>0 < e6\<close>
     using assms energy.sel min_1_6_simps
     unfolding e_def minus_energy_def leq_components
     by (metis (no_types, lifting) gr_zeroI idiff_0_right min_enat_simps(3) not_one_le_zero option.distinct(1) option.sel, auto)
-  have e_comp: \<open>e - (E 0 1 1 0 0 0 0 0) = E e1 (e2-1) (e3-1) e4 e5 e6 e7 e8\<close> using e_def
+  have e_comp: \<open>e - (E 0 1 1 0 0 0 0 0 0) = E e1 (e2-1) (e3-1) e4 e5 e6 e7 e8 e9\<close> using e_def
     by simp
   have conj:
     \<open>E (modal_depth_srbb            \<phi>)
@@ -794,9 +884,10 @@ proof-
        (stable_conjunction_depth    \<phi>)
        (immediate_conjunction_depth \<phi>)
        (max_positive_conjunct_depth \<phi>)
+       (max_positive_conjunct_secondary_depth \<phi>)
        (max_negative_conjunct_depth \<phi>)
        (negation_depth              \<phi>)
-          \<le> ((E ((min e1 e6)-1) (e2-1) (e3-1) e4 e5 e6 e7 e8))\<close>
+          \<le> ((E ((min e1 e6)-1) (e2-1) (e3-1) e4 e5 e6 e7 e8 e9))\<close>
     using assms e'''_def by force
   hence conj_single:
     \<open>modal_depth_srbb \<phi>              \<le> ((min e1 e6)-1)\<close>
@@ -805,8 +896,9 @@ proof-
     \<open>(stable_conjunction_depth    \<phi>) \<le> e4\<close>
     \<open>(immediate_conjunction_depth \<phi>) \<le> e5\<close>
     \<open>(max_positive_conjunct_depth \<phi>) \<le> e6\<close>
-    \<open>(max_negative_conjunct_depth \<phi>) \<le> e7\<close>
-    \<open>(negation_depth              \<phi>) \<le> e8\<close>
+    \<open>(max_positive_conjunct_secondary_depth \<phi>) \<le> e7\<close>
+    \<open>(max_negative_conjunct_depth \<phi>) \<le> e8\<close>
+    \<open>(negation_depth              \<phi>) \<le> e9\<close>
     using leq_components by auto
   have \<open>0 < (min e1 e6)\<close> using \<open>0 < e1\<close> \<open>0 < e6\<close>
     using min_less_iff_conj by blast
@@ -827,9 +919,10 @@ proof-
       (st_conj_depth_conjunct  (\<Phi> q))
       (imm_conj_depth_conjunct  (\<Phi> q))
       (max_pos_conj_depth_conjunct  (\<Phi> q))
+      (max_pos_conj_secondary_depth_conjunct  (\<Phi> q))
       (max_neg_conj_depth_conjunct  (\<Phi> q))
       (neg_depth_conjunct  (\<Phi> q))
-    \<le> (E e1 (e2-1) (e3-1) e4 e5 e6 e7 e8)\<close>
+    \<le> (E e1 (e2-1) (e3-1) e4 e5 e6 e7 e8 e9)\<close>
     using assms e_def e_comp
     by (metis expr_pr_conjunct.simps option.distinct(1) option.sel)
   hence branch_single:
@@ -839,8 +932,9 @@ proof-
     \<open>\<forall>q\<in>Q. (st_conj_depth_conjunct  (\<Phi> q)) \<le> e4\<close>
     \<open>\<forall>q\<in>Q. (imm_conj_depth_conjunct  (\<Phi> q)) \<le> e5\<close>
     \<open>\<forall>q\<in>Q. (max_pos_conj_depth_conjunct  (\<Phi> q)) \<le> e6\<close>
-    \<open>\<forall>q\<in>Q. (max_neg_conj_depth_conjunct  (\<Phi> q)) \<le> e7\<close>
-    \<open>\<forall>q\<in>Q. (neg_depth_conjunct  (\<Phi> q)) \<le> e8\<close>
+    \<open>\<forall>q\<in>Q. (max_pos_conj_secondary_depth_conjunct  (\<Phi> q)) \<le> e7\<close>
+    \<open>\<forall>q\<in>Q. (max_neg_conj_depth_conjunct  (\<Phi> q)) \<le> e8\<close>
+    \<open>\<forall>q\<in>Q. (neg_depth_conjunct  (\<Phi> q)) \<le> e9\<close>
     by auto
   hence \<open>\<forall>q\<in>Q. (1 + branch_conj_depth_conjunct  (\<Phi> q)) \<le> e2\<close>
     by (metis \<open>0 < e2\<close> add.commute add_diff_assoc_enat add_diff_cancel_enat add_right_mono i1_ne_infinity ileI1 one_eSuc)
@@ -855,6 +949,7 @@ proof-
       (st_conj_depth_inner (BranchConj \<alpha> \<phi> Q \<Phi>))
       (imm_conj_depth_inner (BranchConj \<alpha> \<phi> Q \<Phi>))
       (max_pos_conj_depth_inner (BranchConj \<alpha> \<phi> Q \<Phi>))
+      (max_pos_conj_secondary_depth_inner (BranchConj \<alpha> \<phi> Q \<Phi>))
       (max_neg_conj_depth_inner (BranchConj \<alpha> \<phi> Q \<Phi>))
       (neg_depth_inner (BranchConj \<alpha> \<phi> Q \<Phi>))\<close> by simp
   hence expr:
@@ -865,6 +960,7 @@ proof-
       (Sup ({stable_conjunction_depth \<phi>} \<union> ((st_conj_depth_conjunct \<circ> \<Phi>) ` Q)))
       (Sup ({immediate_conjunction_depth \<phi>} \<union> ((imm_conj_depth_conjunct \<circ> \<Phi>) ` Q)))
       (Sup ({1 + modal_depth_srbb \<phi>, max_positive_conjunct_depth \<phi>} \<union> ((max_pos_conj_depth_conjunct \<circ> \<Phi>) ` Q)))
+      (Sup ({1 + modal_depth_srbb \<phi>, max_positive_conjunct_secondary_depth \<phi>} \<union> ((max_positive_conjunct_secondary_depth \<circ> \<Phi>) ` Q)))
       (Sup ({max_negative_conjunct_depth \<phi>} \<union> ((max_neg_conj_depth_conjunct \<circ> \<Phi>) ` Q)))
       (Sup ({negation_depth \<phi>} \<union> ((neg_depth_conjunct \<circ> \<Phi>) ` Q)))\<close> by auto
   from branch_single \<open>1 + modal_depth_srbb \<phi> \<le> e1\<close>
@@ -964,6 +1060,7 @@ lemma example_\<phi>_cp:
   and \<open>stable_conjunction_depth    \<phi> = 0\<close>
   and \<open>immediate_conjunction_depth \<phi> = 0\<close>
   and \<open>max_positive_conjunct_depth \<phi> = 1\<close>
+  and \<open>max_positive_conjunct_secondary_depth \<phi> = 1\<close>
   and \<open>max_negative_conjunct_depth \<phi> = 0\<close>
   and \<open>negation_depth              \<phi> = 0\<close>
   unfolding \<phi>

@@ -59,7 +59,7 @@ and
                \<open>'i set\<close> \<open>'i \<Rightarrow> ('act, 'i) hml_srbb_conjunct\<close>
 and
   ('act, 'i) hml_srbb_conjunct =
-    Pos \<open>('act, 'i) hml_srbb_inner\<close> |
+    is_pos: Pos \<open>('act, 'i) hml_srbb_inner\<close> |
     Neg \<open>('act, 'i) hml_srbb_inner\<close>
 
 
