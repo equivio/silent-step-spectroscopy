@@ -1002,20 +1002,21 @@ qed
 
 lemma expressiveness_price_ImmConj_geq_parts:
   assumes \<open>i \<in> I\<close>
-  shows \<open>expressiveness_price (ImmConj I \<psi>s) - E 0 0 1 0 1 0 0 0 \<ge> expr_pr_conjunct (\<psi>s i)\<close>
+  shows \<open>expressiveness_price (ImmConj I \<psi>s) - E 0 0 1 0 1 0 0 0 0 \<ge> expr_pr_conjunct (\<psi>s i)\<close>
 proof-
   from assms have \<open>I \<noteq> {}\<close> by blast
   from expressiveness_price_ImmConj_non_empty_def[OF \<open>I \<noteq> {}\<close>]
-  have \<open>expressiveness_price (ImmConj I \<psi>s) \<ge> E 0 0 1 0 1 0 0 0\<close>
+  have \<open>expressiveness_price (ImmConj I \<psi>s) \<ge> E 0 0 1 0 1 0 0 0 0\<close>
     using energy_leq_cases by force
   hence
-  \<open>expressiveness_price (ImmConj I \<psi>s) - E 0 0 1 0 1 0 0 0 = E
+  \<open>expressiveness_price (ImmConj I \<psi>s) - E 0 0 1 0 1 0 0 0 0 = E
     (Sup ((modal_depth_srbb_conjunct \<circ> \<psi>s) ` I))
     (Sup ((branch_conj_depth_conjunct \<circ> \<psi>s) ` I))
     (Sup ((inst_conj_depth_conjunct \<circ> \<psi>s) ` I))
     (Sup ((st_conj_depth_conjunct \<circ> \<psi>s) ` I))
     (Sup ((imm_conj_depth_conjunct \<circ> \<psi>s) ` I))
     (Sup ((max_pos_conj_depth_conjunct \<circ> \<psi>s) ` I))
+    (Sup ((max_pos_conj_secondary_depth_conjunct \<circ> \<psi>s) ` I))
     (Sup ((max_neg_conj_depth_conjunct \<circ> \<psi>s) ` I))
     (Sup ((neg_depth_conjunct \<circ> \<psi>s) ` I))\<close>
     unfolding expressiveness_price_ImmConj_non_empty_def[OF \<open>I \<noteq> {}\<close>]
@@ -1027,7 +1028,7 @@ qed
 
 lemma expressiveness_price_ImmConj_geq_parts':
   assumes \<open>i \<in> I\<close>
-  shows \<open>(expressiveness_price (ImmConj I \<psi>s) - E 0 0 0 0 1 0 0 0) - E 0 0 1 0 0 0 0 0 \<ge> expr_pr_conjunct (\<psi>s i)\<close>
+  shows \<open>(expressiveness_price (ImmConj I \<psi>s) - E 0 0 0 0 1 0 0 0 0) - E 0 0 1 0 0 0 0 0 0 \<ge> expr_pr_conjunct (\<psi>s i)\<close>
   using expressiveness_price_ImmConj_geq_parts[OF assms]
     less_eq_energy_def minus_energy_def
   by (smt (z3) energy.sel idiff_0_right)
@@ -1062,7 +1063,7 @@ lemma example_\<phi>_cp:
   and \<open>stable_conjunction_depth    \<phi> = 0\<close>
   and \<open>immediate_conjunction_depth \<phi> = 0\<close>
   and \<open>max_positive_conjunct_depth \<phi> = 1\<close>
-  and \<open>max_positive_conjunct_secondary_depth \<phi> = 1\<close>
+  and \<open>max_positive_conjunct_secondary_depth \<phi> = 0\<close>
   and \<open>max_negative_conjunct_depth \<phi> = 0\<close>
   and \<open>negation_depth              \<phi> = 0\<close>
   unfolding \<phi>
@@ -1076,7 +1077,7 @@ lemma \<open>expressiveness_price (Internal
                       then (Pos (Obs a TT))
                       else if i = right
                            then (Pos (Obs b TT))
-                           else undefined)))))) = E 2 0 1 0 0 1 0 0\<close>
+                           else undefined)))))) = E 2 0 1 0 0 1 0 0 0\<close>
   by simp
 
 end (* Inhabited_LTS *)
@@ -1084,20 +1085,20 @@ end (* Inhabited_LTS *)
 context LTS_Tau
 begin
 
-lemma \<open>expressiveness_price TT = E 0 0 0 0 0 0 0 0\<close>
+lemma \<open>expressiveness_price TT = E 0 0 0 0 0 0 0 0 0\<close>
   by simp
 
-lemma \<open>expressiveness_price (ImmConj {} \<psi>s) = E 0 0 0 0 0 0 0 0\<close>
+lemma \<open>expressiveness_price (ImmConj {} \<psi>s) = E 0 0 0 0 0 0 0 0 0\<close>
   by (simp add: Sup_enat_def)
 
-lemma \<open>expressiveness_price (Internal (Conj {} \<psi>s)) = E 0 0 0 0 0 0 0 0\<close>
+lemma \<open>expressiveness_price (Internal (Conj {} \<psi>s)) = E 0 0 0 0 0 0 0 0 0\<close>
   by (simp add: Sup_enat_def)
 
-lemma \<open>expressiveness_price (Internal (BranchConj \<alpha> TT {} \<psi>s)) = E 1 1 1 0 0 1 0 0\<close>
+lemma \<open>expressiveness_price (Internal (BranchConj \<alpha> TT {} \<psi>s)) = E 1 1 1 0 0 1 0 0 0\<close>
   by (simp add: Sup_enat_def)
 
 lemma expr_obs_phi:
-  shows \<open>subtract_fn 1 0 0 0 0 0 0 0 (expr_pr_inner (Obs \<alpha> \<phi>)) = Some (expressiveness_price \<phi>)\<close>
+  shows \<open>subtract_fn 1 0 0 0 0 0 0 0 0 (expr_pr_inner (Obs \<alpha> \<phi>)) = Some (expressiveness_price \<phi>)\<close>
   by simp
 
 subsection \<open>Characterizing Equivalence by Energy Coordinates\<close>
@@ -1115,7 +1116,7 @@ subsection \<open>Relational Effects of Prices\<close>
 
 lemma distinction_combination_eta:
   fixes p q
-  defines \<open>Q\<alpha> \<equiv> {q'. q \<Zsurj> q' \<and>  (\<nexists>\<phi>. \<phi> \<in> \<O> (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> 0 0) \<and> distinguishes \<phi> p q')}\<close>
+  defines \<open>Q\<alpha> \<equiv> {q'. q \<Zsurj> q' \<and>  (\<nexists>\<phi>. \<phi> \<in> \<O> (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> 0 0 0) \<and> distinguishes \<phi> p q')}\<close>
   assumes
     \<open>p \<mapsto>a \<alpha> p'\<close>
     \<open>\<forall>q'\<in> Q\<alpha>.
@@ -1144,15 +1145,15 @@ qed
 lemma distinction_conjunctification_two_way_price:
   assumes
     \<open>\<forall>q\<in>I. distinguishes (\<Phi> q) p q \<or> distinguishes (\<Phi> q) q p\<close>
-    \<open>\<forall>q\<in>I. \<Phi> q \<in> \<O> (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> \<infinity> \<infinity>)\<close>
+    \<open>\<forall>q\<in>I. \<Phi> q \<in> \<O> (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> e7 \<infinity> \<infinity>)\<close>
   shows
     \<open>\<forall>q\<in>I.
       (if distinguishes (\<Phi> q) p q then conjunctify_distinctions else conjunctify_distinctions_dual) \<Phi> p q
-      \<in> \<O>_conjunct (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> \<infinity> \<infinity>)\<close>
+      \<in> \<O>_conjunct (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> e7 \<infinity> \<infinity>)\<close>
 proof
   fix q
   assume \<open>q \<in> I\<close>
-  show \<open>(if distinguishes (\<Phi> q) p q then conjunctify_distinctions else conjunctify_distinctions_dual) \<Phi> p q \<in> \<O>_conjunct (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> \<infinity> \<infinity>)\<close>
+  show \<open>(if distinguishes (\<Phi> q) p q then conjunctify_distinctions else conjunctify_distinctions_dual) \<Phi> p q \<in> \<O>_conjunct (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> e7 \<infinity> \<infinity>)\<close>
   proof (cases \<open>\<Phi> q\<close>)
     case TT
     then show ?thesis
@@ -1177,7 +1178,7 @@ qed
 lemma distinction_combination_eta_two_way:
   fixes p q p' \<Phi>
   defines
-    \<open>Q\<alpha> \<equiv> {q'. q \<Zsurj> q' \<and>  (\<nexists>\<phi>. \<phi> \<in> \<O> (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> \<infinity> \<infinity>) \<and> (distinguishes \<phi> p q' \<or> distinguishes \<phi> q' p))}\<close> and
+    \<open>Q\<alpha> \<equiv> {q'. q \<Zsurj> q' \<and>  (\<nexists>\<phi>. \<phi> \<in> \<O> (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> 0 \<infinity> \<infinity>) \<and> (distinguishes \<phi> p q' \<or> distinguishes \<phi> q' p))}\<close> and
     \<open>\<Psi>\<alpha> \<equiv> \<lambda>q'''. (if distinguishes (\<Phi> q''') p' q''' then conjunctify_distinctions else conjunctify_distinctions_dual) \<Phi> p' q'''\<close>
   assumes
     \<open>p \<mapsto>a \<alpha> p'\<close>
@@ -1258,29 +1259,29 @@ proof
 qed
 
 lemma modal_stability_respecting:
-  \<open>stability_respecting (preordered (\<O> (E e1 e2 e3 \<infinity> e5 \<infinity> e7 e8)))\<close>
+  \<open>stability_respecting (preordered (\<O> (E e1 e2 e3 \<infinity> e5 \<infinity> \<infinity> e8 e9)))\<close>
   unfolding stability_respecting_def
 proof safe
   fix p q
   assume p_stability:
-    \<open>preordered (\<O> (E e1 e2 e3 \<infinity> e5 \<infinity> e7 e8)) p q\<close>
+    \<open>preordered (\<O> (E e1 e2 e3 \<infinity> e5 \<infinity> \<infinity> e8 e9)) p q\<close>
     \<open>stable_state p\<close>
-  have \<open>\<not>(\<forall>q'. q \<Zsurj> q' \<longrightarrow> \<not> preordered (\<O> (E e1 e2 e3 \<infinity> e5 \<infinity> e7 e8)) p q' \<or> \<not> stable_state q')\<close>
+  have \<open>\<not>(\<forall>q'. q \<Zsurj> q' \<longrightarrow> \<not> preordered (\<O> (E e1 e2 e3 \<infinity> e5 \<infinity> \<infinity> e8 e9)) p q' \<or> \<not> stable_state q')\<close>
   proof safe
-    assume \<open>\<forall>q'. q \<Zsurj> q' \<longrightarrow> \<not> preordered (\<O> (E e1 e2 e3 \<infinity> e5 \<infinity> e7 e8)) p q' \<or> \<not> stable_state q'\<close>
-    hence  \<open>\<forall>q'. q \<Zsurj> q' \<longrightarrow> stable_state q' \<longrightarrow> (\<exists>\<phi> \<in> \<O> (E e1 e2 e3 \<infinity> e5 \<infinity> e7 e8). distinguishes \<phi> p q')\<close> by auto
+    assume \<open>\<forall>q'. q \<Zsurj> q' \<longrightarrow> \<not> preordered (\<O> (E e1 e2 e3 \<infinity> e5 \<infinity> \<infinity> e8 e9)) p q' \<or> \<not> stable_state q'\<close>
+    hence  \<open>\<forall>q'. q \<Zsurj> q' \<longrightarrow> stable_state q' \<longrightarrow> (\<exists>\<phi> \<in> \<O> (E e1 e2 e3 \<infinity> e5 \<infinity> \<infinity> e8 e9). distinguishes \<phi> p q')\<close> by auto
     then obtain \<Phi> where \<Phi>_def:
       \<open>\<forall>q'\<in>(silent_reachable_set {q}). stable_state q'
-      \<longrightarrow> distinguishes (\<Phi> q') p q' \<and> \<Phi> q' \<in> \<O> (E e1 e2 e3 \<infinity> e5 \<infinity> e7 e8)\<close>
+      \<longrightarrow> distinguishes (\<Phi> q') p q' \<and> \<Phi> q' \<in> \<O> (E e1 e2 e3 \<infinity> e5 \<infinity> \<infinity> e8 e9)\<close>
       using singleton_iff sreachable_set_is_sreachable by metis
     hence distinctions:
       \<open>\<forall>q'\<in>(silent_reachable_set {q} \<inter> {q'. stable_state q'}). distinguishes (\<Phi> q') p q'\<close>
-      \<open>\<forall>q'\<in>(silent_reachable_set {q} \<inter> {q'. stable_state q'}). \<Phi> q' \<in> \<O> (E e1 e2 e3 \<infinity> e5 \<infinity> e7 e8)\<close> by blast+
+      \<open>\<forall>q'\<in>(silent_reachable_set {q} \<inter> {q'. stable_state q'}). \<Phi> q' \<in> \<O> (E e1 e2 e3 \<infinity> e5 \<infinity> \<infinity> e8 e9)\<close> by blast+
     from distinction_conjunctification_price[OF this] have
-      \<open>\<forall>q'\<in>(silent_reachable_set {q} \<inter> {q'. stable_state q'}). conjunctify_distinctions \<Phi> p q' \<in> \<O>_conjunct (E e1 e2 e3 \<infinity> e5 \<infinity> e7 e8)\<close>
+      \<open>\<forall>q'\<in>(silent_reachable_set {q} \<inter> {q'. stable_state q'}). conjunctify_distinctions \<Phi> p q' \<in> \<O>_conjunct (E e1 e2 e3 \<infinity> e5 \<infinity> \<infinity> e8 e9)\<close>
       by fastforce
     hence conj_price: \<open>StableConj (silent_reachable_set {q} \<inter> {q'. stable_state q'}) (conjunctify_distinctions \<Phi> p)
-        \<in> \<O>_inner (E e1 e2 e3 \<infinity> e5 \<infinity> e7 e8)\<close>
+        \<in> \<O>_inner (E e1 e2 e3 \<infinity> e5 \<infinity> \<infinity> e8 e9)\<close>
       unfolding \<O>_inner_def \<O>_conjunct_def using SUP_le_iff by fastforce
     from \<Phi>_def have
       \<open>\<forall>q'\<in>(silent_reachable_set {q}). stable_state q' \<longrightarrow>
@@ -1299,12 +1300,12 @@ proof safe
       using silent_reachable.refl by auto
     moreover have
       \<open>Internal (StableConj (silent_reachable_set {q} \<inter> {q'. stable_state q'}) (conjunctify_distinctions \<Phi> p))
-        \<in> \<O> (E e1 e2 e3 \<infinity> e5 \<infinity> e7 e8)\<close>
+        \<in> \<O> (E e1 e2 e3 \<infinity> e5 \<infinity> \<infinity> e8 e9)\<close>
       using conj_price unfolding \<O>_def \<O>_inner_def by simp
     ultimately show False
       using p_stability(1) preordered_no_distinction by blast
   qed
-  thus \<open>\<exists>q'. q \<Zsurj> q' \<and> preordered (\<O> (E e1 e2 e3 \<infinity> e5 \<infinity> e7 e8)) p q' \<and> stable_state q'\<close>
+  thus \<open>\<exists>q'. q \<Zsurj> q' \<and> preordered (\<O> (E e1 e2 e3 \<infinity> e5 \<infinity> \<infinity> e8 e9)) p q' \<and> stable_state q'\<close>
     by blast
 qed
 
