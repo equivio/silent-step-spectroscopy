@@ -414,7 +414,7 @@ primrec
 
   \<open>neg_depth_inner (Obs _ \<phi>) = negation_depth \<phi>\<close> |
   \<open>neg_depth_inner (Conj I \<psi>s) = Sup ((neg_depth_conjunct \<circ> \<psi>s) ` I)\<close> |
-  \<open>neg_depth_inner (StableConj I \<psi>s) = Sup ((neg_depth_conjunct \<circ> \<psi>s) ` I)\<close> |
+  \<open>neg_depth_inner (StableConj I \<psi>s) = Sup ({1} \<union>  (neg_depth_conjunct \<circ> \<psi>s) ` I)\<close> |
   \<open>neg_depth_inner (BranchConj _ \<phi> I \<psi>s) = Sup ({negation_depth \<phi>} \<union> ((neg_depth_conjunct \<circ> \<psi>s) ` I))\<close> |
 
   \<open>neg_depth_conjunct (Pos \<chi>) = neg_depth_inner \<chi>\<close> |
@@ -660,6 +660,7 @@ lemma expr_st_conj:
     \<open>I \<noteq> {}\<close>
     \<open>\<forall>q \<in> I. expr_pr_conjunct (\<psi>s q) \<le> e'\<close>
     \<open>\<forall>q \<in> I - revival_conjunct_index I \<psi>s. is_pos (\<psi>s q) \<longrightarrow> modal_depth_srbb_conjunct (\<psi>s q) \<le> pos_conjuncts_sec e'\<close>
+    \<open>0 < neg_depth e\<close>
   shows
     \<open>expr_pr_inner (StableConj I \<psi>s) \<le> e\<close>
 proof -
@@ -674,7 +675,7 @@ proof -
       Sup (((\<lambda>\<psi>. case \<psi> of (Pos \<chi>) \<Rightarrow> modal_depth_srbb_inner \<chi> | _ \<Rightarrow> max_pos_conj_secondary_depth_conjunct \<psi>) \<circ> \<psi>s)   
         ` (I - (revival_conjunct_index I \<psi>s)))\<close>
     \<open>max_neg_conj_depth_inner (StableConj I \<psi>s) = Sup ((max_neg_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close>
-    \<open>neg_depth_inner (StableConj I \<psi>s) = Sup ((neg_depth_conjunct \<circ> \<psi>s) ` I)\<close>
+    \<open>neg_depth_inner (StableConj I \<psi>s) = Sup ({1} \<union> (neg_depth_conjunct \<circ> \<psi>s) ` I)\<close>
     by force+
   obtain e1 e2 e3 e4 e5 e6 e7 e8 e9 where e_def: \<open>e = E e1 e2 e3 e4 e5 e6 e7 e8 e9\<close>
     using energy.exhaust_sel by blast
@@ -692,7 +693,8 @@ proof -
     \<open>\<forall>q \<in> I - revival_conjunct_index I \<psi>s. is_pos (\<psi>s q) \<longrightarrow> modal_depth_srbb_conjunct (\<psi>s q) \<le> e7\<close>
     \<open>\<forall>i \<in> I. max_neg_conj_depth_conjunct (\<psi>s i) \<le> e8\<close>
     \<open>\<forall>i \<in> I. neg_depth_conjunct (\<psi>s i) \<le> e9\<close>
-    using assms unfolding leq_components
+    \<open>0 < e9\<close>
+    using assms unfolding leq_components e_def
     by auto
   hence sups:
     \<open>Sup ((modal_depth_srbb_conjunct \<circ> \<psi>s) ` I) \<le> e1\<close>
@@ -713,9 +715,9 @@ proof -
     using e_leqs(8,10) modal_depth_srbb_rewrite
     by (metis Diff_iff e_leqs(7) hml_srbb_conjunct.case_eq_if hml_srbb_conjunct.collapse(1))
   ultimately show ?thesis
-    using st_conj_upds sups \<open>subtract_fn  0 0 0 1 0 0 0 0 0 e = Some e'\<close>
+    using st_conj_upds sups \<open>subtract_fn  0 0 0 1 0 0 0 0 0 e = Some e'\<close> \<open>0 < e9\<close>
     unfolding e_def
-    by (auto simp add:  SUP_le_iff)    
+    by (auto simp add: SUP_le_iff ileI1 one_eSuc)
 qed
 
 lemma expr_imm_conj:
@@ -1259,7 +1261,10 @@ proof
 qed
 
 lemma modal_stability_respecting:
-  \<open>stability_respecting (preordered (\<O> (E e1 e2 e3 \<infinity> e5 \<infinity> \<infinity> e8 e9)))\<close>
+  assumes
+    \<open>0 < e9\<close>
+  shows
+    \<open>stability_respecting (preordered (\<O> (E e1 e2 e3 \<infinity> e5 \<infinity> \<infinity> e8 e9)))\<close>
   unfolding stability_respecting_def
 proof safe
   fix p q
@@ -1282,7 +1287,8 @@ proof safe
       by fastforce
     hence conj_price: \<open>StableConj (silent_reachable_set {q} \<inter> {q'. stable_state q'}) (conjunctify_distinctions \<Phi> p)
         \<in> \<O>_inner (E e1 e2 e3 \<infinity> e5 \<infinity> \<infinity> e8 e9)\<close>
-      unfolding \<O>_inner_def \<O>_conjunct_def using SUP_le_iff by fastforce
+      unfolding \<O>_inner_def \<O>_conjunct_def using SUP_le_iff ileI1[OF \<open>0 < e9\<close>] one_eSuc
+      by (fastforce simp add: SUP_le_iff)
     from \<Phi>_def have
       \<open>\<forall>q'\<in>(silent_reachable_set {q}). stable_state q' \<longrightarrow>
          hml_srbb_conj.distinguishes (conjunctify_distinctions \<Phi> p q') p q'\<close>

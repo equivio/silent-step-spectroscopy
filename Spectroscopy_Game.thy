@@ -14,13 +14,14 @@ datatype ('s, 'a) spectroscopy_position =
          Attacker_Immediate (attacker_state: \<open>'s\<close>) (defender_states: \<open>'s set\<close>) |
          Attacker_Branch (attacker_state: \<open>'s\<close>) (defender_states: \<open>'s set\<close>) |
          Attacker_Clause (attacker_state: \<open>'s\<close>) (defender_state: \<open>'s\<close>) |
+         Attacker_Stable_Clause (attacker_state: \<open>'s\<close>) (defender_state: \<open>'s\<close>) |
          Attacker_Delayed (attacker_state: \<open>'s\<close>) (defender_states: \<open>'s set\<close>) |
 
          Defender_Branch (attacker_state: \<open>'s\<close>) (attack_action: \<open>'a\<close>)
                          (attacker_state_succ: \<open>'s\<close>) (defender_states: \<open>'s set\<close>)
                          (defender_branch_states: \<open>'s set\<close>) |
          Defender_Conj (attacker_state: \<open>'s\<close>) (defender_states: \<open>'s set\<close>) |
-         Defender_Stable_Conj (attacker_state: \<open>'s\<close>) (defender_states: \<open>'s set\<close>)
+         Defender_Stable_Conj (attacker_state: \<open>'s\<close>) (defender_states: \<open>'s set\<close>) (defender_revivals: \<open>'s set\<close>)
 
 context LTS_Tau begin
 
@@ -37,12 +38,12 @@ fun spectroscopy_moves :: \<open>('s, 'a) spectroscopy_position \<Rightarrow> ('
 
   observation:
     \<open>spectroscopy_moves (Attacker_Delayed p Q) (Attacker_Immediate p' Q')
-      = (if (\<exists>a. p \<mapsto>a a p' \<and> Q \<mapsto>aS a Q') then (subtract 1 0 0 0 0 0 0 0)
+      = (if (\<exists>a. p \<mapsto>a a p' \<and> Q \<mapsto>aS a Q') then (subtract 1 0 0 0 0 0 0 0 0)
          else None)\<close> |
 
   f_or_early_conj:
     \<open>spectroscopy_moves (Attacker_Immediate p Q) (Defender_Conj p' Q')
-      =(if (Q\<noteq>{} \<and> Q = Q' \<and> p = p') then (subtract 0 0 0 0 1 0 0 0)
+      =(if (Q\<noteq>{} \<and> Q = Q' \<and> p = p') then (subtract 0 0 0 0 1 0 0 0 0)
         else None)\<close> |
 
   late_inst_conj:
@@ -51,28 +52,41 @@ fun spectroscopy_moves :: \<open>('s, 'a) spectroscopy_position \<Rightarrow> ('
 
   conj_answer:
     \<open>spectroscopy_moves (Defender_Conj p Q) (Attacker_Clause p' q)
-      = (if p = p' \<and> q \<in> Q then (subtract 0 0 1 0 0 0 0 0) else None)\<close> |
+      = (if p = p' \<and> q \<in> Q then (subtract 0 0 1 0 0 0 0 0 0) else None)\<close> |
 
   pos_neg_clause:
     \<open>spectroscopy_moves (Attacker_Clause p q) (Attacker_Delayed p' Q')
       = (if (p = p') then
           (if {q} \<Zsurj>S Q' then Some min1_6 else None)
          else (if ({p} \<Zsurj>S Q'\<and> q=p')
-               then Some (\<lambda>e. Option.bind ((subtract_fn 0 0 0 0 0 0 0 1) e) min1_7) else None))\<close> |
+               then Some (\<lambda>e. Option.bind ((subtract_fn 0 0 0 0 0 0 0 0 1) e) min1_8) else None))\<close> |
+  pos_neg_stable_clause:
+    \<open>spectroscopy_moves (Attacker_Stable_Clause p q) (Attacker_Delayed p' Q')
+      = (if (p = p') then
+          (if Q' = {q} then Some min1_7 else None)
+         else if q = p' \<and> Q' = {p}
+               then Some (\<lambda>e. Option.bind ((subtract_fn 0 0 0 0 0 0 0 0 1) e) min1_8)
+         else None)\<close> |
 
   late_stbl_conj:
-    \<open>spectroscopy_moves (Attacker_Delayed p Q) (Defender_Stable_Conj p' Q')
-      = (if (p = p' \<and> Q' = { q \<in> Q. (\<nexists>q'. q \<mapsto>\<tau> q')} \<and> (\<nexists>p''. p \<mapsto>\<tau> p''))
+    \<open>spectroscopy_moves (Attacker_Delayed p Q) (Defender_Stable_Conj p' Q' Qr)
+      = (if (p = p' \<and> (\<nexists>p''. p \<mapsto>\<tau> p'')
+        \<and> Qr \<subseteq> { q \<in> Q. (\<nexists>q'. q \<mapsto>\<tau> q')} \<and> Q' = { q \<in> Q. (\<nexists>q'. q \<mapsto>\<tau> q')} - Qr)
           then Some Some else None)\<close> |
 
   conj_s_answer:
-    \<open>spectroscopy_moves (Defender_Stable_Conj p Q) (Attacker_Clause p' q)
-      = (if p = p' \<and> q \<in> Q then (subtract 0 0 0 1 0 0 0 0)
+    \<open>spectroscopy_moves (Defender_Stable_Conj p Q Qr) (Attacker_Stable_Clause p' q)
+      = (if p = p' \<and> q \<in> Q then Some (\<lambda>e. Option.bind ((subtract_fn 0 0 0 1 0 0 0 0 0) e) min6_7)
+         else None)\<close> |
+
+  conj_s_revival:
+    \<open>spectroscopy_moves (Defender_Stable_Conj p Q Qr) (Attacker_Delayed p' Q')
+      = (if p = p' \<and> Q' = Qr then Some (\<lambda>e. Option.bind ((subtract_fn 0 0 0 1 0 0 0 0 0) e) min1_6)
          else None)\<close> |
 
   empty_stbl_conj_answer:
-    \<open>spectroscopy_moves (Defender_Stable_Conj p Q) (Defender_Conj p' Q')
-      = (if Q = {} \<and> Q = Q' \<and> p = p' then (subtract 0 0 0 1 0 0 0 0)
+    \<open>spectroscopy_moves (Defender_Stable_Conj p Q Qr) (Defender_Conj p' Q')
+      = (if Q = {} \<and> Q = Q' \<and> p = p' then (subtract 0 0 0 1 0 0 0 0 1)
          else None)\<close> |
 
   br_conj:
@@ -82,16 +96,16 @@ fun spectroscopy_moves :: \<open>('s, 'a) spectroscopy_position \<Rightarrow> ('
 
   br_answer:
     \<open>spectroscopy_moves (Defender_Branch p \<alpha> p' Q Q\<alpha>) (Attacker_Clause p'' q)
-      = (if (p = p'' \<and> q \<in> Q) then (subtract 0 1 1 0 0 0 0 0) else None)\<close> |
+      = (if (p = p'' \<and> q \<in> Q) then (subtract 0 1 1 0 0 0 0 0 0) else None)\<close> |
 
   br_obsv:
     \<open>spectroscopy_moves (Defender_Branch p \<alpha> p' Q Q\<alpha>) (Attacker_Branch p'' Q')
       = (if (p' = p'' \<and> Q\<alpha> \<mapsto>aS \<alpha> Q')
-         then Some (\<lambda>e. Option.bind ((subtract_fn 0 1 1 0 0 0 0 0) e) min1_6) else None)\<close> |
+         then Some (\<lambda>e. Option.bind ((subtract_fn 0 1 1 0 0 0 0 0 0) e) min1_6) else None)\<close> |
 
   br_acct:
     \<open>spectroscopy_moves (Attacker_Branch p Q) (Attacker_Immediate p' Q')
-      = (if p = p' \<and> Q = Q' then subtract 1 0 0 0 0 0 0 0 else None)\<close> |
+      = (if p = p' \<and> Q = Q' then subtract 1 0 0 0 0 0 0 0 0 else None)\<close> |
 
   others: \<open>spectroscopy_moves _ _ = None\<close>
 
@@ -99,10 +113,11 @@ fun spectroscopy_defender where
   \<open>spectroscopy_defender (Attacker_Immediate _ _) = False\<close> |
   \<open>spectroscopy_defender (Attacker_Branch _ _) = False\<close> |
   \<open>spectroscopy_defender (Attacker_Clause _ _) = False\<close> |
+  \<open>spectroscopy_defender (Attacker_Stable_Clause _ _) = False\<close> |
   \<open>spectroscopy_defender (Attacker_Delayed _ _) = False\<close> |
   \<open>spectroscopy_defender (Defender_Branch _ _ _ _ _) = True\<close> |
   \<open>spectroscopy_defender (Defender_Conj _ _) = True\<close> |
-  \<open>spectroscopy_defender (Defender_Stable_Conj _ _) = True\<close>
+  \<open>spectroscopy_defender (Defender_Stable_Conj _ _ _) = True\<close>
 
 interpretation Game: energy_game \<open>spectroscopy_moves\<close> \<open>spectroscopy_defender\<close> \<open>(\<le>)\<close>
 proof
@@ -130,9 +145,10 @@ next
   next
     case (Attacker_Clause p q)
     hence \<open>\<exists>p' Q'. g'= (Attacker_Delayed p' Q')\<close>
-      using monotonicity_assms(1,2)
-      by (metis spectroscopy_defender.cases spectroscopy_moves.simps(22,23,26,46,62,67))
-    hence \<open>spectroscopy_moves g g' = Some min1_6 \<or> spectroscopy_moves g g' = Some (\<lambda>e. Option.bind ((subtract_fn 0 0 0 0 0 0 0 1) e) min1_7)\<close>
+      using monotonicity_assms(1,2) 
+      by (induct, auto)
+    hence \<open>spectroscopy_moves g g' =
+      Some min1_6 \<or> spectroscopy_moves g g' = Some (\<lambda>e. Option.bind ((subtract_fn 0 0 0 0 0 0 0 0 1) e) min1_8)\<close>
       using monotonicity_assms(1,2) Attacker_Clause
       by (smt (verit, ccfv_threshold) spectroscopy_moves.simps(7))
     thus ?thesis
@@ -143,9 +159,9 @@ next
         unfolding leq_components
         by (metis min_1_6_simps option.sel)
     next
-      assume \<open>spectroscopy_moves g g' = Some (\<lambda>e. Option.bind (if \<not> E 0 0 0 0 0 0 0 1 \<le> e then None else Some (e - E 0 0 0 0 0 0 0 1)) min1_7)\<close>
+      assume \<open>spectroscopy_moves g g' = Some (\<lambda>e. Option.bind (if \<not> E 0 0 0 0 0 0 0 0 1 \<le> e then None else Some (e - E 0 0 0 0 0 0 0 0 1)) min1_8)\<close>
       thus ?thesis
-        unfolding min_1_7_subtr_simp
+        unfolding min_1_8_subtr_simp
         using monotonicity_assms
         by (smt (z3) enat_diff_mono energy.sel leq_components min.mono option.distinct(1) option.sel)
     qed
@@ -154,9 +170,10 @@ next
     hence \<open>(\<exists>p' Q'. g'=(Attacker_Delayed p' Q')) \<or>
       (\<exists>p' Q'. g'=(Attacker_Immediate p' Q')) \<or>
       (\<exists>p' Q'. g'=(Defender_Conj p' Q')) \<or>
-      (\<exists>p' Q'. g'=(Defender_Stable_Conj p' Q')) \<or>
+      (\<exists>p' Q' Qr. g'=(Defender_Stable_Conj p' Q' Qr)) \<or>
       (\<exists>p' p'' Q' \<alpha> Q\<alpha> . g'= (Defender_Branch p' \<alpha> p'' Q' Q\<alpha>))\<close>
-      by (metis monotonicity_assms(1) spectroscopy_defender.cases spectroscopy_moves.simps(27,59))
+      using  monotonicity_assms(1)
+      by (induct, auto)
     thus ?thesis
     proof (safe)
       fix p' Q'
@@ -167,7 +184,7 @@ next
     next
       fix p' Q'
       assume \<open>g' = Attacker_Immediate p' Q'\<close>
-      hence \<open>spectroscopy_moves g g' = (subtract 1 0 0 0 0 0 0 0)\<close>
+      hence \<open>spectroscopy_moves g g' = (subtract 1 0 0 0 0 0 0 0 0)\<close>
         using Attacker_Delayed monotonicity_assms local.observation
         by (clarify, presburger)
       thus \<open>eu \<le> eu'\<close>
@@ -179,8 +196,8 @@ next
         using Attacker_Delayed monotonicity_assms local.late_inst_conj
         by (metis option.sel)
     next
-      fix p' Q'
-      assume \<open>g' = Defender_Stable_Conj p' Q'\<close>
+      fix p' Q' Qr
+      assume \<open>g' = Defender_Stable_Conj p' Q' Qr\<close>
       thus \<open>eu \<le> eu'\<close>
         using Attacker_Delayed monotonicity_assms local.late_stbl_conj
         by (metis (no_types, lifting) option.sel)
@@ -202,10 +219,36 @@ next
       by (cases g', simp_all del: leq_components)
         (smt (verit, ccfv_SIG) mono_subtract option.discI option.sel)
   next
-    case (Defender_Stable_Conj x71 x72)
-    with monotonicity_assms show ?thesis
-      by (cases g', simp_all del: leq_components)
-       (smt (verit, ccfv_SIG) mono_subtract option.discI option.sel)+
+    case (Defender_Stable_Conj p Q Qr)
+    with monotonicity_assms(1) show ?thesis
+    proof (cases g', auto simp del: leq_components)
+      case (Attacker_Stable_Clause p' q')
+      fix up
+      assume upd: \<open>(if p = p' \<and> q' \<in> Q then Some (\<lambda>e. Option.bind (if \<not> E 0 0 0 1 0 0 0 0 0 \<le> e then None else Some (e - E 0 0 0 1 0 0 0 0 0)) min6_7) else None) = Some up\<close>
+      hence \<open>up e = Some eu\<close> \<open>up e' = Some eu'\<close> using monotonicity_assms(2,3)
+        by (auto simp add: Attacker_Stable_Clause Defender_Stable_Conj)
+      then show ?thesis using monotonicity_assms(2,3,4) upd min_6_7_subtr_mono unfolding mono_def
+        apply (auto simp add: min_6_7_subtr_simp) 
+        apply (metis (no_types, lifting) energy.sel min_6_7_subtr_simp option.discI option.sel)
+        apply (metis (no_types, lifting) energy.sel min_6_7_subtr_simp option.discI option.sel)
+              apply (metis (no_types, lifting) energy.sel min_6_7_subtr_simp option.discI option.sel)
+        apply (metis (no_types, lifting) enat_diff_mono energy.sel(4) min_6_7_subtr_simp option.discI option.sel)
+        apply (metis (no_types, lifting) energy.collapse energy.inject min_6_7_subtr_simp option.distinct(1) option.sel)
+        apply (metis (no_types, lifting) energy.sel(6) min_6_7_subtr_simp option.discI option.sel)
+        apply (smt (verit) bind_eq_None_conv energy.sel(4) leq_components option.case_eq_if option.discI option.sel)
+        apply (metis (no_types, lifting) energy.sel(8) min_6_7_subtr_simp option.discI option.sel)
+        by (metis (no_types, lifting) energy.sel(9) min_6_7_subtr_simp option.discI option.sel)
+    next
+      case (Attacker_Delayed p' Q')
+      then show ?thesis using monotonicity_assms(2,3,4) sorry
+    next
+      case (Defender_Conj p' Q')
+      then show ?thesis using monotonicity_assms(2,3,4) apply (smt (verit, best) mono_subtract option.sel option.simps(3))
+    qed
+
+      apply (cases g', simp_all del: leq_components)
+      
+      apply (smt (verit, ccfv_SIG) mono_subtract option.discI option.sel)
   qed
 next
   fix g g' e e'

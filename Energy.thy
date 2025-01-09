@@ -163,13 +163,15 @@ text \<open>We also define abbreviations for performing subtraction.\<close>
 abbreviation \<open>subtract_fn a b c d e f g h i \<equiv>
   (\<lambda>x. if somewhere_larger x (E a b c d e f g h i) then None else Some (x - (E a b c d e f g h i)))\<close>
 
-abbreviation \<open>subtract a b c d e f g h \<equiv> Some (subtract_fn a b c d e f g h)\<close>
+abbreviation \<open>subtract a b c d e f g h i \<equiv> Some (subtract_fn a b c d e f g h i)\<close>
 
 subsection \<open>Minimum Updates\<close>
-text \<open>Next, we define two energy updates that replace the first component with the minimum of two other components.\<close>
+
 definition \<open>min1_6 e \<equiv> case e of E a b c d e f g h i \<Rightarrow> Some (E (min a f) b c d e f g h i)\<close>
 definition \<open>min1_7 e \<equiv> case e of E a b c d e f g h i \<Rightarrow> Some (E (min a g) b c d e f g h i)\<close>
 definition \<open>min1_8 e \<equiv> case e of E a b c d e f g h i \<Rightarrow> Some (E (min a h) b c d e f g h i)\<close>
+
+definition \<open>min6_7 e \<equiv> case e of E a b c d e f g h i \<Rightarrow> Some (E a b c d e f (min g f) h i)\<close>
 
 
 text \<open>lift order to options\<close>
@@ -249,9 +251,21 @@ lemma min_1_8_simps[simp]:
         \<open>neg_depth (the (min1_8 e)) = neg_depth e\<close>
   unfolding min1_8_def by (simp_all add: energy.case_eq_if)
 
+lemma min_6_7_simps[simp]:
+  shows \<open>modal_depth (the (min6_7 e)) = modal_depth e\<close>
+        \<open>br_conj_depth (the (min6_7 e)) = br_conj_depth e\<close>
+        \<open>conj_depth (the (min6_7 e)) = conj_depth e\<close>
+        \<open>st_conj_depth (the (min6_7 e)) = st_conj_depth e\<close>
+        \<open>imm_conj_depth (the (min6_7 e)) = imm_conj_depth e\<close>
+        \<open>pos_conjuncts (the (min6_7 e)) =  pos_conjuncts e\<close>
+        \<open>pos_conjuncts_sec (the (min6_7 e)) = min (pos_conjuncts e) (pos_conjuncts_sec e)\<close>
+        \<open>neg_conjuncts (the (min6_7 e)) = neg_conjuncts e\<close>
+        \<open>neg_depth (the (min6_7 e)) = neg_depth e\<close>
+  unfolding min6_7_def by (simp_all add: energy.case_eq_if min.commute)
+
 lemma min_some:
-  shows \<open>min1_6 e \<noteq> None\<close>  \<open>min1_7 e \<noteq> None\<close>  \<open>min1_8 e \<noteq> None\<close>
-  unfolding min1_6_def min1_7_def min1_8_def
+  shows \<open>min1_6 e \<noteq> None\<close>  \<open>min1_7 e \<noteq> None\<close>  \<open>min1_8 e \<noteq> None\<close>  \<open>min6_7 e \<noteq> None\<close>
+  unfolding min1_6_def min1_7_def min1_8_def min6_7_def
   using energy.case_eq_if by blast+
 
 lemma mono_min_1_6:
@@ -309,6 +323,15 @@ lemma min_1_6_subtr_simp:
     = (if br_conj_depth e = 0 \<or> conj_depth e = 0 then None
         else Some (E (min (modal_depth e) (pos_conjuncts e)) (br_conj_depth e - 1) (conj_depth e - 1) (st_conj_depth e) (imm_conj_depth e) (pos_conjuncts e) (pos_conjuncts_sec e) (neg_conjuncts e) (neg_depth e)))\<close>
   by (auto simp add: min1_6_def ileI1 one_eSuc)
+
+lemma min_6_7_subtr_simp:
+  shows \<open>(Option.bind ((subtract_fn 0 0 0 1 0 0 0 0 0) e) min6_7) = (if st_conj_depth e = 0 then None else Some (E (modal_depth e) (br_conj_depth e) (conj_depth e) (st_conj_depth e - 1) (imm_conj_depth e) (pos_conjuncts e) (min (pos_conjuncts_sec e) (pos_conjuncts e)) (neg_conjuncts e) (neg_depth e)))\<close>
+  by (auto simp add: min6_7_def ileI1 one_eSuc)
+
+lemma min_6_7_subtr_mono:
+  \<open>mono (\<lambda>e. Option.bind ((subtract_fn 0 0 0 1 0 0 0 0 0) e) min6_7)\<close>
+  unfolding min_6_7_subtr_simp mono_def
+  by (auto simp add: min.coboundedI1  min.coboundedI2 enat_diff_mono)
 
 instantiation energy :: Sup
 begin

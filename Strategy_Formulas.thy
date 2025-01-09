@@ -42,17 +42,17 @@ where
   observation:
     \<open>strategy_formula_inner (Attacker_Delayed p Q) e (Obs \<alpha> \<phi>)\<close>
       if \<open>\<exists>p' Q'. spectroscopy_moves (Attacker_Delayed p Q) (Attacker_Immediate p' Q')
-         = (subtract 1 0 0 0 0 0 0 0)
-          \<and> attacker_wins (e - (E 1 0 0 0 0 0 0 0)) (Attacker_Immediate p' Q')
-          \<and> strategy_formula (Attacker_Immediate p' Q') (e - (E 1 0 0 0 0 0 0 0)) \<phi>
+         = (subtract 1 0 0 0 0 0 0 0 0)
+          \<and> attacker_wins (e - (E 1 0 0 0 0 0 0 0 0)) (Attacker_Immediate p' Q')
+          \<and> strategy_formula (Attacker_Immediate p' Q') (e - (E 1 0 0 0 0 0 0 0 0)) \<phi>
           \<and> p \<mapsto>a\<alpha> p' \<and> Q \<mapsto>aS \<alpha> Q'\<close> |
 
   early_conj:
     \<open>strategy_formula (Attacker_Immediate p Q) e \<phi>\<close>
       if \<open>\<exists>p'. spectroscopy_moves (Attacker_Immediate p Q) (Defender_Conj p' Q')
-                = (subtract 0 0 0 0 1 0 0 0)
-                  \<and> attacker_wins (e - (E 0 0 0 0 1 0 0 0)) (Defender_Conj p' Q')
-                  \<and> strategy_formula (Defender_Conj p' Q') (e - (E 0 0 0 0 1 0 0 0)) \<phi>\<close> |
+                = (subtract 0 0 0 0 1 0 0 0 0)
+                  \<and> attacker_wins (e - (E 0 0 0 0 1 0 0 0 0)) (Defender_Conj p' Q')
+                  \<and> strategy_formula (Defender_Conj p' Q') (e - (E 0 0 0 0 1 0 0 0 0)) \<phi>\<close> |
 
   late_conj:
     \<open>strategy_formula_inner (Attacker_Delayed p Q) e \<chi>\<close>
