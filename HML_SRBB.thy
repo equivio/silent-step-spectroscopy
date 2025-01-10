@@ -54,8 +54,8 @@ and
   ('act, 'i) hml_srbb_inner =
     Obs 'act \<open>('act, 'i) hml_srbb\<close> |
     Conj \<open>'i set\<close> \<open>'i \<Rightarrow> ('act, 'i) hml_srbb_conjunct\<close> |
-    StableConj \<open>'i set\<close> \<open>'i \<Rightarrow> ('act, 'i) hml_srbb_conjunct\<close> |
-    BranchConj 'act \<open>('act, 'i) hml_srbb\<close>
+    StableConj \<open>'i option set\<close> \<open>'i option \<Rightarrow> ('act, 'i) hml_srbb_conjunct\<close> |
+    BranchConj \<open>'act\<close> \<open>('act, 'i) hml_srbb\<close>
                \<open>'i set\<close> \<open>'i \<Rightarrow> ('act, 'i) hml_srbb_conjunct\<close>
 and
   ('act, 'i) hml_srbb_conjunct =
@@ -440,6 +440,43 @@ proof
       using assms q_I by auto
     then show ?thesis
       by (metis (mono_tags, lifting) ImmConj hml_srbb.simps(11) someI)
+  qed
+qed
+
+
+definition conjunctify_distinctions_opt ::
+  \<open>('s \<Rightarrow> ('a, 's) hml_srbb) \<Rightarrow> 's \<Rightarrow> ('s option \<Rightarrow> ('a, 's) hml_srbb_conjunct)\<close> where
+  \<open>conjunctify_distinctions_opt \<Phi> p \<equiv> \<lambda>q.
+    case (\<Phi> (the q)) of
+      TT \<Rightarrow> undefined
+    | Internal \<chi> \<Rightarrow> Pos \<chi>
+    | ImmConj I \<Psi> \<Rightarrow> \<Psi> (SOME i. i\<in>I \<and> hml_srbb_conj.distinguishes (\<Psi> i) p (the q))\<close>
+
+lemma distinction_conjunctification_opt:
+  assumes
+    \<open>\<forall>q\<in>I. distinguishes (\<Phi> q) p q\<close>
+  shows
+    \<open>\<forall>q\<in>I. hml_srbb_conj.distinguishes ((conjunctify_distinctions_opt \<Phi> p) (Some q)) p q\<close>
+  unfolding conjunctify_distinctions_opt_def
+proof
+  fix q
+  assume q_I: \<open>q\<in>I\<close>
+  show \<open>hml_srbb_conj.distinguishes
+          (case \<Phi> (the (Some q)) of hml_srbb.Internal x \<Rightarrow> hml_srbb_conjunct.Pos x
+           | ImmConj I \<Psi> \<Rightarrow> \<Psi> (SOME i. i \<in> I \<and> hml_srbb_conj.distinguishes (\<Psi> i) p (the (Some q))))
+          p q\<close>
+  proof (cases \<open>\<Phi> q\<close>)
+    case TT
+    then show ?thesis using assms q_I by fastforce
+  next
+    case (Internal \<chi>)
+    then show ?thesis using assms q_I by auto
+  next
+    case (ImmConj J \<Psi>)
+    then have \<open>\<exists>i \<in> J. hml_srbb_conj.distinguishes (\<Psi> i) p q\<close>
+      using assms q_I by auto
+    then show ?thesis
+      by (metis (mono_tags, lifting) ImmConj hml_srbb.simps(11) someI option.sel)
   qed
 qed
 

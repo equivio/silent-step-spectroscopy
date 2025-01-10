@@ -278,14 +278,13 @@ lemma modal_depth_dominates_pos_conjuncts:
   by (auto simp add: SUP_mono' add_increasing sup.coboundedI1 sup.coboundedI2)
 
 \<comment>\<open>Supremum after some maximal element has been removed\<close>
-definition revival_conjunct_index :: \<open>'s set \<Rightarrow> ('s \<Rightarrow> ('a, 's) hml_srbb_conjunct) \<Rightarrow> 's set\<close> where
+definition revival_conjunct_index :: \<open>'s option set \<Rightarrow> ('s option \<Rightarrow> ('a, 's) hml_srbb_conjunct) \<Rightarrow> 's option set\<close> where
   \<open>revival_conjunct_index I \<psi>s \<equiv>
     if (\<exists>i\<in>I. is_pos (\<psi>s i) \<and> (\<forall>j\<in>I. is_pos (\<psi>s j) \<longrightarrow>
         modal_depth_srbb_conjunct (\<psi>s j) \<le> modal_depth_srbb_conjunct (\<psi>s i))) then
       {SOME i. i\<in>I \<and> is_pos (\<psi>s i) \<and> (\<forall>j\<in>I. is_pos (\<psi>s j) \<longrightarrow>
         modal_depth_srbb_conjunct (\<psi>s j) \<le> modal_depth_srbb_conjunct (\<psi>s i))}
     else {}\<close>
-
 
 (*lemma
   assumes \<open>\<exists>j\<in>I. is_pos (\<psi>s j)\<close>
@@ -345,14 +344,14 @@ lemma max_positive_conjunct_depth_dominates_secondary:
   apply (simp add: SUP_mono' hml_srbb_conjunct.case_eq_if) defer
   using modal_depth_dominates_pos_conjuncts order_trans  apply blast
 proof -
-  fix x1 :: "'s set" and x2 :: "'s \<Rightarrow> ('a, 's) hml_srbb_conjunct"
+  fix x1 :: "'s option set" and x2 :: "'s option \<Rightarrow> ('a, 's) hml_srbb_conjunct"
   assume a1: "\<And>x2a. x2a \<in> range x2 \<Longrightarrow> max_pos_conj_secondary_depth_conjunct x2a \<le> max_pos_conj_depth_conjunct x2a"
-  obtain ss :: "('s \<Rightarrow> enat) \<Rightarrow> ('s \<Rightarrow> enat) \<Rightarrow> 's" where
-    "\<And>f fa S. \<not> f (ss f fa) \<le> fa (ss f fa) \<or> Sup (f ` S) \<le> Sup (fa ` S)"
+  obtain zz :: "('s option \<Rightarrow> enat) \<Rightarrow> ('s option \<Rightarrow> enat) \<Rightarrow> 's option" where
+    "\<And>f fa Z. \<not> f (zz f fa) \<le> fa (zz f fa) \<or> Sup (f ` Z) \<le> Sup (fa ` Z)"
     by (meson SUP_mono')
-  then have "(SUP s\<in>x1. if is_pos (x2 s) then modal_depth_srbb_inner (un_Pos (x2 s)) else max_pos_conj_secondary_depth_conjunct (x2 s)) \<le> (SUP s\<in>x1. max_pos_conj_depth_conjunct (x2 s))"
-    using a1 by (smt (z3) hml_srbb_conjunct.collapse(1) max_pos_conj_depth_conjunct.simps(1) modal_depth_dominates_pos_conjuncts modal_depth_srbb_rewrite rangeI)
-  then show "Sup ((\<lambda>s. modal_depth_srbb_inner (un_Pos (x2 s))) ` (x1 \<inter> {s. is_pos (x2 s)}) \<union> (\<lambda>s. max_pos_conj_secondary_depth_conjunct (x2 s)) ` (x1 \<inter> {s. \<not> is_pos (x2 s)})) \<le> (SUP s\<in>x1. max_pos_conj_depth_conjunct (x2 s))"
+  then have "(SUP z\<in>x1. if is_pos (x2 z) then modal_depth_srbb_inner (un_Pos (x2 z)) else max_pos_conj_secondary_depth_conjunct (x2 z)) \<le> (SUP z\<in>x1. max_pos_conj_depth_conjunct (x2 z))"
+    using a1 by (smt (z3) hml_srbb_conjunct.collapse(1) max_pos_conj_depth_conjunct.simps(1) nle_le rangeI)
+  then show "Sup ((\<lambda>z. modal_depth_srbb_inner (un_Pos (x2 z))) ` (x1 \<inter> {z. is_pos (x2 z)}) \<union> (\<lambda>z. max_pos_conj_secondary_depth_conjunct (x2 z)) ` (x1 \<inter> {z. \<not> is_pos (x2 z)})) \<le> (SUP z\<in>x1. max_pos_conj_depth_conjunct (x2 z))"
     by simp
 qed
   
@@ -1260,6 +1259,48 @@ proof
   qed
 qed
 
+lemma distinction_conjunctification_opt_price:
+  assumes
+    \<open>\<forall>q\<in>I. distinguishes (\<Phi> q) p q\<close>
+    \<open>\<forall>q\<in>I. \<Phi> q \<in> \<O> pr\<close>
+    \<open>modal_depth pr \<le> pos_conjuncts pr\<close>
+  shows
+    \<open>\<forall>q\<in>I. ((conjunctify_distinctions_opt \<Phi> p) (Some q)) \<in> \<O>_conjunct pr\<close>
+proof
+  fix q
+  assume \<open>q \<in> I\<close>
+  show \<open>conjunctify_distinctions_opt \<Phi> p (Some q) \<in> \<O>_conjunct pr\<close>
+  proof (cases \<open>\<Phi> q\<close>)
+    case TT
+    then show ?thesis
+      using assms \<open>q \<in> I\<close>
+      by fastforce
+  next
+    case (Internal \<chi>)
+    then show ?thesis
+      using assms \<open>q \<in> I\<close>
+      unfolding conjunctify_distinctions_opt_def \<O>_def \<O>_conjunct_def
+      by fastforce
+  next
+    case (ImmConj J \<Psi>)
+    hence \<open>\<exists>i. i\<in>J \<and> hml_srbb_conj.distinguishes (\<Psi> i) p q\<close>
+      using \<open>q \<in> I\<close> assms(1) by fastforce
+    moreover have \<open>conjunctify_distinctions_opt \<Phi> p (Some q)  = \<Psi> (SOME i. i\<in>J \<and> hml_srbb_conj.distinguishes (\<Psi> i) p q)\<close>
+      unfolding conjunctify_distinctions_opt_def using ImmConj by fastforce
+    ultimately have \<Psi>_i: \<open>\<exists>i\<in>J. hml_srbb_conj.distinguishes (\<Psi> i) p q \<and> conjunctify_distinctions_opt \<Phi> p (Some q) = \<Psi> i\<close>
+      by (metis (no_types, lifting) some_eq_ex)
+    hence \<open>conjunctify_distinctions_opt \<Phi> p (Some q) \<in> \<Psi>`J\<close>
+      unfolding image_iff by blast
+    hence \<open>expr_pr_conjunct (conjunctify_distinctions_opt \<Phi> p (Some q)) \<le> expressiveness_price (ImmConj J \<Psi>)\<close>
+      by (smt (verit, best) \<Psi>_i dual_order.trans expressiveness_price_ImmConj_geq_parts gets_smaller)
+    then show ?thesis
+      using assms \<open>q \<in> I\<close> ImmConj
+      unfolding \<O>_def \<O>_conjunct_def
+      by auto
+  qed
+qed
+
+
 lemma modal_stability_respecting:
   assumes
     \<open>0 < e9\<close>
@@ -1282,30 +1323,30 @@ proof safe
     hence distinctions:
       \<open>\<forall>q'\<in>(silent_reachable_set {q} \<inter> {q'. stable_state q'}). distinguishes (\<Phi> q') p q'\<close>
       \<open>\<forall>q'\<in>(silent_reachable_set {q} \<inter> {q'. stable_state q'}). \<Phi> q' \<in> \<O> (E e1 e2 e3 \<infinity> e5 \<infinity> \<infinity> e8 e9)\<close> by blast+
-    from distinction_conjunctification_price[OF this] have
-      \<open>\<forall>q'\<in>(silent_reachable_set {q} \<inter> {q'. stable_state q'}). conjunctify_distinctions \<Phi> p q' \<in> \<O>_conjunct (E e1 e2 e3 \<infinity> e5 \<infinity> \<infinity> e8 e9)\<close>
-      by fastforce
-    hence conj_price: \<open>StableConj (silent_reachable_set {q} \<inter> {q'. stable_state q'}) (conjunctify_distinctions \<Phi> p)
+    from distinction_conjunctification_opt_price[OF this] have
+      \<open>\<forall>q'\<in>(silent_reachable_set {q} \<inter> {q'. stable_state q'}). conjunctify_distinctions_opt \<Phi> p (Some q') \<in> \<O>_conjunct (E e1 e2 e3 \<infinity> e5 \<infinity> \<infinity> e8 e9)\<close>
+      by auto
+    hence conj_price: \<open>StableConj (Some ` (silent_reachable_set {q} \<inter> {q'. stable_state q'})) (conjunctify_distinctions_opt \<Phi> p)
         \<in> \<O>_inner (E e1 e2 e3 \<infinity> e5 \<infinity> \<infinity> e8 e9)\<close>
       unfolding \<O>_inner_def \<O>_conjunct_def using SUP_le_iff ileI1[OF \<open>0 < e9\<close>] one_eSuc
       by (fastforce simp add: SUP_le_iff)
     from \<Phi>_def have
       \<open>\<forall>q'\<in>(silent_reachable_set {q}). stable_state q' \<longrightarrow>
-         hml_srbb_conj.distinguishes (conjunctify_distinctions \<Phi> p q') p q'\<close>
-      using singleton_iff distinction_conjunctification by metis
+         hml_srbb_conj.distinguishes (conjunctify_distinctions_opt \<Phi> p (Some q')) p q'\<close>
+      using singleton_iff distinction_conjunctification_opt by metis
     hence \<open>hml_srbb_inner.distinguishes_from
-       (StableConj (silent_reachable_set {q} \<inter> {q'. stable_state q'}) (conjunctify_distinctions \<Phi> p))
+       (StableConj (Some ` (silent_reachable_set {q} \<inter> {q'. stable_state q'})) (conjunctify_distinctions_opt \<Phi> p))
        p (silent_reachable_set {q})\<close>
       using p_stability(2) by fastforce
     hence
       \<open>distinguishes
-        (Internal (StableConj (silent_reachable_set {q} \<inter> {q'. stable_state q'})
-                (conjunctify_distinctions \<Phi> p)))
+        (Internal (StableConj (Some ` (silent_reachable_set {q} \<inter> {q'. stable_state q'}))
+                (conjunctify_distinctions_opt \<Phi> p)))
         p q\<close>
       unfolding silent_reachable_set_def
       using silent_reachable.refl by auto
     moreover have
-      \<open>Internal (StableConj (silent_reachable_set {q} \<inter> {q'. stable_state q'}) (conjunctify_distinctions \<Phi> p))
+      \<open>Internal (StableConj (Some ` (silent_reachable_set {q} \<inter> {q'. stable_state q'})) (conjunctify_distinctions_opt \<Phi> p))
         \<in> \<O> (E e1 e2 e3 \<infinity> e5 \<infinity> \<infinity> e8 e9)\<close>
       using conj_price unfolding \<O>_def \<O>_inner_def by simp
     ultimately show False

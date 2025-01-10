@@ -227,28 +227,41 @@ next
       assume upd: \<open>(if p = p' \<and> q' \<in> Q then Some (\<lambda>e. Option.bind (if \<not> E 0 0 0 1 0 0 0 0 0 \<le> e then None else Some (e - E 0 0 0 1 0 0 0 0 0)) min6_7) else None) = Some up\<close>
       hence \<open>up e = Some eu\<close> \<open>up e' = Some eu'\<close> using monotonicity_assms(2,3)
         by (auto simp add: Attacker_Stable_Clause Defender_Stable_Conj)
-      then show ?thesis using monotonicity_assms(2,3,4) upd min_6_7_subtr_mono unfolding mono_def
-        apply (auto simp add: min_6_7_subtr_simp) 
-        apply (metis (no_types, lifting) energy.sel min_6_7_subtr_simp option.discI option.sel)
-        apply (metis (no_types, lifting) energy.sel min_6_7_subtr_simp option.discI option.sel)
-              apply (metis (no_types, lifting) energy.sel min_6_7_subtr_simp option.discI option.sel)
-        apply (metis (no_types, lifting) enat_diff_mono energy.sel(4) min_6_7_subtr_simp option.discI option.sel)
-        apply (metis (no_types, lifting) energy.collapse energy.inject min_6_7_subtr_simp option.distinct(1) option.sel)
-        apply (metis (no_types, lifting) energy.sel(6) min_6_7_subtr_simp option.discI option.sel)
-        apply (smt (verit) bind_eq_None_conv energy.sel(4) leq_components option.case_eq_if option.discI option.sel)
-        apply (metis (no_types, lifting) energy.sel(8) min_6_7_subtr_simp option.discI option.sel)
-        by (metis (no_types, lifting) energy.sel(9) min_6_7_subtr_simp option.discI option.sel)
+      then show ?thesis
+        using monotonicity_assms(2,3,4) upd min_6_7_subtr_mono
+        apply (simp add: min_6_7_subtr_simp mono_def min_def)
+        by (smt (verit) bind_eq_None_conv energy.sel(4) leq_components option.case_eq_if option.discI option.sel)
     next
       case (Attacker_Delayed p' Q')
       then show ?thesis using monotonicity_assms(2,3,4) sorry
     next
       case (Defender_Conj p' Q')
-      then show ?thesis using monotonicity_assms(2,3,4) apply (smt (verit, best) mono_subtract option.sel option.simps(3))
+      then show ?thesis using monotonicity_assms(2,3,4) sorry
     qed
-
-      apply (cases g', simp_all del: leq_components)
-      
-      apply (smt (verit, ccfv_SIG) mono_subtract option.discI option.sel)
+  next
+    case (Attacker_Stable_Clause p q)
+    \<comment> \<open>Analogous to \<open>Attacker_Stable\<close> case\<close>
+    hence \<open>\<exists>p' Q'. g'= (Attacker_Delayed p' Q')\<close>
+      using monotonicity_assms(1,2) 
+      by (induct, auto)
+    hence \<open>spectroscopy_moves g g' =
+      Some min1_7 \<or> spectroscopy_moves g g' = Some (\<lambda>e. Option.bind ((subtract_fn 0 0 0 0 0 0 0 0 1) e) min1_8)\<close>
+      using monotonicity_assms(1,2) Attacker_Stable_Clause
+      by (smt (verit, ccfv_threshold) spectroscopy_moves.simps(8))
+    thus ?thesis
+    proof safe
+      assume \<open>spectroscopy_moves g g' = Some min1_7\<close>
+      thus ?thesis
+        using monotonicity_assms min.mono
+        unfolding leq_components
+        by (metis min_1_7_simps option.sel)
+    next
+      assume \<open>spectroscopy_moves g g' = Some (\<lambda>e. Option.bind (if \<not> E 0 0 0 0 0 0 0 0 1 \<le> e then None else Some (e - E 0 0 0 0 0 0 0 0 1)) min1_8)\<close>
+      thus ?thesis
+        unfolding min_1_8_subtr_simp
+        using monotonicity_assms
+        by (smt (z3) enat_diff_mono energy.sel leq_components min.mono option.distinct(1) option.sel)
+    qed
   qed
 next
   fix g g' e e'
@@ -270,21 +283,40 @@ next
         (smt (verit, best) option.distinct(1) option.inject order.trans)+
   next
     case (Attacker_Clause p q)
-    hence \<open>\<exists>p' Q'. g'= (Attacker_Delayed p' Q')\<close>
+    then obtain p' Q' where \<open>g'=(Attacker_Delayed p' Q')\<close>
       using defender_win_min_assms(2)
-      by (metis spectroscopy_defender.cases spectroscopy_moves.simps(21,52,58,62,67,72))
-    hence \<open>spectroscopy_moves g g' = Some min1_6 \<or> spectroscopy_moves g g' = Some (\<lambda>e. Option.bind ((subtract_fn 0 0 0 0 0 0 0 1) e) min1_7)\<close>
-      using defender_win_min_assms(2) Attacker_Clause
-      by (smt (verit, ccfv_threshold) spectroscopy_moves.simps(7))
+      by (cases g', auto)
+    hence \<open>spectroscopy_moves g g' = Some min1_6 \<or> spectroscopy_moves g g' = Some (\<lambda>e. Option.bind ((subtract_fn 0 0 0 0 0 0 0 0 1) e) min1_8)\<close>
+      using defender_win_min_assms(2) Attacker_Clause pos_neg_clause
+      by (smt (verit))
     thus ?thesis
     proof safe
       assume \<open>spectroscopy_moves g g' = Some min1_6\<close>
       thus \<open>the (spectroscopy_moves g g') e = None\<close>
-        using defender_win_min_assms min_1_6_some by fastforce
+        using defender_win_min_assms min_some by fastforce
     next
-      assume \<open>spectroscopy_moves g g' = Some (\<lambda>e. Option.bind (if \<not> E 0 0 0 0 0 0 0 1 \<le> e then None else Some (e - E 0 0 0 0 0 0 0 1)) min1_7)\<close>
+      assume \<open>spectroscopy_moves g g' = Some (\<lambda>e. Option.bind (if \<not> E 0 0 0 0 0 0 0 0 1 \<le> e then None else Some (e - E 0 0 0 0 0 0 0 0 1)) min1_8)\<close>
       thus \<open>the (spectroscopy_moves g g') e = None\<close>
-        using defender_win_min_assms(1,3) bind.bind_lunit dual_order.trans min_1_7_some
+        using defender_win_min_assms(1,3) bind.bind_lunit dual_order.trans min_some
+        by (smt (verit, best) option.sel)
+    qed
+  next 
+    case (Attacker_Stable_Clause p q)
+    then obtain p' Q' where \<open>g'= (Attacker_Delayed p' Q')\<close>
+      using defender_win_min_assms(2)
+      by (cases g', auto)
+    hence \<open>spectroscopy_moves g g' = Some min1_7 \<or> spectroscopy_moves g g' = Some (\<lambda>e. Option.bind ((subtract_fn 0 0 0 0 0 0 0 0 1) e) min1_8)\<close>
+      using defender_win_min_assms(2) Attacker_Stable_Clause pos_neg_stable_clause
+      by meson
+    thus ?thesis
+    proof safe
+      assume \<open>spectroscopy_moves g g' = Some min1_7\<close>
+      thus \<open>the (spectroscopy_moves g g') e = None\<close>
+        using defender_win_min_assms min_some by fastforce
+    next
+      assume \<open>spectroscopy_moves g g' = Some (\<lambda>e. Option.bind (if \<not> E 0 0 0 0 0 0 0 0 1 \<le> e then None else Some (e - E 0 0 0 0 0 0 0 0 1)) min1_8)\<close>
+      thus \<open>the (spectroscopy_moves g g') e = None\<close>
+        using defender_win_min_assms(1,3) bind.bind_lunit dual_order.trans min_some
         by (smt (verit, best) option.sel)
     qed
   next
@@ -292,9 +324,10 @@ next
     hence \<open>(\<exists>p' Q'. g'=(Attacker_Delayed p' Q')) \<or>
       (\<exists>p' Q'. g'=(Attacker_Immediate p' Q')) \<or>
       (\<exists>p' Q'. g'=(Defender_Conj p' Q')) \<or>
-      (\<exists>p' Q'. g'=(Defender_Stable_Conj p' Q')) \<or>
+      (\<exists>p' Q' Qr. g'=(Defender_Stable_Conj p' Q' Qr)) \<or>
       (\<exists>p' p'' Q' \<alpha> Q\<alpha> . g'= (Defender_Branch p' \<alpha> p'' Q' Q\<alpha>))\<close>
-      by (metis defender_win_min_assms(2) spectroscopy_defender.cases spectroscopy_moves.simps(27,59))
+      using defender_win_min_assms(2)
+      by (induct, auto)
     thus ?thesis
     proof (safe)
       fix p' Q'
@@ -306,10 +339,10 @@ next
     next
       fix p' Q'
       assume \<open>g' = Attacker_Immediate p' Q'\<close>
-      moreover hence \<open>spectroscopy_moves g g' = (subtract 1 0 0 0 0 0 0 0)\<close>
+      moreover hence \<open>spectroscopy_moves g g' = (subtract 1 0 0 0 0 0 0 0 0)\<close>
         using Attacker_Delayed defender_win_min_assms(2,3) local.observation
         by (clarify, presburger)
-      moreover hence \<open>\<not>E 1 0 0 0 0 0 0 0 \<le> e'\<close>
+      moreover hence \<open>\<not>E 1 0 0 0 0 0 0 0 0 \<le> e'\<close>
         using  defender_win_min_assms by force
       ultimately show  \<open>the (spectroscopy_moves g (Attacker_Immediate p' Q')) e = None\<close>
         using defender_win_min_assms(1) by force
@@ -321,12 +354,12 @@ next
         by (metis option.distinct(1) option.sel)
       thus \<open>the (spectroscopy_moves g (Defender_Conj p' Q')) e = None\<close> ..
     next
-      fix p' Q'
-      assume \<open>g' = Defender_Stable_Conj p' Q'\<close>
+      fix p' Q' Qr
+      assume \<open>g' = Defender_Stable_Conj p' Q' Qr\<close>
       hence False
         using Attacker_Delayed defender_win_min_assms(2,3) local.late_stbl_conj
         by (metis (no_types, lifting) option.distinct(1) option.sel)
-      thus \<open>the (spectroscopy_moves g (Defender_Stable_Conj p' Q')) e = None\<close> ..
+      thus \<open>the (spectroscopy_moves g (Defender_Stable_Conj p' Q' Qr)) e = None\<close> ..
     next
       fix p' p'' Q' \<alpha> Q\<alpha>
       assume \<open>g' = Defender_Branch p' \<alpha> p'' Q' Q\<alpha>\<close>
@@ -340,12 +373,12 @@ next
     hence \<open>(\<exists>q'\<in>Q'. g' = Attacker_Clause p q')
       \<or> (\<exists>Qa'. Qa \<mapsto>aS a Qa' \<and> g' = Attacker_Branch p' Qa')\<close>
       using defender_win_min_assms by (cases g', auto) (metis not_None_eq)+
-    hence \<open>(spectroscopy_moves g g') = (subtract 0 1 1 0 0 0 0 0) \<or>
-      (spectroscopy_moves g g') = Some (\<lambda>e. Option.bind ((subtract_fn 0 1 1 0 0 0 0 0) e) min1_6)\<close>
+    hence \<open>(spectroscopy_moves g g') = (subtract 0 1 1 0 0 0 0 0 0) \<or>
+      (spectroscopy_moves g g') = Some (\<lambda>e. Option.bind ((subtract_fn 0 1 1 0 0 0 0 0 0) e) min1_6)\<close>
       using Defender_Branch option.collapse[OF defender_win_min_assms(2)]
       by (cases g', auto)
     thus ?thesis
-      using defender_win_min_assms min_1_6_some
+      using defender_win_min_assms min_some
       by (smt (verit, best) bind.bind_lunit option.distinct(1) dual_order.trans option.sel)
   next
     case (Defender_Conj p Q)
@@ -353,10 +386,14 @@ next
       by (cases g', auto)
         (smt (verit, best) option.distinct(1) option.inject order.trans)+
   next
-    case (Defender_Stable_Conj x71 x72)
+    case (Defender_Stable_Conj p Q Qr)
     with defender_win_min_assms show ?thesis
-      by (cases g', simp_all del: leq_components)
-         (smt (verit) dual_order.trans option.discI option.sel)+
+      apply (cases g') apply (simp_all del: leq_components)
+      apply (smt (verit) energy.sel(4) le_zero_eq leq_components min_6_7_subtr_simp not_one_le_zero option.discI option.sel)
+      apply (smt (verit) bind.bind_lunit leq_components min.absorb2 min.bounded_iff min_some(1) option.discI option.sel)
+      by (smt (verit, best) dual_order.trans option.collapse option.distinct(1) option.inject)
+      (*by (cases g', simp_all del: leq_components)
+         (smt (verit) dual_order.trans option.discI option.sel)+*)
   qed
 qed
 
