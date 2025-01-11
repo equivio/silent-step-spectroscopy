@@ -43,6 +43,12 @@ lemma leq_components[simp]:
                      pos_conjuncts_sec e1 \<le> pos_conjuncts_sec e2 \<and> neg_conjuncts e1 \<le> neg_conjuncts e2 \<and> neg_depth e1 \<le> neg_depth e2)\<close>
   unfolding less_eq_energy_def by (simp add: energy.case_eq_if)
 
+
+
+lemma leq_components_constr[simp]:
+  shows \<open>E a1 b1 c1 d1 e1 f1 g1 h1 i1 \<le> E a2 b2 c2 d2 e2 f2 g2 h2 i2 \<equiv> a1 \<le> a2 \<and> b1 \<le> b2 \<and> c1 \<le> c2 \<and> d1 \<le> d2 \<and> e1 \<le> e2 \<and> f1 \<le> f2 \<and> g1 \<le> g2 \<and> h1 \<le> h2 \<and> i1 \<le> i2\<close>
+  unfolding less_eq_energy_def by simp
+
 lemma energy_leq_cases:
   assumes \<open>modal_depth e1 \<le> modal_depth e2\<close> \<open>br_conj_depth e1 \<le> br_conj_depth e2\<close> \<open>conj_depth e1 \<le> conj_depth e2\<close>
           \<open>st_conj_depth e1 \<le> st_conj_depth e2\<close> \<open>imm_conj_depth e1 \<le> imm_conj_depth e2\<close> \<open>pos_conjuncts e1 \<le> pos_conjuncts e2\<close>
@@ -158,6 +164,17 @@ lemma mono_subtract:
   assumes \<open>x \<le> x'\<close>
   shows \<open>(\<lambda>x. x - (E a b c d e f g h i)) x \<le> (\<lambda>x. x - (E a b c d e f g h i)) x'\<close>
   using assms enat_diff_mono by force
+
+lemma energy_subtraction_inequallity:
+  fixes d::energy
+  assumes
+    \<open>d \<le> x\<close>
+    \<open>d \<le> x'\<close>
+    \<open>x - d \<le> x' - d\<close>
+  shows
+    \<open>x \<le> x'\<close>
+  using assms add_diff_cancel_enat enat_add_left_cancel_le le_iff_add
+  by (smt (z3) energy.sel leq_components minus_energy_def)
 
 text \<open>We also define abbreviations for performing subtraction.\<close>
 abbreviation \<open>subtract_fn a b c d e f g h i \<equiv>

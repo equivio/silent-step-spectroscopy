@@ -854,6 +854,13 @@ proof-
     by (simp add: e_def)
 qed
 
+lemma conj_price_transfer:
+  assumes
+    \<open>expr_pr_inner (Conj I \<Psi>) \<le> e\<close>
+  shows
+    \<open>expressiveness_price (ImmConj I \<Psi>) - E 0 0 0 0 1 0 0 0 0 \<le> e\<close>
+  using assms by auto
+
 lemma expr_br_conj:
   assumes
     \<open>subtract_fn 0 1 1 0 0 0 0 0 0 e = Some e'\<close>
