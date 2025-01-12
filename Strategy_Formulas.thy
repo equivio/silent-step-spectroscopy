@@ -732,20 +732,58 @@ next
       ultimately show ?thesis using conj_price_transfer by auto
     qed
   next
-    (* TODO *)
     case (Defender_Stable_Conj p Q Qr)
-    hence cases:
+    have cases:
       \<open>\<forall>g'. spectroscopy_moves (Defender_Stable_Conj p Q Qr) g' \<noteq> None \<longrightarrow>
-       (\<exists>e'. weight (Defender_Stable_Conj p Q) g' e = Some e' \<and> attacker_wins e' g')
-        \<and> ((\<exists>p' q. g' = (Attacker_Clause p' q)) \<or> (\<exists>p' Q'. g' = (Defender_Conj p' Q')))\<close>
-      by (metis (no_types, opaque_lifting)
-            spectroscopy_defender.elims(2,3) spectroscopy_moves.simps(40,42,43,44,55))
-    show ?case
-    proof(cases \<open>Q = {}\<close>)
+       (\<exists>e'. weight (Defender_Stable_Conj p Q Qr) g' e = Some e' \<and> attacker_wins e' g')
+        \<and> ((\<exists>q\<in>Q. g' = Attacker_Stable_Clause p q) \<or> g' = Attacker_Delayed p Qr  \<or> g' = (Defender_Conj p {}))\<close>
+    proof clarify
+      fix g' e'
+      assume case_assm: \<open>spectroscopy_moves (Defender_Stable_Conj p Q Qr) g' = Some e'\<close>
+      hence \<open>\<exists>e'. weight (Defender_Stable_Conj p Q Qr) g' e = Some e' \<and> attacker_wins e' g'\<close>
+        using Defender_Stable_Conj by auto
+      moreover have \<open>(\<exists>q\<in>Q. g' = Attacker_Stable_Clause p q) \<or> g' = Attacker_Delayed p Qr \<or> g' = Defender_Conj p {}\<close>
+        using case_assm Defender_Stable_Conj
+        by (induct g', fastforce, fastforce, fastforce, fastforce, unfold conj_s_revival, smt (verit, ccfv_threshold) not_Some_eq, fastforce, unfold empty_stbl_conj_answer, smt (verit, best) not_None_eq, fastforce)
+      ultimately show
+        \<open>(\<exists>e'. weight (Defender_Stable_Conj p Q Qr) g' e = Some e' \<and> attacker_wins e' g') \<and> ((\<exists>q\<in>Q. g' = Attacker_Stable_Clause p q) \<or> g' = Attacker_Delayed p Qr \<or> g' = Defender_Conj p {})\<close>
+        ..
+    qed
+    have \<open>\<exists>\<chi>. strategy_formula_inner (Defender_Stable_Conj p Q Qr) e \<chi> \<and> expr_pr_inner \<chi> \<le> e\<close>
+    proof
+      obtain e' where e'_spec:
+        \<open>e' = e - (E 0 0 0 1 0 0 0 0 0)\<close>
+        \<open>\<forall>q \<in> Q. weight (Defender_Stable_Conj p Q Qr) (Attacker_Stable_Clause p q) e = Some e'
+          \<and> attacker_wins e' (Attacker_Stable_Clause p q)\<close>
+        using cases local.conj_s_answer
+        by (smt (verit, del_insts) option.distinct(1) option.sel)
+      hence IH: \<open>\<forall>q \<in> Q. \<exists>\<psi>.
+        strategy_formula_conjunct (Attacker_Clause p q) e' \<psi> \<and>
+        expr_pr_conjunct \<psi> \<le> e'\<close>
+        using Defender_Stable_Conj local.conj_s_answer
+        by (smt (verit, best) option.distinct(1) option.inject spectroscopy_position.simps(52))
+      hence \<open>\<exists>\<Phi>. \<forall>q \<in> Q.
+        strategy_formula_conjunct (Attacker_Clause p q) e' (\<Phi> q) \<and>
+        expr_pr_conjunct (\<Phi> q) \<le> e'\<close>
+        by meson
+      then obtain \<Phi> where \<Phi>_prop: \<open>\<forall>q \<in> Q.
+        strategy_formula_conjunct (Attacker_Clause p q) e' (\<Phi> q)
+        \<and> expr_pr_conjunct (\<Phi> q) \<le> e'\<close>
+        by blast
+      have \<open>E 0 0 0 1 0 0 0 0 \<le> e\<close>
+        using e'_spec False by fastforce
+      hence \<open>expr_pr_inner (StableConj Q \<Phi>) \<le> e\<close>
+        using expr_st_conj e'_spec \<Phi>_prop False by metis
+      moreover have \<open>strategy_formula_inner (Defender_Stable_Conj p Q) e (StableConj Q \<Phi>)\<close>
+        using \<Phi>_prop e'_spec stable_conj
+        unfolding e'_spec by fastforce
+      ultimately show ?thesis by auto
+    thus ?case by simp
+    proof(cases \<open>Q = {} \<and> Qr = {}\<close>)
       case True
       then obtain e' where e'_spec:
-        \<open>weight (Defender_Stable_Conj p Q) (Defender_Conj p Q) e = Some e'\<close>
-        \<open>e' = e - (E 0 0 0 1 0 0 0 0)\<close>
+        \<open>weight (Defender_Stable_Conj p Q Qr) (Defender_Conj p Q) e = Some e'\<close>
+        \<open>e' = e - (E 0 0 0 1 0 0 0 0 0)\<close>
         \<open>attacker_wins e' (Defender_Conj p Q)\<close>
         using cases local.empty_stbl_conj_answer
         by (smt (verit, best) option.discI option.sel)
