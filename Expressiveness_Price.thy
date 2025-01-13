@@ -656,7 +656,6 @@ qed
 lemma expr_st_conj:
   assumes
     \<open>subtract_fn  0 0 0 1 0 0 0 0 0 e = Some e'\<close>
-    \<open>I \<noteq> {}\<close>
     \<open>\<forall>q \<in> I. expr_pr_conjunct (\<psi>s q) \<le> e'\<close>
     \<open>\<forall>q \<in> I - revival_conjunct_index I \<psi>s. is_pos (\<psi>s q) \<longrightarrow> modal_depth_srbb_conjunct (\<psi>s q) \<le> pos_conjuncts_sec e'\<close>
     \<open>0 < neg_depth e\<close>
