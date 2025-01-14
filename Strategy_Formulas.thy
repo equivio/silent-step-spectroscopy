@@ -797,8 +797,16 @@ next
         \<open>expr_pr_inner \<chi> \<le> e\<chi>'\<close>
         using Defender_Stable_Conj conj_s_revival spectroscopy_position.simps
         by (smt (verit, best) option.discI option.inject)
-      hence \<chi>e: \<open>expr_pr_conjunct (Pos \<chi>) \<le> the (min1_6 e)\<close> sorry
-      hence \<open>modal_depth_srbb_inner \<chi> \<le> pos_conjuncts e\<close> by simp
+      hence \<chi>e: \<open>expr_pr_conjunct (Pos \<chi>) \<le> the
+          (Option.bind (if \<not> E 0 0 0 1 0 0 0 0 0 \<le> e then None else Some (e - E 0 0 0 1 0 0 0 0 0)) min1_6)\<close>
+        using e\<chi>'_spec(1)
+        by (simp, smt (z3) bind.bind_lunit bind_eq_None_conv energy.sel idiff_0_right
+            min.bounded_iff min_1_6_simps minus_energy_def option.sel)
+      hence \<open>modal_depth_srbb_inner \<chi> \<le> pos_conjuncts e\<close>
+        using \<chi>_spec(2) e\<chi>'_spec(1)
+        by (smt (verit, ccfv_SIG) bind.bind_lunit bind_eq_None_conv energy.sel(1,6)
+            expr_pr_inner.simps idiff_0_right leq_components min_1_6_simps(1) min_def
+            minus_energy_def option.distinct(1) option.sel order_trans)
       hence \<open>\<forall>q\<in>Q. \<exists>\<chi>q. \<Psi> q = Pos \<chi>q \<longrightarrow> modal_depth_srbb_inner \<chi>q \<le> pos_conjuncts e\<close> by blast
       obtain e'' where e''_spec: \<open>subtract_fn  0 0 0 1 0 0 0 0 0 e = Some e''\<close>
         using e_not_low by auto
@@ -807,7 +815,7 @@ next
       define rQ where
         \<open>rQ \<equiv> {None} \<union> Some ` Q\<close>
       have \<open>\<forall>qn \<in> rQ. expr_pr_conjunct (\<Psi>\<chi> qn) \<le> e''\<close>
-        using \<Psi>_prop e'_spec e''_spec \<chi>e e\<chi>'_spec \<chi>_spec leq_components e_not_low
+        using \<Psi>_prop e'_spec e''_spec e\<chi>'_spec \<chi>_spec leq_components e_not_low
         unfolding \<Psi>\<chi>_def rQ_def
         by (simp, smt (z3) bind.bind_lunit energy.sel min.bounded_iff min_1_6_simps min_6_7_simps option.sel)
       moreover have \<open>\<forall>qn \<in> rQ - revival_conjunct_index rQ \<Psi>\<chi>. is_pos (\<Psi>\<chi> qn) \<longrightarrow> modal_depth_srbb_conjunct (\<Psi>\<chi> qn) \<le> pos_conjuncts_sec e''\<close>
