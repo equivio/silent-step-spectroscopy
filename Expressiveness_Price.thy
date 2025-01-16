@@ -278,7 +278,7 @@ lemma modal_depth_dominates_pos_conjuncts:
   by (auto simp add: SUP_mono' add_increasing sup.coboundedI1 sup.coboundedI2)
 
 \<comment>\<open>Supremum after some maximal element has been removed\<close>
-definition revival_conjunct_index :: \<open>'s option set \<Rightarrow> ('s option \<Rightarrow> ('a, 's) hml_srbb_conjunct) \<Rightarrow> 's option set\<close> where
+definition revival_conjunct_index :: \<open>'x option set \<Rightarrow> ('x option \<Rightarrow> ('a, 's) hml_srbb_conjunct) \<Rightarrow> 'x option set\<close> where
   \<open>revival_conjunct_index I \<psi>s \<equiv>
     if (\<exists>i\<in>I. is_pos (\<psi>s i) \<and> (\<forall>j\<in>I. is_pos (\<psi>s j) \<longrightarrow>
         modal_depth_srbb_conjunct (\<psi>s j) \<le> modal_depth_srbb_conjunct (\<psi>s i))) then

@@ -79,6 +79,7 @@ proof-
                \<longrightarrow> attacker_wins (expr_pr_conjunct \<psi>) (Attacker_Clause p q))
         \<and> (\<forall>p q. hml_srbb_conj.distinguishes \<psi> p q
                \<longrightarrow> attacker_wins (expr_pr_conjunct \<psi>) (Attacker_Stable_Clause p q))\<close>
+    \<comment> \<open>Likely, I should add another induction hypothesis to cater for conjuncts that distinguish from sets ... ?\<close>
   proof -
     fix \<phi> \<chi> \<psi>
     show \<open>(\<forall>Q p. Q \<noteq> {} \<longrightarrow> distinguishes_from \<phi> p Q
@@ -424,7 +425,6 @@ proof-
           \<open>Q \<noteq> {}\<close>
           \<open>hml_srbb_inner.distinguishes_from (StableConj I \<psi>s) p (Q \<union> Qr)\<close>
           \<open>\<forall>q\<in>Q\<union>Qr. stable_state q\<close>
-          \<open>attacker_wins (expr_pr_inner (StableConj I \<psi>s)) (Defender_Stable_Conj p Q Qr)\<close>
         hence distinctions: \<open>\<forall>q\<in>Q\<union>Qr. \<exists>i\<in>I. hml_srbb_conj.distinguishes (\<psi>s i) p q\<close>
           by simp
         hence inductive_wins: \<open>\<forall>q\<in>Q\<union>Qr. \<exists>i\<in>I. hml_srbb_conj.distinguishes (\<psi>s i) p q
@@ -437,6 +437,21 @@ proof-
           \<open>\<forall>q\<in>Q\<union>Qr. \<exists>i\<in>I. \<psi>qs q = \<psi>s i \<and> hml_srbb_conj.distinguishes (\<psi>qs q ) p q
             \<and> attacker_wins (expr_pr_conjunct (\<psi>qs q)) (Attacker_Stable_Clause p q)\<close>
           by (smt (verit))
+        define revivals where \<open>revivals \<equiv> revival_conjunct_index I \<psi>s\<close>
+        show \<open>attacker_wins (expr_pr_inner (StableConj I \<psi>s)) (Defender_Stable_Conj p Q Qr)\<close>
+        proof (cases \<open>revivals = {}\<close>)
+          case True
+          then show ?thesis sorry
+        next
+          case False
+          then obtain \<psi>r where \<open>revivals = {\<psi>r}\<close>
+            unfolding revivals_def revival_conjunct_index_def empty_iff
+            by (metis (no_types, lifting))
+
+          then show ?thesis sorry
+        qed
+
+
         have conjuncts_present: \<open>\<forall>q\<in>Q. expr_pr_conjunct (\<psi>qs q) \<in> expr_pr_conjunct ` (\<psi>qs ` Q)\<close>
           using \<open>Q \<noteq> {}\<close> by blast
         define e' where \<open>e' = E
@@ -446,7 +461,8 @@ proof-
           (Sup (st_conj_depth  ` (expr_pr_conjunct ` (\<psi>qs ` (Q\<union>Qr)))))
           (Sup (imm_conj_depth  ` (expr_pr_conjunct ` (\<psi>qs ` (Q\<union>Qr)))))
           (Sup (pos_conjuncts   ` (expr_pr_conjunct ` (\<psi>qs ` (Q\<union>Qr)))))
-          (Sup (pos_conjuncts_sec   ` (expr_pr_conjunct ` (\<psi>qs ` (Q\<union>Qr)))))
+          (Sup (((\<lambda>\<psi>. case \<psi> of (Pos \<chi>) \<Rightarrow> modal_depth_srbb_inner \<chi> | _ \<Rightarrow> max_pos_conj_secondary_depth_conjunct \<psi>) \<circ> \<psi>qs)
+            ` ((Q\<union>Qr) - (revival_conjunct_index (Q\<union>Qr) \<psi>qs))))
           (Sup (neg_conjuncts ` (expr_pr_conjunct ` (\<psi>qs ` (Q\<union>Qr)))))
           (Sup ({1} \<union> neg_depth ` (expr_pr_conjunct ` (\<psi>qs ` (Q\<union>Qr)))))\<close>
         from conjuncts_present have \<open>\<forall>q\<in>Q\<union>Qr. (expr_pr_conjunct (\<psi>qs q)) \<le> e'\<close> unfolding e'_def
@@ -460,7 +476,8 @@ proof-
           (Sup (st_conj_depth  ` (expr_pr_conjunct ` (\<psi>s ` I))))
           (Sup (imm_conj_depth  ` (expr_pr_conjunct ` (\<psi>s ` I))))
           (Sup (pos_conjuncts   ` (expr_pr_conjunct ` (\<psi>s ` I))))
-          (Sup (pos_conjuncts_sec   ` (expr_pr_conjunct ` (\<psi>s ` I))))
+          (Sup (((\<lambda>\<psi>. case \<psi> of (Pos \<chi>) \<Rightarrow> modal_depth_srbb_inner \<chi> | _ \<Rightarrow> max_pos_conj_secondary_depth_conjunct \<psi>) \<circ> \<psi>s)
+          ` (I - (revival_conjunct_index I \<psi>s))))
           (Sup (neg_conjuncts ` (expr_pr_conjunct ` (\<psi>s ` I))))
           (Sup ({1} \<union> neg_depth ` (expr_pr_conjunct ` (\<psi>s ` I))))\<close>
         have subset_form: \<open>\<psi>qs ` (Q\<union>Qr) \<subseteq> \<psi>s ` I\<close>
