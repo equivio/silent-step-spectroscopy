@@ -80,7 +80,7 @@ proof-
             Q \<noteq> {} \<longrightarrow> hml_srbb_inner.distinguishes_from \<chi> p Q
             \<longrightarrow> attacker_wins (expr_pr_inner \<chi>) (Defender_Conj p Q))
         \<and> (\<forall>\<Psi>_I \<Psi> p Q Qr. \<chi> = StableConj \<Psi>_I \<Psi> \<longrightarrow>
-            Q \<noteq> {} \<longrightarrow> hml_srbb_inner.distinguishes_from \<chi> p (Q \<union> Qr) \<longrightarrow> (\<forall>q \<in> Q \<union> Qr. stable_state q)
+            Q \<noteq> {} \<longrightarrow> hml_srbb_inner.distinguishes_from \<chi> p (Q \<union> Qr) \<longrightarrow> stable_state p \<longrightarrow> (\<forall>q \<in> Q \<union> Qr. stable_state q)
             \<longrightarrow> attacker_wins (expr_pr_inner \<chi>) (Defender_Stable_Conj p Q Qr))
         \<and> (\<forall>\<Psi>_I \<Psi> \<alpha> \<phi> p Q p' Q_\<alpha>. \<chi> = BranchConj \<alpha> \<phi> \<Psi>_I \<Psi> \<longrightarrow>
             hml_srbb_inner.distinguishes_from \<chi> p Q \<longrightarrow> p \<mapsto>a \<alpha> p' \<longrightarrow> p' \<Turnstile>SRBB \<phi> \<longrightarrow>
@@ -89,8 +89,9 @@ proof-
       \<and>
         (\<forall>p q. hml_srbb_conj.distinguishes \<psi> p q
                \<longrightarrow> attacker_wins (expr_pr_conjunct \<psi>) (Attacker_Clause p q))
-        \<and> (\<forall>p q. hml_srbb_conj.distinguishes \<psi> p q
-               \<longrightarrow> attacker_wins (expr_pr_conjunct \<psi>) (Attacker_Stable_Clause p q))\<close>
+        \<and> (\<forall>p q e'. hml_srbb_conj.distinguishes \<psi> p q \<longrightarrow> stable_state p \<longrightarrow> stable_state q
+               \<longrightarrow> expr_pr_conjunct \<psi> \<le> e' \<longrightarrow> pos_conjuncts e' \<le> pos_conjuncts_sec e'
+               \<longrightarrow> attacker_wins e' (Attacker_Stable_Clause p q))\<close>
     \<comment> \<open>Likely, I should add another induction hypothesis to cater for conjuncts that distinguish from sets ... ?\<close>
   proof -
     fix \<phi> \<chi> \<psi>
@@ -102,8 +103,8 @@ proof-
         \<and> (\<forall>\<Psi>_I \<Psi> p Q. \<chi> = Conj \<Psi>_I \<Psi> \<longrightarrow>
             Q \<noteq> {} \<longrightarrow> hml_srbb_inner.distinguishes_from \<chi> p Q
             \<longrightarrow> attacker_wins (expr_pr_inner \<chi>) (Defender_Conj p Q))
-        \<and> (\<forall>\<Psi>_I \<Psi> p Q Qr. \<chi> = StableConj \<Psi>_I \<Psi> \<longrightarrow>
-            Q \<noteq> {} \<longrightarrow> hml_srbb_inner.distinguishes_from \<chi> p (Q \<union> Qr) \<longrightarrow> (\<forall>q \<in> Q \<union> Qr. stable_state q)
+        \<and> (\<forall>\<Psi>_I \<Psi> p Q Qr. \<chi> = StableConj \<Psi>_I \<Psi> \<longrightarrow> Q \<noteq> {} \<longrightarrow>
+                hml_srbb_inner.distinguishes_from \<chi> p (Q \<union> Qr) \<longrightarrow> stable_state p  \<longrightarrow> (\<forall>q \<in> Q \<union> Qr. stable_state q)
             \<longrightarrow> attacker_wins (expr_pr_inner \<chi>) (Defender_Stable_Conj p Q Qr))
         \<and> (\<forall>\<Psi>_I \<Psi> \<alpha> \<phi> p Q p' Q_\<alpha>. \<chi> = BranchConj \<alpha> \<phi> \<Psi>_I \<Psi> \<longrightarrow>
             hml_srbb_inner.distinguishes_from \<chi> p Q \<longrightarrow> p \<mapsto>a \<alpha> p' \<longrightarrow> p' \<Turnstile>SRBB \<phi> \<longrightarrow>
@@ -112,8 +113,9 @@ proof-
       \<and>
         (\<forall>p q. hml_srbb_conj.distinguishes \<psi> p q
                \<longrightarrow> attacker_wins (expr_pr_conjunct \<psi>) (Attacker_Clause p q))
-        \<and> (\<forall>p q. hml_srbb_conj.distinguishes \<psi> p q
-               \<longrightarrow> attacker_wins (expr_pr_conjunct \<psi>) (Attacker_Stable_Clause p q))\<close>
+        \<and> (\<forall>p q e'. hml_srbb_conj.distinguishes \<psi> p q \<longrightarrow> stable_state p \<longrightarrow> stable_state q
+               \<longrightarrow> expr_pr_conjunct \<psi> \<le> e' \<longrightarrow> pos_conjuncts e' \<le> pos_conjuncts_sec e'
+               \<longrightarrow> attacker_wins e' (Attacker_Stable_Clause p q))\<close>
     proof (induct rule: hml_srbb_hml_srbb_inner_hml_srbb_conjunct.induct[of _ _ _ \<phi> \<chi> \<psi>])
       case TT
       then show ?case
@@ -429,20 +431,21 @@ proof-
     next
       case (StableConj I \<psi>s)
       have main_case: \<open>\<forall>\<Psi>_I \<Psi> p Q Qr. Q \<noteq> {} \<longrightarrow>
-           hml_srbb_inner.distinguishes_from (StableConj I \<psi>s) p (Q \<union> Qr) \<longrightarrow>
+           hml_srbb_inner.distinguishes_from (StableConj I \<psi>s) p (Q \<union> Qr) \<longrightarrow> stable_state p \<longrightarrow>
            (\<forall>q\<in>Q \<union> Qr. stable_state q) \<longrightarrow> attacker_wins (expr_pr_inner (StableConj I \<psi>s)) (Defender_Stable_Conj p Q Qr)\<close>
       proof clarify
         fix p Q Qr
         assume case_assms:
           \<open>Q \<noteq> {}\<close>
           \<open>hml_srbb_inner.distinguishes_from (StableConj I \<psi>s) p (Q \<union> Qr)\<close>
+          \<open>stable_state p\<close>
           \<open>\<forall>q\<in>Q\<union>Qr. stable_state q\<close>
         hence distinctions: \<open>\<forall>q\<in>Q\<union>Qr. \<exists>i\<in>I. hml_srbb_conj.distinguishes (\<psi>s i) p q\<close>
           by simp
         hence inductive_wins: \<open>\<forall>q\<in>Q\<union>Qr. \<exists>i\<in>I. hml_srbb_conj.distinguishes (\<psi>s i) p q
             \<and> attacker_wins (expr_pr_conjunct (\<psi>s i)) (Attacker_Clause p q)
             \<and> attacker_wins (expr_pr_conjunct (\<psi>s i)) (Attacker_Stable_Clause p q)\<close>
-          using StableConj by blast
+          using StableConj case_assms(3,4) sorry (*by (meson rangeI)*)
         define \<psi>qs where
           \<open>\<psi>qs \<equiv> \<lambda>q. (SOME \<psi>. \<exists>i\<in>I. \<psi> = \<psi>s i \<and>  hml_srbb_conj.distinguishes \<psi> p q
             \<and> attacker_wins (expr_pr_conjunct \<psi>) (Attacker_Clause p q)
@@ -461,12 +464,13 @@ proof-
           (Sup (st_conj_depth  ` (expr_pr_conjunct ` (\<psi>qs ` (Q\<union>Qr)))))
           (Sup (imm_conj_depth  ` (expr_pr_conjunct ` (\<psi>qs ` (Q\<union>Qr)))))
           (Sup (pos_conjuncts   ` (expr_pr_conjunct ` (\<psi>qs ` (Q\<union>Qr)))
-                \<union> pos_conjuncts_sec   ` (expr_pr_conjunct ` (\<psi>qs ` (Q\<union>Qr)))))
+                ))
           (Sup (pos_conjuncts_sec   ` (expr_pr_conjunct ` (\<psi>qs ` (Q\<union>Qr)))))
           (Sup (neg_conjuncts ` (expr_pr_conjunct ` (\<psi>qs ` (Q\<union>Qr)))))
           (Sup ({1} \<union> neg_depth ` (expr_pr_conjunct ` (\<psi>qs ` (Q\<union>Qr)))))\<close>
         from conjuncts_present have conj_prices: \<open>\<forall>q\<in>Q\<union>Qr. (expr_pr_conjunct (\<psi>qs q)) \<le> e'\<close> unfolding e'_def
           by (smt (z3) Sup_upper UnI1 UnI2 energy.sel image_insert insert_iff leq_components mk_disjoint_insert)
+(*\<union> pos_conjuncts_sec   ` (expr_pr_conjunct ` (\<psi>qs ` (Q\<union>Qr))) *)
         hence clause_win: \<open>\<forall>q\<in>Q. attacker_wins e' (Attacker_Stable_Clause p q)\<close>
           using \<psi>qs_spec win_a_upwards_closure by blast
         have clause_win_revivals: \<open>attacker_wins e' (Attacker_Delayed p Qr)\<close>
@@ -522,9 +526,10 @@ proof-
             using subset_form
             apply (auto simp add: Sup_subset_mono image_mono sup.coboundedI2)
              defer
-            apply
+            by
                (smt (z3) SUP_cong Sup_le_iff Sup_upper sup_Q_I equal_sets(2) dual_order.trans
                 energy.sel(7) image_iff image_image mem_Collect_eq)
+(*
             proof -
               assume a1: "\<psi>qs ` (Q \<union> Qr) \<subseteq> \<psi>s ` I"
               obtain ee :: "enat \<Rightarrow> enat set \<Rightarrow> enat" where
@@ -545,7 +550,7 @@ proof-
                 using f6 by blast
               then show "Sup (pos_conjuncts ` (\<lambda>h. E (modal_depth_srbb_conjunct h) (branch_conj_depth_conjunct h) (inst_conj_depth_conjunct h) (st_conj_depth_conjunct h) (imm_conj_depth_conjunct h) (max_pos_conj_depth_conjunct h) (max_pos_conj_secondary_depth_conjunct h) (max_neg_conj_depth_conjunct h) (neg_depth_conjunct h)) ` \<psi>qs ` (Q \<union> Qr) \<union> pos_conjuncts_sec ` (\<lambda>h. E (modal_depth_srbb_conjunct h) (branch_conj_depth_conjunct h) (inst_conj_depth_conjunct h) (st_conj_depth_conjunct h) (imm_conj_depth_conjunct h) (max_pos_conj_depth_conjunct h) (max_pos_conj_secondary_depth_conjunct h) (max_neg_conj_depth_conjunct h) (neg_depth_conjunct h)) ` \<psi>qs ` (Q \<union> Qr)) \<le> Sup (pos_conjuncts ` (\<lambda>h. E (modal_depth_srbb_conjunct h) (branch_conj_depth_conjunct h) (inst_conj_depth_conjunct h) (st_conj_depth_conjunct h) (imm_conj_depth_conjunct h) (max_pos_conj_depth_conjunct h) (max_pos_conj_secondary_depth_conjunct h) (max_neg_conj_depth_conjunct h) (neg_depth_conjunct h)) ` \<psi>s ` I)"
                 using f4 by meson
-            qed
+            qed *)
           define e where \<open>e = E
             (modal_depth e')
             (br_conj_depth e')
@@ -553,12 +558,16 @@ proof-
             (1 + st_conj_depth e')
             (imm_conj_depth e')
             (pos_conjuncts e')
-            (pos_conjuncts_sec e')
+            (max (pos_conjuncts e') (pos_conjuncts_sec e'))
             (neg_conjuncts e')
             (sup 1 (neg_depth e'))\<close>
-          have \<open>e' = e - (E 0 0 0 1 0 0 0 0 0)\<close> unfolding e_def e'_def by auto
-          hence \<open>Some e' = (subtract_fn 0 0 0 1 0 0 0 0 0) e\<close>
-            by (metis e_def energy.sel energy_leq_cases i0_lb le_iff_add)
+          have e'_bound:
+              \<open>e' \<le> the (Option.bind (if \<not> E 0 0 0 1 0 0 0 0 0 \<le> e then None else Some (e - E 0 0 0 1 0 0 0 0 0)) min6_7)\<close>
+            unfolding e_def e'_def min_6_7_subtr_simp apply auto
+            using max_positive_conjunct_depth_dominates_secondary
+            by (smt (verit, del_insts) SUP_le_iff SUP_upper2 energy.sel(6) energy.sel(7) image_iff)
+          (* hence \<open>Some e' = (subtract_fn 0 0 0 1 0 0 0 0 0) e\<close>
+            by (metis e_def energy.sel energy_leq_cases i0_lb le_iff_add)*)
           have expr_lower: \<open>(E 0 0 0 1 0 0 0 0 0) \<le> expr_pr_inner (StableConj I \<psi>s)\<close>
             using case_assms(1) subset_form by force
           have eu'_comp: \<open>eu' = (expr_pr_inner (StableConj I \<psi>s)) - (E 0 0 0 1 0 0 0 0 0)\<close>
@@ -618,9 +627,9 @@ proof-
             proof cases
               case stable_answer
               then show ?thesis
-                using clause_win \<open>Some e' = (subtract_fn 0 0 0 1 0 0 0 0 0) e\<close>
+                using clause_win e'_bound
                 unfolding e_def
-                sledgehammer
+                using min_6_7_subtr_simp win_a_upwards_closure by auto
             next
               case stable_revival
               then show ?thesis using clause_win_revivals sorry
@@ -634,9 +643,10 @@ proof-
             unfolding e_def
             by (auto simp add: attacker_wins.Defense)
           moreover have \<open>e \<le> expr_pr_inner (StableConj I \<psi>s)\<close>
-            using \<open>e' \<le> eu'\<close> eu'_characterization \<open>Some e' = (subtract_fn 0 0 0 1 0 0 0 0 0) e\<close> expr_lower case_assms(1) subset_form
-            unfolding e_def eu'_comp minus_energy_def leq_components
-            by (metis \<open>e' = e - E 0 0 0 1 0 0 0 0 0\<close> \<open>e' \<le> eu'\<close> e_def energy_subtraction_inequallity eu'_comp leq_components option.discI)
+            using \<open>e' \<le> eu'\<close> eu'_characterization e'_bound expr_lower case_assms(1) subset_form
+            unfolding e_def eu'_comp minus_energy_def leq_components min_6_7_subtr_simp
+            sorry
+            (* by (metis \<open>e' \<le> eu'\<close> e_def energy_subtraction_inequallity eu'_comp leq_components option.discI) *)
          ultimately show \<open>attacker_wins (expr_pr_inner (StableConj I \<psi>s)) (Defender_Stable_Conj p Q Qr)\<close>
             using win_a_upwards_closure by blast
         next
@@ -647,105 +657,11 @@ proof-
 
           then show ?thesis sorry
         qed
-
-
-        have conjuncts_present: \<open>\<forall>q\<in>Q. expr_pr_conjunct (\<psi>qs q) \<in> expr_pr_conjunct ` (\<psi>qs ` Q)\<close>
-          using \<open>Q \<noteq> {}\<close> by blast
-        define e' where \<open>e' = E
-          (Sup (modal_depth   ` (expr_pr_conjunct ` (\<psi>qs ` (Q\<union>Qr)))))
-          (Sup (br_conj_depth   ` (expr_pr_conjunct ` (\<psi>qs ` (Q\<union>Qr)))))
-          (Sup (conj_depth ` (expr_pr_conjunct ` (\<psi>qs ` (Q\<union>Qr)))))
-          (Sup (st_conj_depth  ` (expr_pr_conjunct ` (\<psi>qs ` (Q\<union>Qr)))))
-          (Sup (imm_conj_depth  ` (expr_pr_conjunct ` (\<psi>qs ` (Q\<union>Qr)))))
-          (Sup (pos_conjuncts   ` (expr_pr_conjunct ` (\<psi>qs ` (Q\<union>Qr)))))
-          (Sup (((\<lambda>\<psi>. case \<psi> of (Pos \<chi>) \<Rightarrow> modal_depth_srbb_inner \<chi> | _ \<Rightarrow> max_pos_conj_secondary_depth_conjunct \<psi>) \<circ> \<psi>qs)
-            ` ((Q\<union>Qr) - (revival_conjunct_index (Q\<union>Qr) \<psi>qs))))
-          (Sup (neg_conjuncts ` (expr_pr_conjunct ` (\<psi>qs ` (Q\<union>Qr)))))
-          (Sup ({1} \<union> neg_depth ` (expr_pr_conjunct ` (\<psi>qs ` (Q\<union>Qr)))))\<close>
-        from conjuncts_present have \<open>\<forall>q\<in>Q\<union>Qr. (expr_pr_conjunct (\<psi>qs q)) \<le> e'\<close> unfolding e'_def
-          by (smt (z3) Sup_upper UnI2 energy.sel image_insert insert_iff leq_components mk_disjoint_insert)
-        with \<psi>qs_spec win_a_upwards_closure
-          have clause_win: \<open>\<forall>q\<in>Q. attacker_wins e' (Attacker_Stable_Clause p q)\<close> by blast
-        define eu' where \<open>eu' = E
-          (Sup (modal_depth   ` (expr_pr_conjunct ` (\<psi>s ` I))))
-          (Sup (br_conj_depth   ` (expr_pr_conjunct ` (\<psi>s ` I))))
-          (Sup (conj_depth ` (expr_pr_conjunct ` (\<psi>s ` I))))
-          (Sup (st_conj_depth  ` (expr_pr_conjunct ` (\<psi>s ` I))))
-          (Sup (imm_conj_depth  ` (expr_pr_conjunct ` (\<psi>s ` I))))
-          (Sup (pos_conjuncts   ` (expr_pr_conjunct ` (\<psi>s ` I))))
-          (Sup (((\<lambda>\<psi>. case \<psi> of (Pos \<chi>) \<Rightarrow> modal_depth_srbb_inner \<chi> | _ \<Rightarrow> max_pos_conj_secondary_depth_conjunct \<psi>) \<circ> \<psi>s)
-          ` (I - (revival_conjunct_index I \<psi>s))))
-          (Sup (neg_conjuncts ` (expr_pr_conjunct ` (\<psi>s ` I))))
-          (Sup ({1} \<union> neg_depth ` (expr_pr_conjunct ` (\<psi>s ` I))))\<close>
-        have subset_form: \<open>\<psi>qs ` (Q\<union>Qr) \<subseteq> \<psi>s ` I\<close>
-          using \<psi>qs_spec by fastforce
-        \<comment> \<open>TODO: encode this computation\<close>
-        term \<open>Sup (((\<lambda>\<psi>. case \<psi> of (Pos \<chi>) \<Rightarrow> modal_depth_srbb_inner \<chi> | _ \<Rightarrow> max_pos_conj_secondary_depth_conjunct \<psi>) \<circ> \<psi>s)
-          ` (I - (revival_conjunct_index I \<psi>s)))\<close>
-
-        hence \<open>e' \<le> eu'\<close> unfolding e'_def eu'_def
-          by (simp add: Sup_subset_mono image_mono sup.coboundedI2)
-        define e where \<open>e = E
-          (modal_depth e')
-          (br_conj_depth e')
-          (conj_depth e')
-          (1 + st_conj_depth e')
-          (imm_conj_depth e')
-          (pos_conjuncts e')
-          (pos_conjuncts_sec e')
-          (neg_conjuncts e')
-          (sup 1 (neg_depth e'))\<close>
-        have \<open>e' = e - (E 0 0 0 1 0 0 0 0 0)\<close> unfolding e_def e'_def by auto
-        hence \<open>Some e' = (subtract_fn 0 0 0 1 0 0 0 0 0) e\<close>
-          by (metis e_def energy.sel energy_leq_cases i0_lb le_iff_add)
-        have expr_lower: \<open>(E 0 0 0 1 0 0 0 0 0) \<le> expr_pr_inner (StableConj I \<psi>s)\<close>
-          using case_assms(1) subset_form by force
-        have eu'_comp: \<open>eu' = (expr_pr_inner (StableConj I \<psi>s)) - (E 0 0 0 1 0 0 0 0 0)\<close>
-          unfolding eu'_def using energy.sel
-          apply (auto simp add: bot_enat_def)
-          apply (metis (no_types, lifting) SUP_cong energy.sel image_image)
-          apply (metis (no_types, lifting) SUP_cong energy.sel image_image)
-          apply (metis (no_types, lifting) SUP_cong energy.sel image_image)
-          apply (metis (no_types, lifting) SUP_cong energy.sel image_image)
-          apply (metis (no_types, lifting) SUP_cong energy.sel image_image)
-             apply (metis (no_types, lifting) SUP_cong energy.sel image_image)
-          defer
-            apply (metis (no_types, lifting) SUP_cong energy.sel image_image)
-          apply (metis (no_types, lifting) energy.sel(9) image_cong image_image)
-          sledgehammer
-          apply (metis (no_types, lifting) SUP_cong energy.sel image_image)
-          apply (metis (no_types, lifting) SUP_cong image_image)
-          by (auto simp add: bot_enat_def, (metis (no_types, lifting) SUP_cong image_image)+)
-        with expr_lower have eu'_characterization: \<open>Some eu' = (subtract_fn 0 0 0 1 0 0 0 0) (expr_pr_inner (StableConj I \<psi>s))\<close>
-          by presburger
-        have \<open>\<forall>g'. spectroscopy_moves (Defender_Stable_Conj p Q) g' \<noteq> None
-        \<longrightarrow> (\<exists>q\<in>Q. (Attacker_Clause p q) = g') \<and> spectroscopy_moves (Defender_Stable_Conj p Q) g' = (subtract 0 0 0 1 0 0 0 0)\<close>
-        proof clarify
-          fix g' upd
-          assume upd_def: \<open>spectroscopy_moves (Defender_Stable_Conj p Q) g' = Some upd\<close>
-          hence \<open>\<And>px q. g' = Attacker_Clause px q \<Longrightarrow> p = px \<and> q \<in> Q \<and> upd = (subtract_fn 0 0 0 1 0 0 0 0)\<close>
-            by (metis (no_types, lifting) local.conj_s_answer option.discI option.inject)
-          with upd_def case_assms(1) show
-            \<open>(\<exists>q\<in>Q. Attacker_Clause p q = g') \<and> spectroscopy_moves (Defender_Stable_Conj p Q) g' = (subtract 0 0 0 1 0 0 0 0)\<close>
-            by (cases g', auto)
-        qed
-        hence \<open>\<forall>g'. spectroscopy_moves (Defender_Stable_Conj p Q) g' \<noteq> None
-          \<longrightarrow> (\<exists>e'. (the (spectroscopy_moves (Defender_Stable_Conj p Q) g')) e = Some e' \<and> attacker_wins e' g')\<close>
-          unfolding e_def
-          using clause_win \<open>Some e' = (subtract_fn 0 0 0 1 0 0 0 0) e\<close> e_def by force
-        hence \<open>attacker_wins e (Defender_Stable_Conj p Q)\<close>
-          unfolding e_def
-          by (auto simp add: attacker_wins.Defense)
-        moreover have \<open>e \<le> expr_pr_inner (StableConj I \<psi>s)\<close>
-          using \<open>e' \<le> eu'\<close> eu'_characterization \<open>Some e' = (subtract_fn 0 0 0 1 0 0 0 0) e\<close> expr_lower case_assms(1) subset_form
-          unfolding e_def eu'_comp minus_energy_def leq_components
-          by (metis add_diff_assoc_enat add_diff_cancel_enat add_left_mono enat.simps(3) enat_defs(2) energy.sel idiff_0_right)
-       ultimately show \<open>attacker_wins (expr_pr_inner (StableConj I \<psi>s)) (Defender_Stable_Conj p Q)\<close>
-          using win_a_upwards_closure by blast
       qed
       moreover have
         \<open>(\<forall>p Q. Q \<noteq> {} \<longrightarrow> hml_srbb_inner.distinguishes_from (StableConj I \<psi>s) p Q \<longrightarrow> Q \<Zsurj>S Q
-           \<longrightarrow> attacker_wins (expr_pr_inner (StableConj I \<psi>s)) (Attacker_Delayed p Q))\<close>
+           \<longrightarrow> attacker_wins (expr_pr_inner (StableConj I \<psi>s)) (Attacker_Delayed p Q))\<close> sorry
+      (*
       proof clarify
         \<comment> \<open>This is where things are more complicated than in the Conj-case. (We have to differentiate
             situations where the stability requirement finishes the distinction.)\<close>
@@ -799,7 +715,8 @@ proof-
             by (metis (mono_tags, lifting) mem_Collect_eq option.distinct(1) option.sel spectroscopy_defender.simps(4))
         qed
       qed
-      ultimately show ?case by blast
+*)
+      ultimately show ?case by auto
     next
       case (BranchConj \<alpha> \<phi> I \<psi>s)
       have main_case:
@@ -823,7 +740,7 @@ proof-
         hence inductive_wins: \<open>\<forall>q\<in>(Q \<inter> hml_srbb_inner.model_set (Obs \<alpha> \<phi>)).
           \<exists>i\<in>I. hml_srbb_conj.distinguishes (\<psi>s i) p q
             \<and> attacker_wins (expr_pr_conjunct (\<psi>s i)) (Attacker_Clause p q)\<close>
-          using BranchConj by blast
+          using BranchConj by (meson rangeI)
         define \<psi>qs where
           \<open>\<psi>qs \<equiv> \<lambda>q. (SOME \<psi>. \<exists>i\<in>I. \<psi> = \<psi>s i \<and>  hml_srbb_conj.distinguishes \<psi> p q
             \<and> attacker_wins (expr_pr_conjunct \<psi>) (Attacker_Clause p q))\<close>
@@ -843,6 +760,7 @@ proof-
           (Sup (st_conj_depth  ` (expr_pr_conjunct ` (\<psi>qs ` (Q \<inter> hml_srbb_inner.model_set (Obs \<alpha> \<phi>))))))
           (Sup (imm_conj_depth  ` (expr_pr_conjunct ` (\<psi>qs ` (Q \<inter> hml_srbb_inner.model_set (Obs \<alpha> \<phi>))))))
           (Sup (pos_conjuncts   ` (expr_pr_conjunct ` (\<psi>qs ` (Q \<inter> hml_srbb_inner.model_set (Obs \<alpha> \<phi>))))))
+          (Sup (pos_conjuncts_sec   ` (expr_pr_conjunct ` (\<psi>qs ` (Q \<inter> hml_srbb_inner.model_set (Obs \<alpha> \<phi>))))))
           (Sup (neg_conjuncts ` (expr_pr_conjunct ` (\<psi>qs ` (Q \<inter> hml_srbb_inner.model_set (Obs \<alpha> \<phi>))))))
           (Sup (neg_depth ` (expr_pr_conjunct ` (\<psi>qs ` (Q \<inter> hml_srbb_inner.model_set (Obs \<alpha> \<phi>))))))\<close>
         from conjuncts_present have branch_answer_bound:
@@ -858,6 +776,7 @@ proof-
           (Sup (st_conj_depth  ` (expr_pr_conjunct ` (\<psi>s ` I))))
           (Sup (imm_conj_depth  ` (expr_pr_conjunct ` (\<psi>s ` I))))
           (Sup (pos_conjuncts   ` (expr_pr_conjunct ` (\<psi>s ` I))))
+          (Sup (pos_conjuncts_sec   ` (expr_pr_conjunct ` (\<psi>s ` I))))
           (Sup (neg_conjuncts ` (expr_pr_conjunct ` (\<psi>s ` I))))
           (Sup (neg_depth ` (expr_pr_conjunct ` (\<psi>s ` I))))\<close>
         have subset_form: \<open>\<psi>qs ` (Q \<inter> hml_srbb_inner.model_set (Obs \<alpha> \<phi>)) \<subseteq> \<psi>s ` I\<close>
@@ -875,11 +794,11 @@ proof-
         with BranchConj have win_a_branch:
           \<open>attacker_wins (expressiveness_price \<phi>) (Attacker_Immediate p' Q')\<close>
           using distinction_implies_winning_budgets_empty_Q by (cases \<open>Q' = {}\<close>) auto
-        have \<open>expr_pr_inner (Obs \<alpha> \<phi>) \<ge> (E 1 0 0 0 0 0 0 0)\<close> by auto
-        hence \<open>(subtract_fn 1 0 0 0 0 0 0 0) (expr_pr_inner (Obs \<alpha> \<phi>)) = Some (expressiveness_price \<phi>)\<close>
+        have \<open>expr_pr_inner (Obs \<alpha> \<phi>) \<ge> (E 1 0 0 0 0 0 0 0 0)\<close> by auto
+        hence \<open>(subtract_fn 1 0 0 0 0 0 0 0 0) (expr_pr_inner (Obs \<alpha> \<phi>)) = Some (expressiveness_price \<phi>)\<close>
           using expr_obs_phi by auto
         with win_a_branch have win_a_step:
-          \<open>attacker_wins (the ((subtract_fn 1 0 0 0 0 0 0 0) (expr_pr_inner (Obs \<alpha> \<phi>)))) (Attacker_Immediate p' Q')\<close> by auto
+          \<open>attacker_wins (the ((subtract_fn 1 0 0 0 0 0 0 0 0) (expr_pr_inner (Obs \<alpha> \<phi>)))) (Attacker_Immediate p' Q')\<close> by auto
         define e' where \<open>e' = E
           (Sup (modal_depth   ` ({expr_pr_inner (Obs \<alpha> \<phi>)} \<union> (expr_pr_conjunct ` (\<psi>s ` I)))))
           (Sup (br_conj_depth   ` ({expr_pr_inner (Obs \<alpha> \<phi>)} \<union> (expr_pr_conjunct ` (\<psi>s ` I)))))
@@ -888,11 +807,12 @@ proof-
           (Sup (imm_conj_depth  ` ({expr_pr_inner (Obs \<alpha> \<phi>)} \<union> (expr_pr_conjunct ` (\<psi>s ` I)))))
           (Sup ({1 + modal_depth_srbb \<phi>}
              \<union> (pos_conjuncts   ` ({expr_pr_inner (Obs \<alpha> \<phi>)} \<union> (expr_pr_conjunct ` (\<psi>s ` I))))))
+          (Sup (pos_conjuncts_sec   ` ({expr_pr_inner (Obs \<alpha> \<phi>)} \<union> (expr_pr_conjunct ` (\<psi>s ` I)))))
           (Sup (neg_conjuncts ` ({expr_pr_inner (Obs \<alpha> \<phi>)} \<union> (expr_pr_conjunct ` (\<psi>s ` I)))))
           (Sup (neg_depth ` ({expr_pr_inner (Obs \<alpha> \<phi>)} \<union> (expr_pr_conjunct ` (\<psi>s ` I)))))\<close>
         have \<open>eu'0 \<le> e'\<close> unfolding e'_def eu'0_def
           by (auto, meson sup.cobounded2 sup.coboundedI2)
-        have \<open>spectroscopy_moves (Attacker_Branch p' Q') (Attacker_Immediate p' Q') = Some (subtract_fn 1 0 0 0 0 0 0 0)\<close> by simp
+        have \<open>spectroscopy_moves (Attacker_Branch p' Q') (Attacker_Immediate p' Q') = Some (subtract_fn 1 0 0 0 0 0 0 0 0)\<close> by simp
         with win_a_step attacker_wins_Ga have obs_later_win: \<open>attacker_wins (expr_pr_inner (Obs \<alpha> \<phi>)) (Attacker_Branch p' Q')\<close>
           by force
         hence e'_win: \<open>attacker_wins e' (Attacker_Branch p' Q')\<close>
@@ -915,6 +835,7 @@ proof-
           (Sup (st_conj_depth  ` ({expr_pr_inner (Obs \<alpha> \<phi>)} \<union> (expr_pr_conjunct ` (\<psi>s ` I)))))
           (Sup (imm_conj_depth  ` ({expr_pr_inner (Obs \<alpha> \<phi>)} \<union> (expr_pr_conjunct ` (\<psi>s ` I)))))
           (Sup ({1 + modal_depth_srbb \<phi>} \<union> (pos_conjuncts ` ({expr_pr_inner (Obs \<alpha> \<phi>)} \<union> (expr_pr_conjunct ` (\<psi>s ` I))))))
+          (Sup (pos_conjuncts_sec ` ({expr_pr_inner (Obs \<alpha> \<phi>)} \<union> (expr_pr_conjunct ` (\<psi>s ` I)))))
           (Sup (neg_conjuncts ` ({expr_pr_inner (Obs \<alpha> \<phi>)} \<union> (expr_pr_conjunct ` (\<psi>s ` I)))))
           (Sup (neg_depth ` ({expr_pr_inner (Obs \<alpha> \<phi>)} \<union> (expr_pr_conjunct ` (\<psi>s ` I))))))\<close>
           using e'_def min1_6_def six_e'_simp
@@ -930,42 +851,45 @@ proof-
           (st_conj_depth e')
           (imm_conj_depth e')
           (pos_conjuncts e')
+          (pos_conjuncts_sec e')
           (neg_conjuncts e')
           (neg_depth e')\<close>
-        have \<open>e' = e - (E 0 1 1 0 0 0 0 0)\<close> unfolding e_def e'_def by auto
-        hence e'_comp: \<open>Some e' = (subtract_fn 0 1 1 0 0 0 0 0) e\<close>
+        have \<open>e' = e - (E 0 1 1 0 0 0 0 0 0)\<close> unfolding e_def e'_def by auto
+        hence e'_comp: \<open>Some e' = (subtract_fn 0 1 1 0 0 0 0 0 0) e\<close>
           by (metis e_def energy.sel energy_leq_cases i0_lb le_iff_add)
-        have expr_lower: \<open>(E 0 1 1 0 0 0 0 0) \<le> expr_pr_inner (BranchConj \<alpha> \<phi> I \<psi>s)\<close>
+        have expr_lower: \<open>(E 0 1 1 0 0 0 0 0 0) \<le> expr_pr_inner (BranchConj \<alpha> \<phi> I \<psi>s)\<close>
           using case_assms subset_form by auto
-        have e'_minus: \<open>e' = expr_pr_inner (BranchConj \<alpha> \<phi> I \<psi>s) - E 0 1 1 0 0 0 0 0\<close>
+        have e'_minus: \<open>e' = expr_pr_inner (BranchConj \<alpha> \<phi> I \<psi>s) - E 0 1 1 0 0 0 0 0 0\<close>
           unfolding e'_def using energy.sel
           by (auto simp add: bot_enat_def sup.left_commute,
              (metis (no_types, lifting) SUP_cong image_image)+)
         with expr_lower have e'_characterization:
-            \<open>Some e' = (subtract_fn 0 1 1 0 0 0 0 0) (expr_pr_inner (BranchConj \<alpha> \<phi> I \<psi>s))\<close>
+            \<open>Some e' = (subtract_fn 0 1 1 0 0 0 0 0 0) (expr_pr_inner (BranchConj \<alpha> \<phi> I \<psi>s))\<close>
           by presburger
         have moves: \<open>\<forall>g'. spectroscopy_moves (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>) g' \<noteq> None
         \<longrightarrow> (((Attacker_Branch p' Q' = g')
-            \<and> (spectroscopy_moves (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>) g' = Some (\<lambda>e. Option.bind ((subtract_fn 0 1 1 0 0 0 0 0) e) min1_6)))
+            \<and> (spectroscopy_moves (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>) g' = Some (\<lambda>e. Option.bind ((subtract_fn 0 1 1 0 0 0 0 0 0) e) min1_6)))
           \<or> ((\<exists>q\<in>(Q - Q_\<alpha>). Attacker_Clause p q = g'
-            \<and> spectroscopy_moves (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>) g' = (subtract 0 1 1 0 0 0 0 0))))\<close>
+            \<and> spectroscopy_moves (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>) g' = (subtract 0 1 1 0 0 0 0 0 0))))\<close>
         proof clarify
           fix g' u
           assume no_subtr_move:
             \<open>spectroscopy_moves (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>) g' = Some u\<close>
-            \<open>\<not> (\<exists>q\<in>Q - Q_\<alpha>. Attacker_Clause p q = g' \<and> spectroscopy_moves (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>) g' = subtract 0 1 1 0 0 0 0 0)\<close>
+            \<open>\<not> (\<exists>q\<in>Q - Q_\<alpha>. Attacker_Clause p q = g' \<and> spectroscopy_moves (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>) g' = subtract 0 1 1 0 0 0 0 0 0)\<close>
           hence \<open>g' = Attacker_Branch p' Q'\<close>
             unfolding Q'_def using soft_step_set_is_soft_step_set no_subtr_move local.br_answer
             by (cases g', auto, (metis (no_types, lifting)  option.discI)+)
-          moreover have \<open>Attacker_Branch p' Q' = g' \<longrightarrow> spectroscopy_moves (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>) g' =  Some (\<lambda>e. Option.bind ((subtract_fn 0 1 1 0 0 0 0 0) e) min1_6)\<close>
+          moreover have \<open>Attacker_Branch p' Q' = g'
+              \<longrightarrow> spectroscopy_moves (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>) g' =  Some (\<lambda>e. Option.bind ((subtract_fn 0 1 1 0 0 0 0 0 0) e) min1_6)\<close>
             unfolding Q'_def using soft_step_set_is_soft_step_set by auto
-          ultimately show \<open>Attacker_Branch p' Q' = g' \<and> spectroscopy_moves (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>) g' =  Some (\<lambda>e. Option.bind ((subtract_fn 0 1 1 0 0 0 0 0) e) min1_6)\<close>
+          ultimately show \<open>Attacker_Branch p' Q' = g'
+              \<and> spectroscopy_moves (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>) g' =  Some (\<lambda>e. Option.bind ((subtract_fn 0 1 1 0 0 0 0 0 0) e) min1_6)\<close>
             by blast
         qed
-        have obs_e: \<open>\<exists>e'. (\<lambda>e. Option.bind ((subtract_fn 0 1 1 0 0 0 0 0) e) min1_6) e = Some e' \<and> attacker_wins e' (Attacker_Branch p' Q')\<close>
+        have obs_e: \<open>\<exists>e'. (\<lambda>e. Option.bind ((subtract_fn 0 1 1 0 0 0 0 0 0) e) min1_6) e = Some e' \<and> attacker_wins e' (Attacker_Branch p' Q')\<close>
           using obs_win e'_comp min_e'_def
-          by (smt (verit, best) bind.bind_lunit min_1_6_some option.collapse)
-        have \<open>\<forall>q\<in>(Q - Q_\<alpha>). spectroscopy_moves (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>) (Attacker_Clause p q) = (subtract 0 1 1 0 0 0 0 0)
+          by (smt (verit, best) bind.bind_lunit min_some option.collapse)
+        have \<open>\<forall>q\<in>(Q - Q_\<alpha>). spectroscopy_moves (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>) (Attacker_Clause p q) = (subtract 0 1 1 0 0 0 0 0 0)
           \<longrightarrow> attacker_wins e'0 (Attacker_Clause p q)\<close>
           using conj_wins \<open>eu'0 \<le> e'\<close> case_assms(4) by blast
         with obs_e moves have move_wins: \<open>\<forall>g'. spectroscopy_moves (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>) g' \<noteq> None
@@ -975,7 +899,7 @@ proof-
         moreover have \<open>expr_pr_inner (BranchConj \<alpha> \<phi> I \<psi>s) = e\<close>
           using e'_characterization e'_minus unfolding e_def by force
         ultimately show \<open>attacker_wins (expr_pr_inner (BranchConj \<alpha> \<phi> I \<psi>s)) (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>)\<close>
-        using attacker_wins.Defense spectroscopy_defender.simps(5)
+        using attacker_wins.Defense spectroscopy_defender.simps(6)
           by metis
       qed
       moreover have
@@ -1000,7 +924,7 @@ proof-
     next
       case (Pos \<chi>)
       show ?case
-      proof clarify
+      proof safe
         fix p q
         assume case_assms: \<open>hml_srbb_conj.distinguishes (Pos \<chi>) p q\<close>
         then obtain p' where p'_spec: \<open>p \<Zsurj> p'\<close> \<open>p' \<in> hml_srbb_inner.model_set \<chi>\<close>
@@ -1019,14 +943,43 @@ proof-
           using distinction Pos by blast
         from p'_spec(1) this have \<open>attacker_wins (expr_pr_inner \<chi>) (Attacker_Delayed p (silent_reachable_set {q}))\<close>
           by (induct, auto,
-              metis attacker_wins_Ga_with_id_step local.procrastination option.distinct(1) option.sel spectroscopy_defender.simps(4))
+              metis attacker_wins_Ga_with_id_step local.procrastination option.distinct(1) option.sel spectroscopy_defender.simps(5))
         moreover have \<open>spectroscopy_moves (Attacker_Clause p q) (Attacker_Delayed p (silent_reachable_set {q})) = Some min1_6\<close>
           using q_reach_nonempty sreachable_set_is_sreachable by fastforce
         moreover have \<open>the (min1_6 (expr_pr_conjunct (Pos \<chi>))) \<ge> expr_pr_inner \<chi>\<close>
           unfolding min1_6_def by (auto simp add: energy_leq_cases modal_depth_dominates_pos_conjuncts)
         ultimately show \<open>attacker_wins (expr_pr_conjunct (Pos \<chi>)) (Attacker_Clause p q)\<close>
           using attacker_wins_Ga win_a_upwards_closure spectroscopy_defender.simps(3)
-          by (metis (no_types, lifting) min_1_6_some option.discI option.exhaust_sel option.sel)
+          by (metis (no_types, lifting) min_some(1) option.discI option.exhaust_sel option.sel)
+      next
+        fix p q e'
+        have order: \<open>\<forall>\<chi>. max_pos_conj_secondary_depth_inner \<chi> \<le> modal_depth_srbb_inner \<chi>\<close>
+          using max_positive_conjunct_depth_dominates_secondary(2) modal_depth_dominates_pos_conjuncts
+          using order.trans by blast
+        assume case_assms:
+          \<open>hml_srbb_conj.distinguishes (Pos \<chi>) p q\<close>
+          \<open>stable_state p\<close> \<open>stable_state q\<close>
+          \<open>expr_pr_conjunct (Pos \<chi>) \<le> e'\<close> \<open>pos_conjuncts e' \<le> pos_conjuncts_sec e'\<close>
+        hence \<open>hml_srbb_inner.distinguishes_from \<chi> p {q}\<close>
+          using stable_state_stable silent_reachable.refl
+          by auto
+        hence \<open>attacker_wins (expr_pr_inner \<chi>) (Attacker_Delayed p {q})\<close>
+          using Pos stable_state_stabilized[OF \<open>stable_state q\<close>]
+          by auto
+        moreover have \<open>spectroscopy_moves (Attacker_Stable_Clause p q) (Attacker_Delayed p {q}) = Some min1_7\<close>
+          by fastforce
+        moreover have \<open>the (min1_6 (expr_pr_conjunct (Pos \<chi>))) \<ge> expr_pr_inner \<chi>\<close>
+          unfolding min1_6_def by (auto simp add: energy_leq_cases modal_depth_dominates_pos_conjuncts)
+        moreover hence \<open>the (min1_7 e') \<ge> expr_pr_inner \<chi>\<close>
+          using case_assms by auto
+        ultimately have
+            \<open>attacker_wins e' (Attacker_Stable_Clause p q)\<close>
+          using attacker_wins_Ga win_a_upwards_closure spectroscopy_defender.simps(4)
+          by (metis (mono_tags, lifting) min_some(2) not_None_eq option.sel)
+      next
+        show \<open>\<And>p q e'.
+       hml_srbb_conj.distinguishes (Pos \<chi>) p q \<Longrightarrow>
+       stable_state p \<Longrightarrow> stable_state q \<Longrightarrow> expr_pr_conjunct (Pos \<chi>) \<le> e' \<Longrightarrow> pos_conjuncts e' \<le> pos_conjuncts_sec e' \<Longrightarrow> attacker_wins e' (Attacker_Stable_Clause p q)\<close> sorry
       qed
     next
       case (Neg \<chi>)

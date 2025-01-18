@@ -359,6 +359,12 @@ lemma stable_state_stable:
   shows \<open>p = p'\<close>
   using assms(2,1) by (cases, blast+)
 
+lemma stable_state_stabilized:
+  assumes \<open>stable_state p\<close>
+  shows \<open>{p} \<Zsurj>S {p}\<close>
+  using assms
+  by (metis LTS_Tau.refl singletonD stable_state_stable)
+
 definition stability_respecting :: \<open>('s \<Rightarrow> 's \<Rightarrow> bool) \<Rightarrow> bool\<close> where
   \<open>stability_respecting R \<equiv> \<forall> p q. R p q \<and> stable_state p \<longrightarrow>
     (\<exists>q'. q \<Zsurj> q' \<and> R p q' \<and> stable_state q')\<close>
