@@ -381,12 +381,189 @@ proof -
     unfolding eta_simulation_def by blast
 qed
 
-theorem \<open>(p ~\<eta> q) = (p \<sim> (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> \<infinity> \<infinity>) q)\<close>
+theorem eta_bisim_coordinate: \<open>(p ~\<eta> q) = (p \<sim> (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> \<infinity> \<infinity>) q)\<close>
   using modal_eta_sim_eq logic_eta_bisim_invariant sympD equivalent_no_distinction
   unfolding eta_bisimulated_def expr_equiv_def distinguishes_def
   by (smt (verit, best) equivalent_equiv equivpE)
 
-\<comment>\<open>This proof essentially is a simpler version of the proof for the equivalence\<close>
+subsection \<open>\<open>\<eta>\<close>-Similarity\<close>
+
+\<comment>\<open>The following two proofs essentially are a simpler version of the proof for eta bisim\<close>
+
+lemma logic_eta_sim_invariant:
+  assumes
+    \<open>\<exists>R. eta_simulation R \<and>  R p0 q0\<close>
+    \<open>\<phi> \<in> \<O> (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> 0 0)\<close>
+    \<open>p0 \<Turnstile>SRBB \<phi>\<close>
+  shows \<open>q0 \<Turnstile>SRBB \<phi>\<close>
+proof -
+  have \<open>\<And>\<phi> \<chi> \<psi>.
+    (\<forall>p q. (\<exists>R. eta_simulation R \<and>  R p q) \<longrightarrow> \<phi> \<in> \<O> (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> 0 0) \<longrightarrow> p \<Turnstile>SRBB \<phi> \<longrightarrow> q \<Turnstile>SRBB \<phi>) \<and>
+    (\<forall>p q. (\<exists>R. eta_simulation R \<and>  R p q) \<longrightarrow> \<chi> \<in> \<O>_inner (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> 0 0) \<longrightarrow> hml_srbb_inner_models p \<chi> \<longrightarrow> (\<exists>q'. q \<Zsurj> q' \<and> hml_srbb_inner_models q' \<chi>)) \<and>
+    (\<forall>p q. (\<exists>R. eta_simulation R \<and>  R p q) \<longrightarrow> \<psi> \<in> \<O>_conjunct (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> 0 0) \<longrightarrow> hml_srbb_conjunct_models p \<psi> \<longrightarrow> hml_srbb_conjunct_models q \<psi>)\<close>
+  proof-
+    fix \<phi> \<chi> \<psi>
+    show
+      \<open>(\<forall>p q. (\<exists>R. eta_simulation R \<and> R p q) \<longrightarrow> \<phi> \<in> \<O> (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> 0 0) \<longrightarrow> p \<Turnstile>SRBB \<phi> \<longrightarrow> q \<Turnstile>SRBB \<phi>) \<and>
+       (\<forall>p q. (\<exists>R. eta_simulation R \<and> R p q) \<longrightarrow> \<chi> \<in> \<O>_inner (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> 0 0) \<longrightarrow> hml_srbb_inner_models p \<chi> \<longrightarrow> (\<exists>q'. q \<Zsurj> q' \<and> hml_srbb_inner_models q' \<chi>)) \<and>
+       (\<forall>p q. (\<exists>R. eta_simulation R \<and> R p q) \<longrightarrow> \<psi> \<in> \<O>_conjunct (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> 0 0) \<longrightarrow> hml_srbb_conjunct_models p \<psi> \<longrightarrow> hml_srbb_conjunct_models q \<psi>)\<close>
+    proof (induct rule: hml_srbb_hml_srbb_inner_hml_srbb_conjunct.induct)
+      case TT
+      then show ?case by simp
+    next
+      case (Internal \<chi>)
+      show ?case
+      proof safe
+        fix p q R
+        assume case_assms:
+           \<open>eta_simulation R\<close> \<open>R p q\<close>  \<open>p \<Turnstile>SRBB hml_srbb.Internal \<chi>\<close> \<open>Internal \<chi> \<in> \<O> (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> 0 0)\<close>
+        then obtain p' where p'_spec: \<open>p \<Zsurj> p'\<close> \<open>hml_srbb_inner_models p' \<chi>\<close> by auto
+        have \<open>\<chi> \<in> \<O>_inner (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> 0 0)\<close>
+          using case_assms(4) unfolding \<O>_inner_def \<O>_def by auto
+        hence \<open>\<exists>q'. q \<Zsurj> q' \<and> hml_srbb_inner_models q' \<chi>\<close>
+          using Internal case_assms(1,2) p'_spec silence_retains_eta_sim
+          by (metis silent_reachable_trans)
+        thus \<open>q \<Turnstile>SRBB hml_srbb.Internal \<chi>\<close> by auto
+      qed
+    next
+      case (ImmConj I \<Psi>)
+      then show ?case unfolding \<O>_inner_def \<O>_def by auto
+    next
+      case (Obs \<alpha> \<phi>)
+      then show ?case
+      proof (safe)
+        fix p q R
+        assume case_assms:
+          \<open>eta_simulation R\<close> \<open>R p q\<close>
+          \<open>Obs \<alpha> \<phi> \<in> \<O>_inner (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> 0 0)\<close>
+          \<open>hml_srbb_inner_models p (hml_srbb_inner.Obs \<alpha> \<phi>)\<close>
+        hence \<open>\<phi> \<in> \<O> (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> 0 0)\<close> unfolding \<O>_inner_def \<O>_def by auto
+        hence no_imm_conj: \<open>\<nexists>I \<Psi>. \<phi> = ImmConj I \<Psi> \<and> I \<noteq> {}\<close> unfolding \<O>_def by force
+        have back_step: \<open>\<forall>p0 p1. p1 \<Turnstile>SRBB \<phi> \<longrightarrow> p0 \<Zsurj> p1 \<longrightarrow> p0 \<Turnstile>SRBB \<phi>\<close>
+        proof (cases \<phi>)
+          case TT
+          then show ?thesis by auto
+        next
+          case (Internal _)
+          then show ?thesis
+            using silent_reachable_trans by auto
+        next
+          case (ImmConj _ _)
+          then show ?thesis using no_imm_conj by auto
+        qed
+        from case_assms obtain p' where \<open>p \<mapsto>a \<alpha> p'\<close> \<open>p' \<Turnstile>SRBB \<phi>\<close> by auto
+        then obtain q' q'' q''' where \<open>q \<Zsurj> q'\<close> \<open>q' \<mapsto>a \<alpha> q''\<close> \<open>q'' \<Zsurj> q'''\<close>  \<open>R p' q'''\<close>
+          using \<open>eta_simulation R\<close> \<open>R p q\<close> unfolding eta_simulation_def
+          using silent_reachable.refl by blast
+        hence \<open>q''' \<Turnstile>SRBB \<phi>\<close> using \<open>p' \<Turnstile>SRBB \<phi>\<close> Obs \<open>\<phi> \<in> \<O> (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> 0 0)\<close>
+          using case_assms(1) by blast
+        hence \<open>hml_srbb_inner_models q' (hml_srbb_inner.Obs \<alpha> \<phi>)\<close>
+          using \<open>q' \<mapsto>a \<alpha> q''\<close> \<open>q'' \<Zsurj> q'''\<close> back_step by auto
+        thus \<open>\<exists>q'. q \<Zsurj> q' \<and> hml_srbb_inner_models q' (hml_srbb_inner.Obs \<alpha> \<phi>)\<close>
+          using \<open>q \<Zsurj> q'\<close> by blast
+      qed
+    next
+      case (Conj I \<Psi>)
+      show ?case
+      proof safe
+        fix p q R
+        assume case_assms:
+          \<open>eta_simulation R\<close> \<open>R p q\<close>
+          \<open>Conj I \<Psi> \<in> \<O>_inner (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> 0 0)\<close>
+          \<open>hml_srbb_inner_models p (Conj I \<Psi>)\<close>
+        hence conj_price: \<open>\<forall>i\<in>I. \<Psi> i \<in> \<O>_conjunct (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> 0 0)\<close>
+          unfolding \<O>_conjunct_def \<O>_inner_def
+          by (simp, metis SUP_bot_conv(1) le_zero_eq sup_bot_left sup_ge1)
+        from case_assms have \<open>\<forall>i\<in>I. hml_srbb_conjunct_models p (\<Psi> i)\<close> by auto
+        hence \<open>\<forall>i\<in>I. hml_srbb_conjunct_models q (\<Psi> i)\<close>
+          using Conj \<open>eta_simulation R\<close> \<open>R p q\<close> conj_price by blast
+        hence \<open>hml_srbb_inner_models q (hml_srbb_inner.Conj I \<Psi>)\<close> by simp
+        thus \<open>\<exists>q'. q \<Zsurj> q' \<and> hml_srbb_inner_models q' (hml_srbb_inner.Conj I \<Psi>)\<close>
+          using silent_reachable.refl by blast
+      qed
+    next
+      case (StableConj I \<Psi>)
+      thus ?case unfolding \<O>_inner_def \<O>_def by auto
+    next
+      case (BranchConj \<alpha> \<phi> I \<Psi>)
+      show ?case
+      proof safe
+        fix p q R
+        assume case_assms:
+          \<open>eta_simulation R\<close> \<open>R p q\<close>
+          \<open>BranchConj \<alpha> \<phi> I \<Psi> \<in> \<O>_inner (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> 0 0)\<close>
+          \<open>hml_srbb_inner_models p (BranchConj \<alpha> \<phi> I \<Psi>)\<close>
+        hence \<open>\<phi> \<in> \<O> (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> 0 0)\<close> unfolding \<O>_inner_def \<O>_def
+          by (simp, metis le_zero_eq sup_ge1)
+        hence no_imm_conj: \<open>\<nexists>I \<Psi>. \<phi> = ImmConj I \<Psi> \<and> I \<noteq> {}\<close> unfolding \<O>_def by force
+        have back_step: \<open>\<forall>p0 p1. p1 \<Turnstile>SRBB \<phi> \<longrightarrow> p0 \<Zsurj> p1 \<longrightarrow> p0 \<Turnstile>SRBB \<phi>\<close>
+        proof (cases \<phi>)
+          case TT
+          then show ?thesis by auto
+        next
+          case (Internal _)
+          then show ?thesis
+            using silent_reachable_trans by auto
+        next
+          case (ImmConj _ _)
+          then show ?thesis using no_imm_conj by auto
+        qed
+        from case_assms have conj_price: \<open>\<forall>i\<in>I. \<Psi> i \<in> \<O>_conjunct (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> 0 0)\<close>
+          unfolding \<O>_conjunct_def \<O>_inner_def
+          by (simp, metis SUP_bot_conv(1) bot_enat_def bot_eq_sup_iff)
+        from case_assms have \<open>\<forall>i\<in>I. hml_srbb_conjunct_models p (\<Psi> i)\<close>
+              \<open>hml_srbb_inner_models p (Obs \<alpha> \<phi>)\<close>
+          using branching_conj_parts branching_conj_obs by blast+
+        then obtain p' where \<open>p \<mapsto>a \<alpha> p'\<close> \<open>p' \<Turnstile>SRBB \<phi>\<close> by auto
+        then obtain q' q'' q''' where q'_q''_spec:
+          \<open>q \<Zsurj> q'\<close> \<open>q' \<mapsto>a \<alpha> q''\<close> \<open>q'' \<Zsurj> q'''\<close>
+          \<open>R p q'\<close> \<open>R p' q'''\<close>
+          using \<open>eta_simulation R\<close> \<open>R p q\<close> silent_reachable.refl
+          unfolding eta_simulation_def by blast
+        hence \<open>q''' \<Turnstile>SRBB \<phi>\<close>
+          using BranchConj.hyps \<open>p' \<Turnstile>SRBB \<phi>\<close> \<open>\<phi> \<in> \<O> (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> 0 0)\<close> case_assms by auto
+        hence \<open>q'' \<Turnstile>SRBB \<phi>\<close> using back_step q'_q''_spec by blast
+        hence \<open>hml_srbb_inner_models q' (Obs \<alpha> \<phi>)\<close> using q'_q''_spec by auto
+        moreover have \<open>\<forall>i\<in>I. hml_srbb_conjunct_models q' (\<Psi> i)\<close>
+          using BranchConj.hyps \<open>\<forall>i\<in>I. hml_srbb_conjunct_models p (\<Psi> i)\<close> q'_q''_spec conj_price case_assms
+          by blast
+        ultimately show \<open>\<exists>q'. q \<Zsurj> q' \<and> hml_srbb_inner_models q' (BranchConj \<alpha> \<phi> I \<Psi>)\<close>
+          using \<open>q \<Zsurj> q'\<close> by auto
+      qed
+    next
+      case (Pos \<chi>)
+      show ?case
+      proof safe
+        fix p q R
+        assume case_assms:
+          \<open>eta_simulation R\<close> \<open>R p q\<close>
+          \<open>Pos \<chi> \<in> \<O>_conjunct (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> 0 0)\<close>
+          \<open>hml_srbb_conjunct_models p (Pos \<chi>)\<close>
+        hence \<open>\<chi> \<in> \<O>_inner (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> 0 0)\<close>
+          unfolding \<O>_inner_def \<O>_conjunct_def by simp
+        from case_assms obtain p' where \<open>p \<Zsurj> p'\<close> \<open>hml_srbb_inner_models p' \<chi>\<close> by auto
+        then obtain q' where \<open>q \<Zsurj> q'\<close> \<open>hml_srbb_inner_models q' \<chi>\<close>
+          using Pos case_assms \<open>\<chi> \<in> \<O>_inner (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> 0 0)\<close> silence_retains_eta_sim
+          by (smt (verit, ccfv_threshold) silent_reachable_trans)
+        thus \<open>hml_srbb_conjunct_models q (Pos \<chi>)\<close> by auto
+      qed
+    next
+      case (Neg \<chi>)
+      show ?case
+      proof safe
+        fix p q R
+        assume case_assms:
+          \<open>eta_simulation R\<close> \<open>R p q\<close>
+          \<open>Neg \<chi> \<in> \<O>_conjunct (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> 0 0)\<close>
+          \<open>hml_srbb_conjunct_models p (Neg \<chi>)\<close>
+        hence False unfolding \<O>_conjunct_def by auto
+        thus \<open>hml_srbb_conjunct_models q (Neg \<chi>)\<close> by simp
+      qed
+    qed
+  qed
+  thus ?thesis using assms by blast
+qed
+
 lemma modal_eta_sim: \<open>eta_simulation (preordered (\<O> (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> 0 0)))\<close>
 proof -
   have \<open>\<nexists>p \<alpha> p' q. (preordered (\<O> (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> 0 0))) p q \<and> p \<mapsto> \<alpha> p' \<and>
@@ -510,8 +687,8 @@ proof -
     unfolding eta_simulation_def by blast
 qed
 
-theorem \<open>(p \<preceq> (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> 0 0) q) \<Longrightarrow> (\<exists>R. eta_simulation R \<and> R p q)\<close>
-  using modal_eta_sim unfolding expr_preord_def
+theorem eta_sim_coordinate: \<open>(p \<preceq> (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> 0 0) q) = (\<exists>R. eta_simulation R \<and> R p q)\<close>
+  using modal_eta_sim logic_eta_sim_invariant unfolding expr_preord_def
   by auto
 
 end

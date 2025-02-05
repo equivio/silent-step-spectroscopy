@@ -392,6 +392,11 @@ definition \<O> :: \<open>energy \<Rightarrow> (('a, 's) hml_srbb) set\<close> w
 
 lemma \<O>_sup: \<open>UNIV = \<O> (E \<infinity> \<infinity> \<infinity> \<infinity> \<infinity> \<infinity> \<infinity> \<infinity>)\<close> unfolding \<O>_def by auto
 
+lemma price_hierarchy_entails_modal_hierarchy:
+  assumes \<open>e1 \<le> e2\<close>
+  shows \<open>\<O> e1 \<subseteq> \<O> e2\<close>
+  using assms unfolding \<O>_def by auto
+
 text \<open>Formalizing HML$_{SRBB}$ by mutually recursive data types leads to expressiveness price functions of these other types,
 namely @{term \<open>expr_pr_inner\<close>} and @{term \<open>expr_pr_conjunct\<close>}, and corresponding definitions and lemmas.\<close>
 
@@ -1011,8 +1016,15 @@ text \<open>Conversely, \<open>p\<close> and \<open>q\<close> are equivalent wit
 definition expr_equiv :: \<open>'s \<Rightarrow> energy \<Rightarrow> 's \<Rightarrow> bool\<close> (\<open>_ \<sim> _ _\<close> 60) where
   \<open>(p \<sim> e q) \<equiv> equivalent (\<O> e) p q\<close>
 
-subsection \<open>Relational Effects of Prices\<close>
+lemma price_hierachy_preorder_dual:
+  assumes
+    \<open>e1 \<le> e2\<close>
+    \<open>p \<preceq> e2 q\<close>
+  shows
+    \<open>p \<preceq> e1 q\<close>
+  using assms price_hierarchy_entails_modal_hierarchy expr_preord_def by auto
 
+subsection \<open>Relational Effects of Prices\<close>
 
 lemma distinction_combination_eta:
   fixes p q

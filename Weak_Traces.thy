@@ -406,7 +406,7 @@ next
 qed
 
 text \<open>Two states \<open>p\<close> and \<open>q\<close> are weakly trace equivalent if and only if they they are equivalent with respect to the coordinate (\<open>\<infinity>, 0, 0, 0, 0, 0, 0, 0\<close>).\<close>
-lemma \<open>(p \<simeq>WT q) = (p \<sim> (E \<infinity> 0 0 0 0 0 0 0) q)\<close>
+theorem weak_traces_coordinate: \<open>(p \<simeq>WT q) = (p \<sim> (E \<infinity> 0 0 0 0 0 0 0) q)\<close>
   using expr_preorder_characterizes_relational_preorder_traces
   unfolding weakly_trace_equivalent_def expr_equiv_def \<O>_def expr_preord_def
   by simp
