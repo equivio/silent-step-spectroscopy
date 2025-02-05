@@ -574,7 +574,7 @@ lemma sr_branching_bisimulation_stuttering_all:
     sr_branching_bisimulation_stuttering
   by metis
 
-theorem \<open>(p ~SRBB q) = (p \<preceq> (E \<infinity> \<infinity> \<infinity> \<infinity> \<infinity> \<infinity> \<infinity> \<infinity>) q)\<close>
+theorem sr_branching_bisim_coordinate: \<open>(p ~SRBB q) = (p \<preceq> (E \<infinity> \<infinity> \<infinity> \<infinity> \<infinity> \<infinity> \<infinity> \<infinity>) q)\<close>
   using sr_branching_bisim_is_hmlsrbb \<O>_sup
   unfolding expr_preord_def by auto
 
