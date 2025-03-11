@@ -76,7 +76,7 @@ proof-
             \<longrightarrow> attacker_wins (expr_pr_inner \<chi>) (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>)))
       \<and>
         (\<forall>p q. hml_srbb_conj.distinguishes \<psi> p q
-               \<longrightarrow> attacker_wins (expr_pr_conjunct \<psi>) (Attacker_Clause p q))\<close>
+               \<longrightarrow> attacker_wins (expr_pr_conjunct \<psi>) (Attacker_Conjunct p q))\<close>
   proof -
     fix \<phi> \<chi> \<psi>
     show \<open>(\<forall>Q p. Q \<noteq> {} \<longrightarrow> distinguishes_from \<phi> p Q
@@ -96,7 +96,7 @@ proof-
             \<longrightarrow> attacker_wins (expr_pr_inner \<chi>) (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>)))
       \<and>
         (\<forall>p q. hml_srbb_conj.distinguishes \<psi> p q
-               \<longrightarrow> attacker_wins (expr_pr_conjunct \<psi>) (Attacker_Clause p q))\<close>
+               \<longrightarrow> attacker_wins (expr_pr_conjunct \<psi>) (Attacker_Conjunct p q))\<close>
     proof (induct rule: hml_srbb_hml_srbb_inner_hml_srbb_conjunct.induct[of _ _ _ \<phi> \<chi> \<psi>])
       case TT
       then show ?case
@@ -196,8 +196,8 @@ proof-
         hence \<open>\<forall>q\<in>Q. \<exists>i\<in>I. hml_srbb_conj.distinguishes (\<psi>s i) p q\<close>
           using hml_srbb_conj.distinguishes_def by simp
         hence \<open>\<forall>q\<in>Q. \<exists>i\<in>I. ((\<psi>s i) \<in> range \<psi>s) \<and> hml_srbb_conj.distinguishes (\<psi>s i) p q\<close> by blast
-        hence \<open>\<forall>q\<in>Q. \<exists>i\<in>I. attacker_wins (expr_pr_conjunct (\<psi>s i)) (Attacker_Clause p q)\<close> using ImmConj by blast
-        hence a_clause_wina: \<open>\<forall>q\<in>Q. \<exists>i\<in>I. attacker_wins (expressiveness_price (ImmConj I \<psi>s) - E 0 0 1 0 1 0 0 0) (Attacker_Clause p q)\<close>
+        hence \<open>\<forall>q\<in>Q. \<exists>i\<in>I. attacker_wins (expr_pr_conjunct (\<psi>s i)) (Attacker_Conjunct p q)\<close> using ImmConj by blast
+        hence a_clause_wina: \<open>\<forall>q\<in>Q. \<exists>i\<in>I. attacker_wins (expressiveness_price (ImmConj I \<psi>s) - E 0 0 1 0 1 0 0 0) (Attacker_Conjunct p q)\<close>
           using expressiveness_price_ImmConj_geq_parts win_a_upwards_closure by fast
         from this \<open>Q \<noteq> {}\<close> have \<open>I \<noteq> {}\<close> by blast
         hence subtracts:
@@ -206,9 +206,9 @@ proof-
           by (simp add: \<open>I \<noteq> {}\<close>)+
         have def_conj: \<open>spectroscopy_defender (Defender_Conj p Q)\<close> by simp
         have \<open>spectroscopy_moves (Defender_Conj p Q) N \<noteq> None
-              \<Longrightarrow> N = Attacker_Clause (attacker_state N) (defender_state N)\<close> for N
-          by (metis spectroscopy_moves.simps(34,35,36,38,64,74) spectroscopy_position.exhaust_sel)
-        hence move_kind: \<open>spectroscopy_moves (Defender_Conj p Q) N \<noteq> None \<Longrightarrow> \<exists>q\<in>Q. N = Attacker_Clause p q\<close> for N
+              \<Longrightarrow> N = Attacker_Conjunct (attacker_state N) (defender_state N)\<close> for N
+          by (metis spectroscopy_moves.simps(29,30,33,34,58,62) spectroscopy_position.exhaust_sel)
+        hence move_kind: \<open>spectroscopy_moves (Defender_Conj p Q) N \<noteq> None \<Longrightarrow> \<exists>q\<in>Q. N = Attacker_Conjunct p q\<close> for N
           using conj_answer by metis
         hence update: \<open>\<And>g'. spectroscopy_moves (Defender_Conj p Q) g' \<noteq> None \<Longrightarrow>
           weight (Defender_Conj p Q) g' = subtract_fn 0 0 1 0 0 0 0 0\<close>
@@ -305,14 +305,14 @@ proof-
         hence distinctions: \<open>\<forall>q\<in>Q. \<exists>i\<in>I. hml_srbb_conj.distinguishes (\<psi>s i) p q\<close>
           by auto
         hence inductive_wins: \<open>\<forall>q\<in>Q. \<exists>i\<in>I. hml_srbb_conj.distinguishes (\<psi>s i) p q
-            \<and> attacker_wins (expr_pr_conjunct (\<psi>s i)) (Attacker_Clause p q)\<close>
+            \<and> attacker_wins (expr_pr_conjunct (\<psi>s i)) (Attacker_Conjunct p q)\<close>
           using Conj by blast
         define \<psi>qs where
           \<open>\<psi>qs \<equiv> \<lambda>q. (SOME \<psi>. \<exists>i\<in>I. \<psi> = \<psi>s i \<and>  hml_srbb_conj.distinguishes \<psi> p q
-            \<and> attacker_wins (expr_pr_conjunct \<psi>) (Attacker_Clause p q))\<close>
+            \<and> attacker_wins (expr_pr_conjunct \<psi>) (Attacker_Conjunct p q))\<close>
         with inductive_wins someI have \<psi>qs_spec:
           \<open>\<forall>q\<in>Q. \<exists>i\<in>I. \<psi>qs q = \<psi>s i \<and> hml_srbb_conj.distinguishes (\<psi>qs q ) p q
-            \<and> attacker_wins (expr_pr_conjunct (\<psi>qs q)) (Attacker_Clause p q)\<close>
+            \<and> attacker_wins (expr_pr_conjunct (\<psi>qs q)) (Attacker_Conjunct p q)\<close>
           by (smt (verit))
         have conjuncts_present: \<open>\<forall>q\<in>Q. expr_pr_conjunct (\<psi>qs q) \<in> expr_pr_conjunct ` (\<psi>qs ` Q)\<close>
           using \<open>Q \<noteq> {}\<close> by blast
@@ -329,7 +329,7 @@ proof-
           unfolding e'_def
           by (metis SUP_upper energy.sel leq_components)
         with \<psi>qs_spec win_a_upwards_closure
-          have clause_win: \<open>\<forall>q\<in>Q. attacker_wins e' (Attacker_Clause p q)\<close> by blast
+          have clause_win: \<open>\<forall>q\<in>Q. attacker_wins e' (Attacker_Conjunct p q)\<close> by blast
         define eu' where \<open>eu' = E
           (Sup (modal_depth   ` (expr_pr_conjunct ` (\<psi>s ` I))))
           (Sup (br_conj_depth   ` (expr_pr_conjunct ` (\<psi>s ` I))))
@@ -363,13 +363,13 @@ proof-
         with expr_lower have eu'_characterization: \<open>Some eu' = (subtract_fn 0 0 1 0 0 0 0 0) (expr_pr_inner (Conj I \<psi>s))\<close>
           by presburger
         have \<open>\<forall>g'. spectroscopy_moves (Defender_Conj p Q) g' \<noteq> None
-        \<longrightarrow> (\<exists>q\<in>Q. (Attacker_Clause p q) = g') \<and> spectroscopy_moves (Defender_Conj p Q) g' = Some (subtract_fn 0 0 1 0 0 0 0 0)\<close>
+        \<longrightarrow> (\<exists>q\<in>Q. (Attacker_Conjunct p q) = g') \<and> spectroscopy_moves (Defender_Conj p Q) g' = Some (subtract_fn 0 0 1 0 0 0 0 0)\<close>
         proof clarify
           fix g' upd
           assume upd_def: \<open>spectroscopy_moves (Defender_Conj p Q) g' = Some upd\<close>
-          hence \<open>\<And>px q. g' = Attacker_Clause px q \<Longrightarrow> p = px \<and> q \<in> Q \<and> upd = (subtract_fn 0 0 1 0 0 0 0 0)\<close>
+          hence \<open>\<And>px q. g' = Attacker_Conjunct px q \<Longrightarrow> p = px \<and> q \<in> Q \<and> upd = (subtract_fn 0 0 1 0 0 0 0 0)\<close>
             by (metis (mono_tags, lifting) local.conj_answer option.sel option.simps(3))
-          with upd_def show \<open>(\<exists>q\<in>Q. Attacker_Clause p q = g') \<and> spectroscopy_moves (Defender_Conj p Q) g' = Some (subtract_fn 0 0 1 0 0 0 0 0)\<close>
+          with upd_def show \<open>(\<exists>q\<in>Q. Attacker_Conjunct p q = g') \<and> spectroscopy_moves (Defender_Conj p Q) g' = Some (subtract_fn 0 0 1 0 0 0 0 0)\<close>
             by (cases g', auto)
         qed
         hence \<open>\<forall>g'. spectroscopy_moves (Defender_Conj p Q) g' \<noteq> None
@@ -420,14 +420,14 @@ proof-
         hence distinctions: \<open>\<forall>q\<in>Q. \<exists>i\<in>I. hml_srbb_conj.distinguishes (\<psi>s i) p q\<close>
           by (metis hml_srbb_conj.distinguishes_def hml_srbb_inner.distinguishes_from_def hml_srbb_inner_models.simps(3))
         hence inductive_wins: \<open>\<forall>q\<in>Q. \<exists>i\<in>I. hml_srbb_conj.distinguishes (\<psi>s i) p q
-            \<and> attacker_wins (expr_pr_conjunct (\<psi>s i)) (Attacker_Clause p q)\<close>
+            \<and> attacker_wins (expr_pr_conjunct (\<psi>s i)) (Attacker_Conjunct p q)\<close>
           using StableConj by blast
         define \<psi>qs where
           \<open>\<psi>qs \<equiv> \<lambda>q. (SOME \<psi>. \<exists>i\<in>I. \<psi> = \<psi>s i \<and>  hml_srbb_conj.distinguishes \<psi> p q
-            \<and> attacker_wins (expr_pr_conjunct \<psi>) (Attacker_Clause p q))\<close>
+            \<and> attacker_wins (expr_pr_conjunct \<psi>) (Attacker_Conjunct p q))\<close>
         with inductive_wins someI have \<psi>qs_spec:
           \<open>\<forall>q\<in>Q. \<exists>i\<in>I. \<psi>qs q = \<psi>s i \<and> hml_srbb_conj.distinguishes (\<psi>qs q ) p q
-            \<and> attacker_wins (expr_pr_conjunct (\<psi>qs q)) (Attacker_Clause p q)\<close>
+            \<and> attacker_wins (expr_pr_conjunct (\<psi>qs q)) (Attacker_Conjunct p q)\<close>
           by (smt (verit))
         have conjuncts_present: \<open>\<forall>q\<in>Q. expr_pr_conjunct (\<psi>qs q) \<in> expr_pr_conjunct ` (\<psi>qs ` Q)\<close>
           using \<open>Q \<noteq> {}\<close> by blast
@@ -443,7 +443,7 @@ proof-
         from conjuncts_present have \<open>\<forall>q\<in>Q. (expr_pr_conjunct (\<psi>qs q)) \<le> e'\<close> unfolding e'_def
           by (smt (verit, best) SUP_upper energy.sel energy.simps(3) energy_leq_cases image_iff)
         with \<psi>qs_spec win_a_upwards_closure
-          have clause_win: \<open>\<forall>q\<in>Q. attacker_wins e' (Attacker_Clause p q)\<close> by blast
+          have clause_win: \<open>\<forall>q\<in>Q. attacker_wins e' (Attacker_Conjunct p q)\<close> by blast
         define eu' where \<open>eu' = E
           (Sup (modal_depth   ` (expr_pr_conjunct ` (\<psi>s ` I))))
           (Sup (br_conj_depth   ` (expr_pr_conjunct ` (\<psi>s ` I))))
@@ -477,14 +477,14 @@ proof-
         with expr_lower have eu'_characterization: \<open>Some eu' = (subtract_fn 0 0 0 1 0 0 0 0) (expr_pr_inner (StableConj I \<psi>s))\<close>
           by presburger
         have \<open>\<forall>g'. spectroscopy_moves (Defender_Stable_Conj p Q) g' \<noteq> None
-        \<longrightarrow> (\<exists>q\<in>Q. (Attacker_Clause p q) = g') \<and> spectroscopy_moves (Defender_Stable_Conj p Q) g' = (subtract 0 0 0 1 0 0 0 0)\<close>
+        \<longrightarrow> (\<exists>q\<in>Q. (Attacker_Conjunct p q) = g') \<and> spectroscopy_moves (Defender_Stable_Conj p Q) g' = (subtract 0 0 0 1 0 0 0 0)\<close>
         proof clarify
           fix g' upd
           assume upd_def: \<open>spectroscopy_moves (Defender_Stable_Conj p Q) g' = Some upd\<close>
-          hence \<open>\<And>px q. g' = Attacker_Clause px q \<Longrightarrow> p = px \<and> q \<in> Q \<and> upd = (subtract_fn 0 0 0 1 0 0 0 0)\<close>
+          hence \<open>\<And>px q. g' = Attacker_Conjunct px q \<Longrightarrow> p = px \<and> q \<in> Q \<and> upd = (subtract_fn 0 0 0 1 0 0 0 0)\<close>
             by (metis (no_types, lifting) local.conj_s_answer option.discI option.inject)
           with upd_def case_assms(1) show
-            \<open>(\<exists>q\<in>Q. Attacker_Clause p q = g') \<and> spectroscopy_moves (Defender_Stable_Conj p Q) g' = (subtract 0 0 0 1 0 0 0 0)\<close>
+            \<open>(\<exists>q\<in>Q. Attacker_Conjunct p q = g') \<and> spectroscopy_moves (Defender_Stable_Conj p Q) g' = (subtract 0 0 0 1 0 0 0 0)\<close>
             by (cases g', auto)
         qed
         hence \<open>\<forall>g'. spectroscopy_moves (Defender_Stable_Conj p Q) g' \<noteq> None
@@ -580,15 +580,15 @@ proof-
           by (metis Int_Collect)
         hence inductive_wins: \<open>\<forall>q\<in>(Q \<inter> hml_srbb_inner.model_set (Obs \<alpha> \<phi>)).
           \<exists>i\<in>I. hml_srbb_conj.distinguishes (\<psi>s i) p q
-            \<and> attacker_wins (expr_pr_conjunct (\<psi>s i)) (Attacker_Clause p q)\<close>
+            \<and> attacker_wins (expr_pr_conjunct (\<psi>s i)) (Attacker_Conjunct p q)\<close>
           using BranchConj by blast
         define \<psi>qs where
           \<open>\<psi>qs \<equiv> \<lambda>q. (SOME \<psi>. \<exists>i\<in>I. \<psi> = \<psi>s i \<and>  hml_srbb_conj.distinguishes \<psi> p q
-            \<and> attacker_wins (expr_pr_conjunct \<psi>) (Attacker_Clause p q))\<close>
+            \<and> attacker_wins (expr_pr_conjunct \<psi>) (Attacker_Conjunct p q))\<close>
         with inductive_wins someI have \<psi>qs_spec:
           \<open>\<forall>q\<in>(Q \<inter> hml_srbb_inner.model_set (Obs \<alpha> \<phi>)).
             \<exists>i\<in>I. \<psi>qs q = \<psi>s i \<and> hml_srbb_conj.distinguishes (\<psi>qs q ) p q
-              \<and> attacker_wins (expr_pr_conjunct (\<psi>qs q)) (Attacker_Clause p q)\<close>
+              \<and> attacker_wins (expr_pr_conjunct (\<psi>qs q)) (Attacker_Conjunct p q)\<close>
           by (smt (verit))
         have conjuncts_present:
           \<open>\<forall>q\<in>(Q \<inter> hml_srbb_inner.model_set (Obs \<alpha> \<phi>)). expr_pr_conjunct (\<psi>qs q)
@@ -608,7 +608,7 @@ proof-
           unfolding e'0_def using SUP_upper energy.sel energy.simps(3) energy_leq_cases image_iff
           by (smt (z3))
         with \<psi>qs_spec win_a_upwards_closure have
-          conj_wins: \<open>\<forall>q\<in>(Q \<inter> hml_srbb_inner.model_set (Obs \<alpha> \<phi>)). attacker_wins e'0 (Attacker_Clause p q)\<close> by blast
+          conj_wins: \<open>\<forall>q\<in>(Q \<inter> hml_srbb_inner.model_set (Obs \<alpha> \<phi>)). attacker_wins e'0 (Attacker_Conjunct p q)\<close> by blast
         define eu'0 where \<open>eu'0 = E
           (Sup (modal_depth   ` (expr_pr_conjunct ` (\<psi>s ` I))))
           (Sup (br_conj_depth   ` (expr_pr_conjunct ` (\<psi>s ` I))))
@@ -705,13 +705,13 @@ proof-
         have moves: \<open>\<forall>g'. spectroscopy_moves (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>) g' \<noteq> None
         \<longrightarrow> (((Attacker_Branch p' Q' = g')
             \<and> (spectroscopy_moves (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>) g' = Some (\<lambda>e. Option.bind ((subtract_fn 0 1 1 0 0 0 0 0) e) min1_6)))
-          \<or> ((\<exists>q\<in>(Q - Q_\<alpha>). Attacker_Clause p q = g'
+          \<or> ((\<exists>q\<in>(Q - Q_\<alpha>). Attacker_Conjunct p q = g'
             \<and> spectroscopy_moves (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>) g' = (subtract 0 1 1 0 0 0 0 0))))\<close>
         proof clarify
           fix g' u
           assume no_subtr_move:
             \<open>spectroscopy_moves (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>) g' = Some u\<close>
-            \<open>\<not> (\<exists>q\<in>Q - Q_\<alpha>. Attacker_Clause p q = g' \<and> spectroscopy_moves (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>) g' = subtract 0 1 1 0 0 0 0 0)\<close>
+            \<open>\<not> (\<exists>q\<in>Q - Q_\<alpha>. Attacker_Conjunct p q = g' \<and> spectroscopy_moves (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>) g' = subtract 0 1 1 0 0 0 0 0)\<close>
           hence \<open>g' = Attacker_Branch p' Q'\<close>
             unfolding Q'_def using soft_step_set_is_soft_step_set no_subtr_move local.br_answer
             by (cases g', auto, (metis (no_types, lifting)  option.discI)+)
@@ -723,8 +723,8 @@ proof-
         have obs_e: \<open>\<exists>e'. (\<lambda>e. Option.bind ((subtract_fn 0 1 1 0 0 0 0 0) e) min1_6) e = Some e' \<and> attacker_wins e' (Attacker_Branch p' Q')\<close>
           using obs_win e'_comp min_e'_def
           by (smt (verit, best) bind.bind_lunit min_1_6_some option.collapse)
-        have \<open>\<forall>q\<in>(Q - Q_\<alpha>). spectroscopy_moves (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>) (Attacker_Clause p q) = (subtract 0 1 1 0 0 0 0 0)
-          \<longrightarrow> attacker_wins e'0 (Attacker_Clause p q)\<close>
+        have \<open>\<forall>q\<in>(Q - Q_\<alpha>). spectroscopy_moves (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>) (Attacker_Conjunct p q) = (subtract 0 1 1 0 0 0 0 0)
+          \<longrightarrow> attacker_wins e'0 (Attacker_Conjunct p q)\<close>
           using conj_wins \<open>eu'0 \<le> e'\<close> case_assms(4) by blast
         with obs_e moves have move_wins: \<open>\<forall>g'. spectroscopy_moves (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>) g' \<noteq> None
           \<longrightarrow> (\<exists>e'. (the (spectroscopy_moves (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>) g')) e = Some e' \<and> attacker_wins e' g')\<close>
@@ -778,11 +778,11 @@ proof-
         from p'_spec(1) this have \<open>attacker_wins (expr_pr_inner \<chi>) (Attacker_Delayed p (silent_reachable_set {q}))\<close>
           by (induct, auto,
               metis attacker_wins_Ga_with_id_step local.procrastination option.distinct(1) option.sel spectroscopy_defender.simps(4))
-        moreover have \<open>spectroscopy_moves (Attacker_Clause p q) (Attacker_Delayed p (silent_reachable_set {q})) = Some min1_6\<close>
+        moreover have \<open>spectroscopy_moves (Attacker_Conjunct p q) (Attacker_Delayed p (silent_reachable_set {q})) = Some min1_6\<close>
           using q_reach_nonempty sreachable_set_is_sreachable by fastforce
         moreover have \<open>the (min1_6 (expr_pr_conjunct (Pos \<chi>))) \<ge> expr_pr_inner \<chi>\<close>
           unfolding min1_6_def by (auto simp add: energy_leq_cases modal_depth_dominates_pos_conjuncts)
-        ultimately show \<open>attacker_wins (expr_pr_conjunct (Pos \<chi>)) (Attacker_Clause p q)\<close>
+        ultimately show \<open>attacker_wins (expr_pr_conjunct (Pos \<chi>)) (Attacker_Conjunct p q)\<close>
           using attacker_wins_Ga win_a_upwards_closure spectroscopy_defender.simps(3)
           by (metis (no_types, lifting) min_1_6_some option.discI option.exhaust_sel option.sel)
       qed
@@ -810,7 +810,7 @@ proof-
         from q'_spec(1) this have \<open>attacker_wins (expr_pr_inner \<chi>) (Attacker_Delayed q (silent_reachable_set {p}))\<close>
           by (induct, auto,
               metis attacker_wins_Ga_with_id_step local.procrastination option.distinct(1) option.sel spectroscopy_defender.simps(4))
-        moreover have \<open>spectroscopy_moves (Attacker_Clause p q) (Attacker_Delayed q (silent_reachable_set {p}))
+        moreover have \<open>spectroscopy_moves (Attacker_Conjunct p q) (Attacker_Delayed q (silent_reachable_set {p}))
              = Some (\<lambda>e. Option.bind ((subtract_fn 0 0 0 0 0 0 0 1) e) min1_7)\<close>
           using p_reach_nonempty sreachable_set_is_sreachable \<open>p \<noteq> q\<close> by fastforce
         moreover have \<open>the (min1_7 (expr_pr_conjunct (Neg \<chi>) - E 0 0 0 0 0 0 0 1)) \<ge> (expr_pr_inner \<chi>)\<close>
@@ -818,7 +818,7 @@ proof-
           by (simp add: modal_depth_dominates_neg_conjuncts)
         moreover from this have \<open>\<exists>e'. Some e' = ((\<lambda>e. Option.bind ((subtract_fn 0 0 0 0 0 0 0 1) e) min1_7) (expr_pr_conjunct (Neg \<chi>))) \<and> e' \<ge> (expr_pr_inner \<chi>)\<close>
           unfolding min_1_7_subtr_simp by auto
-        ultimately show \<open>attacker_wins (expr_pr_conjunct (Neg \<chi>)) (Attacker_Clause p q)\<close>
+        ultimately show \<open>attacker_wins (expr_pr_conjunct (Neg \<chi>)) (Attacker_Conjunct p q)\<close>
           using attacker_wins.Attack win_a_upwards_closure spectroscopy_defender.simps(3)
           by (metis (no_types, lifting) option.discI option.sel)
       qed
