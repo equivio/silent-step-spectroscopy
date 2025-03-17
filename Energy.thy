@@ -164,6 +164,8 @@ text \<open>Next, we define two energy updates that replace the first component 
 definition \<open>min1_6 e \<equiv> case e of E a b c d e f g h \<Rightarrow> Some (E (min a f) b c d e f g h)\<close>
 definition \<open>min1_7 e \<equiv> case e of E a b c d e f g h \<Rightarrow> Some (E (min a g) b c d e f g h)\<close>
 
+text \<open>Abbreviations for identity update.\<close>
+abbreviation \<open>id_up \<equiv> Some Some\<close>
 
 text \<open>lift order to options\<close>
 instantiation option :: (order) order

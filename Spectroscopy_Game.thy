@@ -29,11 +29,11 @@ text\<open>We also define the moves of the weak spectroscopy game. Their names i
 fun spectroscopy_moves :: \<open>('s, 'a) spectroscopy_position \<Rightarrow> ('s, 'a) spectroscopy_position \<Rightarrow> energy update option\<close> where
   delay:
     \<open>spectroscopy_moves (Attacker_Immediate p Q) (Attacker_Delayed p' Q')
-     = (if p' = p \<and> Q \<Zsurj>S Q' then Some Some else None)\<close> |
+     = (if p' = p \<and> Q \<Zsurj>S Q' then id_up else None)\<close> |
 
   procrastination:
     \<open>spectroscopy_moves (Attacker_Delayed p Q) (Attacker_Delayed p' Q')
-      = (if (Q' = Q \<and> p \<noteq> p' \<and> p \<mapsto> \<tau> p') then Some Some else None)\<close> |
+      = (if (Q' = Q \<and> p \<noteq> p' \<and> p \<mapsto> \<tau> p') then id_up else None)\<close> |
 
   observation:
     \<open>spectroscopy_moves (Attacker_Delayed p Q) (Attacker_Immediate p' Q')
@@ -47,7 +47,7 @@ fun spectroscopy_moves :: \<open>('s, 'a) spectroscopy_position \<Rightarrow> ('
 
   late_inst_conj:
     \<open>spectroscopy_moves (Attacker_Delayed p Q) (Defender_Conj p' Q')
-      = (if p = p' \<and> Q = Q' then Some Some else None)\<close> |
+      = (if p = p' \<and> Q = Q' then id_up else None)\<close> |
 
   conj_answer:
     \<open>spectroscopy_moves (Defender_Conj p Q) (Attacker_Conjunct p' q)
@@ -63,7 +63,7 @@ fun spectroscopy_moves :: \<open>('s, 'a) spectroscopy_position \<Rightarrow> ('
   late_stbl_conj:
     \<open>spectroscopy_moves (Attacker_Delayed p Q) (Defender_Stable_Conj p' Q')
       = (if (p = p' \<and> Q' = { q \<in> Q. (\<nexists>q'. q \<mapsto>\<tau> q')} \<and> (\<nexists>p''. p \<mapsto>\<tau> p''))
-          then Some Some else None)\<close> |
+          then id_up else None)\<close> |
 
   conj_s_answer:
     \<open>spectroscopy_moves (Defender_Stable_Conj p Q) (Attacker_Conjunct p' q)
@@ -77,7 +77,7 @@ fun spectroscopy_moves :: \<open>('s, 'a) spectroscopy_position \<Rightarrow> ('
 
   br_conj:
     \<open>spectroscopy_moves (Attacker_Delayed p Q) (Defender_Branch p' \<alpha> p'' Q' Q\<alpha>)
-      = (if (p = p' \<and> Q' = Q - Q\<alpha> \<and> p \<mapsto>a \<alpha> p'' \<and> Q\<alpha> \<subseteq> Q) then Some Some
+      = (if (p = p' \<and> Q' = Q - Q\<alpha> \<and> p \<mapsto>a \<alpha> p'' \<and> Q\<alpha> \<subseteq> Q) then id_up
          else None)\<close> |
 
   br_answer:
@@ -322,7 +322,7 @@ end
 text \<open>Now, we are able to define the weak spectroscopy game on an arbitrary (but inhabited) LTS.\<close>
 locale weak_spectroscopy_game =
   LTS_Tau step \<tau>
-  + energy_game \<open>spectroscopy_moves\<close> \<open>spectroscopy_defender\<close> \<open>less_eq\<close>
+  + energy_game \<open>spectroscopy_moves\<close> \<open>spectroscopy_defender\<close> \<open>(\<le>)\<close>
   for step :: \<open>'s \<Rightarrow> 'a \<Rightarrow> 's \<Rightarrow> bool\<close> (\<open>_ \<mapsto>_ _\<close> [70, 70, 70] 80) and
       \<tau> :: 'a
 

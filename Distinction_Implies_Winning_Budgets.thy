@@ -40,10 +40,10 @@ proof-
     by (simp add: attacker_wins.Defense)
 
   from late_inst_conj[of p \<open>{}\<close> p \<open>{}\<close>] have next_move0:
-    \<open>spectroscopy_moves (Attacker_Delayed p {}) (Defender_Conj p {}) = Some Some\<close> by force
+    \<open>spectroscopy_moves (Attacker_Delayed p {}) (Defender_Conj p {}) = id_up\<close> by force
 
   from delay[of p \<open>{}\<close> p \<open>{}\<close>] have next_move1:
-    \<open>spectroscopy_moves (Attacker_Immediate p {}) (Attacker_Delayed p {}) = Some Some\<close> by force
+    \<open>spectroscopy_moves (Attacker_Immediate p {}) (Attacker_Delayed p {}) = id_up\<close> by force
 
   moreover have \<open>attacker (Attacker_Immediate p {})\<close> by simp
   ultimately show ?thesis using attacker_wins.Attack[of \<open>Attacker_Immediate p {}\<close> _ \<open>expressiveness_price \<phi>\<close>]
@@ -170,13 +170,13 @@ proof-
           hence \<open>attacker_wins (expressiveness_price (Internal \<chi>)) (Attacker_Delayed p' Q\<tau>)\<close>
             by simp
           moreover have \<open>spectroscopy_moves (Attacker_Delayed p Q\<tau>) (Attacker_Delayed p' Q\<tau>)
-            = Some Some\<close> using spectroscopy_moves.simps(2) \<open>p \<noteq> p'\<close> \<open>p \<mapsto>\<tau> p'\<close> by auto
+            = id_up\<close> using spectroscopy_moves.simps(2) \<open>p \<noteq> p'\<close> \<open>p \<mapsto>\<tau> p'\<close> by auto
           moreover have \<open>attacker (Attacker_Delayed p Q\<tau>)\<close> by simp
           ultimately show ?case using attacker_wins_Ga_with_id_step by auto
         qed
         have  \<open>Q \<Zsurj>S Q\<tau>\<close>
           using Q\<tau>_def sreachable_set_is_sreachable by simp
-        hence \<open>spectroscopy_moves (Attacker_Immediate p Q) (Attacker_Delayed p Q\<tau>) = Some Some\<close>
+        hence \<open>spectroscopy_moves (Attacker_Immediate p Q) (Attacker_Delayed p Q\<tau>) = id_up\<close>
           using spectroscopy_moves.simps(1) by simp
         with \<open>attacker_wins (expressiveness_price (Internal \<chi>)) (Attacker_Delayed p Q\<tau>)\<close>
         show \<open>attacker_wins (expressiveness_price (Internal \<chi>)) (Attacker_Immediate p Q)\<close>
@@ -399,7 +399,7 @@ proof-
           \<open>hml_srbb_inner.distinguishes_from (hml_srbb_inner.Conj I \<psi>s) p Q\<close>
         hence \<open>attacker_wins (expr_pr_inner (hml_srbb_inner.Conj I \<psi>s)) (Defender_Conj p Q)\<close>
           using main_case by blast
-        moreover have \<open>spectroscopy_moves (Attacker_Delayed p Q) (Defender_Conj p Q) = Some Some\<close>
+        moreover have \<open>spectroscopy_moves (Attacker_Delayed p Q) (Defender_Conj p Q) = id_up\<close>
           by auto
         ultimately show \<open>attacker_wins (expr_pr_inner (hml_srbb_inner.Conj I \<psi>s)) (Attacker_Delayed p Q)\<close>
           by (metis attacker_wins_Ga_with_id_step option.discI option.sel spectroscopy_defender.simps(4))
@@ -516,7 +516,7 @@ proof-
         define Q' where \<open>Q' = { q \<in> Q. (\<nexists>q'. q \<mapsto>\<tau> q')}\<close>
         with case_assms(2) have Q'_spec: \<open>hml_srbb_inner.distinguishes_from (StableConj I \<psi>s) p Q'\<close> \<open>\<nexists>p''. p \<mapsto>\<tau> p''\<close>
           unfolding hml_srbb_inner.distinguishes_from_def by auto
-        hence move: \<open>spectroscopy_moves (Attacker_Delayed p Q) (Defender_Stable_Conj p Q') = Some Some\<close>
+        hence move: \<open>spectroscopy_moves (Attacker_Delayed p Q) (Defender_Stable_Conj p Q') = id_up\<close>
           unfolding Q'_def by auto
         show \<open>attacker_wins (expr_pr_inner (StableConj I \<psi>s)) (Attacker_Delayed p Q)\<close>
         proof (cases \<open>Q' = {}\<close>)
@@ -749,7 +749,7 @@ proof-
         define Q_\<alpha> where \<open>Q_\<alpha> = Q - hml_srbb_inner.model_set (Obs \<alpha> \<phi>)\<close>
         have \<open>attacker_wins (expr_pr_inner (BranchConj \<alpha> \<phi> I \<psi>s)) (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>)\<close>
           using main_case case_assms(1) p'_spec Q_\<alpha>_def by blast
-        moreover have \<open>spectroscopy_moves (Attacker_Delayed p Q) (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>) = Some Some\<close>
+        moreover have \<open>spectroscopy_moves (Attacker_Delayed p Q) (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>) = id_up\<close>
           using p'_spec Q_\<alpha>_def by auto
         ultimately show \<open>attacker_wins (expr_pr_inner (BranchConj \<alpha> \<phi> I \<psi>s)) (Attacker_Delayed p Q)\<close>
           using attacker_wins_Ga_with_id_step by auto

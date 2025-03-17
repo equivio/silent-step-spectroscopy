@@ -12,12 +12,12 @@ begin
 theorem spectroscopy_game_correctness:
   fixes e p Q
   shows \<open>(\<exists>\<phi>. distinguishes_from \<phi> p Q \<and> expressiveness_price \<phi> \<le> e)
-       = (attacker_wins e (Attacker_Immediate p Q))\<close>
+       \<longleftrightarrow> attacker_wins e (Attacker_Immediate p Q)\<close>
 proof
   assume \<open>\<exists>\<phi>. distinguishes_from \<phi> p Q \<and> expressiveness_price \<phi> \<le> e\<close>
   then obtain \<phi> where \<phi>_spec:
     \<open>distinguishes_from \<phi> p Q\<close> \<open>expressiveness_price \<phi> \<le> e\<close>
-    unfolding \<O>_def by blast
+    by blast
   from distinction_implies_winning_budgets \<phi>_spec(1) have
     \<open>attacker_wins (expressiveness_price \<phi>) (Attacker_Immediate p Q)\<close> .
   thus \<open>attacker_wins e (Attacker_Immediate p Q)\<close>
@@ -28,7 +28,7 @@ next
     \<open>\<exists>\<phi>. strategy_formula (Attacker_Immediate p Q) e \<phi> \<and> expressiveness_price \<phi> \<le> e\<close>
     by force
   hence \<open>\<exists>\<phi>. strategy_formula (Attacker_Immediate p Q) e \<phi> \<and> expressiveness_price \<phi> \<le> e\<close>
-    unfolding \<O>_def by blast
+    by blast
   thus \<open>\<exists>\<phi>. distinguishes_from \<phi> p Q \<and> expressiveness_price \<phi> \<le> e\<close>
     using strategy_formulas_distinguish by fastforce
 qed
