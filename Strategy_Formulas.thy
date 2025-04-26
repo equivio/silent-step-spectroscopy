@@ -548,8 +548,8 @@ next
       \<open>\<forall>g'. spectroscopy_moves (Defender_Conj p Q) g' \<noteq> None \<longrightarrow> (\<exists>e'. weight (Defender_Conj p Q) g' e = Some e' \<and> attacker_wins e' g')
         \<and> (\<exists>q. g' = (Attacker_Conjunct p q))\<close>
       using local.conj_answer
-      sorry
-(*      by (metis (no_types, lifting) spectroscopy_defender.elims(2,3) spectroscopy_moves.simps(34,35,36,37,38,39))*)
+        LTS_Tau.spectroscopy_defender.elims spectroscopy_moves.simps(30,33,34,47,58,62)
+      by (smt (verit, best))
     show ?case
     proof (cases \<open>Q = {}\<close>)
       case True
