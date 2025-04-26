@@ -33,6 +33,16 @@ next
     using strategy_formulas_distinguish by fastforce
 qed
 
+proposition attacker_subet_wins:
+  assumes
+    \<open>attacker_wins e (Attacker_Immediate p Q)\<close>
+    \<open>Q' \<subseteq> Q\<close>
+  shows
+    \<open>attacker_wins e (Attacker_Immediate p Q')\<close>
+  using assms spectroscopy_game_correctness
+  unfolding distinguishes_from_def subset_iff
+  by meson
+
 end (* context weak_spectroscopy_game *)
 
 end
