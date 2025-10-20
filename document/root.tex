@@ -11,6 +11,7 @@
   bottom=4cm,
   bindingoffset=5mm
 }
+\usepackage{authblk}
 
 % this should be the last package used
 \usepackage{pdfsetup}
@@ -28,17 +29,31 @@
 \renewcommand{\isacommand}[1]{\textcolor{command}{\textbf{#1}}}
 \renewcommand{\isakeyword}[1]{\textcolor{keyword}{\textbf{#1}}}
 
-
+\title{A \textbf{Weak Spectroscopy Game} \\ to Characterize Behavioral Equivalences}
+\author[1]{Lisa Annett Barthel}
+\author[1]{Leonard Moritz Hübner}
+\author[1,2]{Caroline Lemke}
+\author[1]{Karl Parvis Philipp Mattes}
+\author[1]{Lenard Mollenkopf}
+\author[1,3]{Benjamin Bisping}
+%
+\affil[1]{Technische Universität Berlin, Germany}
+\affil[2]{Carl von Ossietzky Universität Oldenburg, Germany}
+\affil[3]{Télécom SudParis, Institut Polytechnique de Paris, France}
+\renewcommand\Affilfont{\small}
+%
 \begin{document}
 
-\title{A Weak Spectroscopy Game to Characterize Behavioral Equivalences}
-\author{Lisa Annett Barthel \and Benjamin Bisping \and Leonard Moritz Hübner \and Caroline Lemke \and Karl Parvis Philipp Mattes \and Lenard Mollenkopf}
 \maketitle
 
 \begin{abstract}
-\noindent We provide an Isabelle/HOL formalization of Bisping and Jansen's \cite{bisping2023lineartimebranchingtime} weak spectroscopy game, which can be used to characterize
-a range of behavioral equivalences simultaneously, spanning from stability-respecting branching bisimilarity to weak trace equivalence.
-We relate distinguishing sublanguages of Hennessy-Milner Logic and attacker-winning budgets in an energy game by an eight-dimensional measure of formula expressiveness.
+\noindent
+We provide an Isabelle/HOL formalization of Bisping and Jansen's weak spectroscopy game%
+~\cite{bj2024silentStepSpectroscopyExpress}, which can be used to characterize a range of behavioral
+equivalences simultaneously, spanning from stability-respecting branching bisimilarity to
+weak trace equivalence.
+We relate distinguishing sublanguages of Hennessy--Milner logic and attacker-winning budgets in an
+energy game by an eight-dimensional measure of formula expressiveness.
 \end{abstract}
 
 \tableofcontents

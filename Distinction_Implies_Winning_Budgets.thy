@@ -1,6 +1,6 @@
 section \<open>Correctness\<close>
 
-text \<open>As in the main theorem of \cite{bisping2023lineartimebranchingtime}, we state in what sense winning energy levels and equivalences coincide as the theorem \<open>spectroscopy_game_correctness\<close>:
+text \<open>As in the main theorem of \cite{bj2023silentStepSpectroscopyArxiv}, we state in what sense winning energy levels and equivalences coincide as the theorem \<open>spectroscopy_game_correctness\<close>:
 There exists a formula \<open>\<phi>\<close> distinguishing a process \<open>p\<close> from a set of processes \<open>Q\<close> with
 expressiveness price of at most \<open>e\<close> if and only if \<open>e\<close> is in the winning budget of \<open>Attacker_Immediate p Q\<close>.
 
@@ -21,7 +21,7 @@ begin
 
 text \<open>In this section, we prove that if a formula distinguishes a process @{term \<open>p\<close>}
       from a set of process @{term \<open>Q\<close>}, then the price of this formula is in the attackers-winning
-      budget. This is the same statement as that of lemma $1$ in the paper \cite[p. 20]{bisping2023lineartimebranchingtime}.
+      budget. This is the same statement as that of lemma $1$ in the paper \cite[p. 20]{bj2023silentStepSpectroscopyArxiv}.
       We likewise also prove it in the same manner.
 
       First, we show that the statement holds if @{term \<open>Q = {}\<close>}. This is the case, as the
@@ -52,7 +52,7 @@ proof-
 qed
 
 text \<open>Next, we show the statement for the case that @{term \<open>Q \<noteq> {}\<close>}. Following the proof of
-      \cite[p. 20]{bisping2023lineartimebranchingtime}, we do this by induction on a more
+      \cite[p. 20]{bj2023silentStepSpectroscopyArxiv}, we do this by induction on a more
       complex property.\<close>
 lemma distinction_implies_winning_budgets:
   assumes \<open>distinguishes_from \<phi> p Q\<close>

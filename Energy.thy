@@ -3,11 +3,11 @@ section \<open>Energy\<close>
 theory Energy
   imports Main "HOL-Library.Extended_Nat"
 begin
-text \<open>Following the paper \cite[p. 5]{bisping2023lineartimebranchingtime}, we define energies as
+text \<open>Following the paper \cite[p. 5]{bj2023silentStepSpectroscopyArxiv}, we define energies as
       eight-dimensional vectors of natural numbers extended by @{text \<open>\<infinity>\<close>}.
-      But deviate from \cite{bisping2023lineartimebranchingtime} in also defining
+      But deviate from \cite{bj2023silentStepSpectroscopyArxiv} in also defining
       an energy @{text \<open>eneg\<close>} that represents negative energy. This allows us to
-      express energy updates (cf. \cite[p. 8]{bisping2023lineartimebranchingtime}) as total functions\label{deviation:eneg}.\<close>
+      express energy updates (cf. \cite[p. 8]{bj2023silentStepSpectroscopyArxiv}) as total functions\label{deviation:eneg}.\<close>
 datatype energy = E (modal_depth: \<open>enat\<close>) (br_conj_depth: \<open>enat\<close>) (conj_depth: \<open>enat\<close>) (st_conj_depth: \<open>enat\<close>)
                     (imm_conj_depth: \<open>enat\<close>) (pos_conjuncts: \<open>enat\<close>) (neg_conjuncts: \<open>enat\<close>) (neg_depth: \<open>enat\<close>)
 

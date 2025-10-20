@@ -8,9 +8,9 @@ subsection \<open>Labelled Transition Systems\<close>
 
 text \<open>
 The locale @{term \<open>LTS\<close>} represents a labelled transition system consisting of a set of states $\mathcal{P}$,
-a set of actions $\Sigma$, and a transition relation $\mapsto \subseteq \mathcal{P}\times\Sigma\times\mathcal{P}$ (cf. \cite[defintion 1]{bisping2023lineartimebranchingtime}).
+a set of actions $\Sigma$, and a transition relation $\mapsto \subseteq \mathcal{P}\times\Sigma\times\mathcal{P}$ (cf. \cite[defintion 1]{bj2023silentStepSpectroscopyArxiv}).
 We formalize the sets of states and actions by the type variables \<open>'s\<close> and \<open>'a\<close>. An LTS is then determined by the transition relation @{term \<open>step\<close>}.
-Due to technical limitations we use the notation \<open>p \<mapsto>\<alpha> p'\<close> which has same meaing as $p \xrightarrow{\alpha} p'$ has in \cite{bisping2023lineartimebranchingtime}.
+Due to technical limitations we use the notation \<open>p \<mapsto>\<alpha> p'\<close> which has same meaing as $p \xrightarrow{\alpha} p'$ has in \cite{bj2023silentStepSpectroscopyArxiv}.
 
 \<close>
 
@@ -61,7 +61,7 @@ locale LTS_Tau =
     fixes \<tau> :: 'a
 begin
 
-text \<open>The paper introduces a transition $p \xrightarrow{(\alpha)}p'$ if $p \xrightarrow{\alpha} p'$, or if $\alpha = \tau$ and $p = p'$ (cf. \cite[defintion 2]{bisping2023lineartimebranchingtime}).
+text \<open>The paper introduces a transition $p \xrightarrow{(\alpha)}p'$ if $p \xrightarrow{\alpha} p'$, or if $\alpha = \tau$ and $p = p'$ (cf. \cite[defintion 2]{bj2023silentStepSpectroscopyArxiv}).
 We define @{term \<open>soft_step\<close>} analagously and provide the notation \<open>p \<mapsto>a \<alpha> p'\<close>.\<close>
 abbreviation soft_step (\<open>_ \<mapsto>a _ _\<close> [70,70,70] 80) where
   \<open>p \<mapsto>a \<alpha> q \<equiv> p \<mapsto>\<alpha> q \<or> (\<alpha> = \<tau> \<and> p = q)\<close>

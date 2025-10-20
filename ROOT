@@ -1,16 +1,5 @@
-(* All sessions must be in chapter AFP *)
 chapter AFP
 
-(* There must be one session with the (short) name of the entry.
-   This session generates the web document and HTML files.
-
-   It is strongly encouraged to have precisely one session, but it
-   if needed, further sessions are permitted.
-
-   Every theory must be included in at least one of the sessions.
-*)
-
-(* Session name, list base session: *)
 session Weak_Spectroscopy = "HOL-Library" +
   (* Timeout (in sec) in case of non-termination problems *)
   options [timeout = 720, quick_and_dirty = false]

@@ -6,7 +6,7 @@ begin
 text \<open>This section describes the largest subset of the full HML language in section \ref{sect:HML} that we are
 using for purposes of silent step spectroscopy. It is supposed to characterize the most fine grained
 behavioural equivalence that we may decide: Stability-Respecting Branching Bisimilarity (SRBB). While
-there are good reasons to believe that this subset truly characterizes SRBB (c.f.\cite{bisping2023lineartimebranchingtime}),
+there are good reasons to believe that this subset truly characterizes SRBB (c.f.\cite{bj2023silentStepSpectroscopyArxiv}),
 we do not provide a formal proof. From this sublanguage smaller subsets are derived
 via the notion of expressiveness prices (\ref{sect:ExpressivenessMeasure}). \<close>
 
@@ -28,7 +28,7 @@ The data constructors are to be interpreted as follows:
   \end{itemize}
   \item in @{term \<open>hml_srbb_inner\<close>}
   \begin{itemize}
-    \item \<open>(Obs \<alpha> \<phi>)\<close> encodes \<open>(\<alpha>)\<phi>\<close> (Note the difference to \cite{bisping2023lineartimebranchingtime})
+    \item \<open>(Obs \<alpha> \<phi>)\<close> encodes \<open>(\<alpha>)\<phi>\<close> (Note the difference to \cite{bj2023silentStepSpectroscopyArxiv})
     \item \<open>(Conj I \<psi>s)\<close> encode $\bigwedge\nolimits_{i \in \mathrm{\texttt{I}}} {\psi s}(i)$
     \item \<open>(StableConj I \<psi>s)\<close> encodes $\neg\langle\tau\rangle\top \land \bigwedge\nolimits_{i \in \mathrm{\texttt{I}}} {\psi s}(i)$
     \item \<open>(BranchConj \<alpha> \<phi> I \<psi>s)\<close> encodes $(\alpha)\varphi \land \bigwedge\nolimits_{i \in \mathrm{\texttt{I}}} {\psi s}(i)$

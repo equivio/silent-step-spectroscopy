@@ -14,7 +14,6 @@ fi
 
 # Build isabelle
 isabelle build \
-    -v \
     $ISABELLE_ARG \
     -o document=pdf \
     -o document_variants=document:outline=/proof,/ML \
@@ -22,6 +21,7 @@ isabelle build \
     -d . \
     $SESSION_NAME \
 | tee isabelle_log
+# add -v for verbose output
 
 RED='\033[;31m'
 GREEN='\033[0;32m'
