@@ -20,7 +20,5 @@ session Weak_Spectroscopy = "HOL-Library" +
 
 (* Dependencies on document source files: *)
   document_files
-    "introduction.tex"
-    "conclusion.tex"
     "root.bib"
     "root.tex"
