@@ -15,9 +15,6 @@
 % this should be the last package used
 \usepackage{pdfsetup}
 
-% do not indent paragraphs
-\setlength\parindent{0pt}
-
 % urls in roman style, theory text in math-similar italics
 \urlstyle{rm}
 \isabellestyle{it}
@@ -49,14 +46,25 @@
   \noindent
   We provide an Isabelle/HOL formalization of Bisping and Jansen's weak spectroscopy game~\cite{bj2024silentStepSpectroscopyExpress},
   which can be used to simultaneously characterize and decide a hierarchy of behavioral equivalences for systems with internal behavior.
-  This is valuable for applications in concurrency theory and formal verification where equivalences and distinctions of the ``linear-time---branching-time spectrum'' are a recurring topic.
+  This is valuable for applications in concurrency theory and formal verification where equivalences and distinctions of the ``linear-time--branching-time spectrum'' are a recurring topic.
 
   This entry contains a game characterization of most behavioral equivalences from stability-respecting branching bisimilarity to weak trace equivalence.
   Technically, the results link distinguishing sublanguages of Hennessy--Milner logic to winning attacker budgets in an energy game through an eight-dimensional measurement of syntactic features appearing in formulas.
 \end{abstract}
 
 \paragraph{Overview}
-Some overview text.
+By phrasing \emph{behavioral equivalences as energy games}, we obtain a uniform way to decide a wide range of equivalences in van Glabbeek's \emph{linear-time--branching-time spectrum} for systems with \emph{silent steps}~\cite{glabbeek1990ltbt1,glabbeek1990ltbt2}.
+Silent steps usually arise because of abstraction from internal system behavior, e.g., when modeling communication protocols or distributed systems using transition systems.
+
+This formalization follows Bisping and Jansen's \emph{weak spectroscopy game}~\cite{bj2024silentStepSpectroscopyExpress}, repsectively the proofs from the arXiv version~\cite{bj2023silentStepSpectroscopyArxiv}.
+
+The bigger project of \emph{deciding all equivalences at once} is outlined in Bisping's PhD thesis~\cite{bisping2025generalizedEqChecking}.The energy game approach is due to~\cite{bisping2023equivalenceEnergyGames}.
+
+\paragraph{Acknowledgements}
+TODO.
+
+% do not indent paragraphs
+\setlength\parindent{0pt}
 
 \tableofcontents
 
@@ -76,7 +84,7 @@ Some overview text.
 \input{Strategy_Formulas}
 \input{Silent_Step_Spectroscopy}
 
-\bibliographystyle{abbrv}
+\bibliographystyle{plainurl}
 \bibliography{root}
 
 \end{document}
