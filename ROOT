@@ -16,7 +16,6 @@ session Weak_Spectroscopy = "HOL-Library" +
     Silent_Step_Spectroscopy
     Weak_Traces
     Branching_Bisimilarity
-    Example_Instantiation
 
 (* Dependencies on document source files: *)
   document_files

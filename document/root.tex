@@ -15,6 +15,8 @@
 % this should be the last package used
 \usepackage{pdfsetup}
 
+\AddToHook{cmd/section/before}{\clearpage}
+
 % urls in roman style, theory text in math-similar italics
 \urlstyle{rm}
 \isabellestyle{it}
@@ -52,16 +54,16 @@
   Technically, the results link distinguishing sublanguages of Hennessy--Milner logic to winning attacker budgets in an energy game through an eight-dimensional measurement of syntactic features appearing in formulas.
 \end{abstract}
 
-\paragraph{Overview}
-By phrasing \emph{behavioral equivalences as energy games}, we obtain a uniform way to decide a wide range of equivalences in van Glabbeek's \emph{linear-time--branching-time spectrum} for systems with \emph{silent steps}~\cite{glabbeek1990ltbt1,glabbeek1990ltbt2}.
+\paragraph{Overview.}
+By phrasing \emph{behavioral equivalences as energy games}, we obtain a uniform way to decide a wide range of equivalences in van Glabbeek's \emph{linear-time--branching-time spectrum} for systems with \emph{silent steps}~\cite{glabbeek1990ltbt1,glabbeek1993ltbt2}.
 Silent steps usually arise because of abstraction from internal system behavior, e.g., when modeling communication protocols or distributed systems using transition systems.
 
-This formalization follows Bisping and Jansen's \emph{weak spectroscopy game}~\cite{bj2024silentStepSpectroscopyExpress}, repsectively the proofs from the arXiv version~\cite{bj2023silentStepSpectroscopyArxiv}.
+This formalization follows Bisping and Jansen's \emph{weak spectroscopy game}~\cite{bj2024silentStepSpectroscopyExpress}, respectively the proofs from the arXiv version~\cite{bj2023silentStepSpectroscopyArxiv}.
 
 The bigger project of \emph{deciding all equivalences at once} is outlined in Bisping's PhD thesis~\cite{bisping2025generalizedEqChecking}.The energy game approach is due to~\cite{bisping2023equivalenceEnergyGames}.
 
-\paragraph{Acknowledgements}
-TODO.
+\paragraph{Acknowledgements.}
+Some of the proofs in this document are due to pen-and-paper proofs by David N. Jansen.
 
 % do not indent paragraphs
 \setlength\parindent{0pt}
@@ -78,7 +80,6 @@ TODO.
 \input{Eta_Bisimilarity}
 \input{Branching_Bisimilarity}
 \input{Energy_Games}
-\input{Example_Instantiation}
 \input{Spectroscopy_Game}
 \input{Distinction_Implies_Winning_Budgets}
 \input{Strategy_Formulas}
