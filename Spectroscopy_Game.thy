@@ -103,7 +103,9 @@ fun spectroscopy_defender where
   \<open>spectroscopy_defender (Defender_Conj _ _) = True\<close> |
   \<open>spectroscopy_defender (Defender_Stable_Conj _ _) = True\<close>
 
-interpretation Game: energy_game \<open>spectroscopy_moves\<close> \<open>spectroscopy_defender\<close> \<open>(\<le>)\<close>
+text \<open>Now, we are able to define the weak spectroscopy game on an arbitrary (but inhabited) LTS.\<close>
+sublocale weak_spectroscopy_game:
+  energy_game \<open>spectroscopy_moves\<close> \<open>spectroscopy_defender\<close> \<open>(\<le>)\<close>
 proof
   fix e e' ::energy
   show \<open>e \<le> e' \<Longrightarrow> e' \<le> e \<Longrightarrow> e = e'\<close> unfolding less_eq_energy_def
@@ -316,13 +318,6 @@ next
   qed
 qed
 
-end
-
-text \<open>Now, we are able to define the weak spectroscopy game on an arbitrary (but inhabited) LTS.\<close>
-locale weak_spectroscopy_game =
-  LTS_Tau step \<tau>
-  + energy_game \<open>spectroscopy_moves\<close> \<open>spectroscopy_defender\<close> \<open>(\<le>)\<close>
-  for step :: \<open>'s \<Rightarrow> 'a \<Rightarrow> 's \<Rightarrow> bool\<close> (\<open>_ \<mapsto>_ _\<close> [70, 70, 70] 80) and
-      \<tau> :: 'a
+end \<comment> \<open>of \<open>LTS_Tau\<close>\<close>
 
 end
