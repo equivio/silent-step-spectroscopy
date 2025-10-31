@@ -16,7 +16,7 @@ theory Distinction_Implies_Winning_Budgets
   imports Spectroscopy_Game Expressiveness_Price
 begin
 
-context weak_spectroscopy_game
+context LTS_Tau
 begin
 
 text \<open>In this section, we prove that if a formula distinguishes a process @{term \<open>p\<close>}
@@ -28,6 +28,8 @@ text \<open>In this section, we prove that if a formula distinguishes a process 
       attacker can move, at no cost, from the starting position, @{term \<open>Attacker_Immediate p {}\<close>},
       to the defender position @{term \<open>Defender_Conj p {}\<close>}. In this position the defender is then
       unable to make any further moves. Hence, the attacker wins the game with any budget.\<close>
+
+abbreviation \<open>attacker_wins \<equiv> weak_spectroscopy_game.winning_budget_ind\<close>
 
 lemma distinction_implies_winning_budgets_empty_Q:
   assumes \<open>distinguishes_from \<phi> p {}\<close>
