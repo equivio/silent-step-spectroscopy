@@ -1,4 +1,3 @@
-text \<open>\newpage\<close>
 section \<open>Energy Games\<close>
 
 theory Energy_Games

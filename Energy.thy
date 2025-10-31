@@ -1,4 +1,3 @@
-text \<open>\newpage\<close>
 section \<open>Energy\<close>
 theory Energy
   imports Main "HOL-Library.Extended_Nat"

@@ -1,10 +1,9 @@
-text \<open>\newpage\<close>
-section \<open>LTS \label{sect:LTS}\<close>
+section \<open>Labelled Transition Systems \label{sect:LTS}\<close>
 theory LTS
   imports Main
 begin
 
-subsection \<open>Labelled Transition Systems\<close>
+subsection \<open>Base LTS\<close>
 
 text \<open>
 The locale @{term \<open>LTS\<close>} represents a labelled transition system consisting of a set of states $\mathcal{P}$,
@@ -48,7 +47,7 @@ lemma step_set_eq:
   shows \<open>Q = step_set P \<alpha>\<close>
   using assms step_set_is_step_set exactly_one_step_set by fastforce
 
-end (*<*) (* locale LTS *) (*>*)
+end \<comment> \<open>of locale \<open>LTS\<close>\<close>
 
 subsection \<open>Labelled Transition Systems with Silent Steps\<close>
 
@@ -62,7 +61,7 @@ locale LTS_Tau =
 begin
 
 text \<open>The paper introduces a transition $p \xrightarrow{(\alpha)}p'$ if $p \xrightarrow{\alpha} p'$, or if $\alpha = \tau$ and $p = p'$ (cf. \cite[defintion 2]{bj2023silentStepSpectroscopyArxiv}).
-We define @{term \<open>soft_step\<close>} analagously and provide the notation \<open>p \<mapsto>a \<alpha> p'\<close>.\<close>
+We define @{term \<open>soft_step\<close>} analogously and provide the notation \<open>p \<mapsto>a \<alpha> p'\<close>.\<close>
 abbreviation soft_step (\<open>_ \<mapsto>a _ _\<close> [70,70,70] 80) where
   \<open>p \<mapsto>a \<alpha> q \<equiv> p \<mapsto>\<alpha> q \<or> (\<alpha> = \<tau> \<and> p = q)\<close>
 
@@ -363,6 +362,6 @@ definition stability_respecting :: \<open>('s \<Rightarrow> 's \<Rightarrow> boo
   \<open>stability_respecting R \<equiv> \<forall> p q. R p q \<and> stable_state p \<longrightarrow>
     (\<exists>q'. q \<Zsurj> q' \<and> R p q' \<and> stable_state q')\<close>
 
-end (* locale LTS_Tau *)
+end \<comment> \<open>of locale \<open>LTS_Tau\<close>\<close>
 
-end (* theory LTS *)
+end

@@ -1,5 +1,4 @@
-text \<open>\newpage\<close>
-section \<open>Expressiveness Price Function \label{sect:ExpressivenessMeasure}\<close>
+section \<open>Expressiveness Prices \label{sect:ExpressivenessMeasure}\<close>
 
 theory Expressiveness_Price
   imports HML_SRBB Energy

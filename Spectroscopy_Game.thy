@@ -1,4 +1,3 @@
-text \<open>\newpage\<close>
 section \<open>Weak Spectroscopy Game\<close>
 theory Spectroscopy_Game
   imports Energy_Games Energy LTS

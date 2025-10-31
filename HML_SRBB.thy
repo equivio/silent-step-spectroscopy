@@ -1,5 +1,4 @@
-text \<open>\newpage\<close>
-section \<open> Stability-Respecting Branching Bisimilarity (HML$_\text{SRBB}$) \label{sect:hmlSRBB} \<close>
+section \<open>Hennessy--Milner Logic for Stability-Respecting Branching Bisimilarity \label{sect:hmlSRBB} \<close>
 theory HML_SRBB
   imports Main LTS_Semantics
 begin
