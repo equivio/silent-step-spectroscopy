@@ -1,6 +1,6 @@
 chapter AFP
 
-session Weak_Spectroscopy = "HOL-Library" +
+session Weak_Spectroscopy = Galois_Energy_Games +
   (* Timeout (in sec) in case of non-termination problems *)
   options [timeout = 720, quick_and_dirty = false]
 
