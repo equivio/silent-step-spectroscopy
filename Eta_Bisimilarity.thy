@@ -6,7 +6,7 @@ begin
 
 subsection \<open>Definition and Properties of \<open>\<eta>\<close>-(Bi-)Similarity\<close>
 
-context LTS_Tau
+context lts_tau
 begin
 
 \<comment>\<open>Following Def 2.1 in Divide and congruence\<close>

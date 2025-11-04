@@ -70,7 +70,7 @@ We define what it means for a process @{term \<open>p\<close>} to satisfy a HML$
 written as \<open>p \<Turnstile>SRBB \<phi>\<close>.
 \<close>
 
-context LTS_Tau
+context lts_tau
 begin
 
 primrec
@@ -305,7 +305,7 @@ lemma srbb_obs_is_empty_branch_conj: \<open>Obs \<alpha> \<phi> \<Lleftarrow>\<c
 
 text \<open> The formula $\top$ is equivalent to $\langle\varepsilon\rangle\bigwedge\{\}$.\<close>
 lemma srbb_TT_is_\<chi>TT: \<open>TT \<Lleftarrow>srbb\<Rrightarrow> Internal (Conj {} \<psi>s)\<close>
-  using LTS_Tau.refl by force
+  using lts_tau.refl by force
 
 text \<open> The formula $\top$ is equivalent to $\bigwedge\{\}$.\<close>
 lemma srbb_TT_is_empty_conj: \<open>TT \<Lleftarrow>srbb\<Rrightarrow> ImmConj {} \<psi>s\<close>
@@ -347,7 +347,7 @@ next
   with \<open>stable_state p'\<close> have \<open>hml_srbb_inner_models p' \<chi>\<close>
     using stable_state_stable by (auto, metis silent_reachable.simps)
   then have \<open>hml_srbb_conjunct_models p' (Pos \<chi>)\<close>
-    using LTS_Tau.refl by fastforce
+    using lts_tau.refl by fastforce
   hence \<open>hml_srbb_inner_models p' (StableConj I \<Psi>)\<close>
     using p'_spec assms other_conjuncts by auto
   thus \<open>p \<Turnstile>SRBB hml_srbb.Internal (StableConj I \<Psi>)\<close>
@@ -551,6 +551,6 @@ proof safe
   qed
 qed
 
-end (* LTS_Tau *)
+end \<comment> \<open>of \<open>lts_tau\<close>\<close>
 
 end

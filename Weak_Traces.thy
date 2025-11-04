@@ -111,7 +111,7 @@ lemma modal_depth_only_is_trace_form:
   \<open>(is_trace_formula \<phi>) = (\<phi> \<in> \<O> (E \<infinity> 0 0 0 0 0 0 0))\<close>
   using expressiveness_to_trace_formula trace_formula_to_expressiveness by blast
 
-context LTS_Tau
+context lts_tau
 begin
 
 text \<open>If a formula \<open>\<phi>\<close> is in HML$_{WT}$ and a state \<open>p\<close> models \<open>\<phi>\<close>, then there exists a weak trace \<open>tr\<close> of \<open>p\<close> such that @{term \<open>wtrace_to_srbb tr\<close>} is equivalent to \<open>\<phi>\<close>.\<close>
@@ -343,8 +343,8 @@ proof
     from Cons have goal_eq: \<open>wtrace_to_srbb (a # tail) = (Internal (Obs a (wtrace_to_srbb tail)))\<close>
       by simp
     show ?case
-      by (smt (verit) Cons.IH IS LTS_Tau.hml_srbb_inner_models.simps(1)
-          LTS_Tau.silent_reachable_trans \<open>p \<Zsurj>\<mapsto>\<Zsurj> a p''\<close> empty_trace_allways_weak_trace goal_eq
+      by (smt (verit) Cons.IH IS lts_tau.hml_srbb_inner_models.simps(1)
+          lts_tau.silent_reachable_trans \<open>p \<Zsurj>\<mapsto>\<Zsurj> a p''\<close> empty_trace_allways_weak_trace goal_eq
           hml_srbb_models.simps(2) weak_step_def wtrace_to_srbb.elims)
   qed
 next

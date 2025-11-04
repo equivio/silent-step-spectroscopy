@@ -1,19 +1,19 @@
-section \<open>Labelled Transition Systems \label{sect:LTS}\<close>
-theory LTS
+section \<open>Labeled Transition Systems \label{sect:LTS}\<close>
+theory Labeled_Transition_Systems
   imports Main
 begin
 
 subsection \<open>Base LTS\<close>
 
 text \<open>
-The locale @{term \<open>LTS\<close>} represents a labelled transition system consisting of a set of states $\mathcal{P}$,
+The locale @{term \<open>LTS\<close>} represents a labeled transition system consisting of a set of states $\mathcal{P}$,
 a set of actions $\Sigma$, and a transition relation $\mapsto \subseteq \mathcal{P}\times\Sigma\times\mathcal{P}$ (cf. \cite[defintion 1]{bj2023silentStepSpectroscopyArxiv}).
 We formalize the sets of states and actions by the type variables \<open>'s\<close> and \<open>'a\<close>. An LTS is then determined by the transition relation @{term \<open>step\<close>}.
 Due to technical limitations we use the notation \<open>p \<mapsto>\<alpha> p'\<close> which has same meaing as $p \xrightarrow{\alpha} p'$ has in \cite{bj2023silentStepSpectroscopyArxiv}.
 
 \<close>
 
-locale LTS =
+locale lts =
   fixes step :: \<open>'s \<Rightarrow> 'a \<Rightarrow> 's \<Rightarrow> bool\<close> (\<open>_ \<mapsto> _ _\<close> [70,70,70] 80)
 begin
 
@@ -47,15 +47,15 @@ lemma step_set_eq:
   shows \<open>Q = step_set P \<alpha>\<close>
   using assms step_set_is_step_set exactly_one_step_set by fastforce
 
-end \<comment> \<open>of locale \<open>LTS\<close>\<close>
+end \<comment> \<open>of locale \<open>lts\<close>\<close>
 
-subsection \<open>Labelled Transition Systems with Silent Steps\<close>
+subsection \<open>Labeled Transition Systems with Silent Steps\<close>
 
-text \<open>We formalize labelled transition systems with silent steps as an extension of ordinary labelled transition systems
+text \<open>We formalize labeled transition systems with silent steps as an extension of ordinary labeled transition systems
 with a fixed silent action \<open>\<tau>\<close>.\<close>
 
-locale LTS_Tau =
-  LTS step
+locale lts_tau =
+  lts step
     for step :: \<open>'s \<Rightarrow> 'a \<Rightarrow> 's \<Rightarrow> bool\<close> (\<open>_ \<mapsto> _ _\<close> [70,70,70] 80) +
     fixes \<tau> :: 'a
 begin
@@ -194,14 +194,14 @@ lemma weak_step_sequence_trans:
 proof induct
   case (1 p p')
   then show ?case
-    by (metis LTS_Tau.weak_step_sequence.simps append_Nil silent_prepend_weak_step silent_reachable_trans)
+    by (metis lts_tau.weak_step_sequence.simps append_Nil silent_prepend_weak_step silent_reachable_trans)
 next
   case (2 p \<alpha> p' rt p'')
   then show ?case by fastforce
 qed
 
 text \<open>The weak traces of a state or all possible sequences of weak transitions that can be performed.
-In the context of labelled transition systems, weak traces capture the observable behaviour of a state.\<close>
+In the context of labeled transition systems, weak traces capture the observable behaviour of a state.\<close>
 abbreviation weak_traces :: \<open>'s \<Rightarrow> 'a list set\<close>
   where \<open>weak_traces p \<equiv> {tr. \<exists>p'. p \<Zsurj>\<mapsto>\<Zsurj>$ tr p'}\<close>
 
@@ -258,7 +258,7 @@ proof -
   then obtain p'' where \<open>p' \<Zsurj>\<mapsto>\<Zsurj>$ tr p''\<close> by auto
   with \<open>p \<mapsto> \<alpha> p'\<close>
   have \<open>p \<Zsurj>\<mapsto>\<Zsurj>$ (\<alpha> # tr) p''\<close>
-    by (metis LTS_Tau.silent_reachable.intros(1) LTS_Tau.silent_reachable_append_\<tau> LTS_Tau.weak_step_def LTS_Tau.weak_step_sequence.intros(2))
+    by (metis lts_tau.silent_reachable.intros(1) lts_tau.silent_reachable_append_\<tau> lts_tau.weak_step_def lts_tau.weak_step_sequence.intros(2))
   then have \<open>\<exists>p''. p \<Zsurj>\<mapsto>\<Zsurj>$ (\<alpha> # tr) p''\<close> by auto
   then show \<open>(\<alpha> # tr) \<in> weak_traces p\<close> by auto
 qed
@@ -362,6 +362,6 @@ definition stability_respecting :: \<open>('s \<Rightarrow> 's \<Rightarrow> boo
   \<open>stability_respecting R \<equiv> \<forall> p q. R p q \<and> stable_state p \<longrightarrow>
     (\<exists>q'. q \<Zsurj> q' \<and> R p q' \<and> stable_state q')\<close>
 
-end \<comment> \<open>of locale \<open>LTS_Tau\<close>\<close>
+end \<comment> \<open>of locale \<open>lts_tau\<close>\<close>
 
 end

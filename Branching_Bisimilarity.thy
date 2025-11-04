@@ -6,7 +6,7 @@ begin
 
 subsection \<open>Definitions of (Stability-Respecting) Branching Bisimilarity\<close>
 
-context LTS_Tau
+context lts_tau
 begin
 
 definition branching_simulation :: \<open>('s \<Rightarrow> 's \<Rightarrow> bool) \<Rightarrow> bool\<close> where
@@ -423,7 +423,7 @@ proof-
         assume \<open>sr_branching_bisimulated p q\<close> \<open>p \<Turnstile>SRBB hml_srbb.Internal \<chi>\<close>
         then obtain p' where \<open>p \<Zsurj> p'\<close> \<open>hml_srbb_inner_models p' \<chi>\<close> by auto
         hence \<open>\<exists>q'. q \<Zsurj> q' \<and> hml_srbb_inner_models q' \<chi>\<close> using Internal \<open>hml_srbb_inner_models p' \<chi>\<close>
-          by (meson LTS_Tau.silent_reachable_trans \<open>p ~SRBB q\<close> sr_branching_bisimulation_silently_retained)
+          by (meson lts_tau.silent_reachable_trans \<open>p ~SRBB q\<close> sr_branching_bisimulation_silently_retained)
         thus \<open>q \<Turnstile>SRBB hml_srbb.Internal \<chi>\<close> by auto
       qed
     next

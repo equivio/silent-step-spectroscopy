@@ -6,7 +6,7 @@ theory Silent_Step_Spectroscopy
     Strategy_Formulas
 begin
 
-context LTS_Tau
+context lts_tau
 begin
 
 theorem spectroscopy_game_correctness:

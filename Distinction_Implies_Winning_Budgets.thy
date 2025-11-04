@@ -16,7 +16,7 @@ theory Distinction_Implies_Winning_Budgets
   imports Spectroscopy_Game Expressiveness_Price
 begin
 
-context LTS_Tau
+context lts_tau
 begin
 
 text \<open>In this section, we prove that if a formula distinguishes a process @{term \<open>p\<close>}
@@ -274,7 +274,7 @@ proof-
           hence \<open>weak_spectroscopy_game.attacker_wins (expressiveness_price \<phi>) (Attacker_Immediate p'' ?Q')\<close>
             by (metis Obs distinction_implies_winning_budgets_empty_Q)
           moreover have \<open>p \<mapsto>\<alpha> p''\<close> using \<open>p \<mapsto>\<alpha> p'' \<and> p'' \<Turnstile>SRBB \<phi>\<close> by simp
-          moreover have \<open>Q \<mapsto>aS \<alpha> ?Q'\<close> by (simp add: False LTS.step_set_is_step_set)
+          moreover have \<open>Q \<mapsto>aS \<alpha> ?Q'\<close> by (simp add: False lts.step_set_is_step_set)
           ultimately show ?thesis by blast
         qed
         then obtain p' Q' where p'_Q': \<open>p \<mapsto>a \<alpha> p'\<close> \<open>Q \<mapsto>aS \<alpha> Q'\<close> and

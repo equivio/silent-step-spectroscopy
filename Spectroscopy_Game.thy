@@ -1,6 +1,6 @@
 section \<open>Weak Spectroscopy Game\<close>
 theory Spectroscopy_Game
-  imports Energy_Games Energy LTS
+  imports Energy_Games Energy Labeled_Transition_Systems
 begin
 
 text \<open>In this theory, we define the weak spectroscopy game as a locale.
@@ -21,7 +21,7 @@ datatype ('s, 'a) spectroscopy_position =
                  (attacker_state_succ: \<open>'s\<close>) (defender_states: \<open>'s set\<close>)
                  (defender_branch_states: \<open>'s set\<close>)
 
-context LTS_Tau begin
+context lts_tau begin
 
 text\<open>\label{specmoves}\<close>
 text\<open>We also define the moves of the weak spectroscopy game. Their names indicate the respective HML formulas they correspond to. This correspondence will be shown in section \ref{deviation:lemma3}. \<close>
@@ -318,6 +318,6 @@ next
   qed
 qed
 
-end \<comment> \<open>of \<open>LTS_Tau\<close>\<close>
+end \<comment> \<open>of \<open>lts_tau\<close>\<close>
 
 end

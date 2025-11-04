@@ -16,7 +16,7 @@ has a partial order on energies such that all updates are monotonic and have sin
 
 type_synonym 'energy update = \<open>'energy \<Rightarrow> 'energy option\<close>
 
-text\<open>An energy game is played by two players on a directed graph labelled by energy updates.
+text\<open>An energy game is played by two players on a directed graph labeled by energy updates.
 These updates represent the costs of choosing a certain move.
 Since we will only consider cases in which the attacker's moves may actually have non-zero costs, only they can run
 out of energy. This is the case when the energy level reaches the \<open>defender_win_level\<close>.
@@ -114,6 +114,6 @@ next
     using Defense attacker_wins.Defense monotonicity by meson
 qed
 
-end (*End of context energy_game*)
+end \<comment> \<open>context \<open>energy_game\<close>\<close>
 
 end

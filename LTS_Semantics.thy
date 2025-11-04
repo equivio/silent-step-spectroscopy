@@ -2,10 +2,10 @@ subsection \<open>Modal Logics on LTS\<close>
 
 theory LTS_Semantics
   imports
-    LTS
+    Labeled_Transition_Systems
 begin
 
-locale lts_semantics = LTS step
+locale lts_semantics = lts step
   for step :: \<open>'s \<Rightarrow> 'a \<Rightarrow> 's \<Rightarrow> bool\<close> (\<open>_ \<mapsto> _ _\<close> [70,70,70] 80) +
   fixes models :: \<open>'s \<Rightarrow> 'formula \<Rightarrow> bool\<close>
 begin

@@ -11,7 +11,7 @@ spectroscopy game and winning budgets. We then show that for some energy \<open>
 exists a strategy formula with expressiveness price \<open>\<le> e\<close>. Afterwards, we prove that this formula
 actually distinguishes the corresponding processes.\<close>
 
-context LTS_Tau
+context lts_tau
 begin
 text \<open>\label{stratFormula}\<close>
 text \<open>We define strategy formulas inductively. For example for \<open>\<langle>\<alpha>\<rangle>\<phi>\<close> to be a strategy formula for some attacker
@@ -173,7 +173,7 @@ proof(induction rule: weak_spectroscopy_game.attacker_wins.induct)
       assume \<open>\<exists>p' Q'. g' = Attacker_Delayed p' Q'\<close>
       then obtain p' Q' where g'_att_del: \<open>g' = Attacker_Delayed p' Q'\<close> by blast
       have e_comp: \<open>(the (spectroscopy_moves (Attacker_Immediate p Q) (Attacker_Delayed p' Q')) e) = (Some e)\<close>
-        by (smt (verit, ccfv_threshold) Spectroscopy_Game.LTS_Tau.delay g'_att_del Attacker_Immediate move option.exhaust_sel option.inject)
+        by (smt (verit, ccfv_threshold) Spectroscopy_Game.lts_tau.delay g'_att_del Attacker_Immediate move option.exhaust_sel option.inject)
       have \<open>p' = p\<close>
         by (metis g'_att_del Attacker_Immediate(2) spectroscopy_moves.simps(1))
       moreover have \<open>(weak_spectroscopy_game.attacker_wins e (Attacker_Delayed p Q'))\<close>
@@ -188,7 +188,7 @@ proof(induction rule: weak_spectroscopy_game.attacker_wins.induct)
       = (id_up)) \<and> (weak_spectroscopy_game.attacker_wins e (Attacker_Delayed p Q'))
         \<and> strategy_formula_inner (Attacker_Delayed p Q') e \<chi>))\<close>
         using g'_att_del
-        by (smt (verit) Spectroscopy_Game.LTS_Tau.delay \<open>weak_spectroscopy_game.attacker_wins e (Attacker_Delayed p Q')\<close> Attacker_Immediate)
+        by (smt (verit) Spectroscopy_Game.lts_tau.delay \<open>weak_spectroscopy_game.attacker_wins e (Attacker_Delayed p Q')\<close> Attacker_Immediate)
       hence \<open>strategy_formula (Attacker_Immediate p Q) e (Internal \<chi>)\<close>
         using strategy_formula_strategy_formula_inner_strategy_formula_conjunct.delay by blast
       moreover have \<open>expressiveness_price (Internal \<chi>) \<le> e\<close>
@@ -224,7 +224,7 @@ proof(induction rule: weak_spectroscopy_game.attacker_wins.induct)
         using S strategy_formula_strategy_formula_inner_strategy_formula_conjunct.conj
           strategy_formula_strategy_formula_inner_strategy_formula_conjunct.imm_conj
           Qp' Attacker_Immediate unfolding g'_def_conj
-        by (smt (verit) LTS_Tau.spectroscopy_moves.simps(70) hml_srbb_inner.inject(2) spectroscopy_position.distinct(17,37) strategy_formula_inner.cases)
+        by (smt (verit) lts_tau.spectroscopy_moves.simps(70) hml_srbb_inner.inject(2) spectroscopy_position.distinct(17,37) strategy_formula_inner.cases)
       hence SI: \<open>strategy_formula (Attacker_Immediate p Q) e (ImmConj Q \<psi>)\<close>
          using strategy_formula_strategy_formula_inner_strategy_formula_conjunct.delay early_conj Qp'
          by (metis (no_types, lifting) \<open>weak_spectroscopy_game.attacker_wins (e - E 0 0 0 0 1 0 0 0) (Defender_Conj p Q')\<close> local.f_or_early_conj)
@@ -319,7 +319,7 @@ proof(induction rule: weak_spectroscopy_game.attacker_wins.induct)
       then obtain p' Q' where
         g'_att_del: \<open>g' = Attacker_Delayed p' Q'\<close> by blast
       have Qp': \<open>Q' = Q\<close> \<open>p \<noteq> p'\<close> \<open>p \<mapsto> \<tau> p'\<close>
-        using Attacker_Delayed g'_att_del Spectroscopy_Game.LTS_Tau.procrastination
+        using Attacker_Delayed g'_att_del Spectroscopy_Game.lts_tau.procrastination
         by metis+
       hence e_comp: \<open>(the (spectroscopy_moves (Attacker_Delayed p Q) g') e) = Some e\<close>
         using g'_att_del
@@ -335,7 +335,7 @@ proof(induction rule: weak_spectroscopy_game.attacker_wins.induct)
          \<and>  weak_spectroscopy_game.attacker_wins e (Attacker_Delayed p' Q)
          \<and> strategy_formula_inner (Attacker_Delayed p' Q) e \<chi>\<close>
         using e_comp g'_att_del Qp' local.procrastination Attack.hyps att_win
-          Spectroscopy_Game.LTS_Tau.procrastination
+          Spectroscopy_Game.lts_tau.procrastination
         by metis
       hence \<open>strategy_formula_inner (Attacker_Delayed p Q) e \<chi>\<close>
         using strategy_formula_strategy_formula_inner_strategy_formula_conjunct.procrastination by blast
@@ -548,7 +548,7 @@ next
       \<open>\<forall>g'. spectroscopy_moves (Defender_Conj p Q) g' \<noteq> None \<longrightarrow> (\<exists>e'. weak_spectroscopy_game.weight (Defender_Conj p Q) g' e = Some e' \<and> weak_spectroscopy_game.attacker_wins e' g')
         \<and> (\<exists>q. g' = (Attacker_Conjunct p q))\<close>
       using local.conj_answer
-        LTS_Tau.spectroscopy_defender.elims spectroscopy_moves.simps(30,33,34,47,58,62)
+        lts_tau.spectroscopy_defender.elims spectroscopy_moves.simps(30,33,34,47,58,62)
       by (smt (verit, best))
     show ?case
     proof (cases \<open>Q = {}\<close>)
@@ -752,7 +752,7 @@ next
   from IH have \<open>p \<Zsurj>p'\<close>
     by (metis option.discI silent_reachable.intros(1) silent_reachable_append_\<tau> spectroscopy_moves.simps(2))
   hence \<open>Q \<Zsurj>S Q \<longrightarrow> distinguishes_from (hml_srbb.Internal \<chi>) p Q\<close> using D
-    by (smt (verit) LTS_Tau.silent_reachable_trans distinguishes_from_def hml_srbb_models.simps(2))
+    by (smt (verit) lts_tau.silent_reachable_trans distinguishes_from_def hml_srbb_models.simps(2))
   then show ?case by simp
 next
   case (observation p Q e \<phi> \<alpha>)
@@ -816,7 +816,7 @@ next
   have \<open>P' \<Zsurj>S P' \<longrightarrow> p \<in> P'\<close> using \<open>{p} \<Zsurj>S P'\<close>  by (simp add: silent_reachable.intros(1))
   hence \<open>hml_srbb_conj.distinguishes (hml_srbb_conjunct.Neg \<chi>) p q\<close> using D \<open>{p} \<Zsurj>S P'\<close>
     unfolding hml_srbb_conj.distinguishes_def distinguishes_from_def
-    by (smt (verit) LTS_Tau.silent_reachable_trans hml_srbb_conjunct_models.simps(2) hml_srbb_models.simps(2) silent_reachable.refl)
+    by (smt (verit) lts_tau.silent_reachable_trans hml_srbb_conjunct_models.simps(2) hml_srbb_models.simps(2) silent_reachable.refl)
   then show ?case by simp
 next
   case (stable p Q e \<chi>)
@@ -834,7 +834,7 @@ next
   hence \<open>hml_srbb_inner.distinguishes_from \<chi> p Q'\<close> using \<open>\<nexists>p''. p \<mapsto>\<tau> p''\<close> by auto
   hence \<open>hml_srbb_inner_models p \<chi>\<close> by simp
   hence \<open>p \<Turnstile>SRBB (hml_srbb.Internal \<chi>)\<close>
-    using LTS_Tau.refl by force
+    using lts_tau.refl by force
   have \<open>Q \<Zsurj>S Q \<longrightarrow> distinguishes_from (hml_srbb.Internal \<chi>) p Q\<close>
   proof
     assume \<open>Q \<Zsurj>S Q\<close>

@@ -431,7 +431,7 @@ text \<open>
 We demonstrate the pricing mechanisms for various formulas. These proofs operate under the assumption of an expressiveness price \<open>e\<close> for a given formula \<open>\<chi>\<close> and proceed to determine the price of a derived formula such as \<open>Pos \<chi>\<close>.
 The proofs all are of a similar nature. They decompose the expression function(s) into their constituent parts and apply their definitions to the constructed formula (\<open>(Pos \<chi>)\<close>).\<close>
 
-context LTS_Tau
+context lts_tau
 begin
 
 text \<open>For example, here, we establish that the expressiveness price of \<open>Internal \<chi>\<close> is equal to the expressiveness price of \<open>\<chi>\<close>.\<close>
@@ -938,10 +938,10 @@ lemma expressiveness_price_ImmConj_geq_parts':
     less_eq_energy_def minus_energy_def
   by (smt (z3) energy.sel idiff_0_right)
 
-end (* LTS_Tau *)
+end \<comment> \<open>of \<open>lts_tau\<close>\<close>
 
 text \<open>Here, we show the prices for some specific formulas.\<close>
-locale Inhabited_LTS = LTS step
+locale inhabited_lts = lts step
   for step :: \<open>'s \<Rightarrow> 'a \<Rightarrow> 's \<Rightarrow> bool\<close> (\<open>_ \<mapsto> _ _\<close> [70,70,70] 80) +
   fixes left :: 's
     and right :: 's
@@ -984,9 +984,9 @@ lemma \<open>expressiveness_price (Internal
                            else undefined)))))) = E 2 0 1 0 0 1 0 0\<close>
   by simp
 
-end (* Inhabited_LTS *)
+end \<comment> \<open>of \<open>inhabited_lts\<close>\<close>
 
-context LTS_Tau
+context lts_tau
 begin
 
 lemma \<open>expressiveness_price TT = E 0 0 0 0 0 0 0 0\<close>
