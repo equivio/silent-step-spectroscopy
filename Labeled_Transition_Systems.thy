@@ -78,7 +78,7 @@ lemma silent_reachable_trans:
 using assms silent_reachable.intros(2)
   by (induct, blast+)
 
-text \<open>The relation \<open>silent_reachable_loopless\<close> is a variation of \<^term>\<open>silent_reachable\<close>} that does not use self-loops.\<close>
+text \<open>The relation \<open>silent_reachable_loopless\<close> is a variation of \<^term>\<open>silent_reachable\<close> that does not use self-loops.\<close>
 inductive silent_reachable_loopless :: \<open>'s \<Rightarrow> 's \<Rightarrow> bool\<close>  (infix \<open>\<Zsurj>L\<close> 80)
   where
     \<open>p \<Zsurj>L p\<close> |
@@ -150,7 +150,7 @@ lemma weak_step_sequence_trans:
 proof induct
   case (1 p p')
   then show ?case
-    by (metis lts_tau.weak_step_sequence.simps append_Nil silent_prepend_weak_step silent_reachable_trans)
+    by (metis weak_step_sequence.simps append_Nil silent_prepend_weak_step silent_reachable_trans)
 next
   case (2 p \<alpha> p' rt p'')
   then show ?case by fastforce

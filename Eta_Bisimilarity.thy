@@ -286,7 +286,7 @@ proof -
       have \<open>\<forall>q'\<in>{q'. q \<Zsurj> q' \<and> (\<exists>\<phi>\<in>\<O> (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> \<infinity> \<infinity>). distinguishes \<phi> p q' \<or> distinguishes \<phi> q' p)}.
         hml_srbb_conj.distinguishes ((if distinguishes (\<Phi>\<eta> q') p q' then conjunctify_distinctions else conjunctify_distinctions_dual) \<Phi>\<eta> p q') p q' \<and>
          (if distinguishes (\<Phi>\<eta> q') p q' then conjunctify_distinctions else conjunctify_distinctions_dual) \<Phi>\<eta> p q' \<in> \<O>_conjunct (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> \<infinity> \<infinity>)\<close>
-        by blast
+        by fastforce
     then obtain \<Psi>\<eta> where distinctions_\<eta>:
       \<open>\<forall>q'\<in>{q'. q \<Zsurj> q' \<and> (\<exists>\<phi>\<in>\<O> (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> \<infinity> \<infinity>). distinguishes \<phi> p q' \<or> distinguishes \<phi> q' p)}.
         hml_srbb_conj.distinguishes (\<Psi>\<eta> q') p q' \<and> \<Psi>\<eta> q' \<in> \<O>_conjunct (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> \<infinity> \<infinity>)\<close>

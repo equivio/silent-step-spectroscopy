@@ -1,34 +1,10 @@
-section \<open>Expressiveness Prices \label{sect:ExpressivenessMeasure}\<close>
+subsection \<open>Components of Expressiveness Prices\<close>
 
 theory Expressiveness_Price
   imports HML_SRBB Energy
 begin
 
-text \<open>
-  The expressiveness price function assigns a price---an eight-dimensional vector---to a HML$_\text{SRBB}$ formula.
-  This price is supposed to capture syntactic features needed to describe a certain property and will later be used to select sublogics of specific expressiveness to characterize behavioural equivalences.
-
-  The eight dimensions are intended to measure the following properties of formulas:
-
-   \<^enum> Modal depth (of observations $\langle\alpha\rangle$, $(\alpha)$),
-   \<^enum> Depth of branching conjunctions (with one observation clause not starting with $\langle\varepsilon\rangle$),
-   \<^enum> Depth of stable conjunctions (that do enforce stability by a $\neg\langle\tau\rangle\top$-conjunct),
-   \<^enum> Depth of unstable conjunctions (that do not enforce stability by a $\neg\langle\tau\rangle\top$-conjunct),
-   \<^enum> Depth of immediate conjunctions (that are not preceded by $\langle\varepsilon\rangle$),
-   \<^enum> Maximal modal depth of positive clauses in conjunctions,
-   \<^enum> Maximal modal depth of negative clauses in conjunctions,
-   \<^enum> Depth of negations
-\<close>
-
-subsection \<open>Modal Depth\<close>
-
-text \<open>
-The (maximal) modal depth (of observations $\langle\alpha\rangle$, $(\alpha)$) is increased on each:
-\begin{itemize}
-  \item \<open>Obs\<close>
-  \item \<open>BranchConj\<close>
-\end{itemize}
-\<close>
+text \<open>The (maximal) modal depth (of observations $\langle\alpha\rangle$, $(\alpha)$) is increased on each \<^term>\<open>Obs\<close> and \<^term>\<open>BranchConj\<close>.\<close>
 
 primrec
       modal_depth_srbb :: \<open>('act, 'i) hml_srbb \<Rightarrow> enat\<close>
@@ -48,6 +24,152 @@ primrec
 
  \<open>modal_depth_srbb_conjunct (Pos \<chi>) = modal_depth_srbb_inner \<chi>\<close> |
  \<open>modal_depth_srbb_conjunct (Neg \<chi>) = modal_depth_srbb_inner \<chi>\<close>
+
+text \<open>The depth of branching conjunctions (with one observation clause not starting with $\langle\varepsilon\rangle$) is increased on each: \<^term>\<open>BranchConj\<close>.\<close>
+
+primrec
+      branching_conjunction_depth :: \<open>('a, 's) hml_srbb \<Rightarrow> enat\<close>
+  and branch_conj_depth_inner :: \<open>('a, 's) hml_srbb_inner \<Rightarrow> enat\<close>
+  and branch_conj_depth_conjunct :: \<open>('a, 's) hml_srbb_conjunct \<Rightarrow> enat\<close> where
+  \<open>branching_conjunction_depth TT = 0\<close> |
+  \<open>branching_conjunction_depth (Internal \<chi>) = branch_conj_depth_inner \<chi>\<close> |
+  \<open>branching_conjunction_depth (ImmConj I \<psi>s) = Sup ((branch_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close> |
+
+  \<open>branch_conj_depth_inner (Obs _ \<phi>) = branching_conjunction_depth \<phi>\<close> |
+  \<open>branch_conj_depth_inner (Conj I \<psi>s) = Sup ((branch_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close> |
+  \<open>branch_conj_depth_inner (StableConj I \<psi>s) = Sup ((branch_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close> |
+  \<open>branch_conj_depth_inner (BranchConj _ \<phi> I \<psi>s) =
+     1 + Sup ({branching_conjunction_depth \<phi>} \<union> ((branch_conj_depth_conjunct \<circ> \<psi>s) ` I))\<close> |
+
+  \<open>branch_conj_depth_conjunct (Pos \<chi>) = branch_conj_depth_inner \<chi>\<close> |
+  \<open>branch_conj_depth_conjunct (Neg \<chi>) = branch_conj_depth_inner \<chi>\<close>
+
+text \<open>The depth of stable conjunctions (that do enforce stability by a $\neg\langle\tau\rangle\top$-conjunct) is increased on each \<^term>\<open>StableConj\<close>. Note that if the \<open>StableConj\<close> is empty (has no other conjuncts), it is still counted.\<close>
+
+primrec
+      stable_conjunction_depth :: \<open>('a, 's) hml_srbb \<Rightarrow> enat\<close>
+  and st_conj_depth_inner :: \<open>('a, 's) hml_srbb_inner \<Rightarrow> enat\<close>
+  and st_conj_depth_conjunct :: \<open>('a, 's) hml_srbb_conjunct \<Rightarrow> enat\<close> where
+  \<open>stable_conjunction_depth TT = 0\<close> |
+  \<open>stable_conjunction_depth (Internal \<chi>) = st_conj_depth_inner \<chi>\<close> |
+  \<open>stable_conjunction_depth (ImmConj I \<psi>s) = Sup ((st_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close> |
+
+  \<open>st_conj_depth_inner (Obs _ \<phi>) = stable_conjunction_depth \<phi>\<close> |
+  \<open>st_conj_depth_inner (Conj I \<psi>s) = Sup ((st_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close> |
+  \<open>st_conj_depth_inner (StableConj I \<psi>s) = 1 + Sup ((st_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close> |
+  \<open>st_conj_depth_inner (BranchConj _ \<phi> I \<psi>s) = Sup ({stable_conjunction_depth \<phi>} \<union> ((st_conj_depth_conjunct \<circ> \<psi>s) ` I))\<close> |
+
+  \<open>st_conj_depth_conjunct (Pos \<chi>) = st_conj_depth_inner \<chi>\<close> |
+  \<open>st_conj_depth_conjunct (Neg \<chi>) = st_conj_depth_inner \<chi>\<close>
+
+text \<open>
+  The depth of unstable conjunctions (that do not enforce stability by a $\neg\langle\tau\rangle\top$-conjunct) is increased on each:
+  
+   \<^item> \<^term>\<open>ImmConj\<close> if there are conjuncts (i.e. $\bigwedge\{\}$ is not counted)
+   \<^item> \<^term>\<open>Conj\<close> if there are conjuncts, (i.e. the conjunction is not empty)
+   \<^item> \<^term>\<open>BranchConj\<close>.
+\<close>
+
+primrec
+      unstable_conjunction_depth :: \<open>('a, 's) hml_srbb \<Rightarrow> enat\<close>
+  and inst_conj_depth_inner :: \<open>('a, 's) hml_srbb_inner \<Rightarrow> enat\<close>
+  and inst_conj_depth_conjunct :: \<open>('a, 's) hml_srbb_conjunct \<Rightarrow> enat\<close> where
+  \<open>unstable_conjunction_depth TT = 0\<close> |
+  \<open>unstable_conjunction_depth (Internal \<chi>) = inst_conj_depth_inner \<chi>\<close> |
+  \<open>unstable_conjunction_depth (ImmConj I \<psi>s) =
+    (if I = {}
+     then 0
+     else 1 + Sup ((inst_conj_depth_conjunct \<circ> \<psi>s) ` I))\<close> |
+
+  \<open>inst_conj_depth_inner (Obs _ \<phi>) = unstable_conjunction_depth \<phi>\<close> |
+  \<open>inst_conj_depth_inner (Conj I \<psi>s) =
+    (if I = {}
+     then 0
+     else 1 + Sup ((inst_conj_depth_conjunct \<circ> \<psi>s) ` I))\<close> |
+  \<open>inst_conj_depth_inner (StableConj I \<psi>s) = Sup ((inst_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close> |
+  \<open>inst_conj_depth_inner (BranchConj _ \<phi> I \<psi>s) =
+    1 + Sup ({unstable_conjunction_depth \<phi>} \<union> ((inst_conj_depth_conjunct \<circ> \<psi>s) ` I))\<close> |
+
+  \<open>inst_conj_depth_conjunct (Pos \<chi>) = inst_conj_depth_inner \<chi>\<close> |
+  \<open>inst_conj_depth_conjunct (Neg \<chi>) = inst_conj_depth_inner \<chi>\<close>
+
+text \<open>The depth of immediate conjunctions (that are not preceded by $\langle\varepsilon\rangle$)
+is increased on each \<^term>\<open>ImmConj\<close> if there are conjuncts (i.e. $\bigwedge\{\}$ is not counted).\<close>
+
+primrec
+      immediate_conjunction_depth :: \<open>('a, 's) hml_srbb \<Rightarrow> enat\<close>
+  and imm_conj_depth_inner :: \<open>('a, 's) hml_srbb_inner \<Rightarrow> enat\<close>
+  and imm_conj_depth_conjunct :: \<open>('a, 's) hml_srbb_conjunct \<Rightarrow> enat\<close> where
+  \<open>immediate_conjunction_depth TT = 0\<close> |
+  \<open>immediate_conjunction_depth (Internal \<chi>) = imm_conj_depth_inner \<chi>\<close> |
+  \<open>immediate_conjunction_depth (ImmConj I \<psi>s) =
+    (if I = {}
+     then 0
+     else 1 + Sup ((imm_conj_depth_conjunct \<circ> \<psi>s) ` I))\<close> |
+
+  \<open>imm_conj_depth_inner (Obs _ \<phi>) = immediate_conjunction_depth \<phi>\<close> |
+  \<open>imm_conj_depth_inner (Conj I \<psi>s) = Sup ((imm_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close> |
+  \<open>imm_conj_depth_inner (StableConj I \<psi>s) = Sup ((imm_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close> |
+  \<open>imm_conj_depth_inner (BranchConj _ \<phi> I \<psi>s) = Sup ({immediate_conjunction_depth \<phi>} \<union> ((imm_conj_depth_conjunct \<circ> \<psi>s) ` I))\<close> |
+
+  \<open>imm_conj_depth_conjunct (Pos \<chi>) = imm_conj_depth_inner \<chi>\<close> |
+  \<open>imm_conj_depth_conjunct (Neg \<chi>) = imm_conj_depth_inner \<chi>\<close>
+
+text \<open>The maximal modal depth of positive clauses in conjunctions calculates the modal depth for every positive clause in a conjunction (\<^term>\<open>Pos \<chi>\<close>).\<close>
+
+primrec
+      max_positive_conjunct_depth :: \<open>('a, 's) hml_srbb \<Rightarrow> enat\<close>
+  and max_pos_conj_depth_inner :: \<open>('a, 's) hml_srbb_inner \<Rightarrow> enat\<close>
+  and max_pos_conj_depth_conjunct :: \<open>('a, 's) hml_srbb_conjunct \<Rightarrow> enat\<close> where
+  \<open>max_positive_conjunct_depth TT = 0\<close> |
+  \<open>max_positive_conjunct_depth (Internal \<chi>) = max_pos_conj_depth_inner \<chi>\<close> |
+  \<open>max_positive_conjunct_depth (ImmConj I \<psi>s) = Sup ((max_pos_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close> |
+
+  \<open>max_pos_conj_depth_inner (Obs _ \<phi>) = max_positive_conjunct_depth \<phi>\<close> |
+  \<open>max_pos_conj_depth_inner (Conj I \<psi>s) = Sup ((max_pos_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close> |
+  \<open>max_pos_conj_depth_inner (StableConj I \<psi>s) = Sup ((max_pos_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close> |
+  \<open>max_pos_conj_depth_inner (BranchConj _ \<phi> I \<psi>s) = Sup ({1 + modal_depth_srbb \<phi>, max_positive_conjunct_depth \<phi>} \<union> ((max_pos_conj_depth_conjunct \<circ> \<psi>s) ` I))\<close> |
+
+  \<open>max_pos_conj_depth_conjunct (Pos \<chi>) = modal_depth_srbb_inner \<chi>\<close> |
+  \<open>max_pos_conj_depth_conjunct (Neg \<chi>) = max_pos_conj_depth_inner \<chi>\<close>
+
+text \<open>The maximal modal depth of negative clauses in conjunctions calculates the modal depth for every negative clause in a conjunction (\<^term>\<open>Neg \<chi>\<close>).\<close>
+
+primrec
+      max_negative_conjunct_depth :: \<open>('a, 's) hml_srbb \<Rightarrow> enat\<close>
+  and max_neg_conj_depth_inner :: \<open>('a, 's) hml_srbb_inner \<Rightarrow> enat\<close>
+  and max_neg_conj_depth_conjunct :: \<open>('a, 's) hml_srbb_conjunct \<Rightarrow> enat\<close> where
+  \<open>max_negative_conjunct_depth TT = 0\<close> |
+  \<open>max_negative_conjunct_depth (Internal \<chi>) = max_neg_conj_depth_inner \<chi>\<close> |
+  \<open>max_negative_conjunct_depth (ImmConj I \<psi>s) = Sup ((max_neg_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close> |
+
+  \<open>max_neg_conj_depth_inner (Obs _ \<phi>) = max_negative_conjunct_depth \<phi>\<close> |
+  \<open>max_neg_conj_depth_inner (Conj I \<psi>s) = Sup ((max_neg_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close> |
+  \<open>max_neg_conj_depth_inner (StableConj I \<psi>s) = Sup ((max_neg_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close> |
+  \<open>max_neg_conj_depth_inner (BranchConj _ \<phi> I \<psi>s) = Sup ({max_negative_conjunct_depth \<phi>} \<union> ((max_neg_conj_depth_conjunct \<circ> \<psi>s) ` I))\<close> |
+
+  \<open>max_neg_conj_depth_conjunct (Pos \<chi>) = max_neg_conj_depth_inner \<chi>\<close> |
+  \<open>max_neg_conj_depth_conjunct (Neg \<chi>) = modal_depth_srbb_inner \<chi>\<close>
+
+text \<open>The depth of negations on a path of the syntax tree) is increased on each \<^term>\<open>Neg \<chi>\<close>.\<close>
+
+primrec
+      negation_depth :: \<open>('a, 's) hml_srbb \<Rightarrow> enat\<close>
+  and neg_depth_inner :: \<open>('a, 's) hml_srbb_inner \<Rightarrow> enat\<close>
+  and neg_depth_conjunct :: \<open>('a, 's) hml_srbb_conjunct \<Rightarrow> enat\<close> where
+  \<open>negation_depth TT = 0\<close> |
+  \<open>negation_depth (Internal \<chi>) = neg_depth_inner \<chi>\<close> |
+  \<open>negation_depth (ImmConj I \<psi>s) = Sup ((neg_depth_conjunct \<circ> \<psi>s) ` I)\<close> |
+
+  \<open>neg_depth_inner (Obs _ \<phi>) = negation_depth \<phi>\<close> |
+  \<open>neg_depth_inner (Conj I \<psi>s) = Sup ((neg_depth_conjunct \<circ> \<psi>s) ` I)\<close> |
+  \<open>neg_depth_inner (StableConj I \<psi>s) = Sup ((neg_depth_conjunct \<circ> \<psi>s) ` I)\<close> |
+  \<open>neg_depth_inner (BranchConj _ \<phi> I \<psi>s) = Sup ({negation_depth \<phi>} \<union> ((neg_depth_conjunct \<circ> \<psi>s) ` I))\<close> |
+
+  \<open>neg_depth_conjunct (Pos \<chi>) = neg_depth_inner \<chi>\<close> |
+  \<open>neg_depth_conjunct (Neg \<chi>) = 1 + neg_depth_inner \<chi>\<close>
+
+subsection \<open>Properties of Price Components\<close>
 
 lemma \<open>modal_depth_srbb TT = 0\<close>
   using Sup_enat_def by simp
@@ -85,157 +207,6 @@ lemma \<open>modal_depth_srbb (ImmConj \<nat> (\<lambda>n. Pos (Obs \<alpha> (ob
         and obs_n_\<alpha>_depth_n
   by (metis sucs_of_nats_in_enats_sup_infinite)
 
-
-subsection \<open>Depth of Branching Conjunctions\<close>
-
-text \<open>
-The depth of branching conjunctions (with one observation clause not starting with $\langle\varepsilon\rangle$) is increased on each:
-\begin{itemize}
-  \item \<open>BranchConj\<close> if there are other conjuncts besides the branching conjunct
-\end{itemize}
-
-Note that if the \<open>BranchConj\<close> is empty (has no other conjuncts),
-then it is treated like a simple \<open>Obs\<close>.
-\<close>
-
-primrec
-      branching_conjunction_depth :: \<open>('a, 's) hml_srbb \<Rightarrow> enat\<close>
-  and branch_conj_depth_inner :: \<open>('a, 's) hml_srbb_inner \<Rightarrow> enat\<close>
-  and branch_conj_depth_conjunct :: \<open>('a, 's) hml_srbb_conjunct \<Rightarrow> enat\<close> where
-  \<open>branching_conjunction_depth TT = 0\<close> |
-  \<open>branching_conjunction_depth (Internal \<chi>) = branch_conj_depth_inner \<chi>\<close> |
-  \<open>branching_conjunction_depth (ImmConj I \<psi>s) = Sup ((branch_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close> |
-
-  \<open>branch_conj_depth_inner (Obs _ \<phi>) = branching_conjunction_depth \<phi>\<close> |
-  \<open>branch_conj_depth_inner (Conj I \<psi>s) = Sup ((branch_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close> |
-  \<open>branch_conj_depth_inner (StableConj I \<psi>s) = Sup ((branch_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close> |
-  \<open>branch_conj_depth_inner (BranchConj _ \<phi> I \<psi>s) =
-     1 + Sup ({branching_conjunction_depth \<phi>} \<union> ((branch_conj_depth_conjunct \<circ> \<psi>s) ` I))\<close> |
-
-  \<open>branch_conj_depth_conjunct (Pos \<chi>) = branch_conj_depth_inner \<chi>\<close> |
-  \<open>branch_conj_depth_conjunct (Neg \<chi>) = branch_conj_depth_inner \<chi>\<close>
-
-subsection \<open>Depth of Stable Conjunctions\<close>
-
-text \<open>
-The depth of stable conjunctions (that do enforce stability by a $\neg\langle\tau\rangle\top$-conjunct)
-is increased on each:
-\begin{itemize}
-  \item \<open>StableConj\<close>
-\end{itemize}
-
-Note that if the \<open>StableConj\<close> is empty (has no other conjuncts),
-it is still counted.
-\<close>
-
-primrec
-      stable_conjunction_depth :: \<open>('a, 's) hml_srbb \<Rightarrow> enat\<close>
-  and st_conj_depth_inner :: \<open>('a, 's) hml_srbb_inner \<Rightarrow> enat\<close>
-  and st_conj_depth_conjunct :: \<open>('a, 's) hml_srbb_conjunct \<Rightarrow> enat\<close> where
-  \<open>stable_conjunction_depth TT = 0\<close> |
-  \<open>stable_conjunction_depth (Internal \<chi>) = st_conj_depth_inner \<chi>\<close> |
-  \<open>stable_conjunction_depth (ImmConj I \<psi>s) = Sup ((st_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close> |
-
-  \<open>st_conj_depth_inner (Obs _ \<phi>) = stable_conjunction_depth \<phi>\<close> |
-  \<open>st_conj_depth_inner (Conj I \<psi>s) = Sup ((st_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close> |
-  \<open>st_conj_depth_inner (StableConj I \<psi>s) = 1 + Sup ((st_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close> |
-  \<open>st_conj_depth_inner (BranchConj _ \<phi> I \<psi>s) = Sup ({stable_conjunction_depth \<phi>} \<union> ((st_conj_depth_conjunct \<circ> \<psi>s) ` I))\<close> |
-
-  \<open>st_conj_depth_conjunct (Pos \<chi>) = st_conj_depth_inner \<chi>\<close> |
-  \<open>st_conj_depth_conjunct (Neg \<chi>) = st_conj_depth_inner \<chi>\<close>
-
-subsection \<open>Depth of Instable Conjunctions\<close>
-
-text \<open>
-The depth of unstable conjunctions (that do not enforce stability by a $\neg\langle\tau\rangle\top$-conjunct)
-is increased on each:
-\begin{itemize}
-  \item \<open>ImmConj\<close> if there are conjuncts (i.e. $\bigwedge\{\}$ is not counted)
-  \item \<open>Conj\<close> if there are conjuncts, (i.e. the conjunction is not empty)
-  \item \<open>BranchConj\<close> if there are other conjuncts besides the branching conjunct
-\end{itemize}
-
-Note that if the \<open>BranchConj\<close> is empty (has no other conjuncts),
-then it is treated like a simple \<open>Obs\<close>.
-\<close>
-
-primrec
-      unstable_conjunction_depth :: \<open>('a, 's) hml_srbb \<Rightarrow> enat\<close>
-  and inst_conj_depth_inner :: \<open>('a, 's) hml_srbb_inner \<Rightarrow> enat\<close>
-  and inst_conj_depth_conjunct :: \<open>('a, 's) hml_srbb_conjunct \<Rightarrow> enat\<close> where
-  \<open>unstable_conjunction_depth TT = 0\<close> |
-  \<open>unstable_conjunction_depth (Internal \<chi>) = inst_conj_depth_inner \<chi>\<close> |
-  \<open>unstable_conjunction_depth (ImmConj I \<psi>s) =
-    (if I = {}
-     then 0
-     else 1 + Sup ((inst_conj_depth_conjunct \<circ> \<psi>s) ` I))\<close> |
-
-  \<open>inst_conj_depth_inner (Obs _ \<phi>) = unstable_conjunction_depth \<phi>\<close> |
-  \<open>inst_conj_depth_inner (Conj I \<psi>s) =
-    (if I = {}
-     then 0
-     else 1 + Sup ((inst_conj_depth_conjunct \<circ> \<psi>s) ` I))\<close> |
-  \<open>inst_conj_depth_inner (StableConj I \<psi>s) = Sup ((inst_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close> |
-  \<open>inst_conj_depth_inner (BranchConj _ \<phi> I \<psi>s) =
-    1 + Sup ({unstable_conjunction_depth \<phi>} \<union> ((inst_conj_depth_conjunct \<circ> \<psi>s) ` I))\<close> |
-
-  \<open>inst_conj_depth_conjunct (Pos \<chi>) = inst_conj_depth_inner \<chi>\<close> |
-  \<open>inst_conj_depth_conjunct (Neg \<chi>) = inst_conj_depth_inner \<chi>\<close>
-
-subsection \<open>Depth of Immediate Conjunctions\<close>
-
-text \<open>
-The depth of immediate conjunctions (that are not preceded by $\langle\varepsilon\rangle$)
-is increased on each:
-\begin{itemize}
-  \item \<open>ImmConj\<close> if there are conjuncts (i.e. $\bigwedge\{\}$ is not counted)
-\end{itemize}
-\<close>
-
-primrec
-      immediate_conjunction_depth :: \<open>('a, 's) hml_srbb \<Rightarrow> enat\<close>
-  and imm_conj_depth_inner :: \<open>('a, 's) hml_srbb_inner \<Rightarrow> enat\<close>
-  and imm_conj_depth_conjunct :: \<open>('a, 's) hml_srbb_conjunct \<Rightarrow> enat\<close> where
-  \<open>immediate_conjunction_depth TT = 0\<close> |
-  \<open>immediate_conjunction_depth (Internal \<chi>) = imm_conj_depth_inner \<chi>\<close> |
-  \<open>immediate_conjunction_depth (ImmConj I \<psi>s) =
-    (if I = {}
-     then 0
-     else 1 + Sup ((imm_conj_depth_conjunct \<circ> \<psi>s) ` I))\<close> |
-
-  \<open>imm_conj_depth_inner (Obs _ \<phi>) = immediate_conjunction_depth \<phi>\<close> |
-  \<open>imm_conj_depth_inner (Conj I \<psi>s) = Sup ((imm_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close> |
-  \<open>imm_conj_depth_inner (StableConj I \<psi>s) = Sup ((imm_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close> |
-  \<open>imm_conj_depth_inner (BranchConj _ \<phi> I \<psi>s) = Sup ({immediate_conjunction_depth \<phi>} \<union> ((imm_conj_depth_conjunct \<circ> \<psi>s) ` I))\<close> |
-
-  \<open>imm_conj_depth_conjunct (Pos \<chi>) = imm_conj_depth_inner \<chi>\<close> |
-  \<open>imm_conj_depth_conjunct (Neg \<chi>) = imm_conj_depth_inner \<chi>\<close>
-
-
-subsection \<open>Maximal Modal Depth of Positive Clauses in Conjunctions\<close>
-
-text \<open>
-Now, we take a look at the maximal modal depth of positive clauses in conjunctions.
-
-This counter calculates the modal depth for every positive clause in a conjunction (\<open>Pos \<chi>\<close>).
-\<close>
-
-primrec
-      max_positive_conjunct_depth :: \<open>('a, 's) hml_srbb \<Rightarrow> enat\<close>
-  and max_pos_conj_depth_inner :: \<open>('a, 's) hml_srbb_inner \<Rightarrow> enat\<close>
-  and max_pos_conj_depth_conjunct :: \<open>('a, 's) hml_srbb_conjunct \<Rightarrow> enat\<close> where
-  \<open>max_positive_conjunct_depth TT = 0\<close> |
-  \<open>max_positive_conjunct_depth (Internal \<chi>) = max_pos_conj_depth_inner \<chi>\<close> |
-  \<open>max_positive_conjunct_depth (ImmConj I \<psi>s) = Sup ((max_pos_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close> |
-
-  \<open>max_pos_conj_depth_inner (Obs _ \<phi>) = max_positive_conjunct_depth \<phi>\<close> |
-  \<open>max_pos_conj_depth_inner (Conj I \<psi>s) = Sup ((max_pos_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close> |
-  \<open>max_pos_conj_depth_inner (StableConj I \<psi>s) = Sup ((max_pos_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close> |
-  \<open>max_pos_conj_depth_inner (BranchConj _ \<phi> I \<psi>s) = Sup ({1 + modal_depth_srbb \<phi>, max_positive_conjunct_depth \<phi>} \<union> ((max_pos_conj_depth_conjunct \<circ> \<psi>s) ` I))\<close> |
-
-  \<open>max_pos_conj_depth_conjunct (Pos \<chi>) = modal_depth_srbb_inner \<chi>\<close> |
-  \<open>max_pos_conj_depth_conjunct (Neg \<chi>) = max_pos_conj_depth_inner \<chi>\<close>
-
 lemma modal_depth_dominates_pos_conjuncts:
   fixes
     \<phi>::\<open>('a, 's) hml_srbb\<close> and
@@ -250,32 +221,6 @@ lemma modal_depth_dominates_pos_conjuncts:
         \<open>\<lambda>\<chi>. max_pos_conj_depth_inner \<chi> \<le> modal_depth_srbb_inner \<chi>\<close>
         \<open>\<lambda>\<psi>. max_pos_conj_depth_conjunct \<psi> \<le> modal_depth_srbb_conjunct \<psi>\<close>]
   by (auto simp add: SUP_mono' add_increasing sup.coboundedI1 sup.coboundedI2)
-
-subsection \<open>Maximal Modal Depth of Negative Clauses in Conjunctions\<close>
-
-text \<open>
-We take a look at the maximal modal depth of negative clauses in conjunctions.
-
-This counter calculates the modal depth for every negative clause in a conjunction (\<open>Neg \<chi>\<close>).
-\<close>
-
-primrec
-      max_negative_conjunct_depth :: \<open>('a, 's) hml_srbb \<Rightarrow> enat\<close>
-  and max_neg_conj_depth_inner :: \<open>('a, 's) hml_srbb_inner \<Rightarrow> enat\<close>
-  and max_neg_conj_depth_conjunct :: \<open>('a, 's) hml_srbb_conjunct \<Rightarrow> enat\<close> where
-  \<open>max_negative_conjunct_depth TT = 0\<close> |
-  \<open>max_negative_conjunct_depth (Internal \<chi>) = max_neg_conj_depth_inner \<chi>\<close> |
-  \<open>max_negative_conjunct_depth (ImmConj I \<psi>s) = Sup ((max_neg_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close> |
-
-  \<open>max_neg_conj_depth_inner (Obs _ \<phi>) = max_negative_conjunct_depth \<phi>\<close> |
-  \<open>max_neg_conj_depth_inner (Conj I \<psi>s) = Sup ((max_neg_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close> |
-  \<open>max_neg_conj_depth_inner (StableConj I \<psi>s) = Sup ((max_neg_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close> |
-  \<open>max_neg_conj_depth_inner (BranchConj _ \<phi> I \<psi>s) = Sup ({max_negative_conjunct_depth \<phi>} \<union> ((max_neg_conj_depth_conjunct \<circ> \<psi>s) ` I))\<close> |
-
-  \<open>max_neg_conj_depth_conjunct (Pos \<chi>) = max_neg_conj_depth_inner \<chi>\<close> |
-  \<open>max_neg_conj_depth_conjunct (Neg \<chi>) = modal_depth_srbb_inner \<chi>\<close>
-
-
 
 lemma modal_depth_dominates_neg_conjuncts:
   fixes
@@ -292,44 +237,20 @@ lemma modal_depth_dominates_neg_conjuncts:
         \<open>\<lambda>\<psi>. max_neg_conj_depth_conjunct \<psi> \<le> modal_depth_srbb_conjunct \<psi>\<close>]
   by (auto simp add: SUP_mono' add_increasing sup.coboundedI1 sup.coboundedI2)
 
-subsection \<open>Depth of Negations\<close>
-
-text \<open>
-The depth of negations (occurrences of \<open>Neg \<chi>\<close> on a path of the syntax tree) is increased on each:
-\begin{itemize}
-  \item \<open>Neg \<chi>\<close>
-\end{itemize}
-\<close>
-
-primrec
-      negation_depth :: \<open>('a, 's) hml_srbb \<Rightarrow> enat\<close>
-  and neg_depth_inner :: \<open>('a, 's) hml_srbb_inner \<Rightarrow> enat\<close>
-  and neg_depth_conjunct :: \<open>('a, 's) hml_srbb_conjunct \<Rightarrow> enat\<close> where
-  \<open>negation_depth TT = 0\<close> |
-  \<open>negation_depth (Internal \<chi>) = neg_depth_inner \<chi>\<close> |
-  \<open>negation_depth (ImmConj I \<psi>s) = Sup ((neg_depth_conjunct \<circ> \<psi>s) ` I)\<close> |
-
-  \<open>neg_depth_inner (Obs _ \<phi>) = negation_depth \<phi>\<close> |
-  \<open>neg_depth_inner (Conj I \<psi>s) = Sup ((neg_depth_conjunct \<circ> \<psi>s) ` I)\<close> |
-  \<open>neg_depth_inner (StableConj I \<psi>s) = Sup ((neg_depth_conjunct \<circ> \<psi>s) ` I)\<close> |
-  \<open>neg_depth_inner (BranchConj _ \<phi> I \<psi>s) = Sup ({negation_depth \<phi>} \<union> ((neg_depth_conjunct \<circ> \<psi>s) ` I))\<close> |
-
-  \<open>neg_depth_conjunct (Pos \<chi>) = neg_depth_inner \<chi>\<close> |
-  \<open>neg_depth_conjunct (Neg \<chi>) = 1 + neg_depth_inner \<chi>\<close>
-
 subsection \<open>Expressiveness Price Function\<close>
 
-text \<open>The @{term \<open>expressiveness_price\<close>} function combines the eight functions into one.\<close>
+text \<open>The \<open>expressiveness_price\<close> function combines the eight component functions into one.\<close>
 
 fun expressiveness_price :: \<open>('a, 's) hml_srbb \<Rightarrow> energy\<close> where
-  \<open>expressiveness_price \<phi> = E (modal_depth_srbb            \<phi>)
-                              (branching_conjunction_depth \<phi>)
-                              (unstable_conjunction_depth  \<phi>)
-                              (stable_conjunction_depth    \<phi>)
-                              (immediate_conjunction_depth \<phi>)
-                              (max_positive_conjunct_depth \<phi>)
-                              (max_negative_conjunct_depth \<phi>)
-                              (negation_depth              \<phi>)\<close>
+  \<open>expressiveness_price \<phi> =
+    E (modal_depth_srbb            \<phi>)
+      (branching_conjunction_depth \<phi>)
+      (unstable_conjunction_depth  \<phi>)
+      (stable_conjunction_depth    \<phi>)
+      (immediate_conjunction_depth \<phi>)
+      (max_positive_conjunct_depth \<phi>)
+      (max_negative_conjunct_depth \<phi>)
+      (negation_depth              \<phi>)\<close>
 
 text \<open>Here, we can see the decomposed price of an immediate conjunction:\<close>
 lemma expressiveness_price_ImmConj_def:
@@ -360,51 +281,31 @@ lemma expressiveness_price_ImmConj_empty_def:
   shows \<open>expressiveness_price (ImmConj I \<psi>s) = E 0 0 0 0 0 0 0 0\<close> using assms
   unfolding expressiveness_price_ImmConj_def by (simp add: bot_enat_def)
 
-text \<open>We can now define a sublanguage of Hennessy-Milner Logic @{term \<open>\<O>\<close>} by the set of formulas with prices below an energy coordinate.\<close>
-definition \<O> :: \<open>energy \<Rightarrow> (('a, 's) hml_srbb) set\<close> where
-  \<open>\<O> energy \<equiv> {\<phi> . expressiveness_price \<phi> \<le> energy}\<close>
-
-lemma \<O>_sup: \<open>UNIV = \<O> (E \<infinity> \<infinity> \<infinity> \<infinity> \<infinity> \<infinity> \<infinity> \<infinity>)\<close> unfolding \<O>_def by auto
-
-lemma price_hierarchy_entails_modal_hierarchy:
-  assumes \<open>e1 \<le> e2\<close>
-  shows \<open>\<O> e1 \<subseteq> \<O> e2\<close>
-  using assms unfolding \<O>_def by auto
-
-text \<open>Formalizing HML$_{SRBB}$ by mutually recursive data types leads to expressiveness price functions of these other types,
-namely @{term \<open>expr_pr_inner\<close>} and @{term \<open>expr_pr_conjunct\<close>}, and corresponding definitions and lemmas.\<close>
+text \<open>Formalizing HML$_{SRBB}$ by mutually recursive data types leads to expressiveness price functions of these other types  and corresponding definitions and lemmas.\<close>
 
 fun expr_pr_inner :: \<open>('a, 's) hml_srbb_inner \<Rightarrow> energy\<close> where
-  \<open>expr_pr_inner \<chi> = E (modal_depth_srbb_inner \<chi>)
-                 (branch_conj_depth_inner \<chi>)
-                 (inst_conj_depth_inner \<chi>)
-                 (st_conj_depth_inner \<chi>)
-                 (imm_conj_depth_inner \<chi>)
-                 (max_pos_conj_depth_inner \<chi>)
-                 (max_neg_conj_depth_inner \<chi>)
-                 (neg_depth_inner \<chi>)\<close>
-
-definition \<O>_inner :: \<open>energy \<Rightarrow> (('a, 's) hml_srbb_inner) set\<close> where
-  \<open>\<O>_inner energy \<equiv> {\<chi> . expr_pr_inner \<chi> \<le> energy}\<close>
+  \<open>expr_pr_inner \<chi> =
+    E (modal_depth_srbb_inner \<chi>)
+      (branch_conj_depth_inner \<chi>)
+      (inst_conj_depth_inner \<chi>)
+      (st_conj_depth_inner \<chi>)
+      (imm_conj_depth_inner \<chi>)
+      (max_pos_conj_depth_inner \<chi>)
+      (max_neg_conj_depth_inner \<chi>)
+      (neg_depth_inner \<chi>)\<close>
 
 fun expr_pr_conjunct :: \<open>('a, 's) hml_srbb_conjunct \<Rightarrow> energy\<close> where
-  \<open>expr_pr_conjunct \<psi> = E (modal_depth_srbb_conjunct \<psi>)
-                 (branch_conj_depth_conjunct \<psi>)
-                 (inst_conj_depth_conjunct \<psi>)
-                 (st_conj_depth_conjunct \<psi>)
-                 (imm_conj_depth_conjunct \<psi>)
-                 (max_pos_conj_depth_conjunct \<psi>)
-                 (max_neg_conj_depth_conjunct \<psi>)
-                 (neg_depth_conjunct \<psi>)\<close>
-
-definition \<O>_conjunct :: \<open>energy \<Rightarrow> (('a, 's) hml_srbb_conjunct) set\<close> where
-  \<open>\<O>_conjunct energy \<equiv> {\<chi> . expr_pr_conjunct \<chi> \<le> energy}\<close>
+  \<open>expr_pr_conjunct \<psi> =
+    E (modal_depth_srbb_conjunct \<psi>)
+      (branch_conj_depth_conjunct \<psi>)
+      (inst_conj_depth_conjunct \<psi>)
+      (st_conj_depth_conjunct \<psi>)
+      (imm_conj_depth_conjunct \<psi>)
+      (max_pos_conj_depth_conjunct \<psi>)
+      (max_neg_conj_depth_conjunct \<psi>)
+      (neg_depth_conjunct \<psi>)\<close>
 
 subsection \<open>Prices of Certain Formulas\<close>
-
-text \<open>
-We demonstrate the pricing mechanisms for various formulas. These proofs operate under the assumption of an expressiveness price \<open>e\<close> for a given formula \<open>\<chi>\<close> and proceed to determine the price of a derived formula such as \<open>Pos \<chi>\<close>.
-The proofs all are of a similar nature. They decompose the expression function(s) into their constituent parts and apply their definitions to the constructed formula (\<open>(Pos \<chi>)\<close>).\<close>
 
 context lts_tau
 begin
@@ -413,71 +314,19 @@ text \<open>For example, here, we establish that the expressiveness price of \<o
 
 lemma expr_internal_eq:
   shows \<open>expressiveness_price (Internal \<chi>) = expr_pr_inner \<chi>\<close>
-proof-
-  have expr_internal: \<open>expressiveness_price (Internal \<chi>) = E (modal_depth_srbb (Internal \<chi>))
-                              (branching_conjunction_depth (Internal \<chi>))
-                              (unstable_conjunction_depth  (Internal \<chi>))
-                              (stable_conjunction_depth    (Internal \<chi>))
-                              (immediate_conjunction_depth (Internal \<chi>))
-                              (max_positive_conjunct_depth (Internal \<chi>))
-                              (max_negative_conjunct_depth (Internal \<chi>))
-                              (negation_depth              (Internal \<chi>))\<close>
-            using expressiveness_price.simps by blast
-          have \<open>modal_depth_srbb (Internal \<chi>) = modal_depth_srbb_inner \<chi>\<close>
-            \<open>(branching_conjunction_depth (Internal \<chi>)) = branch_conj_depth_inner \<chi>\<close>
-            \<open>(unstable_conjunction_depth  (Internal \<chi>)) = inst_conj_depth_inner \<chi>\<close>
-            \<open>(stable_conjunction_depth    (Internal \<chi>)) = st_conj_depth_inner \<chi>\<close>
-            \<open>(immediate_conjunction_depth (Internal \<chi>)) = imm_conj_depth_inner \<chi>\<close>
-            \<open>max_positive_conjunct_depth (Internal \<chi>) = max_pos_conj_depth_inner \<chi>\<close>
-            \<open>max_negative_conjunct_depth (Internal \<chi>) = max_neg_conj_depth_inner \<chi>\<close>
-            \<open>negation_depth (Internal \<chi>) = neg_depth_inner \<chi>\<close>
-            by simp+
-          with expr_internal show ?thesis
-            by auto
-        qed
+  by auto
 
-text \<open>If the price of a formula \<open>\<chi>\<close> is not greater than the minimum update @{term \<open>min1_6\<close>} apllied to some energy $e$,
-then \<open>Pos \<chi>\<close> is not greater than \<open>e\<close>.\<close>
 lemma expr_pos:
   assumes \<open>expr_pr_inner \<chi> \<le> the (min1_6 e)\<close>
   shows \<open>expr_pr_conjunct (Pos \<chi>) \<le> e\<close>
-proof-
-  have expr_internal: \<open>expr_pr_conjunct (Pos \<chi>) = E (modal_depth_srbb_conjunct (Pos \<chi>))
-                              (branch_conj_depth_conjunct (Pos \<chi>))
-                              (inst_conj_depth_conjunct  (Pos \<chi>))
-                              (st_conj_depth_conjunct    (Pos \<chi>))
-                              (imm_conj_depth_conjunct (Pos \<chi>))
-                              (max_pos_conj_depth_conjunct (Pos \<chi>))
-                              (max_neg_conj_depth_conjunct (Pos \<chi>))
-                              (neg_depth_conjunct            (Pos \<chi>))\<close>
-            using expr_pr_conjunct.simps by blast
-  have pos_upd: \<open>(modal_depth_srbb_conjunct (Pos \<chi>)) = modal_depth_srbb_inner \<chi>\<close>
-                \<open>(branch_conj_depth_conjunct (Pos \<chi>)) = branch_conj_depth_inner \<chi>\<close>
-                \<open>(inst_conj_depth_conjunct  (Pos \<chi>)) = inst_conj_depth_inner \<chi>\<close>
-                \<open>(st_conj_depth_conjunct    (Pos \<chi>)) = st_conj_depth_inner \<chi>\<close>
-                \<open>(imm_conj_depth_conjunct (Pos \<chi>)) = imm_conj_depth_inner \<chi>\<close>
-                \<open>(max_pos_conj_depth_conjunct (Pos \<chi>)) = modal_depth_srbb_inner \<chi>\<close>
-                \<open>(max_neg_conj_depth_conjunct (Pos \<chi>)) = max_neg_conj_depth_inner \<chi>\<close>
-                \<open>(neg_depth_conjunct            (Pos \<chi>)) = neg_depth_inner \<chi>\<close>
-    by simp+
-  obtain e1 e2 e3 e4 e5 e6 e7 e8 where \<open>e = E e1 e2 e3 e4 e5 e6 e7 e8\<close>
-    by (metis energy.exhaust_sel)
-  hence \<open>min1_6 e = Some (E (min e1 e6) e2 e3 e4 e5 e6 e7 e8)\<close>
-    by (simp add: min1_6_def)
-  hence \<open>modal_depth_srbb_inner \<chi> \<le> (min e1 e6)\<close>
-    using assms leq_components by fastforce
-  hence \<open>modal_depth_srbb_inner \<chi> \<le> e6\<close>
-    using min.boundedE by blast
-  thus \<open>expr_pr_conjunct (Pos \<chi>) \<le> e\<close>
-    using expr_internal pos_upd \<open>e = E e1 e2 e3 e4 e5 e6 e7 e8\<close> assms leq_components by auto
-qed
+  using assms by auto
 
 lemma expr_neg:
   assumes
     \<open>expr_pr_inner \<chi> \<le> e'\<close>
     \<open>(Option.bind ((subtract_fn 0 0 0 0 0 0 0 1) e) min1_7) = Some e'\<close>
   shows \<open>expr_pr_conjunct (Neg \<chi>) \<le> e\<close>
-proof-
+proof -
   have expr_neg: \<open>expr_pr_conjunct (Neg \<chi>) =
     E (modal_depth_srbb_conjunct (Neg \<chi>))
       (branch_conj_depth_conjunct (Neg \<chi>))
@@ -523,46 +372,11 @@ lemma expr_obs:
     \<open>expressiveness_price \<phi> \<le> e'\<close>
     \<open>subtract_fn 1 0 0 0 0 0 0 0 e = Some e'\<close>
   shows \<open>expr_pr_inner (Obs \<alpha> \<phi>) \<le> e\<close>
-proof-
-  have expr_pr_obs:
-    \<open>expr_pr_inner (Obs \<alpha> \<phi>) =
-      (E (modal_depth_srbb_inner (Obs \<alpha> \<phi>))
-      (branch_conj_depth_inner (Obs \<alpha> \<phi>))
-      (inst_conj_depth_inner (Obs \<alpha> \<phi>))
-      (st_conj_depth_inner (Obs \<alpha> \<phi>))
-      (imm_conj_depth_inner (Obs \<alpha> \<phi>))
-      (max_pos_conj_depth_inner (Obs \<alpha> \<phi>))
-      (max_neg_conj_depth_inner (Obs \<alpha> \<phi>))
-      (neg_depth_inner (Obs \<alpha> \<phi>)))\<close>
-    using expr_pr_inner.simps by blast
-  have obs_upds:
-    \<open>modal_depth_srbb_inner (Obs \<alpha> \<phi>) = 1 + modal_depth_srbb \<phi>\<close>
-    \<open>branch_conj_depth_inner (Obs \<alpha> \<phi>) = branching_conjunction_depth \<phi>\<close>
-    \<open>inst_conj_depth_inner (Obs \<alpha> \<phi>) = unstable_conjunction_depth \<phi>\<close>
-    \<open>st_conj_depth_inner (Obs \<alpha> \<phi>) = stable_conjunction_depth \<phi>\<close>
-    \<open>imm_conj_depth_inner (Obs \<alpha> \<phi>) = immediate_conjunction_depth \<phi>\<close>
-    \<open>max_pos_conj_depth_inner (Obs \<alpha> \<phi>) = max_positive_conjunct_depth \<phi>\<close>
-    \<open>max_neg_conj_depth_inner (Obs \<alpha> \<phi>) = max_negative_conjunct_depth \<phi>\<close>
-    \<open>neg_depth_inner (Obs \<alpha> \<phi>) = negation_depth \<phi>\<close>
-    by simp_all
-  obtain e1 e2 e3 e4 e5 e6 e7 e8 where e_def: \<open>e = E e1 e2 e3 e4 e5 e6 e7 e8\<close>
-    by (metis energy.exhaust_sel)
-  then have is_some: \<open>(subtract_fn 1 0 0 0 0 0 0 0 e = Some (E (e1-1) e2 e3 e4 e5 e6 e7 e8))\<close>
-    using energy_minus idiff_0_right assms
-    by (metis option.discI)
-  hence \<open>modal_depth_srbb \<phi> \<le> (e1 - 1)\<close>
-    using assms
-    by (auto simp add: e_def)
-  hence \<open>modal_depth_srbb_inner (Obs \<alpha> \<phi>) \<le> e1\<close>
-    using obs_upds is_some
-    unfolding leq_components e_def
-    by (metis add_diff_assoc_enat add_diff_cancel_enat antisym enat.simps(3) enat_defs(2)
-        enat_diff_mono energy.sel(1) linorder_linear option.distinct(1))
-  then show ?thesis
-    using is_some assms
-    unfolding  e_def leq_components
-    by auto
-qed
+  using assms 
+  by (simp) (metis add_diff_cancel_enat add_mono_thms_linordered_semiring(1)
+      enat.simps(3) enat_defs(2) energy.sel idiff_0_right
+      le_iff_add le_numeral_extra(4) minus_energy_def option.discI
+      option.inject)
 
 lemma expr_st_conj:
   assumes
@@ -913,19 +727,10 @@ lemma expressiveness_price_ImmConj_geq_parts':
     less_eq_energy_def minus_energy_def
   by (smt (z3) energy.sel idiff_0_right)
 
-end \<comment> \<open>of \<open>lts_tau\<close>\<close>
-
 text \<open>Here, we show the prices for some specific formulas.\<close>
-locale inhabited_lts = lts step
-  for step :: \<open>'s \<Rightarrow> 'a \<Rightarrow> 's \<Rightarrow> bool\<close> (\<open>_ \<mapsto> _ _\<close> [70,70,70] 80) +
-  fixes left :: 's
-    and right :: 's
-  assumes left_right_distinct: \<open>(left::'s) \<noteq> (right::'s)\<close>
-
-begin
 
 lemma example_\<phi>_cp:
-  fixes op::\<open>'a\<close> and a::\<open>'a\<close> and b::\<open>'a\<close>
+  fixes op::\<open>'a\<close> and a::\<open>'a\<close> and b::\<open>'a\<close> and left::\<open>'s\<close> and right::\<open>'s\<close> 
   defines \<phi>: \<open>\<phi> \<equiv>
     (Internal
       (Obs op
@@ -959,11 +764,6 @@ lemma \<open>expressiveness_price (Internal
                            else undefined)))))) = E 2 0 1 0 0 1 0 0\<close>
   by simp
 
-end \<comment> \<open>of \<open>inhabited_lts\<close>\<close>
-
-context lts_tau
-begin
-
 lemma \<open>expressiveness_price TT = E 0 0 0 0 0 0 0 0\<close>
   by simp
 
@@ -982,11 +782,33 @@ lemma expr_obs_phi:
 
 subsection \<open>Characterizing Equivalence by Energy Coordinates\<close>
 
-text \<open>A state \<open>p\<close> pre-orders another state \<open>q\<close> with respect to some energy \<open>e\<close> if and only if \<open>p\<close> HML pre-orders \<open>q\<close> with respect to the HML sublanguage @{term \<open>\<O>\<close>} derived from \<open>e\<close>.\<close>
+end
+
+text \<open>We can now define a sublanguage of Hennessy--Milner Logic \<open>\<O>\<close> by the set of formulas with prices below an energy coordinate.\<close>
+definition \<O> :: \<open>energy \<Rightarrow> (('a, 's) hml_srbb) set\<close> where
+  \<open>\<O> energy \<equiv> {\<phi> . expressiveness_price \<phi> \<le> energy}\<close>
+
+lemma \<O>_sup: \<open>UNIV = \<O> (E \<infinity> \<infinity> \<infinity> \<infinity> \<infinity> \<infinity> \<infinity> \<infinity>)\<close> unfolding \<O>_def by auto
+
+lemma price_hierarchy_entails_modal_hierarchy:
+  assumes \<open>e1 \<le> e2\<close>
+  shows \<open>\<O> e1 \<subseteq> \<O> e2\<close>
+  using assms unfolding \<O>_def by auto
+
+definition \<O>_inner :: \<open>energy \<Rightarrow> (('a, 's) hml_srbb_inner) set\<close> where
+  \<open>\<O>_inner energy \<equiv> {\<chi> . expr_pr_inner \<chi> \<le> energy}\<close>
+
+definition \<O>_conjunct :: \<open>energy \<Rightarrow> (('a, 's) hml_srbb_conjunct) set\<close> where
+  \<open>\<O>_conjunct energy \<equiv> {\<chi> . expr_pr_conjunct \<chi> \<le> energy}\<close>
+
+context lts_tau
+begin
+
+text \<open>A state \<open>p\<close> pre-orders another state \<open>q\<close> with respect to some energy \<open>e\<close> if and only if \<open>p\<close> HML pre-orders \<open>q\<close> with respect to the HML sublanguage \<^term>\<open>\<O> e\<close>.\<close>
 definition expr_preord :: \<open>'s \<Rightarrow> energy \<Rightarrow> 's \<Rightarrow> bool\<close> (\<open>_ \<preceq> _ _\<close> 60) where
   \<open>(p \<preceq> e q) \<equiv> preordered (\<O> e) p q\<close>
 
-text \<open>Conversely, \<open>p\<close> and \<open>q\<close> are equivalent with respect to \<open>e\<close> if and only if they are equivalent with respect to that HML sublanguage @{term \<open>\<O>\<close>}.\<close>
+text \<open>Conversely, \<open>p\<close> and \<open>q\<close> are equivalent with respect to \<open>e\<close> if and only if they are equivalent with respect to that HML sublanguage \<^term>\<open>\<O> e\<close>.\<close>
 definition expr_equiv :: \<open>'s \<Rightarrow> energy \<Rightarrow> 's \<Rightarrow> bool\<close> (\<open>_ \<sim> _ _\<close> 60) where
   \<open>(p \<sim> e q) \<equiv> equivalent (\<O> e) p q\<close>
 
@@ -1082,7 +904,8 @@ proof -
     assume \<open>q' \<in> Q\<alpha>\<close> \<open>q' \<mapsto>a \<alpha> q''\<close> \<open>q'' \<Zsurj> q'''\<close>
     thus \<open>hml_srbb_conj.distinguishes
         (\<Psi>\<alpha> q''') p' q''' \<close>
-      using assms(4) distinction_conjunctification_two_way \<Psi>\<alpha>_def by blast
+      using assms(4) \<Psi>\<alpha>_def distinction_conjunctification_two_way mem_Collect_eq
+      by (smt (verit, best))
   qed
   hence \<open>\<forall>q'\<in> Q\<alpha>. \<forall>q'''\<in>{q'''. \<exists>q'\<in> Q\<alpha>. \<exists>q''. q' \<mapsto>a \<alpha> q'' \<and> q'' \<Zsurj> q'''}.
     hml_srbb_inner.distinguishes (Conj {q'''. \<exists>q'\<in> Q\<alpha>. \<exists>q''. q' \<mapsto>a \<alpha> q'' \<and> q'' \<Zsurj> q'''}
