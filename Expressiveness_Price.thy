@@ -5,44 +5,19 @@ theory Expressiveness_Price
 begin
 
 text \<open>
-The expressiveness price function assigns a price - an eight-dimensional vector - to a HML$_\text{SRBB}$ formula.
-This price is supposed to capture the expressiveness power needed to describe a certain property and
-will later be used to select subsets of specific expressiveness power associated with the behavioural equivalence characterized by that subset of the HML$_\text{SRBB}$ sublanguage.
-\\\\
-The expressiveness price function may be defined as a single function:
-\begin{align*}
-  expr(\top) := expr^\varepsilon(\top) :=& 0 \\
-  expr(\langle\varepsilon\rangle\chi) :=& expr^\varepsilon(\chi) \\
-  expr(\bigwedge\Psi) :=& \hat{e}_5 + expr^\varepsilon(\bigwedge\Psi) \\
-  expr^\varepsilon((\alpha)\varphi) :=& \hat{e}_1 + expr(\varphi) \\
-  expr^\varepsilon(\bigwedge(\{(\alpha)\varphi\} \cup \Psi)) :=& \hat{e}_2 + expr^\varepsilon(\bigwedge(\{\langle\varepsilon\rangle(\alpha)\varphi\} \cup \Psi \setminus \{(\alpha)\varphi\})) \\
-  expr^\varepsilon(\bigwedge\Psi) :=& \sup \{expr^\wedge(\psi) | \psi \in \Psi\} +
-    \begin{cases}
-      \hat{e}_4 & \text{if} \neg\langle\tau\rangle\top \in \Psi \\
-      \hat{e}_3 & \text{otherwise}
-    \end{cases} \\
-  expr^\wedge(\neg\langle\tau\rangle\top) :=&  0 \\
-  expr^\wedge(\neg\varphi) :=& \sup \{\hat{e}_8 + expr(\varphi), (0,0,0,0,0,0,expr_1(\varphi),0)\} \\
-  expr^\wedge(\varphi) :=& \sup \{expr(\varphi), (0,0,0,0,0,expr_1(\varphi),0,0)\}
-\end{align*}
+  The expressiveness price function assigns a price---an eight-dimensional vector---to a HML$_\text{SRBB}$ formula.
+  This price is supposed to capture syntactic features needed to describe a certain property and will later be used to select sublogics of specific expressiveness to characterize behavioural equivalences.
 
-The eight dimensions are intended to measure the following properties of formulas:
-\begin{enumerate}
-  \item Modal depth (of observations $\langle\alpha\rangle$, $(\alpha)$),
-  \item Depth of branching conjunctions (with one observation clause not starting with $\langle\varepsilon\rangle$),
-  \item Depth of stable conjunctions (that do enforce stability by a $\neg\langle\tau\rangle\top$-conjunct),
-  \item Depth of unstable conjunctions (that do not enforce stability by a $\neg\langle\tau\rangle\top$-conjunct),
-  \item Depth of immediate conjunctions (that are not preceded by $\langle\varepsilon\rangle$),
-  \item Maximal modal depth of positive clauses in conjunctions,
-  \item Maximal modal depth of negative clauses in conjunctions,
-  \item Depth of negations
-\end{enumerate}
+  The eight dimensions are intended to measure the following properties of formulas:
 
-Instead of defining the expressiveness price function in one go, we define eight functions (one for each dimension)
-and then use them in combination to build the the result vector.\\
-
-Note that since all these functions stem from the above singular function, they all look very similar,
-but differ mostly in where the $1+$ is placed.
+   \<^enum> Modal depth (of observations $\langle\alpha\rangle$, $(\alpha)$),
+   \<^enum> Depth of branching conjunctions (with one observation clause not starting with $\langle\varepsilon\rangle$),
+   \<^enum> Depth of stable conjunctions (that do enforce stability by a $\neg\langle\tau\rangle\top$-conjunct),
+   \<^enum> Depth of unstable conjunctions (that do not enforce stability by a $\neg\langle\tau\rangle\top$-conjunct),
+   \<^enum> Depth of immediate conjunctions (that are not preceded by $\langle\varepsilon\rangle$),
+   \<^enum> Maximal modal depth of positive clauses in conjunctions,
+   \<^enum> Maximal modal depth of negative clauses in conjunctions,
+   \<^enum> Depth of negations
 \<close>
 
 subsection \<open>Modal Depth\<close>
