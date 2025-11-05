@@ -32,7 +32,7 @@ text \<open>In this section, we prove that if a formula distinguishes a process 
 lemma distinction_implies_winning_budgets_empty_Q:
   assumes \<open>distinguishes_from \<phi> p {}\<close>
   shows \<open>weak_spectroscopy_game.attacker_wins (expressiveness_price \<phi>) (Attacker_Immediate p {})\<close>
-proof-
+proof -
   have is_last_move: \<open>spectroscopy_moves (Defender_Conj p {}) p' = None\<close> for p'
     by(rule spectroscopy_moves.elims, auto)
   moreover have \<open>spectroscopy_defender (Defender_Conj p {})\<close> by simp
@@ -57,7 +57,7 @@ text \<open>Next, we show the statement for the case that @{term \<open>Q \<note
 lemma distinction_implies_winning_budgets:
   assumes \<open>distinguishes_from \<phi> p Q\<close>
   shows \<open>weak_spectroscopy_game.attacker_wins (expressiveness_price \<phi>) (Attacker_Immediate p Q)\<close>
-proof-
+proof -
   have \<open>\<And>\<phi> \<chi> \<psi>.
         (\<forall>Q p. Q \<noteq> {} \<longrightarrow> distinguishes_from \<phi> p Q
                \<longrightarrow> weak_spectroscopy_game.attacker_wins (expressiveness_price \<phi>) (Attacker_Immediate p Q))

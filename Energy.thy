@@ -153,7 +153,8 @@ lemma gets_smaller:
   fixes s :: energy
   shows \<open>(\<lambda>x. x - s) x \<le> x\<close>
   by (auto)
-     (metis add.commute add_diff_cancel_enat enat_diff_mono idiff_infinity idiff_infinity_right le_iff_add not_infinity_eq zero_le)+
+     (metis add.commute add_diff_cancel_enat enat_diff_mono idiff_infinity idiff_infinity_right
+      le_iff_add not_infinity_eq zero_le)+
 
 lemma mono_subtract:
   assumes \<open>x \<le> x'\<close>
@@ -284,7 +285,9 @@ lemma min_1_7_lower_end:
 lemma min_1_7_subtr_simp:
   shows \<open>(Option.bind ((subtract_fn 0 0 0 0 0 0 0 1) e) min1_7)
     = (if neg_depth e = 0 then None
-        else Some (E (min (modal_depth e) (neg_conjuncts e)) (br_conj_depth e) (conj_depth e) (st_conj_depth e) (imm_conj_depth e) (pos_conjuncts e) (neg_conjuncts e) (neg_depth e - 1)))\<close>
+        else Some (E (min (modal_depth e) (neg_conjuncts e)) (br_conj_depth e) (conj_depth e)
+                     (st_conj_depth e) (imm_conj_depth e) (pos_conjuncts e)
+                     (neg_conjuncts e) (neg_depth e - 1)))\<close>
   using min_1_7_lower_end
   by (auto simp add: min1_7_def)
 
@@ -302,14 +305,18 @@ qed
 lemma min_1_6_subtr_simp:
   shows \<open>(Option.bind ((subtract_fn 0 1 1 0 0 0 0 0) e) min1_6)
     = (if br_conj_depth e = 0 \<or> conj_depth e = 0 then None
-        else Some (E (min (modal_depth e) (pos_conjuncts e)) (br_conj_depth e - 1) (conj_depth e - 1) (st_conj_depth e) (imm_conj_depth e) (pos_conjuncts e) (neg_conjuncts e) (neg_depth e)))\<close>
+        else Some (E (min (modal_depth e) (pos_conjuncts e)) (br_conj_depth e - 1)
+                     (conj_depth e - 1) (st_conj_depth e) (imm_conj_depth e) (pos_conjuncts e)
+                     (neg_conjuncts e) (neg_depth e)))\<close>
   by (auto simp add: min1_6_def ileI1 one_eSuc)
 
 instantiation energy :: Sup
 begin
 
-definition \<open>Sup ee \<equiv> E (Sup (modal_depth ` ee)) (Sup (br_conj_depth ` ee )) (Sup (conj_depth ` ee)) (Sup (st_conj_depth ` ee))
-  (Sup (imm_conj_depth ` ee)) (Sup (pos_conjuncts ` ee)) (Sup (neg_conjuncts ` ee)) (Sup (neg_depth ` ee))\<close>
+definition \<open>Sup ee \<equiv> E
+  (Sup (modal_depth ` ee)) (Sup (br_conj_depth ` ee )) (Sup (conj_depth ` ee))
+  (Sup (st_conj_depth ` ee)) (Sup (imm_conj_depth ` ee)) (Sup (pos_conjuncts ` ee))
+  (Sup (neg_conjuncts ` ee)) (Sup (neg_depth ` ee))\<close>
 
 instance ..
 end

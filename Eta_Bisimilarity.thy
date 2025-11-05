@@ -69,7 +69,7 @@ proof -
     (\<forall>p q. p ~\<eta> q \<longrightarrow> \<phi> \<in> \<O> (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> \<infinity> \<infinity>) \<longrightarrow> p \<Turnstile>SRBB \<phi> \<longrightarrow> q \<Turnstile>SRBB \<phi>) \<and>
     (\<forall>p q. p ~\<eta> q \<longrightarrow> \<chi> \<in> \<O>_inner (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> \<infinity> \<infinity>) \<longrightarrow> hml_srbb_inner_models p \<chi> \<longrightarrow> (\<exists>q'. q \<Zsurj> q' \<and> hml_srbb_inner_models q' \<chi>)) \<and>
     (\<forall>p q. p ~\<eta> q \<longrightarrow> \<psi> \<in> \<O>_conjunct (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> \<infinity> \<infinity>) \<longrightarrow> hml_srbb_conjunct_models p \<psi> \<longrightarrow> hml_srbb_conjunct_models q \<psi>)\<close>
-  proof-
+  proof -
     fix \<phi> \<chi> \<psi>
     show
       \<open>(\<forall>p q. p ~\<eta> q \<longrightarrow> \<phi> \<in> \<O> (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> \<infinity> \<infinity>) \<longrightarrow> p \<Turnstile>SRBB \<phi> \<longrightarrow> q \<Turnstile>SRBB \<phi>) \<and>
@@ -401,7 +401,7 @@ proof -
     (\<forall>p q. (\<exists>R. eta_simulation R \<and>  R p q) \<longrightarrow> \<phi> \<in> \<O> (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> 0 0) \<longrightarrow> p \<Turnstile>SRBB \<phi> \<longrightarrow> q \<Turnstile>SRBB \<phi>) \<and>
     (\<forall>p q. (\<exists>R. eta_simulation R \<and>  R p q) \<longrightarrow> \<chi> \<in> \<O>_inner (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> 0 0) \<longrightarrow> hml_srbb_inner_models p \<chi> \<longrightarrow> (\<exists>q'. q \<Zsurj> q' \<and> hml_srbb_inner_models q' \<chi>)) \<and>
     (\<forall>p q. (\<exists>R. eta_simulation R \<and>  R p q) \<longrightarrow> \<psi> \<in> \<O>_conjunct (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> 0 0) \<longrightarrow> hml_srbb_conjunct_models p \<psi> \<longrightarrow> hml_srbb_conjunct_models q \<psi>)\<close>
-  proof-
+  proof -
     fix \<phi> \<chi> \<psi>
     show
       \<open>(\<forall>p q. (\<exists>R. eta_simulation R \<and> R p q) \<longrightarrow> \<phi> \<in> \<O> (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> 0 0) \<longrightarrow> p \<Turnstile>SRBB \<phi> \<longrightarrow> q \<Turnstile>SRBB \<phi>) \<and>

@@ -372,7 +372,7 @@ lemma aux:
 proof -
   assume \<phi>_trace: \<open>is_trace_formula \<phi>\<close> and p_sat_srbb: \<open>p \<Turnstile>SRBB \<phi>\<close> and assms: \<open>p \<lesssim>WT q\<close>
   show \<open>q \<Turnstile>SRBB \<phi>\<close>
-  proof-
+  proof -
     from assms have p_trace_implies_q_trace: \<open>\<forall>tr p'. (p \<Zsurj>\<mapsto>\<Zsurj>$ tr p') \<longrightarrow> (\<exists>q'. q \<Zsurj>\<mapsto>\<Zsurj>$ tr q')\<close>
       unfolding weakly_trace_preordered_def by auto
     from p_sat_srbb trace_formula_implies_trace obtain tr p' where

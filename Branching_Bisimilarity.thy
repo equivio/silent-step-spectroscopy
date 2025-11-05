@@ -291,7 +291,7 @@ lemma sr_branching_bisim_stronger:
 subsection \<open>\<open>HML_SRBB\<close> as Modal Characterization of Stability-Respecting Branching Bisimilarity\<close>
 
 lemma modal_sym: \<open>symp (preordered UNIV)\<close>
-proof-
+proof -
   have \<open>\<nexists> p q. preordered UNIV p q \<and> \<not>preordered UNIV q p\<close>
   proof safe
     fix p q
@@ -401,12 +401,12 @@ lemma logic_sr_branching_bisim_invariant:
     \<open>sr_branching_bisimulated p0 q0\<close>
     \<open>p0 \<Turnstile>SRBB \<phi>\<close>
   shows \<open>q0 \<Turnstile>SRBB \<phi>\<close>
-proof-
+proof -
   have \<open>\<And>\<phi> \<chi> \<psi>.
     (\<forall>p q. sr_branching_bisimulated p q \<longrightarrow> p \<Turnstile>SRBB \<phi> \<longrightarrow> q \<Turnstile>SRBB \<phi>) \<and>
     (\<forall>p q. sr_branching_bisimulated p q \<longrightarrow> hml_srbb_inner_models p \<chi> \<longrightarrow> (\<exists>q'. q \<Zsurj> q' \<and> hml_srbb_inner_models q' \<chi>)) \<and>
     (\<forall>p q. sr_branching_bisimulated p q \<longrightarrow> hml_srbb_conjunct_models p \<psi> \<longrightarrow> hml_srbb_conjunct_models q \<psi>)\<close>
-  proof-
+  proof -
     fix \<phi> \<chi> \<psi>
     show
       \<open>(\<forall>p q. sr_branching_bisimulated p q \<longrightarrow> p \<Turnstile>SRBB \<phi> \<longrightarrow> q \<Turnstile>SRBB \<phi>) \<and>

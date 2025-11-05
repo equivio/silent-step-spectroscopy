@@ -33,11 +33,13 @@ primrec
   and branch_conj_depth_conjunct :: \<open>('a, 's) hml_srbb_conjunct \<Rightarrow> enat\<close> where
   \<open>branching_conjunction_depth TT = 0\<close> |
   \<open>branching_conjunction_depth (Internal \<chi>) = branch_conj_depth_inner \<chi>\<close> |
-  \<open>branching_conjunction_depth (ImmConj I \<psi>s) = Sup ((branch_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close> |
+  \<open>branching_conjunction_depth (ImmConj I \<psi>s) =
+    Sup ((branch_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close> |
 
   \<open>branch_conj_depth_inner (Obs _ \<phi>) = branching_conjunction_depth \<phi>\<close> |
   \<open>branch_conj_depth_inner (Conj I \<psi>s) = Sup ((branch_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close> |
-  \<open>branch_conj_depth_inner (StableConj I \<psi>s) = Sup ((branch_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close> |
+  \<open>branch_conj_depth_inner (StableConj I \<psi>s) =
+    Sup ((branch_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close> |
   \<open>branch_conj_depth_inner (BranchConj _ \<phi> I \<psi>s) =
      1 + Sup ({branching_conjunction_depth \<phi>} \<union> ((branch_conj_depth_conjunct \<circ> \<psi>s) ` I))\<close> |
 
@@ -57,7 +59,8 @@ primrec
   \<open>st_conj_depth_inner (Obs _ \<phi>) = stable_conjunction_depth \<phi>\<close> |
   \<open>st_conj_depth_inner (Conj I \<psi>s) = Sup ((st_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close> |
   \<open>st_conj_depth_inner (StableConj I \<psi>s) = 1 + Sup ((st_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close> |
-  \<open>st_conj_depth_inner (BranchConj _ \<phi> I \<psi>s) = Sup ({stable_conjunction_depth \<phi>} \<union> ((st_conj_depth_conjunct \<circ> \<psi>s) ` I))\<close> |
+  \<open>st_conj_depth_inner (BranchConj _ \<phi> I \<psi>s) =
+    Sup ({stable_conjunction_depth \<phi>} \<union> ((st_conj_depth_conjunct \<circ> \<psi>s) ` I))\<close> |
 
   \<open>st_conj_depth_conjunct (Pos \<chi>) = st_conj_depth_inner \<chi>\<close> |
   \<open>st_conj_depth_conjunct (Neg \<chi>) = st_conj_depth_inner \<chi>\<close>
@@ -86,7 +89,8 @@ primrec
     (if I = {}
      then 0
      else 1 + Sup ((inst_conj_depth_conjunct \<circ> \<psi>s) ` I))\<close> |
-  \<open>inst_conj_depth_inner (StableConj I \<psi>s) = Sup ((inst_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close> |
+  \<open>inst_conj_depth_inner (StableConj I \<psi>s) =
+    Sup ((inst_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close> |
   \<open>inst_conj_depth_inner (BranchConj _ \<phi> I \<psi>s) =
     1 + Sup ({unstable_conjunction_depth \<phi>} \<union> ((inst_conj_depth_conjunct \<circ> \<psi>s) ` I))\<close> |
 
@@ -110,7 +114,8 @@ primrec
   \<open>imm_conj_depth_inner (Obs _ \<phi>) = immediate_conjunction_depth \<phi>\<close> |
   \<open>imm_conj_depth_inner (Conj I \<psi>s) = Sup ((imm_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close> |
   \<open>imm_conj_depth_inner (StableConj I \<psi>s) = Sup ((imm_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close> |
-  \<open>imm_conj_depth_inner (BranchConj _ \<phi> I \<psi>s) = Sup ({immediate_conjunction_depth \<phi>} \<union> ((imm_conj_depth_conjunct \<circ> \<psi>s) ` I))\<close> |
+  \<open>imm_conj_depth_inner (BranchConj _ \<phi> I \<psi>s) =
+    Sup ({immediate_conjunction_depth \<phi>} \<union> ((imm_conj_depth_conjunct \<circ> \<psi>s) ` I))\<close> |
 
   \<open>imm_conj_depth_conjunct (Pos \<chi>) = imm_conj_depth_inner \<chi>\<close> |
   \<open>imm_conj_depth_conjunct (Neg \<chi>) = imm_conj_depth_inner \<chi>\<close>
@@ -123,12 +128,17 @@ primrec
   and max_pos_conj_depth_conjunct :: \<open>('a, 's) hml_srbb_conjunct \<Rightarrow> enat\<close> where
   \<open>max_positive_conjunct_depth TT = 0\<close> |
   \<open>max_positive_conjunct_depth (Internal \<chi>) = max_pos_conj_depth_inner \<chi>\<close> |
-  \<open>max_positive_conjunct_depth (ImmConj I \<psi>s) = Sup ((max_pos_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close> |
+  \<open>max_positive_conjunct_depth (ImmConj I \<psi>s) =
+    Sup ((max_pos_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close> |
 
   \<open>max_pos_conj_depth_inner (Obs _ \<phi>) = max_positive_conjunct_depth \<phi>\<close> |
-  \<open>max_pos_conj_depth_inner (Conj I \<psi>s) = Sup ((max_pos_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close> |
-  \<open>max_pos_conj_depth_inner (StableConj I \<psi>s) = Sup ((max_pos_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close> |
-  \<open>max_pos_conj_depth_inner (BranchConj _ \<phi> I \<psi>s) = Sup ({1 + modal_depth_srbb \<phi>, max_positive_conjunct_depth \<phi>} \<union> ((max_pos_conj_depth_conjunct \<circ> \<psi>s) ` I))\<close> |
+  \<open>max_pos_conj_depth_inner (Conj I \<psi>s) =
+    Sup ((max_pos_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close> |
+  \<open>max_pos_conj_depth_inner (StableConj I \<psi>s) =
+    Sup ((max_pos_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close> |
+  \<open>max_pos_conj_depth_inner (BranchConj _ \<phi> I \<psi>s) =
+    Sup ({1 + modal_depth_srbb \<phi>, max_positive_conjunct_depth \<phi>}
+        \<union> ((max_pos_conj_depth_conjunct \<circ> \<psi>s) ` I))\<close> |
 
   \<open>max_pos_conj_depth_conjunct (Pos \<chi>) = modal_depth_srbb_inner \<chi>\<close> |
   \<open>max_pos_conj_depth_conjunct (Neg \<chi>) = max_pos_conj_depth_inner \<chi>\<close>
@@ -141,12 +151,16 @@ primrec
   and max_neg_conj_depth_conjunct :: \<open>('a, 's) hml_srbb_conjunct \<Rightarrow> enat\<close> where
   \<open>max_negative_conjunct_depth TT = 0\<close> |
   \<open>max_negative_conjunct_depth (Internal \<chi>) = max_neg_conj_depth_inner \<chi>\<close> |
-  \<open>max_negative_conjunct_depth (ImmConj I \<psi>s) = Sup ((max_neg_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close> |
+  \<open>max_negative_conjunct_depth (ImmConj I \<psi>s) =
+    Sup ((max_neg_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close> |
 
   \<open>max_neg_conj_depth_inner (Obs _ \<phi>) = max_negative_conjunct_depth \<phi>\<close> |
-  \<open>max_neg_conj_depth_inner (Conj I \<psi>s) = Sup ((max_neg_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close> |
-  \<open>max_neg_conj_depth_inner (StableConj I \<psi>s) = Sup ((max_neg_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close> |
-  \<open>max_neg_conj_depth_inner (BranchConj _ \<phi> I \<psi>s) = Sup ({max_negative_conjunct_depth \<phi>} \<union> ((max_neg_conj_depth_conjunct \<circ> \<psi>s) ` I))\<close> |
+  \<open>max_neg_conj_depth_inner (Conj I \<psi>s) =
+    Sup ((max_neg_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close> |
+  \<open>max_neg_conj_depth_inner (StableConj I \<psi>s) =
+    Sup ((max_neg_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close> |
+  \<open>max_neg_conj_depth_inner (BranchConj _ \<phi> I \<psi>s) =
+    Sup ({max_negative_conjunct_depth \<phi>} \<union> ((max_neg_conj_depth_conjunct \<circ> \<psi>s) ` I))\<close> |
 
   \<open>max_neg_conj_depth_conjunct (Pos \<chi>) = max_neg_conj_depth_inner \<chi>\<close> |
   \<open>max_neg_conj_depth_conjunct (Neg \<chi>) = modal_depth_srbb_inner \<chi>\<close>
@@ -164,7 +178,8 @@ primrec
   \<open>neg_depth_inner (Obs _ \<phi>) = negation_depth \<phi>\<close> |
   \<open>neg_depth_inner (Conj I \<psi>s) = Sup ((neg_depth_conjunct \<circ> \<psi>s) ` I)\<close> |
   \<open>neg_depth_inner (StableConj I \<psi>s) = Sup ((neg_depth_conjunct \<circ> \<psi>s) ` I)\<close> |
-  \<open>neg_depth_inner (BranchConj _ \<phi> I \<psi>s) = Sup ({negation_depth \<phi>} \<union> ((neg_depth_conjunct \<circ> \<psi>s) ` I))\<close> |
+  \<open>neg_depth_inner (BranchConj _ \<phi> I \<psi>s) =
+    Sup ({negation_depth \<phi>} \<union> ((neg_depth_conjunct \<circ> \<psi>s) ` I))\<close> |
 
   \<open>neg_depth_conjunct (Pos \<chi>) = neg_depth_inner \<chi>\<close> |
   \<open>neg_depth_conjunct (Neg \<chi>) = 1 + neg_depth_inner \<chi>\<close>
@@ -392,8 +407,8 @@ proof -
     \<open>inst_conj_depth_inner (StableConj I \<psi>s) = Sup ((inst_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close>
     \<open>st_conj_depth_inner (StableConj I \<psi>s) = 1 + Sup ((st_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close>
     \<open>imm_conj_depth_inner (StableConj I \<psi>s) = Sup ((imm_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close>
-    \<open>max_pos_conj_depth_inner (StableConj I \<psi>s) = Sup ((max_pos_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close>
-    \<open>max_neg_conj_depth_inner (StableConj I \<psi>s) = Sup ((max_neg_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close>
+    \<open>max_pos_conj_depth_inner (StableConj I \<psi>s) = Sup ((max_pos_conj_depth_conjunct\<circ>\<psi>s) ` I)\<close>
+    \<open>max_neg_conj_depth_inner (StableConj I \<psi>s) = Sup ((max_neg_conj_depth_conjunct\<circ>\<psi>s) ` I)\<close>
     \<open>neg_depth_inner (StableConj I \<psi>s) = Sup ((neg_depth_conjunct \<circ> \<psi>s) ` I)\<close>
     by force+
   obtain e1 e2 e3 e4 e5 e6 e7 e8 where e_def: \<open>e = E e1 e2 e3 e4 e5 e6 e7 e8\<close>
@@ -435,7 +450,7 @@ lemma expr_imm_conj:
     \<open>I \<noteq> {}\<close>
     \<open>expr_pr_inner (Conj I \<psi>s) \<le> e'\<close>
   shows \<open>expressiveness_price (ImmConj I \<psi>s) \<le> e\<close>
-proof-
+proof -
   have conj_upds:
     \<open>modal_depth_srbb_inner (Conj I \<psi>s) = Sup ((modal_depth_srbb_conjunct \<circ> \<psi>s) ` I)\<close>
     \<open>branch_conj_depth_inner (Conj I \<psi>s) = Sup ((branch_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close>
@@ -449,13 +464,13 @@ proof-
     by force+
   have imm_conj_upds:
     \<open>modal_depth_srbb (ImmConj I \<psi>s) = Sup ((modal_depth_srbb_conjunct \<circ> \<psi>s) ` I)\<close>
-    \<open>branching_conjunction_depth (ImmConj I \<psi>s) = Sup ((branch_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close>
-    \<open>unstable_conjunction_depth (ImmConj I \<psi>s) = 1 + Sup ((inst_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close>
-    \<open>stable_conjunction_depth (ImmConj I \<psi>s) = Sup ((st_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close>
-    \<open>immediate_conjunction_depth (ImmConj I \<psi>s) = 1 + Sup ((imm_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close>
-    \<open>max_positive_conjunct_depth (ImmConj I \<psi>s) = Sup ((max_pos_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close>
-    \<open>max_negative_conjunct_depth (ImmConj I \<psi>s) = Sup ((max_neg_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close>
-    \<open>negation_depth (ImmConj I \<psi>s) = Sup ((neg_depth_conjunct \<circ> \<psi>s) ` I)\<close>
+    \<open>branching_conjunction_depth (ImmConj I \<psi>s) = Sup ((branch_conj_depth_conjunct\<circ>\<psi>s) ` I)\<close>
+    \<open>unstable_conjunction_depth (ImmConj I \<psi>s) = 1 + Sup ((inst_conj_depth_conjunct\<circ>\<psi>s) ` I)\<close>
+    \<open>stable_conjunction_depth (ImmConj I \<psi>s) = Sup ((st_conj_depth_conjunct\<circ>\<psi>s) ` I)\<close>
+    \<open>immediate_conjunction_depth (ImmConj I \<psi>s) = 1 + Sup ((imm_conj_depth_conjunct\<circ>\<psi>s) ` I)\<close>
+    \<open>max_positive_conjunct_depth (ImmConj I \<psi>s) = Sup ((max_pos_conj_depth_conjunct\<circ>\<psi>s) ` I)\<close>
+    \<open>max_negative_conjunct_depth (ImmConj I \<psi>s) = Sup ((max_neg_conj_depth_conjunct\<circ>\<psi>s) ` I)\<close>
+    \<open>negation_depth (ImmConj I \<psi>s) = Sup ((neg_depth_conjunct\<circ>\<psi>s) ` I)\<close>
     using assms
     by force+
   obtain e1 e2 e3 e4 e5 e6 e7 e8 where e_def: \<open>e = E e1 e2 e3 e4 e5 e6 e7 e8\<close>
@@ -495,12 +510,12 @@ proof-
     \<open>Sup ((max_neg_conj_depth_conjunct \<circ> \<psi>s) ` I) \<le> e7\<close>
     \<open>Sup ((neg_depth_conjunct \<circ> \<psi>s) ` I) \<le> e8\<close>
     using conj_upds by force+
-  from \<open>Sup ((imm_conj_depth_conjunct \<circ> \<psi>s) ` I) \<le> (e5-1)\<close> have \<open>(1 + Sup ((imm_conj_depth_conjunct \<circ> \<psi>s) ` I)) \<le> e5\<close>
-    using assms(1) \<open>e5>0\<close> is_some e_def add.right_neutral add_diff_cancel_enat enat_add_left_cancel_le ileI1 le_iff_add plus_1_eSuc(1)
+  from this(5) have \<open>(1 + Sup ((imm_conj_depth_conjunct \<circ> \<psi>s) ` I)) \<le> e5\<close>
+    using assms(1) \<open>e5>0\<close> is_some e_def add.right_neutral
+      add_diff_cancel_enat enat_add_left_cancel_le ileI1 le_iff_add plus_1_eSuc(1)
     by metis
   thus \<open>expressiveness_price (ImmConj I \<psi>s) \<le> e\<close> using imm_conj_upds E
     by (metis e_def  energy.sel expressiveness_price.elims leD somewhere_larger_eq)
-
 qed
 
 lemma expr_conj:
@@ -509,7 +524,7 @@ lemma expr_conj:
     \<open>I \<noteq> {}\<close>
     \<open>\<forall>q \<in> I. expr_pr_conjunct (\<psi>s q) \<le> e'\<close>
   shows \<open>expr_pr_inner (Conj I \<psi>s) \<le> e\<close>
-proof-
+proof -
   have conj_upds:
     \<open>modal_depth_srbb_inner (Conj I \<psi>s) = Sup ((modal_depth_srbb_conjunct \<circ> \<psi>s) ` I)\<close>
     \<open>branch_conj_depth_inner (Conj I \<psi>s) = Sup ((branch_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close>
@@ -548,9 +563,9 @@ proof-
     by (simp add: Sup_le_iff)+
   hence \<open>inst_conj_depth_inner (Conj I \<psi>s) \<le> e3\<close>
     using \<open>e3>0\<close> is_some e_def
-    unfolding
-      \<open>inst_conj_depth_inner (Conj I \<psi>s) = 1 + Sup ((inst_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close>
-    by (metis add.right_neutral add_diff_cancel_enat enat_add_left_cancel_le ileI1 le_iff_add plus_1_eSuc(1))
+    unfolding conj_upds(3)
+    by (metis add.right_neutral add_diff_cancel_enat enat_add_left_cancel_le ileI1
+        le_iff_add plus_1_eSuc(1))
   then show ?thesis
     using conj_upds sups
     by (simp add: e_def)
@@ -565,19 +580,21 @@ lemma expr_br_conj:
     \<open>\<forall>q \<in> Q. expr_pr_conjunct (\<Phi> q) \<le> e'\<close>
     \<open>1 + modal_depth_srbb \<phi> \<le> pos_conjuncts e\<close>
   shows \<open>expr_pr_inner (BranchConj \<alpha> \<phi> Q \<Phi>) \<le> e\<close>
-proof-
+proof -
   obtain e1 e2 e3 e4 e5 e6 e7 e8 where e_def: \<open>e = E e1 e2 e3 e4 e5 e6 e7 e8\<close>
     by (smt (z3) energy.exhaust)
   hence e'''_def: \<open>e''' = (E ((min e1 e6)-1) (e2-1) (e3-1) e4 e5 e6 e7 e8)\<close>
     using minus_energy_def
     by (smt (z3) assms energy.sel idiff_0_right min_1_6_simps option.distinct(1) option.sel)
-  hence min_vals: \<open>the (min1_6 (e - E 0 1 1 0 0 0 0 0)) - (E 1 0 0 0 0 0 0 0) = (E ((min e1 e6)-1) (e2-1) (e3-1) e4 e5 e6 e7 e8)\<close>
+  hence min_vals: \<open>the (min1_6 (e - E 0 1 1 0 0 0 0 0)) - (E 1 0 0 0 0 0 0 0)
+      = (E ((min e1 e6)-1) (e2-1) (e3-1) e4 e5 e6 e7 e8)\<close>
     using assms
     by (metis not_Some_eq option.sel)
   hence \<open>0 < e1\<close> \<open>0 < e2\<close> \<open>0 < e3\<close> \<open>0 < e6\<close>
     using assms energy.sel min_1_6_simps
     unfolding e_def minus_energy_def leq_components
-    by (metis (no_types, lifting) gr_zeroI idiff_0_right min_enat_simps(3) not_one_le_zero option.distinct(1) option.sel, auto)
+    by (metis (no_types, lifting) gr_zeroI idiff_0_right min_enat_simps(3)
+        not_one_le_zero option.distinct(1) option.sel, auto)
   have e_comp: \<open>e - (E 0 1 1 0 0 0 0 0) = E e1 (e2-1) (e3-1) e4 e5 e6 e7 e8\<close> using e_def
     by simp
   have conj:
@@ -604,14 +621,17 @@ proof-
   have \<open>0 < (min e1 e6)\<close> using \<open>0 < e1\<close> \<open>0 < e6\<close>
     using min_less_iff_conj by blast
   hence \<open>1 + modal_depth_srbb \<phi> \<le> (min e1 e6)\<close>
-    using conj_single add.commute add_diff_assoc_enat add_diff_cancel_enat add_right_mono conj_single(2) i1_ne_infinity ileI1 one_eSuc
+    using conj_single add.commute add_diff_assoc_enat add_diff_cancel_enat
+      add_right_mono conj_single(2) i1_ne_infinity ileI1 one_eSuc
     by (metis (no_types, lifting))
   hence \<open>1 + modal_depth_srbb \<phi> \<le> e1\<close> \<open>1 + modal_depth_srbb \<phi> \<le> e6\<close>
     using min.bounded_iff by blast+
   from conj have \<open>1 + branching_conjunction_depth \<phi> \<le> e2\<close>
-    by (metis \<open>0 < e2\<close> add.commute add_diff_assoc_enat add_diff_cancel_enat add_right_mono conj_single(2) i1_ne_infinity ileI1 one_eSuc)
+    by (metis \<open>0 < e2\<close> add.commute add_diff_assoc_enat add_diff_cancel_enat
+        add_right_mono conj_single(2) i1_ne_infinity ileI1 one_eSuc)
   from conj_single have \<open>1 + unstable_conjunction_depth \<phi> \<le> e3\<close>
-    using \<open>0 < e3\<close> add.commute add_diff_assoc_enat add_diff_cancel_enat add_right_mono conj_single(2) i1_ne_infinity ileI1 one_eSuc
+    using \<open>0 < e3\<close> add.commute add_diff_assoc_enat add_diff_cancel_enat
+      add_right_mono conj_single(2) i1_ne_infinity ileI1 one_eSuc
     by (metis (no_types, lifting))
   have branch: \<open>\<forall>q\<in>Q.
     E (modal_depth_srbb_conjunct (\<Phi> q))
@@ -636,10 +656,12 @@ proof-
     \<open>\<forall>q\<in>Q. (neg_depth_conjunct  (\<Phi> q)) \<le> e8\<close>
     by auto
   hence \<open>\<forall>q\<in>Q. (1 + branch_conj_depth_conjunct  (\<Phi> q)) \<le> e2\<close>
-    by (metis \<open>0 < e2\<close> add.commute add_diff_assoc_enat add_diff_cancel_enat add_right_mono i1_ne_infinity ileI1 one_eSuc)
+    by (metis \<open>0 < e2\<close> add.commute add_diff_assoc_enat add_diff_cancel_enat
+        add_right_mono i1_ne_infinity ileI1 one_eSuc)
   from branch_single have \<open>\<forall>q\<in>Q. (1 + inst_conj_depth_conjunct  (\<Phi> q)) \<le> e3\<close>
     using \<open>0 < e3\<close>
-    by (metis add.commute add_diff_assoc_enat add_diff_cancel_enat add_right_mono i1_ne_infinity ileI1 one_eSuc)
+    by (metis add.commute add_diff_assoc_enat add_diff_cancel_enat add_right_mono
+        i1_ne_infinity ileI1 one_eSuc)
   have
     \<open>expr_pr_inner (BranchConj \<alpha> \<phi> Q \<Phi>)
     = E (modal_depth_srbb_inner (BranchConj \<alpha> \<phi> Q \<Phi>))
@@ -657,36 +679,48 @@ proof-
       (1 + Sup ({unstable_conjunction_depth \<phi>} \<union> ((inst_conj_depth_conjunct \<circ> \<Phi>) ` Q)))
       (Sup ({stable_conjunction_depth \<phi>} \<union> ((st_conj_depth_conjunct \<circ> \<Phi>) ` Q)))
       (Sup ({immediate_conjunction_depth \<phi>} \<union> ((imm_conj_depth_conjunct \<circ> \<Phi>) ` Q)))
-      (Sup ({1 + modal_depth_srbb \<phi>, max_positive_conjunct_depth \<phi>} \<union> ((max_pos_conj_depth_conjunct \<circ> \<Phi>) ` Q)))
+      (Sup ({1 + modal_depth_srbb \<phi>, max_positive_conjunct_depth \<phi>}
+        \<union> ((max_pos_conj_depth_conjunct \<circ> \<Phi>) ` Q)))
       (Sup ({max_negative_conjunct_depth \<phi>} \<union> ((max_neg_conj_depth_conjunct \<circ> \<Phi>) ` Q)))
       (Sup ({negation_depth \<phi>} \<union> ((neg_depth_conjunct \<circ> \<Phi>) ` Q)))\<close> by auto
   from branch_single \<open>1 + modal_depth_srbb \<phi> \<le> e1\<close>
     have \<open>\<forall>x \<in> ({1 + modal_depth_srbb \<phi>} \<union> ((modal_depth_srbb_conjunct \<circ> \<Phi>) ` Q)). x \<le> e1\<close>
     by fastforce
-  hence e1_le: \<open>(Sup ({1 + modal_depth_srbb \<phi>} \<union> ((modal_depth_srbb_conjunct \<circ> \<Phi>) ` Q))) \<le> e1\<close>
+  hence e1_le:
+      \<open>(Sup ({1 + modal_depth_srbb \<phi>} \<union> ((modal_depth_srbb_conjunct \<circ> \<Phi>) ` Q))) \<le> e1\<close>
     using Sup_least by blast
-  have \<open>\<forall>x \<in> {branching_conjunction_depth \<phi>} \<union> ((branch_conj_depth_conjunct \<circ> \<Phi>) ` Q). x \<le> e2 -1\<close>
+  have \<open>\<forall>x \<in> {branching_conjunction_depth \<phi>} \<union> ((branch_conj_depth_conjunct \<circ> \<Phi>) ` Q).
+       x \<le> e2 - 1\<close>
     using branch_single conj_single comp_apply image_iff insertE by auto
-  hence e2_le: \<open>1 + Sup ({branching_conjunction_depth \<phi>} \<union> ((branch_conj_depth_conjunct \<circ> \<Phi>) ` Q)) \<le> e2\<close>
+  hence e2_le:
+      \<open>1 + Sup ({branching_conjunction_depth \<phi>}
+        \<union> ((branch_conj_depth_conjunct \<circ> \<Phi>) ` Q)) \<le> e2\<close>
     using Sup_least
-    by (metis Un_insert_left \<open>0 < e2\<close> add.commute eSuc_minus_1 enat_add_left_cancel_le ileI1 le_iff_add one_eSuc plus_1_eSuc(2) sup_bot_left)
-  have \<open>\<forall>x \<in> ({unstable_conjunction_depth \<phi>} \<union> ((inst_conj_depth_conjunct \<circ> \<Phi>) ` Q)). x \<le> e3-1\<close>
+    by (metis Un_insert_left \<open>0 < e2\<close> add.commute eSuc_minus_1 enat_add_left_cancel_le
+        ileI1 le_iff_add one_eSuc plus_1_eSuc(2) sup_bot_left)
+  have \<open>\<forall>x \<in> ({unstable_conjunction_depth \<phi>} \<union> ((inst_conj_depth_conjunct \<circ> \<Phi>) ` Q)).
+      x \<le> e3-1\<close>
     using conj_single branch_single
     using comp_apply image_iff insertE by auto
-  hence e3_le: \<open>1 + Sup ({unstable_conjunction_depth \<phi>} \<union> ((inst_conj_depth_conjunct \<circ> \<Phi>) ` Q)) \<le> e3\<close>
-    using Un_insert_left \<open>0<e3\<close>  add.commute eSuc_minus_1 enat_add_left_cancel_le ileI1 le_iff_add one_eSuc plus_1_eSuc(2) sup_bot_left
+  hence e3_le:
+      \<open>1 + Sup ({unstable_conjunction_depth \<phi>} \<union> ((inst_conj_depth_conjunct \<circ> \<Phi>) ` Q)) \<le> e3\<close>
+    using Un_insert_left \<open>0<e3\<close>  add.commute eSuc_minus_1 enat_add_left_cancel_le ileI1
+      le_iff_add one_eSuc plus_1_eSuc(2) sup_bot_left
     by (metis Sup_least)
   have fa:
     \<open>\<forall>x \<in> ({stable_conjunction_depth \<phi>} \<union> ((st_conj_depth_conjunct \<circ> \<Phi>) ` Q)). x \<le> e4\<close>
     \<open>\<forall>x \<in> ({immediate_conjunction_depth \<phi>} \<union> ((imm_conj_depth_conjunct \<circ> \<Phi>) ` Q)). x \<le> e5\<close>
-    \<open>\<forall>x \<in> ({1 + modal_depth_srbb \<phi>, max_positive_conjunct_depth \<phi>} \<union> ((max_pos_conj_depth_conjunct \<circ> \<Phi>) ` Q)). x \<le> e6\<close>
-    \<open>\<forall>x \<in> ({max_negative_conjunct_depth \<phi>} \<union> ((max_neg_conj_depth_conjunct \<circ> \<Phi>) ` Q)). x \<le> e7\<close>
+    \<open>\<forall>x \<in> ({1 + modal_depth_srbb \<phi>, max_positive_conjunct_depth \<phi>}
+            \<union> ((max_pos_conj_depth_conjunct \<circ> \<Phi>) ` Q)). x \<le> e6\<close>
+    \<open>\<forall>x \<in> ({max_negative_conjunct_depth \<phi>}
+            \<union> ((max_neg_conj_depth_conjunct \<circ> \<Phi>) ` Q)). x \<le> e7\<close>
     \<open>\<forall>x \<in> ({negation_depth \<phi>} \<union> ((neg_depth_conjunct \<circ> \<Phi>) ` Q)). x \<le> e8\<close>
       using conj_single branch_single \<open>1 + modal_depth_srbb \<phi> \<le> e6\<close> by auto
   hence
     \<open>(Sup ({stable_conjunction_depth \<phi>} \<union> ((st_conj_depth_conjunct \<circ> \<Phi>) ` Q))) \<le> e4\<close>
     \<open>(Sup ({immediate_conjunction_depth \<phi>} \<union> ((imm_conj_depth_conjunct \<circ> \<Phi>) ` Q))) \<le> e5\<close>
-    \<open>(Sup ({1 + modal_depth_srbb \<phi>, max_positive_conjunct_depth \<phi>} \<union> ((max_pos_conj_depth_conjunct \<circ> \<Phi>) ` Q))) \<le> e6\<close>
+    \<open>(Sup ({1 + modal_depth_srbb \<phi>, max_positive_conjunct_depth \<phi>}
+          \<union> ((max_pos_conj_depth_conjunct \<circ> \<Phi>) ` Q))) \<le> e6\<close>
     \<open>(Sup ({max_negative_conjunct_depth \<phi>} \<union> ((max_neg_conj_depth_conjunct \<circ> \<Phi>) ` Q))) \<le> e7\<close>
     \<open>(Sup ({negation_depth \<phi>} \<union> ((neg_depth_conjunct \<circ> \<Phi>) ` Q))) \<le> e8\<close>
     using Sup_least
@@ -698,7 +732,7 @@ qed
 lemma expressiveness_price_ImmConj_geq_parts:
   assumes \<open>i \<in> I\<close>
   shows \<open>expressiveness_price (ImmConj I \<psi>s) - E 0 0 1 0 1 0 0 0 \<ge> expr_pr_conjunct (\<psi>s i)\<close>
-proof-
+proof -
   from assms have \<open>I \<noteq> {}\<close> by blast
   from expressiveness_price_ImmConj_non_empty_def[OF \<open>I \<noteq> {}\<close>]
   have \<open>expressiveness_price (ImmConj I \<psi>s) \<ge> E 0 0 1 0 1 0 0 0\<close>
@@ -722,7 +756,9 @@ qed
 
 lemma expressiveness_price_ImmConj_geq_parts':
   assumes \<open>i \<in> I\<close>
-  shows \<open>(expressiveness_price (ImmConj I \<psi>s) - E 0 0 0 0 1 0 0 0) - E 0 0 1 0 0 0 0 0 \<ge> expr_pr_conjunct (\<psi>s i)\<close>
+  shows
+    \<open>(expressiveness_price (ImmConj I \<psi>s) - E 0 0 0 0 1 0 0 0) - E 0 0 1 0 0 0 0 0
+    \<ge> expr_pr_conjunct (\<psi>s i)\<close>
   using expressiveness_price_ImmConj_geq_parts[OF assms]
     less_eq_energy_def minus_energy_def
   by (smt (z3) energy.sel idiff_0_right)
@@ -730,8 +766,8 @@ lemma expressiveness_price_ImmConj_geq_parts':
 text \<open>Here, we show the prices for some specific formulas.\<close>
 
 lemma example_\<phi>_cp:
-  fixes op::\<open>'a\<close> and a::\<open>'a\<close> and b::\<open>'a\<close> and left::\<open>'s\<close> and right::\<open>'s\<close> 
-  defines \<phi>: \<open>\<phi> \<equiv>
+  fixes op a b::\<open>'a\<close> and left right::\<open>'s\<close> 
+  defines \<open>\<phi> \<equiv>
     (Internal
       (Obs op
         (Internal
@@ -742,16 +778,15 @@ lemma example_\<phi>_cp:
                            then (Pos (Obs b TT))
                            else undefined))))))\<close>
   shows
-      \<open>modal_depth_srbb            \<phi> = 2\<close>
-  and \<open>branching_conjunction_depth \<phi> = 0\<close>
-  and \<open>unstable_conjunction_depth  \<phi> = 1\<close>
-  and \<open>stable_conjunction_depth    \<phi> = 0\<close>
-  and \<open>immediate_conjunction_depth \<phi> = 0\<close>
-  and \<open>max_positive_conjunct_depth \<phi> = 1\<close>
-  and \<open>max_negative_conjunct_depth \<phi> = 0\<close>
-  and \<open>negation_depth              \<phi> = 0\<close>
-  unfolding \<phi>
-  by simp+
+    \<open>modal_depth_srbb            \<phi> = 2\<close>
+    \<open>branching_conjunction_depth \<phi> = 0\<close>
+    \<open>unstable_conjunction_depth  \<phi> = 1\<close>
+    \<open>stable_conjunction_depth    \<phi> = 0\<close>
+    \<open>immediate_conjunction_depth \<phi> = 0\<close>
+    \<open>max_positive_conjunct_depth \<phi> = 1\<close>
+    \<open>max_negative_conjunct_depth \<phi> = 0\<close>
+    \<open>negation_depth              \<phi> = 0\<close>
+  unfolding \<phi>_def by simp+
 
 lemma \<open>expressiveness_price (Internal
       (Obs op
@@ -777,14 +812,16 @@ lemma \<open>expressiveness_price (Internal (BranchConj \<alpha> TT {} \<psi>s))
   by (simp add: Sup_enat_def)
 
 lemma expr_obs_phi:
-  shows \<open>subtract_fn 1 0 0 0 0 0 0 0 (expr_pr_inner (Obs \<alpha> \<phi>)) = Some (expressiveness_price \<phi>)\<close>
+  \<open>subtract_fn 1 0 0 0 0 0 0 0 (expr_pr_inner (Obs \<alpha> \<phi>)) = Some (expressiveness_price \<phi>)\<close>
   by simp
+
+end \<comment> \<open>pause \<open>lts_tau\<close> context\<close>
 
 subsection \<open>Characterizing Equivalence by Energy Coordinates\<close>
 
-end
-
-text \<open>We can now define a sublanguage of Hennessy--Milner Logic \<open>\<O>\<close> by the set of formulas with prices below an energy coordinate.\<close>
+text \<open>
+  We can now define a sublanguage of Hennessy--Milner Logic \<open>\<O>\<close> by the set of formulas with prices below an energy coordinate.
+\<close>
 definition \<O> :: \<open>energy \<Rightarrow> (('a, 's) hml_srbb) set\<close> where
   \<open>\<O> energy \<equiv> {\<phi> . expressiveness_price \<phi> \<le> energy}\<close>
 
@@ -824,14 +861,16 @@ subsection \<open>Relational Effects of Prices\<close>
 
 lemma distinction_combination_eta:
   fixes p q
-  defines \<open>Q\<alpha> \<equiv> {q'. q \<Zsurj> q' \<and>  (\<nexists>\<phi>. \<phi> \<in> \<O> (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> 0 0) \<and> distinguishes \<phi> p q')}\<close>
+  defines
+    \<open>Q\<alpha> \<equiv> {q'. q \<Zsurj> q' \<and>  (\<nexists>\<phi>. \<phi> \<in> \<O> (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> 0 0) \<and> distinguishes \<phi> p q')}\<close>
   assumes
     \<open>p \<mapsto>a \<alpha> p'\<close>
     \<open>\<forall>q'\<in> Q\<alpha>.
       \<forall>q'' q'''. q' \<mapsto>a \<alpha> q'' \<longrightarrow> q'' \<Zsurj> q''' \<longrightarrow> distinguishes (\<Phi> q''') p' q'''\<close>
   shows
     \<open>\<forall>q'\<in> Q\<alpha>. hml_srbb_inner.distinguishes (Obs \<alpha> (Internal (Conj
-      {q'''. \<exists>q'\<in> Q\<alpha>. \<exists>q''. q' \<mapsto>a \<alpha> q'' \<and> q'' \<Zsurj> q'''} (conjunctify_distinctions \<Phi> p')))) p q'\<close>
+      {q'''. \<exists>q'\<in> Q\<alpha>. \<exists>q''. q' \<mapsto>a \<alpha> q'' \<and> q'' \<Zsurj> q'''}
+      (conjunctify_distinctions \<Phi> p')))) p q'\<close>
 proof -
   have \<open>\<forall>q'\<in> Q\<alpha>. \<forall>q'''\<in>{q'''. \<exists>q'\<in> Q\<alpha>. \<exists>q''. q' \<mapsto>a \<alpha> q'' \<and> q'' \<Zsurj> q'''}.
       hml_srbb_conj.distinguishes ((conjunctify_distinctions \<Phi> p') q''') p' q'''\<close>
@@ -842,11 +881,13 @@ proof -
        using assms(3)  distinction_conjunctification by blast
   qed
   hence \<open>\<forall>q'\<in> Q\<alpha>. \<forall>q''. q' \<mapsto>a \<alpha> q''
-    \<longrightarrow> distinguishes (Internal (Conj {q'''. \<exists>q'\<in> Q\<alpha>. \<exists>q''. q' \<mapsto>a \<alpha> q'' \<and> q'' \<Zsurj> q'''} (conjunctify_distinctions \<Phi> p')))  p' q''\<close>
+    \<longrightarrow> distinguishes (Internal (Conj {q'''. \<exists>q'\<in> Q\<alpha>. \<exists>q''. q' \<mapsto>a \<alpha> q'' \<and> q'' \<Zsurj> q'''}
+          (conjunctify_distinctions \<Phi> p')))  p' q''\<close>
     using silent_reachable.refl unfolding Q\<alpha>_def by fastforce
   thus \<open>\<forall>q'\<in> Q\<alpha>.
      hml_srbb_inner.distinguishes (Obs \<alpha> (Internal (Conj
-        {q'''. \<exists>q'\<in> Q\<alpha>. \<exists>q''. q' \<mapsto>a \<alpha> q'' \<and> q'' \<Zsurj> q'''} (conjunctify_distinctions \<Phi> p')))) p q'\<close>
+        {q'''. \<exists>q'\<in> Q\<alpha>. \<exists>q''. q' \<mapsto>a \<alpha> q'' \<and> q'' \<Zsurj> q'''}
+        (conjunctify_distinctions \<Phi> p')))) p q'\<close>
     using assms(2) by (auto) (metis silent_reachable.refl)+
 qed
 
@@ -856,12 +897,18 @@ lemma distinction_conjunctification_two_way_price:
     \<open>\<forall>q\<in>I. \<Phi> q \<in> \<O> (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> \<infinity> \<infinity>)\<close>
   shows
     \<open>\<forall>q\<in>I.
-      (if distinguishes (\<Phi> q) p q then conjunctify_distinctions else conjunctify_distinctions_dual) \<Phi> p q
-      \<in> \<O>_conjunct (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> \<infinity> \<infinity>)\<close>
+      (if distinguishes (\<Phi> q) p q
+        then conjunctify_distinctions
+        else conjunctify_distinctions_dual
+      ) \<Phi> p q \<in> \<O>_conjunct (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> \<infinity> \<infinity>)\<close>
 proof
   fix q
   assume \<open>q \<in> I\<close>
-  show \<open>(if distinguishes (\<Phi> q) p q then conjunctify_distinctions else conjunctify_distinctions_dual) \<Phi> p q \<in> \<O>_conjunct (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> \<infinity> \<infinity>)\<close>
+  show
+    \<open>(if distinguishes (\<Phi> q) p q
+      then conjunctify_distinctions
+      else conjunctify_distinctions_dual
+    ) \<Phi> p q \<in> \<O>_conjunct (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> \<infinity> \<infinity>)\<close>
   proof (cases \<open>\<Phi> q\<close>)
     case TT
     then show ?thesis
@@ -886,12 +933,18 @@ qed
 lemma distinction_combination_eta_two_way:
   fixes p q p' \<Phi>
   defines
-    \<open>Q\<alpha> \<equiv> {q'. q \<Zsurj> q' \<and>  (\<nexists>\<phi>. \<phi> \<in> \<O> (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> \<infinity> \<infinity>) \<and> (distinguishes \<phi> p q' \<or> distinguishes \<phi> q' p))}\<close> and
-    \<open>\<Psi>\<alpha> \<equiv> \<lambda>q'''. (if distinguishes (\<Phi> q''') p' q''' then conjunctify_distinctions else conjunctify_distinctions_dual) \<Phi> p' q'''\<close>
+    \<open>Q\<alpha> \<equiv> {q'. q \<Zsurj> q' \<and>  (\<nexists>\<phi>. \<phi> \<in> \<O> (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> \<infinity> \<infinity>)
+          \<and> (distinguishes \<phi> p q' \<or> distinguishes \<phi> q' p))}\<close> and
+    \<open>\<Psi>\<alpha> \<equiv> \<lambda>q'''. (
+        if distinguishes (\<Phi> q''') p' q'''
+        then conjunctify_distinctions
+        else conjunctify_distinctions_dual
+      ) \<Phi> p' q'''\<close>
   assumes
     \<open>p \<mapsto>a \<alpha> p'\<close>
     \<open>\<forall>q'\<in> Q\<alpha>.
-      \<forall>q'' q'''. q' \<mapsto>a \<alpha> q'' \<longrightarrow> q'' \<Zsurj> q''' \<longrightarrow> distinguishes (\<Phi> q''') p' q''' \<or> distinguishes (\<Phi> q''') q''' p'\<close>
+      \<forall>q'' q'''. q' \<mapsto>a \<alpha> q'' \<longrightarrow> q'' \<Zsurj> q'''
+        \<longrightarrow> distinguishes (\<Phi> q''') p' q''' \<or> distinguishes (\<Phi> q''') q''' p'\<close>
   shows
     \<open>\<forall>q'\<in> Q\<alpha>. hml_srbb_inner.distinguishes (Obs \<alpha> (Internal (Conj
       {q'''. \<exists>q'\<in> Q\<alpha>. \<exists>q''. q' \<mapsto>a \<alpha> q'' \<and> q'' \<Zsurj> q'''}
@@ -902,26 +955,26 @@ proof -
   proof clarify
     fix q' q'' q'''
     assume \<open>q' \<in> Q\<alpha>\<close> \<open>q' \<mapsto>a \<alpha> q''\<close> \<open>q'' \<Zsurj> q'''\<close>
-    thus \<open>hml_srbb_conj.distinguishes
-        (\<Psi>\<alpha> q''') p' q''' \<close>
+    thus \<open>hml_srbb_conj.distinguishes (\<Psi>\<alpha> q''') p' q''' \<close>
       using assms(4) \<Psi>\<alpha>_def distinction_conjunctification_two_way mem_Collect_eq
       by (smt (verit, best))
   qed
   hence \<open>\<forall>q'\<in> Q\<alpha>. \<forall>q'''\<in>{q'''. \<exists>q'\<in> Q\<alpha>. \<exists>q''. q' \<mapsto>a \<alpha> q'' \<and> q'' \<Zsurj> q'''}.
-    hml_srbb_inner.distinguishes (Conj {q'''. \<exists>q'\<in> Q\<alpha>. \<exists>q''. q' \<mapsto>a \<alpha> q'' \<and> q'' \<Zsurj> q'''}
-      \<Psi>\<alpha>)  p' q'''\<close>
+      hml_srbb_inner.distinguishes (Conj {q'''. \<exists>q'\<in> Q\<alpha>. \<exists>q''. q' \<mapsto>a \<alpha> q'' \<and> q'' \<Zsurj> q'''}
+        \<Psi>\<alpha>)  p' q'''\<close>
     using srbb_dist_conjunct_implies_dist_conjunction
     unfolding lts_semantics.distinguishes_def
     by (metis (no_types, lifting))
   hence \<open>\<forall>q'\<in> Q\<alpha>. \<forall>q'''. (\<exists>q''. q' \<mapsto>a \<alpha> q'' \<and> q'' \<Zsurj> q''') \<longrightarrow>
-    hml_srbb_inner.distinguishes (Conj {q'''. \<exists>q'\<in> Q\<alpha>. \<exists>q''. q' \<mapsto>a \<alpha> q'' \<and> q'' \<Zsurj> q'''} \<Psi>\<alpha>)  p' q'''\<close>
+      hml_srbb_inner.distinguishes
+        (Conj {q'''. \<exists>q'\<in> Q\<alpha>. \<exists>q''. q' \<mapsto>a \<alpha> q'' \<and> q'' \<Zsurj> q'''} \<Psi>\<alpha>)  p' q'''\<close>
     by blast
-  hence \<open>\<forall>q'\<in> Q\<alpha>. \<forall>q''. q' \<mapsto>a \<alpha> q'' \<longrightarrow>
-    distinguishes (Internal  (Conj {q'''. \<exists>q'\<in> Q\<alpha>. \<exists>q''. q' \<mapsto>a \<alpha> q'' \<and> q'' \<Zsurj> q'''} \<Psi>\<alpha>)) p' q''\<close>
-    by (meson distinguishes_def hml_srbb_inner.distinguishes_def hml_srbb_models.simps(2) silent_reachable.refl)
-  thus \<open>\<forall>q'\<in> Q\<alpha>.
-     hml_srbb_inner.distinguishes (Obs \<alpha> (Internal (Conj
-        {q'''. \<exists>q'\<in> Q\<alpha>. \<exists>q''. q' \<mapsto>a \<alpha> q'' \<and> q'' \<Zsurj> q'''} \<Psi>\<alpha>))) p q'\<close>
+  hence \<open>\<forall>q'\<in> Q\<alpha>. \<forall>q''. q' \<mapsto>a \<alpha> q'' \<longrightarrow> distinguishes
+      (Internal  (Conj {q'''. \<exists>q'\<in> Q\<alpha>. \<exists>q''. q' \<mapsto>a \<alpha> q'' \<and> q'' \<Zsurj> q'''} \<Psi>\<alpha>)) p' q''\<close>
+    by (meson distinguishes_def hml_srbb_inner.distinguishes_def
+        hml_srbb_models.simps(2) silent_reachable.refl)
+  thus \<open>\<forall>q'\<in> Q\<alpha>. hml_srbb_inner.distinguishes
+      (Obs \<alpha> (Internal (Conj {q'''. \<exists>q'\<in> Q\<alpha>. \<exists>q''. q' \<mapsto>a \<alpha> q'' \<and> q'' \<Zsurj> q'''} \<Psi>\<alpha>))) p q'\<close>
     using assms(3)
     by auto (metis silent_reachable.refl)+
 qed
@@ -952,18 +1005,21 @@ proof
     case (ImmConj J \<Psi>)
     hence \<open>\<exists>i. i\<in>J \<and> hml_srbb_conj.distinguishes (\<Psi> i) p q\<close>
       using \<open>q \<in> I\<close> assms(1) by fastforce
-    moreover have \<open>conjunctify_distinctions \<Phi> p q  = \<Psi> (SOME i. i\<in>J \<and> hml_srbb_conj.distinguishes (\<Psi> i) p q)\<close>
+    moreover have \<open>conjunctify_distinctions \<Phi> p q 
+        = \<Psi> (SOME i. i\<in>J \<and> hml_srbb_conj.distinguishes (\<Psi> i) p q)\<close>
       unfolding ImmConj conjunctify_distinctions_def by simp
-    ultimately have \<Psi>_i: \<open>\<exists>i\<in>J. hml_srbb_conj.distinguishes (\<Psi> i) p q \<and> conjunctify_distinctions \<Phi> p q = \<Psi> i\<close>
+    ultimately have \<Psi>_i:
+      \<open>\<exists>i\<in>J. hml_srbb_conj.distinguishes (\<Psi> i) p q \<and> conjunctify_distinctions \<Phi> p q = \<Psi> i\<close>
       by (metis (no_types, lifting) some_eq_ex)
     hence \<open>conjunctify_distinctions \<Phi> p q \<in> \<Psi>`J\<close>
       unfolding image_iff by blast
-    hence \<open>expr_pr_conjunct (conjunctify_distinctions \<Phi> p q) \<le> expressiveness_price (ImmConj J \<Psi>)\<close>
-      by (smt (verit, best) \<Psi>_i dual_order.trans expressiveness_price_ImmConj_geq_parts gets_smaller)
+    hence
+      \<open>expr_pr_conjunct (conjunctify_distinctions \<Phi> p q)
+        \<le> expressiveness_price (ImmConj J \<Psi>)\<close>
+      by (smt (verit, best) \<Psi>_i dual_order.trans expressiveness_price_ImmConj_geq_parts
+          gets_smaller)
     then show ?thesis
-      using assms \<open>q \<in> I\<close> ImmConj
-      unfolding \<O>_def \<O>_conjunct_def
-      by auto
+      using assms \<open>q \<in> I\<close> ImmConj unfolding \<O>_def \<O>_conjunct_def by auto
   qed
 qed
 
@@ -975,41 +1031,47 @@ proof safe
   assume p_stability:
     \<open>preordered (\<O> (E e1 e2 e3 \<infinity> e5 \<infinity> e7 e8)) p q\<close>
     \<open>stable_state p\<close>
-  have \<open>\<not>(\<forall>q'. q \<Zsurj> q' \<longrightarrow> \<not> preordered (\<O> (E e1 e2 e3 \<infinity> e5 \<infinity> e7 e8)) p q' \<or> \<not> stable_state q')\<close>
+  have \<open>\<not>(\<forall>q'. q \<Zsurj> q'
+    \<longrightarrow> \<not> preordered (\<O> (E e1 e2 e3 \<infinity> e5 \<infinity> e7 e8)) p q' \<or> \<not> stable_state q')\<close>
   proof safe
-    assume \<open>\<forall>q'. q \<Zsurj> q' \<longrightarrow> \<not> preordered (\<O> (E e1 e2 e3 \<infinity> e5 \<infinity> e7 e8)) p q' \<or> \<not> stable_state q'\<close>
-    hence  \<open>\<forall>q'. q \<Zsurj> q' \<longrightarrow> stable_state q' \<longrightarrow> (\<exists>\<phi> \<in> \<O> (E e1 e2 e3 \<infinity> e5 \<infinity> e7 e8). distinguishes \<phi> p q')\<close> by auto
+    assume \<open>\<forall>q'. q \<Zsurj> q'
+      \<longrightarrow> \<not> preordered (\<O> (E e1 e2 e3 \<infinity> e5 \<infinity> e7 e8)) p q' \<or> \<not> stable_state q'\<close>
+    hence  \<open>\<forall>q'. q \<Zsurj> q' \<longrightarrow> stable_state q'
+      \<longrightarrow> (\<exists>\<phi> \<in> \<O> (E e1 e2 e3 \<infinity> e5 \<infinity> e7 e8). distinguishes \<phi> p q')\<close> by auto
     then obtain \<Phi> where \<Phi>_def:
       \<open>\<forall>q'\<in>(silent_reachable_set {q}). stable_state q'
       \<longrightarrow> distinguishes (\<Phi> q') p q' \<and> \<Phi> q' \<in> \<O> (E e1 e2 e3 \<infinity> e5 \<infinity> e7 e8)\<close>
       using singleton_iff sreachable_set_is_sreachable by metis
     hence distinctions:
       \<open>\<forall>q'\<in>(silent_reachable_set {q} \<inter> {q'. stable_state q'}). distinguishes (\<Phi> q') p q'\<close>
-      \<open>\<forall>q'\<in>(silent_reachable_set {q} \<inter> {q'. stable_state q'}). \<Phi> q' \<in> \<O> (E e1 e2 e3 \<infinity> e5 \<infinity> e7 e8)\<close> by blast+
+      \<open>\<forall>q'\<in>(silent_reachable_set {q} \<inter> {q'. stable_state q'}).
+        \<Phi> q' \<in> \<O> (E e1 e2 e3 \<infinity> e5 \<infinity> e7 e8)\<close> by blast+
     from distinction_conjunctification_price[OF this] have
-      \<open>\<forall>q'\<in>(silent_reachable_set {q} \<inter> {q'. stable_state q'}). conjunctify_distinctions \<Phi> p q' \<in> \<O>_conjunct (E e1 e2 e3 \<infinity> e5 \<infinity> e7 e8)\<close>
+      \<open>\<forall>q'\<in>(silent_reachable_set {q} \<inter> {q'. stable_state q'}).
+        conjunctify_distinctions \<Phi> p q' \<in> \<O>_conjunct (E e1 e2 e3 \<infinity> e5 \<infinity> e7 e8)\<close>
       by fastforce
-    hence conj_price: \<open>StableConj (silent_reachable_set {q} \<inter> {q'. stable_state q'}) (conjunctify_distinctions \<Phi> p)
-        \<in> \<O>_inner (E e1 e2 e3 \<infinity> e5 \<infinity> e7 e8)\<close>
+    hence conj_price: \<open>StableConj (silent_reachable_set {q} \<inter> {q'. stable_state q'})
+        (conjunctify_distinctions \<Phi> p) \<in> \<O>_inner (E e1 e2 e3 \<infinity> e5 \<infinity> e7 e8)\<close>
       unfolding \<O>_inner_def \<O>_conjunct_def using SUP_le_iff by fastforce
     from \<Phi>_def have
-      \<open>\<forall>q'\<in>(silent_reachable_set {q}). stable_state q' \<longrightarrow>
-         hml_srbb_conj.distinguishes (conjunctify_distinctions \<Phi> p q') p q'\<close>
+      \<open>\<forall>q'\<in>(silent_reachable_set {q}). stable_state q'
+        \<longrightarrow> hml_srbb_conj.distinguishes (conjunctify_distinctions \<Phi> p q') p q'\<close>
       using singleton_iff distinction_conjunctification by metis
     hence \<open>hml_srbb_inner.distinguishes_from
-       (StableConj (silent_reachable_set {q} \<inter> {q'. stable_state q'}) (conjunctify_distinctions \<Phi> p))
-       p (silent_reachable_set {q})\<close>
+      (StableConj (silent_reachable_set {q} \<inter> {q'. stable_state q'})
+        (conjunctify_distinctions \<Phi> p)) p (silent_reachable_set {q})\<close>
       using p_stability(2) by fastforce
     hence
       \<open>distinguishes
         (Internal (StableConj (silent_reachable_set {q} \<inter> {q'. stable_state q'})
-                (conjunctify_distinctions \<Phi> p)))
+                (conjunctify_distinctions \<Phi> p))
+        )
         p q\<close>
       unfolding silent_reachable_set_def
       using silent_reachable.refl by auto
     moreover have
-      \<open>Internal (StableConj (silent_reachable_set {q} \<inter> {q'. stable_state q'}) (conjunctify_distinctions \<Phi> p))
-        \<in> \<O> (E e1 e2 e3 \<infinity> e5 \<infinity> e7 e8)\<close>
+      \<open>Internal (StableConj (silent_reachable_set {q} \<inter> {q'. stable_state q'})
+          (conjunctify_distinctions \<Phi> p)) \<in> \<O> (E e1 e2 e3 \<infinity> e5 \<infinity> e7 e8)\<close>
       using conj_price unfolding \<O>_def \<O>_inner_def by simp
     ultimately show False
       using p_stability(1) preordered_no_distinction by blast

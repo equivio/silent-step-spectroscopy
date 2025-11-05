@@ -179,7 +179,7 @@ lemma silent_prepend_weak_traces:
   shows
     \<open>tr \<in> weak_traces p\<close>
   using assms
-proof-
+proof -
   assume \<open>p \<Zsurj> p'\<close>
      and \<open>tr \<in> weak_traces p'\<close>
   hence \<open>\<exists>p''. p' \<Zsurj>\<mapsto>\<Zsurj>$ tr p''\<close> by auto
