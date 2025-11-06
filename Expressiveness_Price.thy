@@ -859,6 +859,10 @@ lemma price_hierachy_preorder_dual:
 
 subsection \<open>Relational Effects of Prices\<close>
 
+text \<open>
+  Certain properties of prices influence the preorder/equivalence relations that are characterized by price coordinates. (This will be important for some behavioral equivalences that we will prove to be characterized by specific prices.) 
+\<close>
+
 lemma distinction_combination_eta:
   fixes p q
   defines
