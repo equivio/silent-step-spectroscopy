@@ -12,14 +12,15 @@ session Weak_Spectroscopy = "HOL-Library" +
 *)
 
 (* The top-level theories of the submission: *)
-  theories
-    Silent_Step_Spectroscopy
-    Weak_Traces
-    Branching_Bisimilarity
+theories
+  HML_SRBB
+  Silent_Step_Spectroscopy
+  Weak_Traces
+  Branching_Bisimilarity
 
 (* Dependencies on document source files: *)
-  document_files
-    "root.bib"
-    "root.tex"
+document_files
+  "root.bib"
+  "root.tex"
 
 
