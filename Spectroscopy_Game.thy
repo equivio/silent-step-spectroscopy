@@ -1,14 +1,14 @@
 section \<open>Weak Spectroscopy Game\<close>
+
 theory Spectroscopy_Game
   imports Energy_Games Energy Labeled_Transition_Systems
 begin
 
-text \<open>In this theory, we define the weak spectroscopy game as a locale.
-This game is an energy game constructed by adding stable and branching conjunctions to a delay bisimulation game that depends on a LTS.
-We play the weak spectroscopy game to compare the behaviour of processes and analyze which behavioural equivalences apply.
-The moves of a weak spectroscopy game depend on the transitions of the processes and the available energy.
-So in other words: If the defender wins the weak spectroscopy game starting with a certain energy, the corresponding behavioural equivalence applies.
-\\ Since we added adding stable and branching conjunctions to a delay bisimulation game, we differentiate the positions accordingly.\<close>
+text \<open>
+  The weak spectroscopy game is an energy game played over an LTS.
+  The attacker's moves in the weak spectroscopy game depend on the transitions of the processes and the available energy.
+  Intuitively, each move type corresponds to a production in the construction of distinguishing formulas; and each attacker position to a non-terminal in the underlying grammar.
+\<close>
 datatype ('s, 'a) spectroscopy_position =
   Attacker_Immediate (attacker_state: \<open>'s\<close>) (defender_states: \<open>'s set\<close>) |
   Attacker_Delayed (attacker_state: \<open>'s\<close>) (defender_states: \<open>'s set\<close>) |
@@ -21,11 +21,13 @@ datatype ('s, 'a) spectroscopy_position =
                  (attacker_state_succ: \<open>'s\<close>) (defender_states: \<open>'s set\<close>)
                  (defender_branch_states: \<open>'s set\<close>)
 
-context lts_tau begin
+context lts_tau
+begin
 
-text\<open>\label{specmoves}\<close>
-text\<open>We also define the moves of the weak spectroscopy game. Their names indicate the respective HML formulas they correspond to. This correspondence will be shown in section \ref{deviation:lemma3}. \<close>
-fun spectroscopy_moves :: \<open>('s, 'a) spectroscopy_position \<Rightarrow> ('s, 'a) spectroscopy_position \<Rightarrow> energy update option\<close> where
+text \<open>The names of moves of the weak spectroscopy game indicate the respective HML constructs they correspond to.\<close>
+fun spectroscopy_moves :: \<open>('s, 'a) spectroscopy_position \<Rightarrow> ('s, 'a) spectroscopy_position
+  \<Rightarrow> energy update option\<close>
+where
   delay:
     \<open>spectroscopy_moves (Attacker_Immediate p Q) (Attacker_Delayed p' Q')
      = (if p' = p \<and> Q \<Zsurj>S Q' then id_up else None)\<close> |
@@ -56,8 +58,9 @@ fun spectroscopy_moves :: \<open>('s, 'a) spectroscopy_position \<Rightarrow> ('
     \<open>spectroscopy_moves (Attacker_Conjunct p q) (Attacker_Delayed p' Q')
       = (if (p = p') then
           (if {q} \<Zsurj>S Q' then Some min1_6 else None)
-         else (if ({p} \<Zsurj>S Q'\<and> q=p')
-               then Some (\<lambda>e. Option.bind ((subtract_fn 0 0 0 0 0 0 0 1) e) min1_7) else None))\<close> |
+         else (if {p} \<Zsurj>S Q' \<and> q=p'
+               then Some (\<lambda>e. Option.bind (subtract_fn 0 0 0 0 0 0 0 1 e) min1_7)
+               else None))\<close> |
 
   late_stbl_conj:
     \<open>spectroscopy_moves (Attacker_Delayed p Q) (Defender_Stable_Conj p' Q')
@@ -103,7 +106,7 @@ fun spectroscopy_defender where
   \<open>spectroscopy_defender (Defender_Conj _ _) = True\<close> |
   \<open>spectroscopy_defender (Defender_Stable_Conj _ _) = True\<close>
 
-text \<open>Now, we are able to define the weak spectroscopy game on an arbitrary (but inhabited) LTS.\<close>
+text \<open>Now, we are able to define the weak spectroscopy game on an arbitrary LTS.\<close>
 sublocale weak_spectroscopy_game:
   energy_game \<open>spectroscopy_moves\<close> \<open>spectroscopy_defender\<close> \<open>(\<le>)\<close>
 proof
@@ -133,7 +136,9 @@ next
     hence \<open>\<exists>p' Q'. g'= (Attacker_Delayed p' Q')\<close>
       using monotonicity_assms(1,2)
       by (induct, auto)
-    hence \<open>spectroscopy_moves g g' = Some min1_6 \<or> spectroscopy_moves g g' = Some (\<lambda>e. Option.bind ((subtract_fn 0 0 0 0 0 0 0 1) e) min1_7)\<close>
+    hence \<open>spectroscopy_moves g g' = Some min1_6
+      \<or> spectroscopy_moves g g'
+        = Some (\<lambda>e. Option.bind ((subtract_fn 0 0 0 0 0 0 0 1) e) min1_7)\<close>
       using monotonicity_assms(1,2) Attacker_Conjunct
       by (smt (verit, ccfv_threshold) spectroscopy_moves.simps(7))
     thus ?thesis
@@ -144,19 +149,22 @@ next
         unfolding leq_components
         by (metis min_1_6_simps option.sel)
     next
-      assume \<open>spectroscopy_moves g g' = Some (\<lambda>e. Option.bind (if \<not> E 0 0 0 0 0 0 0 1 \<le> e then None else Some (e - E 0 0 0 0 0 0 0 1)) min1_7)\<close>
+      assume \<open>spectroscopy_moves g g'
+          = Some (\<lambda>e. Option.bind (if \<not> E 0 0 0 0 0 0 0 1 \<le> e
+                                   then None else Some (e - E 0 0 0 0 0 0 0 1)) min1_7)\<close>
       thus ?thesis
         unfolding min_1_7_subtr_simp
         using monotonicity_assms
-        by (smt (z3) enat_diff_mono energy.sel leq_components min.mono option.distinct(1) option.sel)
+        by (smt (z3) enat_diff_mono energy.sel leq_components min.mono
+            option.distinct(1) option.sel)
     qed
   next
     case (Attacker_Delayed p Q)
-    hence \<open>(\<exists>p' Q'. g'=(Attacker_Delayed p' Q')) \<or>
-      (\<exists>p' Q'. g'=(Attacker_Immediate p' Q')) \<or>
-      (\<exists>p' Q'. g'=(Defender_Conj p' Q')) \<or>
-      (\<exists>p' Q'. g'=(Defender_Stable_Conj p' Q')) \<or>
-      (\<exists>p' p'' Q' \<alpha> Q\<alpha> . g'= (Defender_Branch p' \<alpha> p'' Q' Q\<alpha>))\<close>
+    hence \<open>(\<exists>p' Q'. g' = Attacker_Delayed p' Q') \<or>
+      (\<exists>p' Q'. g' = Attacker_Immediate p' Q') \<or>
+      (\<exists>p' Q'. g' = Defender_Conj p' Q') \<or>
+      (\<exists>p' Q'. g' = Defender_Stable_Conj p' Q') \<or>
+      (\<exists>p' p'' Q' \<alpha> Q\<alpha> . g' = Defender_Branch p' \<alpha> p'' Q' Q\<alpha>)\<close>
       using monotonicity_assms(1)
       by (induct, auto)
     thus ?thesis
@@ -197,7 +205,8 @@ next
     case (Defender_Branch p a p' Q' Qa)
     with monotonicity_assms show ?thesis
       by (cases g', auto simp del: leq_components, unfold min_1_6_subtr_simp)
-        (smt (z3) enat_diff_mono mono_subtract option.discI energy.sel leq_components min.mono option.distinct(1) option.inject)+
+        (smt (z3) enat_diff_mono mono_subtract option.discI energy.sel
+           leq_components min.mono option.distinct(1) option.inject)+
   next
     case (Defender_Conj p Q)
     with monotonicity_assms show ?thesis
@@ -231,7 +240,8 @@ next
     case (Attacker_Conjunct p q)
     hence \<open>\<exists>p' Q'. g'= (Attacker_Delayed p' Q')\<close>
       using defender_win_min_assms(2) by (induct, auto)
-    hence \<open>spectroscopy_moves g g' = Some min1_6 \<or> spectroscopy_moves g g' = Some (\<lambda>e. Option.bind ((subtract_fn 0 0 0 0 0 0 0 1) e) min1_7)\<close>
+    hence \<open>spectroscopy_moves g g' = Some min1_6
+      \<or> spectroscopy_moves g g' = Some (\<lambda>e. Option.bind ((subtract_fn 0 0 0 0 0 0 0 1) e) min1_7)\<close>
       using defender_win_min_assms(2) Attacker_Conjunct
       by (smt (verit, ccfv_threshold) spectroscopy_moves.simps(7))
     thus ?thesis
@@ -240,7 +250,9 @@ next
       thus \<open>the (spectroscopy_moves g g') e = None\<close>
         using defender_win_min_assms min_1_6_some by fastforce
     next
-      assume \<open>spectroscopy_moves g g' = Some (\<lambda>e. Option.bind (if \<not> E 0 0 0 0 0 0 0 1 \<le> e then None else Some (e - E 0 0 0 0 0 0 0 1)) min1_7)\<close>
+      assume \<open>spectroscopy_moves g g'
+        = Some (\<lambda>e. Option.bind (if \<not> E 0 0 0 0 0 0 0 1 \<le> e
+                                 then None else Some (e - E 0 0 0 0 0 0 0 1)) min1_7)\<close>
       thus \<open>the (spectroscopy_moves g g') e = None\<close>
         using defender_win_min_assms(1,3) bind.bind_lunit dual_order.trans min_1_7_some
         by (smt (verit, best) option.sel)
@@ -299,7 +311,7 @@ next
       \<or> (\<exists>Qa'. Qa \<mapsto>aS a Qa' \<and> g' = Attacker_Branch p' Qa')\<close>
       using defender_win_min_assms by (cases g', auto) (metis not_None_eq)+
     hence \<open>(spectroscopy_moves g g') = (subtract 0 1 1 0 0 0 0 0) \<or>
-      (spectroscopy_moves g g') = Some (\<lambda>e. Option.bind ((subtract_fn 0 1 1 0 0 0 0 0) e) min1_6)\<close>
+      (spectroscopy_moves g g') = Some (\<lambda>e. Option.bind (subtract_fn 0 1 1 0 0 0 0 0 e) min1_6)\<close>
       using Defender_Branch option.collapse[OF defender_win_min_assms(2)]
       by (cases g', auto)
     thus ?thesis
@@ -318,6 +330,8 @@ next
   qed
 qed
 
-end \<comment> \<open>of \<open>lts_tau\<close>\<close>
+abbreviation \<open>spectro_att_wins \<equiv> weak_spectroscopy_game.attacker_wins\<close>
+
+end \<comment> \<open>of \<^locale>\<open>lts_tau\<close>\<close>
 
 end
