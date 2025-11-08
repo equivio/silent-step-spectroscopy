@@ -43,7 +43,7 @@ abbreviation \<open>weight g1 g2 \<equiv> the (weight_opt g1 g2)\<close>
 
 abbreviation \<open>updated g g' e \<equiv> the (weight g g' e)\<close>
 
-subsubsection \<open>Winning Budgets\<close>
+subsection \<open>Winning Budgets\<close>
 
 text \<open>The attacker wins a game if and only if they manage to force the defender to get stuck before
 running out of energy.\<close>

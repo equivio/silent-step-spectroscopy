@@ -55,15 +55,23 @@
 \end{abstract}
 
 \paragraph{Overview.}
-By phrasing \emph{behavioral equivalences as energy games}, we obtain a uniform way to decide a wide range of equivalences in van Glabbeek's \emph{linear-time--branching-time spectrum} for systems with \emph{silent steps}~\cite{glabbeek1990ltbt1,glabbeek1993ltbt2}.
-Silent steps usually arise because of abstraction from internal system behavior, e.g., when modeling communication protocols or distributed systems using transition systems.
+By phrasing \emph{behavioral equivalences as energy games}, one obtain a uniform way to decide a wide range of equivalences in van Glabbeek's \emph{linear-time--branching-time spectrum} for systems with \emph{silent steps}~\cite{glabbeek1990ltbt1,glabbeek1993ltbt2}.
+Silent $\tau$-steps usually arise because of abstraction from internal system behavior, for instance, when modeling communication protocols or distributed systems using transition systems.
 
 This formalization follows Bisping and Jansen's \emph{weak spectroscopy game}~\cite{bj2024silentStepSpectroscopyExpress}, respectively the proofs from the arXiv version~\cite{bj2023silentStepSpectroscopyArxiv}.
 
+\begin{itemize}
+  \item Section 1 provides some basics on transition systems with internal behavior.
+  \item Sections 2 and 3 define a version of Hennessy--Milner logic for systems with internal behavior and a syntactic metric to select sublanguages of it through coordinates.
+  \item Sections 4 to 6 prove certain coordinates to correspond to weak trace equivalence, $\eta$-bi\-si\-mi\-la\-ri\-ty, $\eta$-similarity and branching bisimilarity as well as their stable variants. (As the relationship is established through modal logics, the results can me understood as Hennessy--Milner theorems~\cite{hm1980hml}.)
+  \item Sections 7 to 9 introduce the weak spectroscopy game and prove that winning attacker energies in the game correspond to coordinates of distinguishing formulas according to the syntactic expressiveness metric.
+\end{itemize}
+
+\noindent
 The bigger project of \emph{deciding all equivalences at once} is outlined in Bisping's PhD thesis~\cite{bisping2025generalizedEqChecking}.The energy game approach is due to~\cite{bisping2023equivalenceEnergyGames}.
 
 \paragraph{Acknowledgements.}
-Some of the proofs in this document are due to pen-and-paper proofs by David N. Jansen.
+Several proofs in this document are due to pen-and-paper proofs by David N. Jansen.
 
 % do not indent paragraphs
 \setlength\parindent{0pt}

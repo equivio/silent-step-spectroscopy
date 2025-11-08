@@ -9,6 +9,9 @@ text \<open>
   The attacker's moves in the weak spectroscopy game depend on the transitions of the processes and the available energy.
   Intuitively, each move type corresponds to a production in the construction of distinguishing formulas; and each attacker position to a non-terminal in the underlying grammar.
 \<close>
+
+subsection \<open>Game Rules\<close>
+
 datatype ('s, 'a) spectroscopy_position =
   Attacker_Immediate (attacker_state: \<open>'s\<close>) (defender_states: \<open>'s set\<close>) |
   Attacker_Delayed (attacker_state: \<open>'s\<close>) (defender_states: \<open>'s set\<close>) |
@@ -105,6 +108,8 @@ fun spectroscopy_defender where
   \<open>spectroscopy_defender (Defender_Branch _ _ _ _ _) = True\<close> |
   \<open>spectroscopy_defender (Defender_Conj _ _) = True\<close> |
   \<open>spectroscopy_defender (Defender_Stable_Conj _ _) = True\<close>
+
+subsection \<open>Energy Game Properties\<close>
 
 text \<open>Now, we are able to define the weak spectroscopy game on an arbitrary LTS.\<close>
 sublocale weak_spectroscopy_game:
