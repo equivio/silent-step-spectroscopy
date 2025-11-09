@@ -55,8 +55,9 @@
 \end{abstract}
 
 \paragraph{Overview.}
-By phrasing \emph{behavioral equivalences as energy games}, one obtain a uniform way to decide a wide range of equivalences in van Glabbeek's \emph{linear-time--branching-time spectrum} for systems with \emph{silent steps}~\cite{glabbeek1990ltbt1,glabbeek1993ltbt2}.
-Silent $\tau$-steps usually arise because of abstraction from internal system behavior, for instance, when modeling communication protocols or distributed systems using transition systems.
+This formalization provides theoretical underpinnings of \url{https://equiv.io}, a tool to \emph{decide all behavioral equivalences at once}.
+By phrasing \emph{equivalences as energy games}, one obtains a uniform way to handle a wide range of equivalences in van Glabbeek's \emph{linear-time--branching-time spectrum}~\cite{glabbeek1990ltbt1,glabbeek1993ltbt2}.
+In particular, we treat systems with \emph{silent} $\tau$-steps, which usually arise because of abstraction from internal behavior, for instance, when modeling communication protocols or distributed systems using transition systems.
 
 This formalization follows Bisping and Jansen's \emph{weak spectroscopy game}~\cite{bj2024silentStepSpectroscopyExpress}, respectively the proofs from the arXiv version~\cite{bj2023silentStepSpectroscopyArxiv}.
 
@@ -68,10 +69,11 @@ This formalization follows Bisping and Jansen's \emph{weak spectroscopy game}~\c
 \end{itemize}
 
 \noindent
-The bigger project of \emph{deciding all equivalences at once} is outlined in Bisping's PhD thesis~\cite{bisping2025generalizedEqChecking}.The energy game approach is due to~\cite{bisping2023equivalenceEnergyGames}.
+The bigger project of \emph{deciding all equivalences at once} is outlined in Bisping's PhD thesis~\cite{bisping2025generalizedEqChecking}.
+The energy game approach is due to~\cite{bisping2023equivalenceEnergyGames}.
 
-\paragraph{Acknowledgements.}
-Several proofs in this document are due to pen-and-paper proofs by David N. Jansen.
+\paragraph{Acknowledgments.}
+Several proofs in this document follow pen-and-paper proofs by David N. Jansen.
 
 % do not indent paragraphs
 \setlength\parindent{0pt}
