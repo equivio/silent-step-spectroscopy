@@ -214,7 +214,7 @@ qed
 
 end
 
-text \<open>Again, we prove that these updates only decrease energies.\<close>
+text \<open>Again, we prove some lemmas to ease the manipulation of expressions using mininum updates.\<close>
 
 lemma min_1_6_simps[simp]:
   shows \<open>modal_depth (the (min1_6 e)) = min (modal_depth e) (pos_conjuncts e)\<close>
@@ -247,33 +247,6 @@ lemma min_1_7_some:
   shows \<open>min1_7 e \<noteq> None\<close>
   unfolding min1_7_def
   using energy.case_eq_if by blast
-
-lemma mono_min_1_6:
-  shows \<open>mono (the \<circ> min1_6)\<close>
-proof
-  fix x y :: energy
-  assume \<open>x \<le> y\<close>
-  thus \<open>(the \<circ> min1_6) x \<le> (the \<circ> min1_6) y\<close> unfolding leq_components
-    using min.mono min_1_6_simps min1_6_def by auto
-qed
-
-lemma mono_min_1_7:
-  shows \<open>mono (the \<circ> min1_7)\<close>
-proof
-  fix x y :: energy
-  assume \<open>x \<le> y\<close>
-  thus \<open>(the \<circ> min1_7) x \<le> (the \<circ> min1_7) y\<close> unfolding leq_components
-    using min.mono min_1_7_simps min1_7_def by auto
-qed
-
-lemma gets_smaller_min_1_6:
-  shows \<open>the (min1_6 x) \<le> x\<close>
-  using min_1_6_simps min_less_iff_conj somewhere_larger_eq by fastforce
-
-
-lemma gets_smaller_min_1_7:
-  shows \<open>the (min1_7 x) \<le> x\<close>
-  using min_1_7_simps min_less_iff_conj somewhere_larger_eq by fastforce
 
 lemma min_1_7_lower_end:
   assumes \<open>(Option.bind ((subtract_fn 0 0 0 0 0 0 0 1) e) min1_7) = None\<close>

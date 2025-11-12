@@ -296,7 +296,7 @@ lemma expressiveness_price_ImmConj_empty_def:
   shows \<open>expressiveness_price (ImmConj I \<psi>s) = E 0 0 0 0 0 0 0 0\<close> using assms
   unfolding expressiveness_price_ImmConj_def by (simp add: bot_enat_def)
 
-text \<open>Formalizing HML$_{SRBB}$ by mutually recursive data types leads to expressiveness price functions of these other types  and corresponding definitions and lemmas.\<close>
+text \<open>Formalizing HML$_\text{SRBB}$ by mutually recursive data types leads to expressiveness price functions of these other types and corresponding definitions and lemmas.\<close>
 
 fun expr_pr_inner :: \<open>('a, 's) hml_srbb_inner \<Rightarrow> energy\<close> where
   \<open>expr_pr_inner \<chi> =

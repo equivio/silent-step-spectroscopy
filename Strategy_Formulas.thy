@@ -5,7 +5,7 @@ theory Strategy_Formulas
 begin
 
 text \<open>
-  Strategy formulas express attacker strategies in HML. They bridge between HML formulas, the spectroscopy game and winning budgets. We show that, if some energy \<open>e\<close> suffices for the attacker to win, there exists a strategy formula with expressiveness price \<open>\<le> e\<close> following the winning strategy. We also prove that this formula actually distinguishes the processes of the attacker position.
+  Strategy formulas express attacker strategies in HML. They bridge between HML formulas, the spectroscopy game and winning budgets. We show that, if some energy \<open>e\<close> suffices for the attacker to win, there exists a strategy formula with expressiveness price \<open>\<le> e\<close>. We also prove that this formula actually distinguishes the processes of the attacker position.
 \<close>
 
 context lts_tau
