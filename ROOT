@@ -2,7 +2,7 @@ chapter AFP
 
 session Weak_Spectroscopy = "HOL-Library" +
   (* Timeout (in sec) in case of non-termination problems *)
-  options [timeout = 720, quick_and_dirty = false, document_bibliography]
+  options [timeout = 900, quick_and_dirty = false, document_bibliography]
 
 (* To suppress document generation of some theories: *)
 (*
