@@ -1,7 +1,7 @@
 section \<open>Energy Games\<close>
 
 theory Energy_Games
-  imports Main Misc
+  imports Main
 begin
 
 text \<open>
