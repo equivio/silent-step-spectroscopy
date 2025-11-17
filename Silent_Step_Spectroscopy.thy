@@ -1,3 +1,5 @@
+(* License: LGPL *)
+
 subsection \<open>Correctness Theorem\<close>
 
 theory Silent_Step_Spectroscopy

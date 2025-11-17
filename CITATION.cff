@@ -10,11 +10,12 @@ authors:
     given-names: Leonard Moritz
   - family-names: Lemke
     given-names: Caroline
+    orcid: https://orcid.org/0009-0008-7863-0818
   - family-names: Mattes
     given-names: Karl Parvis Philipp
   - family-names: Mollenkopf
     given-names: Lenard
-version: v0.9.0
-date-released: 2025-05-05
+version: v1.0.0
+date-released: 2025-11-17
 license: LGPL
 repository-code: "https://github.com/equivio/silent-step-spectroscopy"

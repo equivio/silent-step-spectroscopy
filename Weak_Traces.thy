@@ -1,3 +1,5 @@
+(* License: LGPL *)
+
 section \<open>Weak Traces\<close>
 
 theory Weak_Traces

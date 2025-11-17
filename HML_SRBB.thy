@@ -1,4 +1,7 @@
-section \<open>Hennessy--Milner Logic for Stability-Respecting Branching Bisimilarity \label{sect:hmlSRBB}\<close>
+(* License: LGPL *)
+
+section \<open>Hennessy--Milner Logic for Stability-Respecting Branching Bisimilarity\<close>
+
 theory HML_SRBB
   imports LTS_Semantics
 begin

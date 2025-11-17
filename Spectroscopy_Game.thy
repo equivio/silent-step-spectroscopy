@@ -1,3 +1,5 @@
+(* License: LGPL *)
+
 section \<open>Weak Spectroscopy Game\<close>
 
 theory Spectroscopy_Game

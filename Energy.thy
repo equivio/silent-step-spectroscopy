@@ -1,3 +1,5 @@
+(* License: LGPL *)
+
 section \<open>Expressiveness Prices\<close>
 
 theory Energy

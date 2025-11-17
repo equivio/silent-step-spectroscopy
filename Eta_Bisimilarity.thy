@@ -1,3 +1,5 @@
+(* License: LGPL *)
+
 section \<open>\<open>\<eta>\<close>-Bisimilarity and \<open>\<eta>\<close>-Similarity\<close>
 
 theory Eta_Bisimilarity

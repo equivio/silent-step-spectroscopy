@@ -1,3 +1,5 @@
+(* License: LGPL *)
+
 chapter AFP
 
 session Weak_Spectroscopy = "HOL-Library" +

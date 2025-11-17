@@ -1,3 +1,5 @@
+(* License: LGPL *)
+
 subsection \<open>Components of Expressiveness Prices\<close>
 
 theory Expressiveness_Price

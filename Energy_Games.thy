@@ -1,3 +1,5 @@
+(* License: LGPL *)
+
 section \<open>Energy Games\<close>
 
 theory Energy_Games

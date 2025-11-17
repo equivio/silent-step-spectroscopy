@@ -1,4 +1,7 @@
-section \<open>Labeled Transition Systems \label{sect:LTS}\<close>
+(* License: LGPL *)
+
+section \<open>Labeled Transition Systems\<close>
+
 theory Labeled_Transition_Systems
   imports Main
 begin

@@ -20,9 +20,9 @@ The script assumes that the command `isabelle` resolves to your Isabelle install
 
 ## Authors
 
-Lisa Annett Barthel¹, Leonard Moritz Hübner¹, [Caroline Lemke](https://uol.de/caroline-lemke)¹˒², Karl Parvis Philipp Mattes¹, Lenard Mollenkopf¹, [Benjamin Bisping](https://bbisping.de)¹˒³
+Lisa Annett Barthel¹˒², Leonard Moritz Hübner¹, [Caroline Lemke](https://uol.de/caroline-lemke)¹˒³, Karl Parvis Philipp Mattes¹, Lenard Mollenkopf¹, [Benjamin Bisping](https://bbisping.de)¹˒⁴
 
-(¹ Technische Universität Berlin; ² Carl von Ossietzky Universität Oldenburg; ³ Télécom SudParis, Institut Polytechnique de Paris)
+(¹ Technische Universität Berlin; ² Technische Universität Ilmenau; ³ Carl von Ossietzky Universität Oldenburg; ⁴ Télécom SudParis, Institut Polytechnique de Paris)
 
 
 

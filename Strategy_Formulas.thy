@@ -1,3 +1,5 @@
+(* License: LGPL *)
+
 subsection \<open>Strategy Formulas\<close>
 
 theory Strategy_Formulas

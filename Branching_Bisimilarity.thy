@@ -1,3 +1,5 @@
+(* License: LGPL *)
+
 section \<open>Branching Bisimilarity\<close>
 
 theory Branching_Bisimilarity

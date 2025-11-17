@@ -1,3 +1,5 @@
+(* License: LGPL *)
+
 section \<open>Correctness\<close>
 
 text \<open>
