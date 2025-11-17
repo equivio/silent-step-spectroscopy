@@ -280,7 +280,8 @@ proof -
       \<longrightarrow> (\<exists>\<phi>\<in>\<O> (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> \<infinity> \<infinity>).
              distinguishes \<phi> p' q''' \<or> distinguishes \<phi> q''' p')\<close>
       unfolding Q\<alpha>_def using silent_reachable.refl by fastforce
-    hence \<open>\<forall>q'' q'''. q'' \<Zsurj> q''' \<longrightarrow> (\<exists>q'. q \<Zsurj> q' \<and> (\<nexists>\<phi>. \<phi>\<in>\<O> (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> \<infinity> \<infinity>) \<and> (distinguishes \<phi> p q' \<or> distinguishes \<phi> q' p)) \<and> q' \<mapsto>a \<alpha> q'')
+    hence \<open>\<forall>q'' q'''. q'' \<Zsurj> q''' \<longrightarrow> (\<exists>q'. q \<Zsurj> q' \<and> (\<nexists>\<phi>. \<phi>\<in>\<O> (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> \<infinity> \<infinity>)
+              \<and> (distinguishes \<phi> p q' \<or> distinguishes \<phi> q' p)) \<and> q' \<mapsto>a \<alpha> q'')
         \<longrightarrow> (\<exists>\<phi>\<in>\<O> (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> \<infinity> \<infinity>).
               distinguishes \<phi> p' q''' \<or> distinguishes \<phi> q''' p')\<close>
       unfolding Q\<alpha>_def by blast
@@ -386,7 +387,8 @@ proof -
         (BranchConj \<alpha>
           (Internal (Conj {q'''. \<exists>q'\<in>Q\<alpha>. \<exists>q''. q' \<mapsto>a \<alpha> q'' \<and> q'' \<Zsurj> q'''}
              (\<lambda>q'''. (if distinguishes (\<Phi>\<alpha> q''') p' q'''
-                      then conjunctify_distinctions else conjunctify_distinctions_dual) \<Phi>\<alpha> p'
+                      then conjunctify_distinctions
+                      else conjunctify_distinctions_dual) \<Phi>\<alpha> p'
              q''')))
           {q'. q \<Zsurj> q' \<and> (\<exists>\<phi>\<in>\<O> (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> \<infinity> \<infinity>).
             distinguishes \<phi> p q' \<or> distinguishes \<phi> q' p)} \<Psi>\<eta>)\<close>
@@ -396,7 +398,8 @@ proof -
         \<open>hml_srbb_inner_models q' (BranchConj \<alpha>
           (Internal (Conj {q'''. \<exists>q'\<in>Q\<alpha>. \<exists>q''. q' \<mapsto>a \<alpha> q'' \<and> q'' \<Zsurj> q'''}
              (\<lambda>q'''. (if distinguishes (\<Phi>\<alpha> q''') p' q'''
-                      then conjunctify_distinctions else conjunctify_distinctions_dual) \<Phi>\<alpha> p'
+                      then conjunctify_distinctions
+                      else conjunctify_distinctions_dual) \<Phi>\<alpha> p'
              q''')))
           {q'. q \<Zsurj> q' \<and> (\<exists>\<phi>\<in>\<O> (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> \<infinity> \<infinity>).
             distinguishes \<phi> p q' \<or> distinguishes \<phi> q' p)} \<Psi>\<eta>)\<close>
@@ -410,7 +413,8 @@ proof -
       \<open>(BranchConj \<alpha>
           (Internal (Conj {q'''. \<exists>q'\<in>Q\<alpha>. \<exists>q''. q' \<mapsto>a \<alpha> q'' \<and> q'' \<Zsurj> q'''}
              (\<lambda>q'''. (if distinguishes (\<Phi>\<alpha> q''') p' q'''
-                      then conjunctify_distinctions else conjunctify_distinctions_dual) \<Phi>\<alpha> p'
+                      then conjunctify_distinctions
+                      else conjunctify_distinctions_dual) \<Phi>\<alpha> p'
              q''')))
           {q'. q \<Zsurj> q' \<and> (\<exists>\<phi>\<in>\<O> (E \<infinity> \<infinity> \<infinity> 0 0 \<infinity> \<infinity> \<infinity>).
           distinguishes \<phi> p q' \<or> distinguishes \<phi> q' p)} \<Psi>\<eta>)

@@ -279,8 +279,8 @@ lemma min_1_6_subtr_simp:
   shows \<open>(Option.bind ((subtract_fn 0 1 1 0 0 0 0 0) e) min1_6)
     = (if br_conj_depth e = 0 \<or> conj_depth e = 0 then None
         else Some (E (min (modal_depth e) (pos_conjuncts e)) (br_conj_depth e - 1)
-                     (conj_depth e - 1) (st_conj_depth e) (imm_conj_depth e) (pos_conjuncts e)
-                     (neg_conjuncts e) (neg_depth e)))\<close>
+                     (conj_depth e - 1) (st_conj_depth e) (imm_conj_depth e)
+                     (pos_conjuncts e) (neg_conjuncts e) (neg_depth e)))\<close>
   by (auto simp add: min1_6_def ileI1 one_eSuc)
 
 instantiation energy :: Sup

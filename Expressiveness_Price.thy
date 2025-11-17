@@ -438,7 +438,8 @@ proof -
     by (simp add: Sup_le_iff)+
   hence \<open>st_conj_depth_inner (StableConj I \<psi>s) \<le> e4\<close>
     using e_def is_some minus_energy_def leq_components st_conj_upds(4)
-    by (metis add_diff_cancel_enat add_left_mono enat.simps(3) enat_defs(2) energy.sel(4) le_iff_add option.distinct(1))
+    by (metis add_diff_cancel_enat add_left_mono enat.simps(3) enat_defs(2) energy.sel(4)
+        le_iff_add option.distinct(1))
   then show ?thesis
     using st_conj_upds sups
     by (simp add: e_def)

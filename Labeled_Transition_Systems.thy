@@ -207,7 +207,8 @@ proof -
   then obtain p'' where \<open>p' \<Zsurj>\<mapsto>\<Zsurj>$ tr p''\<close> by auto
   with \<open>p \<mapsto> \<alpha> p'\<close>
   have \<open>p \<Zsurj>\<mapsto>\<Zsurj>$ (\<alpha> # tr) p''\<close>
-    by (metis lts_tau.silent_reachable.intros(1) lts_tau.silent_reachable_append_\<tau> lts_tau.weak_step_def lts_tau.weak_step_sequence.intros(2))
+    by (metis lts_tau.silent_reachable.intros(1) lts_tau.silent_reachable_append_\<tau>
+        lts_tau.weak_step_def lts_tau.weak_step_sequence.intros(2))
   then have \<open>\<exists>p''. p \<Zsurj>\<mapsto>\<Zsurj>$ (\<alpha> # tr) p''\<close> by auto
   then show \<open>(\<alpha> # tr) \<in> weak_traces p\<close> by auto
 qed

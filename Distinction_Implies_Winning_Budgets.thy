@@ -288,11 +288,11 @@ proof -
         have attacker: \<open>weak_spectroscopy_game.attacker (Attacker_Delayed p Q)\<close> by simp
         have
           \<open>spectroscopy_moves (Attacker_Delayed p Q) (Attacker_Immediate p' Q') =
-            (if (\<exists>a. p \<mapsto>a a p' \<and> Q \<mapsto>aS a Q') then Some (subtract_fn 1 0 0 0 0 0 0 0) else None)\<close>
+            (if \<exists>a. p \<mapsto>a a p' \<and> Q \<mapsto>aS a Q' then subtract 1 0 0 0 0 0 0 0 else None)\<close>
           for p Q p' Q' by simp
         from this[of p Q p' Q'] have
           \<open>spectroscopy_moves (Attacker_Delayed p Q) (Attacker_Immediate p' Q') =
-               Some (subtract_fn 1 0 0 0 0 0 0 0)\<close> using p'_Q' by auto
+               subtract 1 0 0 0 0 0 0 0\<close> using p'_Q' by auto
         with expr_obs_phi[of \<alpha> \<phi>] show
           \<open>spectro_att_wins (expr_pr_inner (hml_srbb_inner.Obs \<alpha> \<phi>)) (Attacker_Delayed p Q)\<close>
           using weak_spectroscopy_game.Attack[OF attacker _ _ wina]
