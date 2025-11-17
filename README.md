@@ -1,4 +1,4 @@
-# A weak spectroscopy game to characterize behavioral equivalences
+# The weak spectroscopy game to characterize behavioral equivalences
 
 This Isabelle/HOL theory formalizes the paper [“One Energy Game for the Spectrum between Branching Bisimilarity and Weak Trace Semantics”](https:/doi.org/10.4204/EPTCS.412.6) along the lines of [its tech report](https://doi.org/10.48550/arXiv.2305.17671).
 It describes the *weak spectroscopy game*, an energy game where the attacker wins precisely if two states in a transition system can be distinguished using Hennessy–Milner logic with modalities for silent steps (τ-transitions).
