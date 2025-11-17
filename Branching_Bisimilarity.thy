@@ -405,7 +405,7 @@ proof -
           hml_srbb_inner.distinguishes_def Q\<alpha>_def
         by (auto) blast+
     qed
-    ultimately have \<open>distinguishes (Internal (BranchConj \<alpha> 
+    ultimately have \<open>distinguishes (Internal (BranchConj \<alpha>
           (ImmConj {q''. \<exists>q'''\<in>Q\<alpha>. q''' \<mapsto>a \<alpha> q''} (conjunctify_distinctions \<Phi>\<alpha> p'))
           {q'. q \<Zsurj> q' \<and> (\<exists>\<phi>. distinguishes \<phi> p q')} \<Psi>\<eta>)) p q\<close>
       unfolding distinguishes_def Q\<alpha>_def

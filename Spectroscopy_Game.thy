@@ -17,7 +17,7 @@ datatype ('s, 'a) spectroscopy_position =
   Attacker_Delayed (attacker_state: \<open>'s\<close>) (defender_states: \<open>'s set\<close>) |
   Attacker_Conjunct (attacker_state: \<open>'s\<close>) (defender_state: \<open>'s\<close>) |
   Attacker_Branch (attacker_state: \<open>'s\<close>) (defender_states: \<open>'s set\<close>) |
-  
+
   Defender_Conj (attacker_state: \<open>'s\<close>) (defender_states: \<open>'s set\<close>) |
   Defender_Stable_Conj (attacker_state: \<open>'s\<close>) (defender_states: \<open>'s set\<close>) |
   Defender_Branch (attacker_state: \<open>'s\<close>) (attack_action: \<open>'a\<close>)

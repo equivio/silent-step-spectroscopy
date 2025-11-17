@@ -27,7 +27,7 @@ lemma distinction_implies_winning_budgets_empty_Q:
     \<open>distinguishes_from \<phi> p {}\<close>
   shows
     \<open>spectro_att_wins (expressiveness_price \<phi>) (Attacker_Immediate p {})\<close>
-  using assms 
+  using assms
 proof -
   have \<open>spectroscopy_moves (Defender_Conj p {}) p' = None\<close> for p'
     by(rule spectroscopy_moves.elims, auto)
@@ -337,7 +337,7 @@ proof -
         from conjuncts_present have \<open>\<forall>q\<in>Q. (expr_pr_conjunct (\<psi>qs q)) \<le> e'\<close>
           unfolding e'_def
           by (metis SUP_upper energy.sel leq_components)
-        with \<psi>qs_spec weak_spectroscopy_game.win_a_upwards_closure 
+        with \<psi>qs_spec weak_spectroscopy_game.win_a_upwards_closure
           have clause_win: \<open>\<forall>q\<in>Q. spectro_att_wins e' (Attacker_Conjunct p q)\<close> by blast
         define eu' where \<open>eu' = E
           (Sup (modal_depth   ` (expr_pr_conjunct ` (\<psi>s ` I))))
@@ -467,7 +467,7 @@ proof -
           (Sup (neg_depth ` (expr_pr_conjunct ` (\<psi>qs ` Q))))\<close>
         from conjuncts_present have \<open>\<forall>q\<in>Q. (expr_pr_conjunct (\<psi>qs q)) \<le> e'\<close> unfolding e'_def
           by (smt (verit, best) SUP_upper energy.sel energy.simps(3) energy_leq_cases image_iff)
-        with \<psi>qs_spec weak_spectroscopy_game.win_a_upwards_closure 
+        with \<psi>qs_spec weak_spectroscopy_game.win_a_upwards_closure
           have clause_win: \<open>\<forall>q\<in>Q. spectro_att_wins e' (Attacker_Conjunct p q)\<close> by blast
         define eu' where \<open>eu' = E
           (Sup (modal_depth   ` (expr_pr_conjunct ` (\<psi>s ` I))))
@@ -713,7 +713,7 @@ proof -
             \<open>spectro_att_wins (expr_pr_inner (Obs \<alpha> \<phi>)) (Attacker_Branch p' Q')\<close>
           by force
         hence e'_win: \<open>spectro_att_wins e' (Attacker_Branch p' Q')\<close>
-          unfolding e'_def using weak_spectroscopy_game.win_a_upwards_closure 
+          unfolding e'_def using weak_spectroscopy_game.win_a_upwards_closure
           by auto
         have depths: \<open>1 + modal_depth_srbb \<phi> = modal_depth (expr_pr_inner (Obs \<alpha> \<phi>))\<close> by simp
         have six_e': \<open>pos_conjuncts e' = Sup ({1 + modal_depth_srbb \<phi>}
@@ -806,7 +806,7 @@ proof -
           \<open>\<forall>g'. spectroscopy_moves (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>) g' \<noteq> None
           \<longrightarrow> (\<exists>e'. (the (spectroscopy_moves (Defender_Branch p \<alpha> p' (Q - Q_\<alpha>) Q_\<alpha>) g')) e
                     = Some e' \<and> spectro_att_wins e' g')\<close>
-          using  \<open>eu'0 \<le> e'\<close> e'_comp \<open>e'0 \<le> eu'0\<close> weak_spectroscopy_game.win_a_upwards_closure 
+          using  \<open>eu'0 \<le> e'\<close> e'_comp \<open>e'0 \<le> eu'0\<close> weak_spectroscopy_game.win_a_upwards_closure
          by (smt (verit, ccfv_SIG) option.sel)
         moreover have \<open>expr_pr_inner (BranchConj \<alpha> \<phi> I \<psi>s) = e\<close>
           using e'_characterization e'_minus unfolding e_def by force

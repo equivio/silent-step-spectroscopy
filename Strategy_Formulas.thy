@@ -389,7 +389,7 @@ proof(induction rule: weak_spectroscopy_game.attacker_wins.induct)
         \<open>the (spectroscopy_moves (Attacker_Delayed p Q) (Defender_Conj p' Q')) e = Some e\<close>
         by fastforce
       hence
-          \<open>spectro_att_wins e (Defender_Conj p' Q')\<close> 
+          \<open>spectro_att_wins e (Defender_Conj p' Q')\<close>
           \<open>weak_spectroscopy_game.updated g g' e = e\<close>
         using Attacker_Delayed Attack unfolding g'_def_conj by simp+
       then obtain \<chi> where

@@ -28,7 +28,7 @@ and
 
 text \<open>
   The constructors correspond to more conventional notation of HML as follows:
-  
+
   \<^item> \<^type>\<open>hml_srbb\<close> (members usually referred to as \<open>\<phi>\<close>):
     \<^item> \<^term>\<open>TT\<close> encodes \<open>\<top>\<close>
     \<^item> \<^term>\<open>(Internal \<chi>)\<close> encodes \<open>\<langle>\<epsilon>\<rangle>\<chi>\<close>

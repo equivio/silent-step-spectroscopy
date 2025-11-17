@@ -67,7 +67,7 @@ primrec
 
 text \<open>
   The depth of unstable conjunctions (that do not enforce stability by a $\neg\langle\tau\rangle\top$-conjunct) is increased on each:
-  
+
    \<^item> \<^term>\<open>ImmConj\<close> if there are conjuncts (i.e. $\bigwedge\{\}$ is not counted)
    \<^item> \<^term>\<open>Conj\<close> if there are conjuncts, (i.e. the conjunction is not empty)
    \<^item> \<^term>\<open>BranchConj\<close>.
@@ -387,7 +387,7 @@ lemma expr_obs:
     \<open>expressiveness_price \<phi> \<le> e'\<close>
     \<open>subtract_fn 1 0 0 0 0 0 0 0 e = Some e'\<close>
   shows \<open>expr_pr_inner (Obs \<alpha> \<phi>) \<le> e\<close>
-  using assms 
+  using assms
   by (simp) (metis add_diff_cancel_enat add_mono_thms_linordered_semiring(1)
       enat.simps(3) enat_defs(2) energy.sel idiff_0_right
       le_iff_add le_numeral_extra(4) minus_energy_def option.discI
@@ -767,7 +767,7 @@ lemma expressiveness_price_ImmConj_geq_parts':
 text \<open>Here, we show the prices for some specific formulas.\<close>
 
 lemma example_\<phi>_cp:
-  fixes op a b::\<open>'a\<close> and left right::\<open>'s\<close> 
+  fixes op a b::\<open>'a\<close> and left right::\<open>'s\<close>
   defines \<open>\<phi> \<equiv>
     (Internal
       (Obs op
@@ -861,7 +861,7 @@ lemma price_hierachy_preorder_dual:
 subsection \<open>Relational Effects of Prices\<close>
 
 text \<open>
-  Certain properties of prices influence the preorder/equivalence relations that are characterized by price coordinates. (This will be important for some behavioral equivalences that we will prove to be characterized by specific prices.) 
+  Certain properties of prices influence the preorder/equivalence relations that are characterized by price coordinates. (This will be important for some behavioral equivalences that we will prove to be characterized by specific prices.)
 \<close>
 
 lemma distinction_combination_eta:
@@ -1010,7 +1010,7 @@ proof
     case (ImmConj J \<Psi>)
     hence \<open>\<exists>i. i\<in>J \<and> hml_srbb_conj.distinguishes (\<Psi> i) p q\<close>
       using \<open>q \<in> I\<close> assms(1) by fastforce
-    moreover have \<open>conjunctify_distinctions \<Phi> p q 
+    moreover have \<open>conjunctify_distinctions \<Phi> p q
         = \<Psi> (SOME i. i\<in>J \<and> hml_srbb_conj.distinguishes (\<Psi> i) p q)\<close>
       unfolding ImmConj conjunctify_distinctions_def by simp
     ultimately have \<Psi>_i:
