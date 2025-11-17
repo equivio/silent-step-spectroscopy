@@ -1,11 +1,16 @@
 subsection \<open>Modal Logics on LTS\<close>
 
+text \<open>
+  We here supply abstract definitions that would work for all modal logics one might define over an LTS.
+  In particular, this contains mechanisms to derive equivalences from sublogics.
+\<close>
+
 theory LTS_Semantics
   imports
-    LTS
+    Labeled_Transition_Systems
 begin
 
-locale lts_semantics = LTS step
+locale lts_semantics = lts step
   for step :: \<open>'s \<Rightarrow> 'a \<Rightarrow> 's \<Rightarrow> bool\<close> (\<open>_ \<mapsto> _ _\<close> [70,70,70] 80) +
   fixes models :: \<open>'s \<Rightarrow> 'formula \<Rightarrow> bool\<close>
 begin
@@ -26,10 +31,9 @@ lemma eq_equiv: \<open>equivp logical_eq\<close>
   by (smt (verit, del_insts))
 
 text \<open>
-The definition given above is equivalent which means formula equivalence is a biimplication on the
-models predicate.
+  Formula equivalence is a biimplication on the models predicate.
 \<close>
-lemma eq_equality[simp]: \<open>(logical_eq \<phi>l \<phi>r) = (\<forall>p. models p \<phi>l = models p \<phi>r)\<close>
+lemma eq_equality[simp]: \<open>(logical_eq \<phi>l \<phi>r) = (\<forall>p. models p \<phi>l \<longleftrightarrow> models p \<phi>r)\<close>
   by force
 
 lemma logical_eqI[intro]:
@@ -62,8 +66,6 @@ lemma no_distinction_fom_self:
     \<open>False\<close>
   using assms by simp
 
-text \<open>If $\varphi$ is equivalent to $\varphi'$ and $\varphi$ distinguishes process @{term \<open>p\<close>} from
-process @{term \<open>q\<close>}, the $\varphi'$ also distinguishes process @{term \<open>p\<close>} from process @{term \<open>q\<close>}.\<close>
 lemma dist_equal_dist:
   assumes \<open>logical_eq \<phi>l \<phi>r\<close>
       and \<open>distinguishes \<phi>l p q\<close>
@@ -76,17 +78,12 @@ abbreviation model_set :: \<open>'formula \<Rightarrow> 's set\<close> where
 
 subsection \<open>Preorders and Equivalences on Processes Derived from Formula Sets\<close>
 
-text \<open> A set of formulas pre-orders two processes @{term \<open>p\<close>} and @{term \<open>q\<close>} if
-for all formulas in this set the fact that @{term \<open>p\<close>} satisfies a formula means that also
-@{term \<open>q\<close>} must satisfy this formula. \<close>
+text \<open>A set of formulas pre-orders two processes \<open>p\<close> and \<open>q\<close> if, for all formulas in this set, the fact that \<open>p\<close> satisfies a formula means that \<open>q\<close> must also satisfy this formula.\<close>
 definition preordered :: \<open>'formula set \<Rightarrow> 's \<Rightarrow> 's \<Rightarrow> bool\<close> where
   preordered_def[simp]:
   \<open>preordered \<phi>s p q \<equiv> \<forall>\<phi> \<in> \<phi>s. models p \<phi> \<longrightarrow> models q \<phi>\<close>
 
-text \<open>
-If a set of formulas pre-orders two processes @{term \<open>p\<close>} and @{term \<open>q\<close>}, then no formula in that set
-may distinguish @{term \<open>p\<close>} from @{term \<open>q\<close>}.
-\<close>
+text \<open>If a set of formulas pre-orders two processes \<open>p\<close> and \<open>q\<close>, then no formula in that set may distinguish \<open>p\<close> from \<open>q\<close>.\<close>
 lemma preordered_no_distinction:
   \<open>preordered \<phi>s p q = (\<forall>\<phi> \<in> \<phi>s. \<not>(distinguishes \<phi> p q))\<close>
   by simp
@@ -97,21 +94,18 @@ lemma preordered_preord:
   \<open>transp (preordered \<phi>s)\<close>
   unfolding reflp_def transp_def by auto
 
-text \<open>A set of formulas equates two processes @{term \<open>p\<close>} and @{term \<open>q\<close>} if
-this set of formulas pre-orders these two processes in both directions. \<close>
+text \<open>A set of formulas equates two processes if it pre-orders these two processes in both directions.\<close>
 definition equivalent :: \<open>'formula set \<Rightarrow> 's \<Rightarrow> 's \<Rightarrow> bool\<close> where
   equivalent_def[simp]:
   \<open>equivalent \<phi>s p q \<equiv> preordered \<phi>s p q \<and> preordered \<phi>s q p\<close>
 
-text \<open>
-If a set of formulas equates two processes @{term \<open>p\<close>} and @{term \<open>q\<close>}, then no formula in that set
-may distinguish @{term \<open>p\<close>} from @{term \<open>q\<close>} nor the other way around.
-\<close>
+text \<open>If a set of formulas equates two processes, then no formula in that set
+may distinguish them in any direction.\<close>
 lemma equivalent_no_distinction: \<open>equivalent \<phi>s p q
      = (\<forall>\<phi> \<in> \<phi>s. \<not>(distinguishes \<phi> p q) \<and> \<not>(distinguishes \<phi> q p))\<close>
   by auto
 
-text \<open> A formula-set-derived equivalence is an equivalence. \<close>
+text \<open>A formula-set-derived equivalence is an equivalence.\<close>
 lemma equivalent_equiv: \<open>equivp (equivalent \<phi>s)\<close>
 proof (rule equivpI)
   show \<open>reflp (equivalent \<phi>s)\<close>
@@ -124,6 +118,6 @@ proof (rule equivpI)
     by blast
 qed
 
-end
+end \<comment> \<open>of context \<open>lts_semantics\<close>\<close>
 
 end

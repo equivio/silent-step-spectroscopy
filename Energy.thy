@@ -1,19 +1,37 @@
-text \<open>\newpage\<close>
-section \<open>Energy\<close>
-theory Energy
-  imports Main "HOL-Library.Extended_Nat"
-begin
-text \<open>Following the paper \cite[p. 5]{bisping2023lineartimebranchingtime}, we define energies as
-      eight-dimensional vectors of natural numbers extended by @{text \<open>\<infinity>\<close>}.
-      But deviate from \cite{bisping2023lineartimebranchingtime} in also defining
-      an energy @{text \<open>eneg\<close>} that represents negative energy. This allows us to
-      express energy updates (cf. \cite[p. 8]{bisping2023lineartimebranchingtime}) as total functions\label{deviation:eneg}.\<close>
-datatype energy = E (modal_depth: \<open>enat\<close>) (br_conj_depth: \<open>enat\<close>) (conj_depth: \<open>enat\<close>) (st_conj_depth: \<open>enat\<close>)
-                    (imm_conj_depth: \<open>enat\<close>) (pos_conjuncts: \<open>enat\<close>) (neg_conjuncts: \<open>enat\<close>) (neg_depth: \<open>enat\<close>)
+(* License: LGPL *)
 
-subsection \<open>Ordering Energies\<close>
+section \<open>Expressiveness Prices\<close>
+
+theory Energy
+  imports "HOL-Library.Extended_Nat"
+begin
+
+text \<open>
+  We intend to work on eight-dimensional vectors in an energy game.
+  The dimensions will encode expressiveness prices to HML$_\text{SRBB}$ formulas.
+  This price is supposed to capture syntactic features needed to describe a certain property and will later be used to select sublogics of specific expressiveness to characterize behavioural equivalences.
+
+  The eight dimensions are intended to measure the following properties of formulas:
+
+   \<^enum> Modal depth (of observations $\langle\alpha\rangle$, $(\alpha)$),
+   \<^enum> Depth of branching conjunctions (with one observation clause not starting with $\langle\varepsilon\rangle$),
+   \<^enum> Depth of stable conjunctions (that do enforce stability by a $\neg\langle\tau\rangle\top$-conjunct),
+   \<^enum> Depth of unstable conjunctions (that do not enforce stability by a $\neg\langle\tau\rangle\top$-conjunct),
+   \<^enum> Depth of immediate conjunctions (that are not preceded by $\langle\varepsilon\rangle$),
+   \<^enum> Maximal modal depth of positive clauses in conjunctions,
+   \<^enum> Maximal modal depth of negative clauses in conjunctions,
+   \<^enum> Depth of negations
+\<close>
+
+datatype energy =
+  E (modal_depth: \<open>enat\<close>) (br_conj_depth: \<open>enat\<close>) (conj_depth: \<open>enat\<close>)
+    (st_conj_depth: \<open>enat\<close>) (imm_conj_depth: \<open>enat\<close>)
+    (pos_conjuncts: \<open>enat\<close>) (neg_conjuncts: \<open>enat\<close>) (neg_depth: \<open>enat\<close>)
+
+subsection \<open>Comparing and Subtracting Energies\<close>
+
 text \<open>In order to define subtraction on energies, we first lift the orderings
-      @{text \<open>\<le>\<close>} and @{text \<open><\<close>} from @{type \<open>enat\<close>} to @{type \<open>energy\<close>}.\<close>
+      \<open>\<le>\<close> and \<open><\<close> from \<^type>\<open>enat\<close> to \<^type>\<open>energy\<close>.\<close>
 instantiation energy :: order begin
 
 definition \<open>e1 \<le> e2 \<equiv>
@@ -23,8 +41,6 @@ definition \<open>e1 \<le> e2 \<equiv>
     ))\<close>
 
 definition \<open>(x::energy) < y = (x \<le> y \<and> \<not> y \<le> x)\<close>
-
-text \<open>Next, we show that this yields a reflexive transitive antisymmetric order.\<close>
 
 instance proof
   fix e1 e2 e3 :: energy
@@ -36,36 +52,37 @@ instance proof
     by (smt (z3) energy.case_eq_if energy.expand nle_le)
 qed
 
-
 lemma leq_components[simp]:
-  shows \<open>e1 \<le> e2 \<equiv> (modal_depth e1 \<le> modal_depth e2 \<and> br_conj_depth e1 \<le> br_conj_depth e2 \<and> conj_depth e1 \<le> conj_depth e2 \<and>
-                     st_conj_depth e1 \<le> st_conj_depth e2 \<and> imm_conj_depth e1 \<le> imm_conj_depth e2 \<and> pos_conjuncts e1 \<le> pos_conjuncts e2 \<and>
-                     neg_conjuncts e1 \<le> neg_conjuncts e2 \<and> neg_depth e1 \<le> neg_depth e2)\<close>
+  shows \<open>e1 \<le> e2 \<equiv>
+      (modal_depth e1 \<le> modal_depth e2 \<and> br_conj_depth e1 \<le> br_conj_depth e2
+      \<and> conj_depth e1 \<le> conj_depth e2 \<and> st_conj_depth e1 \<le> st_conj_depth e2
+      \<and> imm_conj_depth e1 \<le> imm_conj_depth e2 \<and> pos_conjuncts e1 \<le> pos_conjuncts e2
+      \<and> neg_conjuncts e1 \<le> neg_conjuncts e2 \<and> neg_depth e1 \<le> neg_depth e2)\<close>
   unfolding less_eq_energy_def by (simp add: energy.case_eq_if)
 
 lemma energy_leq_cases:
-  assumes \<open>modal_depth e1 \<le> modal_depth e2\<close> \<open>br_conj_depth e1 \<le> br_conj_depth e2\<close> \<open>conj_depth e1 \<le> conj_depth e2\<close>
-          \<open>st_conj_depth e1 \<le> st_conj_depth e2\<close> \<open>imm_conj_depth e1 \<le> imm_conj_depth e2\<close> \<open>pos_conjuncts e1 \<le> pos_conjuncts e2\<close>
-          \<open>neg_conjuncts e1 \<le> neg_conjuncts e2\<close> \<open>neg_depth e1 \<le> neg_depth e2\<close>
-  shows \<open>e1 \<le> e2\<close> using assms unfolding leq_components by blast
+  assumes
+    \<open>modal_depth e1 \<le> modal_depth e2\<close> \<open>br_conj_depth e1 \<le> br_conj_depth e2\<close>
+    \<open>conj_depth e1 \<le> conj_depth e2\<close> \<open>st_conj_depth e1 \<le> st_conj_depth e2\<close>
+    \<open>imm_conj_depth e1 \<le> imm_conj_depth e2\<close> \<open>pos_conjuncts e1 \<le> pos_conjuncts e2\<close>
+    \<open>neg_conjuncts e1 \<le> neg_conjuncts e2\<close> \<open>neg_depth e1 \<le> neg_depth e2\<close>
+  shows
+    \<open>e1 \<le> e2\<close>
+  using assms unfolding leq_components by blast
 
 end
-
-text \<open>We then use this order to define a predicate that decides if an @{term \<open>e1 :: energy\<close>}
-      may be subtracted from another @{term \<open>e2 :: energy\<close>} without the result being negative. We encode this by @{term \<open>e1\<close>} being @{text \<open>somewhere_larger\<close>} than @{term \<open>e2\<close>}.\<close>
 
 abbreviation somewhere_larger where \<open>somewhere_larger e1 e2 \<equiv> \<not>(e1 \<ge> e2)\<close>
 
 lemma somewhere_larger_eq:
-  assumes \<open>somewhere_larger e1 e2\<close>
-  shows \<open>modal_depth e1 < modal_depth e2 \<or> br_conj_depth e1 < br_conj_depth e2
-         \<or> conj_depth e1 < conj_depth e2 \<or> st_conj_depth e1 < st_conj_depth e2 \<or> imm_conj_depth e1 < imm_conj_depth e2
-         \<or> pos_conjuncts e1 < pos_conjuncts e2 \<or> neg_conjuncts e1 < neg_conjuncts e2 \<or> neg_depth e1 < neg_depth e2\<close>
+  assumes
+    \<open>somewhere_larger e1 e2\<close>
+  shows
+    \<open>modal_depth e1 < modal_depth e2 \<or> br_conj_depth e1 < br_conj_depth e2
+    \<or> conj_depth e1 < conj_depth e2 \<or> st_conj_depth e1 < st_conj_depth e2
+    \<or> imm_conj_depth e1 < imm_conj_depth e2 \<or> pos_conjuncts e1 < pos_conjuncts e2
+    \<or> neg_conjuncts e1 < neg_conjuncts e2 \<or> neg_depth e1 < neg_depth e2\<close>
   by (smt (z3) assms energy.case_eq_if less_eq_energy_def linorder_le_less_linear)
-
-subsection \<open>Subtracting Energies\<close>
-text \<open>Using \<open>somewhere_larger\<close> we define subtraction as
-  the @{text \<open>minus\<close>} operator on energies.\<close>
 
 instantiation energy :: minus
 begin
@@ -84,8 +101,7 @@ instance ..
 
 end
 
-text \<open>Afterwards, we prove some lemmas to ease the manipulation of expressions
-  using subtraction on energies.\<close>
+text \<open>Some lemmas to ease the manipulation of expressions using subtraction on energies.\<close>
 lemma energy_minus[simp]:
   shows \<open>E a1 b1 c1 d1 e1 f1 g1 h1 - E a2 b2 c2 d2 e2 f2 g2 h2
          = E (a1 - a2) (b1 - b2) (c1 - c2) (d1 - d2)
@@ -93,26 +109,19 @@ lemma energy_minus[simp]:
   unfolding minus_energy_def somewhere_larger_eq by simp
 
 lemma minus_component_leq:
-  assumes \<open>s \<le> x\<close> \<open>x \<le> y\<close>
-  shows \<open>modal_depth (x - s) \<le> modal_depth (y - s)\<close> \<open>br_conj_depth (x - s) \<le> br_conj_depth (y - s)\<close>
-        \<open>conj_depth (x - s) \<le> conj_depth (y - s)\<close> \<open>st_conj_depth (x - s) \<le> st_conj_depth (y - s)\<close>
-        \<open>imm_conj_depth (x - s) \<le> imm_conj_depth (y - s)\<close> \<open>pos_conjuncts (x - s) \<le> pos_conjuncts (y -s)\<close>
-        \<open>neg_conjuncts (x - s) \<le> neg_conjuncts (y - s)\<close> \<open>neg_depth (x - s) \<le> neg_depth (y - s)\<close>
-proof-
-  from assms have \<open>s \<le> y\<close> by (simp del: leq_components)
-  with assms leq_components have
-    \<open>modal_depth (x - s) \<le> modal_depth (y - s) \<and> br_conj_depth (x - s) \<le> br_conj_depth (y - s) \<and>
-    conj_depth (x - s) \<le> conj_depth (y - s) \<and> st_conj_depth (x - s) \<le> st_conj_depth (y - s) \<and>
-    imm_conj_depth (x - s) \<le> imm_conj_depth (y - s) \<and> pos_conjuncts (x - s) \<le> pos_conjuncts (y -s) \<and>
-    neg_conjuncts (x - s) \<le> neg_conjuncts (y - s) \<and> neg_depth (x - s) \<le> neg_depth (y - s)\<close>
-    by (smt (verit, del_insts) add_diff_cancel_enat enat_add_left_cancel_le energy.sel
-        leD le_iff_add le_less minus_energy_def)+
-  thus
-    \<open>modal_depth (x - s) \<le> modal_depth (y - s)\<close> \<open>br_conj_depth (x - s) \<le> br_conj_depth (y - s)\<close>
-    \<open>conj_depth (x - s) \<le> conj_depth (y - s)\<close> \<open>st_conj_depth (x - s) \<le> st_conj_depth (y - s)\<close>
-    \<open>imm_conj_depth (x - s) \<le> imm_conj_depth (y - s)\<close> \<open>pos_conjuncts (x - s) \<le> pos_conjuncts (y -s)\<close>
-    \<open>neg_conjuncts (x - s) \<le> neg_conjuncts (y - s)\<close> \<open>neg_depth (x - s) \<le> neg_depth (y - s)\<close> by auto
-qed
+  assumes
+    \<open>s \<le> x\<close>
+    \<open>x \<le> y\<close>
+  shows
+    \<open>modal_depth (x - s) \<le> modal_depth (y - s)\<close>
+    \<open>br_conj_depth (x - s) \<le> br_conj_depth (y - s)\<close>
+    \<open>conj_depth (x - s) \<le> conj_depth (y - s)\<close>
+    \<open>st_conj_depth (x - s) \<le> st_conj_depth (y - s)\<close>
+    \<open>imm_conj_depth (x - s) \<le> imm_conj_depth (y - s)\<close>
+    \<open>pos_conjuncts (x - s) \<le> pos_conjuncts (y - s)\<close>
+    \<open>neg_conjuncts (x - s) \<le> neg_conjuncts (y - s)\<close>
+    \<open>neg_depth (x - s) \<le> neg_depth (y - s)\<close>
+  using assms by (simp_all) (metis add.commute add_diff_assoc_enat le_iff_add)+
 
 lemma enat_diff_mono:
   assumes \<open>(i::enat) \<le> j\<close>
@@ -146,21 +155,22 @@ lemma gets_smaller:
   fixes s :: energy
   shows \<open>(\<lambda>x. x - s) x \<le> x\<close>
   by (auto)
-     (metis add.commute add_diff_cancel_enat enat_diff_mono idiff_infinity idiff_infinity_right le_iff_add not_infinity_eq zero_le)+
+     (metis add.commute add_diff_cancel_enat enat_diff_mono idiff_infinity idiff_infinity_right
+      le_iff_add not_infinity_eq zero_le)+
 
 lemma mono_subtract:
   assumes \<open>x \<le> x'\<close>
   shows \<open>(\<lambda>x. x - (E a b c d e f g h)) x \<le> (\<lambda>x. x - (E a b c d e f g h)) x'\<close>
   using assms enat_diff_mono by force
 
-text \<open>We also define abbreviations for performing subtraction.\<close>
+text \<open>Abbreviations for performing subtraction in the energy games.\<close>
 abbreviation \<open>subtract_fn a b c d e f g h \<equiv>
   (\<lambda>x. if somewhere_larger x (E a b c d e f g h) then None else Some (x - (E a b c d e f g h)))\<close>
 
 abbreviation \<open>subtract a b c d e f g h \<equiv> Some (subtract_fn a b c d e f g h)\<close>
 
 subsection \<open>Minimum Updates\<close>
-text \<open>Next, we define two energy updates that replace the first component with the minimum of two other components.\<close>
+text \<open>Two energy updates that replace the first component with the minimum of two other components.\<close>
 definition \<open>min1_6 e \<equiv> case e of E a b c d e f g h \<Rightarrow> Some (E (min a f) b c d e f g h)\<close>
 definition \<open>min1_7 e \<equiv> case e of E a b c d e f g h \<Rightarrow> Some (E (min a g) b c d e f g h)\<close>
 
@@ -206,7 +216,7 @@ qed
 
 end
 
-text \<open>Again, we prove that these updates only decrease energies.\<close>
+text \<open>Again, we prove some lemmas to ease the manipulation of expressions using mininum updates.\<close>
 
 lemma min_1_6_simps[simp]:
   shows \<open>modal_depth (the (min1_6 e)) = min (modal_depth e) (pos_conjuncts e)\<close>
@@ -240,43 +250,19 @@ lemma min_1_7_some:
   unfolding min1_7_def
   using energy.case_eq_if by blast
 
-lemma mono_min_1_6:
-  shows \<open>mono (the \<circ> min1_6)\<close>
-proof
-  fix x y :: energy
-  assume \<open>x \<le> y\<close>
-  thus \<open>(the \<circ> min1_6) x \<le> (the \<circ> min1_6) y\<close> unfolding leq_components
-    using min.mono min_1_6_simps min1_6_def by auto
-qed
-
-lemma mono_min_1_7:
-  shows \<open>mono (the \<circ> min1_7)\<close>
-proof
-  fix x y :: energy
-  assume \<open>x \<le> y\<close>
-  thus \<open>(the \<circ> min1_7) x \<le> (the \<circ> min1_7) y\<close> unfolding leq_components
-    using min.mono min_1_7_simps min1_7_def by auto
-qed
-
-lemma gets_smaller_min_1_6:
-  shows \<open>the (min1_6 x) \<le> x\<close>
-  using min_1_6_simps min_less_iff_conj somewhere_larger_eq by fastforce
-
-
-lemma gets_smaller_min_1_7:
-  shows \<open>the (min1_7 x) \<le> x\<close>
-  using min_1_7_simps min_less_iff_conj somewhere_larger_eq by fastforce
-
 lemma min_1_7_lower_end:
   assumes \<open>(Option.bind ((subtract_fn 0 0 0 0 0 0 0 1) e) min1_7) = None\<close>
   shows \<open>neg_depth e = 0\<close>
   using assms
-  by (smt (verit) bind.bind_lunit energy.sel ileI1 leq_components min_1_7_some not_gr_zero one_eSuc zero_le)
+  by (smt (verit, ccfv_threshold) bind.bind_lunit energy.sel ileI1
+      leq_components min_1_7_some not_gr_zero one_eSuc zero_le)
 
 lemma min_1_7_subtr_simp:
   shows \<open>(Option.bind ((subtract_fn 0 0 0 0 0 0 0 1) e) min1_7)
     = (if neg_depth e = 0 then None
-        else Some (E (min (modal_depth e) (neg_conjuncts e)) (br_conj_depth e) (conj_depth e) (st_conj_depth e) (imm_conj_depth e) (pos_conjuncts e) (neg_conjuncts e) (neg_depth e - 1)))\<close>
+        else Some (E (min (modal_depth e) (neg_conjuncts e)) (br_conj_depth e) (conj_depth e)
+                     (st_conj_depth e) (imm_conj_depth e) (pos_conjuncts e)
+                     (neg_conjuncts e) (neg_depth e - 1)))\<close>
   using min_1_7_lower_end
   by (auto simp add: min1_7_def)
 
@@ -294,14 +280,18 @@ qed
 lemma min_1_6_subtr_simp:
   shows \<open>(Option.bind ((subtract_fn 0 1 1 0 0 0 0 0) e) min1_6)
     = (if br_conj_depth e = 0 \<or> conj_depth e = 0 then None
-        else Some (E (min (modal_depth e) (pos_conjuncts e)) (br_conj_depth e - 1) (conj_depth e - 1) (st_conj_depth e) (imm_conj_depth e) (pos_conjuncts e) (neg_conjuncts e) (neg_depth e)))\<close>
+        else Some (E (min (modal_depth e) (pos_conjuncts e)) (br_conj_depth e - 1)
+                     (conj_depth e - 1) (st_conj_depth e) (imm_conj_depth e)
+                     (pos_conjuncts e) (neg_conjuncts e) (neg_depth e)))\<close>
   by (auto simp add: min1_6_def ileI1 one_eSuc)
 
 instantiation energy :: Sup
 begin
 
-definition \<open>Sup ee \<equiv> E (Sup (modal_depth ` ee)) (Sup (br_conj_depth ` ee )) (Sup (conj_depth ` ee)) (Sup (st_conj_depth ` ee))
-  (Sup (imm_conj_depth ` ee)) (Sup (pos_conjuncts ` ee)) (Sup (neg_conjuncts ` ee)) (Sup (neg_depth ` ee))\<close>
+definition \<open>Sup ee \<equiv> E
+  (Sup (modal_depth ` ee)) (Sup (br_conj_depth ` ee )) (Sup (conj_depth ` ee))
+  (Sup (st_conj_depth ` ee)) (Sup (imm_conj_depth ` ee)) (Sup (pos_conjuncts ` ee))
+  (Sup (neg_conjuncts ` ee)) (Sup (neg_depth ` ee))\<close>
 
 instance ..
 end
