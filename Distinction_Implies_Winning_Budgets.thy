@@ -435,7 +435,6 @@ proof -
       ultimately show ?case by fastforce
     next
       case (StableConj I \<psi>s)
-      \<comment>\<open>The following proof is virtually the same as for \<open>Conj I \<psi>s\<close>\<close>
       have main_case: \<open>(\<forall>\<Psi>_I \<Psi> p Q. StableConj I \<psi>s = StableConj \<Psi>_I \<Psi> \<longrightarrow>
            Q \<noteq> {} \<longrightarrow> hml_srbb_inner.distinguishes_from (StableConj I \<psi>s) p Q \<longrightarrow>
            (\<forall>q\<in>Q. \<nexists>q'. q \<mapsto>\<tau> q')
