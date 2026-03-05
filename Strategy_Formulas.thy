@@ -683,18 +683,6 @@ next
       \<open>spectro_att_wins e0' (Defender_Conj p {})\<close>
       using cases local.empty_stbl_conj_answer
         by (smt (verit, best) option.discI option.sel)
-   (* then obtain \<Phi> where \<Phi>_prop: \<open>strategy_formula_inner (Defender_Conj p {}) e0' (Conj {} \<Phi>)\<close>
-        using conj by blast
-    hence strategy: \<open>strategy_formula_inner (Defender_Stable_Conj p Q) e (StableConj Q \<Phi>)\<close>
-        by (simp add: True stable_conj)
-      have \<open>E 0 0 0 1 0 0 0 1 \<le> e\<close> using e'_spec
-        using option.sel True by fastforce
-      moreover have \<open>expr_pr_inner (StableConj Q \<Phi>) = E 0 0 0 1 0 0 0 1\<close>
-        using True by (simp add: bot_enat_def sup_max)
-      ultimately have \<open>expr_pr_inner (StableConj Q \<Phi>) \<le> e\<close> by simp
-      with strategy show ?thesis by auto
-    next
-      case False *)
     then obtain e' where e'_spec:
       \<open>e' = e - (E 0 0 0 1 0 0 0 0)\<close>
       \<open>\<forall>q \<in> Q. weak_spectroscopy_game.weight (Defender_Stable_Conj p Q)
