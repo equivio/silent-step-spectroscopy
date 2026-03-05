@@ -179,7 +179,7 @@ primrec
 
   \<open>neg_depth_inner (Obs _ \<phi>) = negation_depth \<phi>\<close> |
   \<open>neg_depth_inner (Conj I \<psi>s) = Sup ((neg_depth_conjunct \<circ> \<psi>s) ` I)\<close> |
-  \<open>neg_depth_inner (StableConj I \<psi>s) = Sup ((neg_depth_conjunct \<circ> \<psi>s) ` I)\<close> |
+  \<open>neg_depth_inner (StableConj I \<psi>s) = Sup ((neg_depth_conjunct \<circ> \<psi>s) ` I \<union> {1})\<close> |
   \<open>neg_depth_inner (BranchConj _ \<phi> I \<psi>s) =
     Sup ({negation_depth \<phi>} \<union> ((neg_depth_conjunct \<circ> \<psi>s) ` I))\<close> |
 
@@ -398,7 +398,7 @@ lemma expr_obs:
 lemma expr_st_conj:
   assumes
     \<open>subtract_fn  0 0 0 1 0 0 0 0 e = Some e'\<close>
-    \<open>I \<noteq> {}\<close>
+    \<open>1 \<le> neg_depth e\<close>
     \<open>\<forall>q \<in> I. expr_pr_conjunct (\<psi>s q) \<le> e'\<close>
   shows
     \<open>expr_pr_inner (StableConj I \<psi>s) \<le> e\<close>
@@ -411,7 +411,7 @@ proof -
     \<open>imm_conj_depth_inner (StableConj I \<psi>s) = Sup ((imm_conj_depth_conjunct \<circ> \<psi>s) ` I)\<close>
     \<open>max_pos_conj_depth_inner (StableConj I \<psi>s) = Sup ((max_pos_conj_depth_conjunct\<circ>\<psi>s) ` I)\<close>
     \<open>max_neg_conj_depth_inner (StableConj I \<psi>s) = Sup ((max_neg_conj_depth_conjunct\<circ>\<psi>s) ` I)\<close>
-    \<open>neg_depth_inner (StableConj I \<psi>s) = Sup ((neg_depth_conjunct \<circ> \<psi>s) ` I)\<close>
+    \<open>neg_depth_inner (StableConj I \<psi>s) = Sup ((neg_depth_conjunct \<circ> \<psi>s) ` I \<union> {1})\<close>
     by force+
   obtain e1 e2 e3 e4 e5 e6 e7 e8 where e_def: \<open>e = E e1 e2 e3 e4 e5 e6 e7 e8\<close>
     using energy.exhaust_sel by blast
@@ -443,7 +443,7 @@ proof -
     by (metis add_diff_cancel_enat add_left_mono enat.simps(3) enat_defs(2) energy.sel(4)
         le_iff_add option.distinct(1))
   then show ?thesis
-    using st_conj_upds sups
+    using st_conj_upds sups assms(2)
     by (simp add: e_def)
 qed
 
@@ -1031,7 +1031,10 @@ proof
 qed
 
 lemma modal_stability_respecting:
-  \<open>stability_respecting (preordered (\<O> (E e1 e2 e3 \<infinity> e5 \<infinity> e7 e8)))\<close>
+  assumes
+    \<open>e8 > 0\<close>
+  shows
+    \<open>stability_respecting (preordered (\<O> (E e1 e2 e3 \<infinity> e5 \<infinity> e7 e8)))\<close>
   unfolding stability_respecting_def
 proof safe
   fix p q
@@ -1059,7 +1062,8 @@ proof safe
       by fastforce
     hence conj_price: \<open>StableConj (silent_reachable_set {q} \<inter> {q'. stable_state q'})
         (conjunctify_distinctions \<Phi> p) \<in> \<O>_inner (E e1 e2 e3 \<infinity> e5 \<infinity> e7 e8)\<close>
-      unfolding \<O>_inner_def \<O>_conjunct_def using SUP_le_iff by fastforce
+      unfolding \<O>_inner_def \<O>_conjunct_def using SUP_le_iff \<open>e8 > 0\<close>
+      by (auto simp add: Sup_le_iff  ileI1 one_eSuc)
     from \<Phi>_def have
       \<open>\<forall>q'\<in>(silent_reachable_set {q}). stable_state q'
         \<longrightarrow> hml_srbb_conj.distinguishes (conjunctify_distinctions \<Phi> p q') p q'\<close>

@@ -20,10 +20,19 @@ begin
 context lts_tau
 begin
 
+lemma stuck_defender_win:
+    \<open>spectro_att_wins e (Defender_Conj p {})\<close>
+proof -
+  have \<open>spectroscopy_moves (Defender_Conj p {}) p' = None\<close> for p'
+    by(rule spectroscopy_moves.elims, auto)
+  moreover have \<open>spectroscopy_defender (Defender_Conj p {})\<close> by simp
+  ultimately show ?thesis
+    by (simp add: weak_spectroscopy_game.attacker_wins.Defense)
+qed
+
 text \<open>
   We prove that if a formula distinguishes process \<open>p\<close> from a set of process \<open>Q\<close>, then the price of this formula is in attacker's winning budgets.
 \<close>
-
 lemma distinction_implies_winning_budgets_empty_Q:
   assumes
     \<open>distinguishes_from \<phi> p {}\<close>
@@ -31,19 +40,14 @@ lemma distinction_implies_winning_budgets_empty_Q:
     \<open>spectro_att_wins (expressiveness_price \<phi>) (Attacker_Immediate p {})\<close>
   using assms
 proof -
-  have \<open>spectroscopy_moves (Defender_Conj p {}) p' = None\<close> for p'
-    by(rule spectroscopy_moves.elims, auto)
-  moreover have \<open>spectroscopy_defender (Defender_Conj p {})\<close> by simp
-  ultimately have conj_win: \<open>spectro_att_wins (expressiveness_price \<phi>) (Defender_Conj p {})\<close>
-    by (simp add: weak_spectroscopy_game.attacker_wins.Defense)
   from late_inst_conj[of p \<open>{}\<close> p \<open>{}\<close>] have next_move0:
     \<open>spectroscopy_moves (Attacker_Delayed p {}) (Defender_Conj p {}) = id_up\<close> by force
   from delay[of p \<open>{}\<close> p \<open>{}\<close>] have next_move1:
     \<open>spectroscopy_moves (Attacker_Immediate p {}) (Attacker_Delayed p {}) = id_up\<close> by force
   moreover have \<open>weak_spectroscopy_game.attacker (Attacker_Immediate p {})\<close> by simp
   ultimately show ?thesis
-    using weak_spectroscopy_game.attacker_wins.Attack next_move0 next_move1
-    by (metis conj_win option.distinct(1) option.sel spectroscopy_defender.simps(4))
+    using weak_spectroscopy_game.attacker_wins.Attack next_move0 next_move1 
+    by (metis stuck_defender_win option.distinct(1) option.sel spectroscopy_defender.simps(4))
 qed
 
 lemma distinction_implies_winning_budgets:
@@ -467,8 +471,8 @@ proof -
           (Sup (pos_conjuncts   ` (expr_pr_conjunct ` (\<psi>qs ` Q))))
           (Sup (neg_conjuncts ` (expr_pr_conjunct ` (\<psi>qs ` Q))))
           (Sup (neg_depth ` (expr_pr_conjunct ` (\<psi>qs ` Q))))\<close>
-        from conjuncts_present have \<open>\<forall>q\<in>Q. (expr_pr_conjunct (\<psi>qs q)) \<le> e'\<close> unfolding e'_def
-          by (smt (verit, best) SUP_upper energy.sel energy.simps(3) energy_leq_cases image_iff)
+        from conjuncts_present have \<open>\<forall>q\<in>Q. (expr_pr_conjunct (\<psi>qs q)) \<le> e'\<close>
+          by (metis SUP_upper e'_def energy.sel energy_leq_cases)
         with \<psi>qs_spec weak_spectroscopy_game.win_a_upwards_closure
           have clause_win: \<open>\<forall>q\<in>Q. spectro_att_wins e' (Attacker_Conjunct p q)\<close> by blast
         define eu' where \<open>eu' = E
@@ -479,11 +483,12 @@ proof -
           (Sup (imm_conj_depth  ` (expr_pr_conjunct ` (\<psi>s ` I))))
           (Sup (pos_conjuncts   ` (expr_pr_conjunct ` (\<psi>s ` I))))
           (Sup (neg_conjuncts ` (expr_pr_conjunct ` (\<psi>s ` I))))
-          (Sup (neg_depth ` (expr_pr_conjunct ` (\<psi>s ` I))))\<close>
+          (Sup (neg_depth ` (expr_pr_conjunct ` (\<psi>s ` I)) \<union> {1}))\<close>
         have subset_form: \<open>\<psi>qs ` Q \<subseteq> \<psi>s ` I\<close>
           using \<psi>qs_spec by fastforce
         hence \<open>e' \<le> eu'\<close> unfolding e'_def eu'_def
-          by (simp add: Sup_subset_mono image_mono)
+          by (smt (verit) SUP_subset_mono Sup_union_distrib energy.sel energy_leq_cases
+              image_mono le_supI1 order_le_less)
         define e where \<open>e = E
           (modal_depth e')
           (br_conj_depth e')
@@ -492,45 +497,85 @@ proof -
           (imm_conj_depth e')
           (pos_conjuncts e')
           (neg_conjuncts e')
-          (neg_depth e')\<close>
-        have \<open>e' = e - (E 0 0 0 1 0 0 0 0)\<close> unfolding e_def e'_def by auto
-        hence \<open>Some e' = (subtract_fn 0 0 0 1 0 0 0 0) e\<close>
-          by (metis e_def energy.sel energy_leq_cases i0_lb le_iff_add)
+          (max (neg_depth e') 1)\<close>
+        (*have \<open>e' = e - (E 0 0 0 1 0 0 0 0)\<close>
+          unfolding e_def e'_def by auto*)
+        (*hence \<open>Some e' = (subtract_fn 0 0 0 1 0 0 0 0) e\<close>
+          by (metis e_def energy.sel energy_leq_cases i0_lb le_iff_add)*)
         have expr_lower: \<open>(E 0 0 0 1 0 0 0 0) \<le> expr_pr_inner (StableConj I \<psi>s)\<close>
           using case_assms(1) subset_form by force
         have eu'_comp: \<open>eu' = (expr_pr_inner (StableConj I \<psi>s)) - (E 0 0 0 1 0 0 0 0)\<close>
           unfolding eu'_def using energy.sel
-          by (auto simp add: bot_enat_def, (metis (no_types, lifting) SUP_cong image_image)+)
+          by (simp add: bot_enat_def, (metis (no_types, lifting) SUP_cong image_image)+)
         with expr_lower have eu'_characterization:
             \<open>Some eu' = (subtract_fn 0 0 0 1 0 0 0 0) (expr_pr_inner (StableConj I \<psi>s))\<close>
           by presburger
-        have \<open>\<forall>g'. spectroscopy_moves (Defender_Stable_Conj p Q) g' \<noteq> None
-        \<longrightarrow> (\<exists>q\<in>Q. (Attacker_Conjunct p q) = g')
-              \<and> spectroscopy_moves (Defender_Stable_Conj p Q) g' = (subtract 0 0 0 1 0 0 0 0)\<close>
+        have moves: \<open>\<forall>g'. spectroscopy_moves (Defender_Stable_Conj p Q) g' \<noteq> None
+        \<longrightarrow> (\<exists>q\<in>Q. (Attacker_Conjunct p q) = g'
+              \<and> spectroscopy_moves (Defender_Stable_Conj p Q) g' = subtract 0 0 0 1 0 0 0 0)
+            \<or> (Defender_Conj p {} = g'
+              \<and> spectroscopy_moves (Defender_Stable_Conj p Q) g' = subtract 0 0 0 1 0 0 0 1)\<close>
         proof clarify
           fix g' upd
-          assume upd_def: \<open>spectroscopy_moves (Defender_Stable_Conj p Q) g' = Some upd\<close>
+          assume no_self_fin:
+            \<open>spectroscopy_moves (Defender_Stable_Conj p Q) g' = Some upd\<close>
+             \<open>\<not> (Defender_Conj p {} = g' \<and>
+            spectroscopy_moves (Defender_Stable_Conj p Q) g' = subtract 0 0 0 1 0 0 0 1)\<close>
           hence \<open>\<And>px q. g' = Attacker_Conjunct px q
             \<Longrightarrow> p = px \<and> q \<in> Q \<and> upd = (subtract_fn 0 0 0 1 0 0 0 0)\<close>
             by (metis (no_types, lifting) local.conj_s_answer option.discI option.inject)
-          with upd_def case_assms(1) show
-            \<open>(\<exists>q\<in>Q. Attacker_Conjunct p q = g')
-              \<and> spectroscopy_moves (Defender_Stable_Conj p Q) g' = (subtract 0 0 0 1 0 0 0 0)\<close>
-            by (cases g', auto)
+          thus
+            \<open>\<exists>q\<in>Q. Attacker_Conjunct p q = g' \<and>
+              spectroscopy_moves (Defender_Stable_Conj p Q) g' = subtract 0 0 0 1 0 0 0 0\<close>
+            using no_self_fin case_assms(1)
+            by (cases g'; simp; metis (lifting) option.discI)
         qed
-        hence \<open>\<forall>g'. spectroscopy_moves (Defender_Stable_Conj p Q) g' \<noteq> None
+        have \<open>\<forall>g'. spectroscopy_moves (Defender_Stable_Conj p Q) g' \<noteq> None
           \<longrightarrow> (\<exists>e'. (the (spectroscopy_moves (Defender_Stable_Conj p Q) g')) e = Some e'
                 \<and> spectro_att_wins e' g')\<close>
-          unfolding e_def
-          using clause_win \<open>Some e' = (subtract_fn 0 0 0 1 0 0 0 0) e\<close> e_def by force
+        proof clarify
+          fix g' upd
+          assume \<open>spectroscopy_moves (Defender_Stable_Conj p Q) g' = Some upd\<close>
+          then consider \<open>\<exists>q\<in>Q. (Attacker_Conjunct p q) = g'
+              \<and> spectroscopy_moves (Defender_Stable_Conj p Q) g' = subtract 0 0 0 1 0 0 0 0\<close>
+            | \<open>(Defender_Conj p {} = g'
+              \<and> spectroscopy_moves (Defender_Stable_Conj p Q) g' = subtract 0 0 0 1 0 0 0 1)\<close>
+            using moves by blast
+          then show \<open>\<exists>e'. weak_spectroscopy_game.weight (Defender_Stable_Conj p Q) g' e = Some e' \<and>
+               spectro_att_wins e' g'\<close>
+          proof cases
+            case 1
+            define e1' where
+              \<open>e1' \<equiv>
+                (E (modal_depth e') (br_conj_depth e') (conj_depth e') (st_conj_depth e')
+                (imm_conj_depth e') (pos_conjuncts e') (neg_conjuncts e') (max (neg_depth e') 1))\<close>
+            have \<open>e' \<le> e1'\<close> unfolding e1'_def by simp
+            from 1 have \<open>weak_spectroscopy_game.weight (Defender_Stable_Conj p Q) g' e = Some e1'\<close>
+              unfolding e_def e1'_def by simp
+            moreover have \<open>spectro_att_wins e1' g'\<close>
+              using 1 clause_win \<open>e' \<le> e1'\<close> weak_spectroscopy_game.win_a_upwards_closure by blast
+            ultimately show ?thesis by blast
+          next
+            case 2
+            define e2' where
+              \<open>e2' \<equiv>
+                (E (modal_depth e') (br_conj_depth e') (conj_depth e') (st_conj_depth e')
+                (imm_conj_depth e') (pos_conjuncts e') (neg_conjuncts e') (neg_depth e' - 1))\<close>
+            have \<open>weak_spectroscopy_game.weight (Defender_Stable_Conj p Q) g' e = Some e2'\<close>
+              unfolding e_def e2'_def using 2
+              by (simp, metis eSuc_minus_1 enat_diff_mono le_zero_eq max_def one_eSuc)
+            moreover have \<open>spectro_att_wins e2' g'\<close>
+              using 2 stuck_defender_win by blast
+            ultimately show ?thesis by blast
+          qed
+        qed
         hence \<open>spectro_att_wins e (Defender_Stable_Conj p Q)\<close>
           unfolding e_def
           by (auto simp add: weak_spectroscopy_game.attacker_wins.Defense)
         moreover have \<open>e \<le> expr_pr_inner (StableConj I \<psi>s)\<close>
           using \<open>e' \<le> eu'\<close> eu'_characterization expr_lower case_assms(1) subset_form
           unfolding e_def eu'_comp minus_energy_def leq_components
-          by (metis add_diff_assoc_enat add_diff_cancel_enat add_left_mono enat.simps(3)
-                enat_defs(2) energy.sel idiff_0_right)
+          by simp
         ultimately show
             \<open>spectro_att_wins (expr_pr_inner (StableConj I \<psi>s)) (Defender_Stable_Conj p Q)\<close>
           using weak_spectroscopy_game.win_a_upwards_closure  by blast
@@ -560,7 +605,7 @@ proof -
           case True
           hence
             \<open>spectroscopy_moves (Defender_Stable_Conj p Q') (Defender_Conj p {})
-            = (subtract 0 0 0 1 0 0 0 0)\<close> by auto
+            = (subtract 0 0 0 1 0 0 0 1)\<close> by auto
           moreover have
             \<open>\<forall>g'. spectroscopy_moves (Defender_Stable_Conj p Q') g' \<noteq> None
               \<longrightarrow> g' = (Defender_Conj p {})\<close>
@@ -572,8 +617,8 @@ proof -
               by (induct g', auto, metis option.discI, metis empty_iff option.discI)
           qed
           ultimately have win_transfer:
-            \<open>\<forall>e. E 0 0 0 1 0 0 0 0 \<le> e
-              \<and> spectro_att_wins (e - E 0 0 0 1 0 0 0 0) (Defender_Conj p {})
+            \<open>\<forall>e. E 0 0 0 1 0 0 0 1 \<le> e
+              \<and> spectro_att_wins (e - E 0 0 0 1 0 0 0 1) (Defender_Conj p {})
               \<longrightarrow> spectro_att_wins e (Defender_Stable_Conj p Q')\<close>
             using weak_spectroscopy_game.attacker_wins.Defense
             by (smt (verit, ccfv_SIG)  option.sel spectroscopy_defender.simps(7))
@@ -587,10 +632,10 @@ proof -
           moreover have
               \<open>\<forall>e. (subtract_fn 0 0 0 1 0 0 0 0) e \<noteq> None \<longrightarrow> e \<ge> (E 0 0 0 1 0 0 0 0)\<close>
             using minus_energy_def by presburger
-          ultimately have \<open>\<forall>e. e \<ge> (E 0 0 0 1 0 0 0 0)
+          ultimately have \<open>\<forall>e. e \<ge> (E 0 0 0 1 0 0 0 1)
             \<longrightarrow> spectro_att_wins e (Defender_Stable_Conj p Q')\<close>
             using win_transfer by presburger
-          moreover have \<open>expr_pr_inner (StableConj I \<psi>s) \<ge> (E 0 0 0 1 0 0 0 0)\<close>
+          moreover have \<open>expr_pr_inner (StableConj I \<psi>s) \<ge> (E 0 0 0 1 0 0 0 1)\<close>
             by auto
           ultimately show ?thesis
             by (metis move weak_spectroscopy_game.attacker_wins_Ga_with_id_step option.discI

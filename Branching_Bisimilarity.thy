@@ -574,7 +574,8 @@ qed
 lemma sr_branching_bisim_is_hmlsrbb: \<open>sr_branching_bisimulated p q = preordered UNIV p q\<close>
   using modal_stability_respecting modal_sym modal_branching_sim
     logic_sr_branching_bisim_invariant \<O>_sup preordered_def
-  unfolding sr_branching_bisimulated_def by metis
+  unfolding sr_branching_bisimulated_def
+  by (metis i0_less infinity_ne_i0)
 
 lemma sr_branching_bisimulated_transitive:
   assumes

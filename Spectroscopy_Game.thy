@@ -79,7 +79,7 @@ where
 
   empty_stbl_conj_answer:
     \<open>spectroscopy_moves (Defender_Stable_Conj p Q) (Defender_Conj p' Q')
-      = (if Q = {} \<and> Q = Q' \<and> p = p' then (subtract 0 0 0 1 0 0 0 0)
+      = (if Q' = {} \<and> p = p' then (subtract 0 0 0 1 0 0 0 1)
          else None)\<close> |
 
   br_conj:

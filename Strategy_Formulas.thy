@@ -83,10 +83,13 @@ where
         \<and> strategy_formula_inner (Defender_Stable_Conj p Q') e \<chi>)\<close>
 |
   stable_conj:  \<open>strategy_formula_inner (Defender_Stable_Conj p Q) e (StableConj Q \<Phi>)\<close>
-    if \<open>\<forall>q \<in> Q. spectroscopy_moves (Defender_Stable_Conj p Q) (Attacker_Conjunct p q)
-      = (subtract 0 0 0 1 0 0 0 0)
-        \<and> spectro_att_wins (e - (E 0 0 0 1 0 0 0 0)) (Attacker_Conjunct p q)
-        \<and> strategy_formula_conjunct (Attacker_Conjunct p q) (e - E 0 0 0 1 0 0 0 0) (\<Phi> q)\<close>
+    if \<open>spectroscopy_moves (Defender_Stable_Conj p Q) (Defender_Conj p {})
+          = (subtract 0 0 0 1 0 0 0 1)
+        \<and> spectro_att_wins (e - (E 0 0 0 1 0 0 0 1)) (Defender_Conj p {})
+        \<and> (\<forall>q \<in> Q. spectroscopy_moves (Defender_Stable_Conj p Q) (Attacker_Conjunct p q)
+            = (subtract 0 0 0 1 0 0 0 0)
+          \<and> spectro_att_wins (e - (E 0 0 0 1 0 0 0 0)) (Attacker_Conjunct p q)
+          \<and> strategy_formula_conjunct (Attacker_Conjunct p q) (e - E 0 0 0 1 0 0 0 0) (\<Phi> q))\<close>
 |
   branch:  \<open>strategy_formula_inner (Attacker_Delayed p Q) e \<chi>\<close>
     if \<open>\<exists>p' Q' \<alpha> Q\<alpha>. spectroscopy_moves (Attacker_Delayed p Q)
@@ -673,57 +676,54 @@ next
         \<and> ((\<exists>p' q. g' = Attacker_Conjunct p' q) \<or> (\<exists>p' Q'. g' = Defender_Conj p' Q'))\<close>
       by (metis (no_types, opaque_lifting)
             spectroscopy_defender.elims(2,3) spectroscopy_moves.simps(35,36,37,38,74))
-    show ?case
-    proof(cases \<open>Q = {}\<close>)
-      case True
-      then obtain e' where e'_spec:
-        \<open>weak_spectroscopy_game.weight (Defender_Stable_Conj p Q) (Defender_Conj p Q) e
-          = Some e'\<close>
-        \<open>e' = e - (E 0 0 0 1 0 0 0 0)\<close>
-        \<open>spectro_att_wins e' (Defender_Conj p Q)\<close>
-        using cases local.empty_stbl_conj_answer
+    obtain e0' where e0'_spec:
+      \<open>weak_spectroscopy_game.weight (Defender_Stable_Conj p Q) (Defender_Conj p {}) e
+        = Some e0'\<close>
+      \<open>e0' = e - (E 0 0 0 1 0 0 0 1)\<close>
+      \<open>spectro_att_wins e0' (Defender_Conj p {})\<close>
+      using cases local.empty_stbl_conj_answer
         by (smt (verit, best) option.discI option.sel)
-      then obtain \<Phi> where \<Phi>_prop: \<open>strategy_formula_inner (Defender_Conj p Q) e' (Conj Q \<Phi>)\<close>
-        using conj True by blast
-      hence strategy: \<open>strategy_formula_inner (Defender_Stable_Conj p Q) e (StableConj Q \<Phi>)\<close>
+   (* then obtain \<Phi> where \<Phi>_prop: \<open>strategy_formula_inner (Defender_Conj p {}) e0' (Conj {} \<Phi>)\<close>
+        using conj by blast
+    hence strategy: \<open>strategy_formula_inner (Defender_Stable_Conj p Q) e (StableConj Q \<Phi>)\<close>
         by (simp add: True stable_conj)
-      have \<open>E 0 0 0 1 0 0 0 0 \<le> e\<close> using e'_spec
+      have \<open>E 0 0 0 1 0 0 0 1 \<le> e\<close> using e'_spec
         using option.sel True by fastforce
-      moreover have \<open>expr_pr_inner (StableConj Q \<Phi>) = E 0 0 0 1 0 0 0 0\<close>
-        using True by (simp add: bot_enat_def)
+      moreover have \<open>expr_pr_inner (StableConj Q \<Phi>) = E 0 0 0 1 0 0 0 1\<close>
+        using True by (simp add: bot_enat_def sup_max)
       ultimately have \<open>expr_pr_inner (StableConj Q \<Phi>) \<le> e\<close> by simp
       with strategy show ?thesis by auto
     next
-      case False
-      then obtain e' where e'_spec:
-        \<open>e' = e - (E 0 0 0 1 0 0 0 0)\<close>
-        \<open>\<forall>q \<in> Q. weak_spectroscopy_game.weight (Defender_Stable_Conj p Q)
-            (Attacker_Conjunct p q) e = Some e'
-          \<and> spectro_att_wins e' (Attacker_Conjunct p q)\<close>
-        using cases local.conj_s_answer
-        by (smt (verit, del_insts) option.distinct(1) option.sel)
-      hence IH: \<open>\<forall>q \<in> Q. \<exists>\<psi>.
-        strategy_formula_conjunct (Attacker_Conjunct p q) e' \<psi> \<and>
-        expr_pr_conjunct \<psi> \<le> e'\<close>
-        using Defender_Stable_Conj local.conj_s_answer
-        by (smt (verit, best) option.distinct(1) option.inject spectroscopy_position.simps(52))
-      hence \<open>\<exists>\<Phi>. \<forall>q \<in> Q.
-        strategy_formula_conjunct (Attacker_Conjunct p q) e' (\<Phi> q) \<and>
-        expr_pr_conjunct (\<Phi> q) \<le> e'\<close>
-        by meson
-      then obtain \<Phi> where \<Phi>_prop: \<open>\<forall>q \<in> Q.
-        strategy_formula_conjunct (Attacker_Conjunct p q) e' (\<Phi> q)
-        \<and> expr_pr_conjunct (\<Phi> q) \<le> e'\<close>
-        by blast
-      have \<open>E 0 0 0 1 0 0 0 0 \<le> e\<close>
-        using e'_spec False by fastforce
-      hence \<open>expr_pr_inner (StableConj Q \<Phi>) \<le> e\<close>
-        using expr_st_conj e'_spec \<Phi>_prop False by metis
-      moreover have \<open>strategy_formula_inner (Defender_Stable_Conj p Q) e (StableConj Q \<Phi>)\<close>
-        using \<Phi>_prop e'_spec stable_conj
-        unfolding e'_spec by fastforce
-      ultimately show ?thesis by auto
-    qed
+      case False *)
+    then obtain e' where e'_spec:
+      \<open>e' = e - (E 0 0 0 1 0 0 0 0)\<close>
+      \<open>\<forall>q \<in> Q. weak_spectroscopy_game.weight (Defender_Stable_Conj p Q)
+          (Attacker_Conjunct p q) e = Some e'
+        \<and> spectro_att_wins e' (Attacker_Conjunct p q)\<close>
+      using cases local.conj_s_answer
+      by (smt (verit, del_insts) option.distinct(1) option.sel)
+    hence IH: \<open>\<forall>q \<in> Q. \<exists>\<psi>.
+      strategy_formula_conjunct (Attacker_Conjunct p q) e' \<psi> \<and>
+      expr_pr_conjunct \<psi> \<le> e'\<close>
+      using Defender_Stable_Conj local.conj_s_answer
+      by (smt (verit, best) option.distinct(1) option.inject spectroscopy_position.simps(52))
+    hence \<open>\<exists>\<Phi>. \<forall>q \<in> Q.
+      strategy_formula_conjunct (Attacker_Conjunct p q) e' (\<Phi> q) \<and>
+      expr_pr_conjunct (\<Phi> q) \<le> e'\<close>
+      by meson
+    then obtain \<Phi> where \<Phi>_prop: \<open>\<forall>q \<in> Q.
+      strategy_formula_conjunct (Attacker_Conjunct p q) e' (\<Phi> q)
+      \<and> expr_pr_conjunct (\<Phi> q) \<le> e'\<close>
+      by blast
+    have \<open>E 0 0 0 1 0 0 0 1 \<le> e\<close>
+      using e0'_spec  option.sel by fastforce
+    hence \<open>E 0 0 0 1 0 0 0 0 \<le> e\<close> \<open>1 \<le> neg_depth e\<close> by simp+
+    hence \<open>expr_pr_inner (StableConj Q \<Phi>) \<le> e\<close>
+      using expr_st_conj e'_spec \<Phi>_prop by metis
+    moreover have \<open>strategy_formula_inner (Defender_Stable_Conj p Q) e (StableConj Q \<Phi>)\<close>
+      using \<Phi>_prop e'_spec stable_conj e0'_spec
+      unfolding e'_spec by fastforce
+    ultimately show ?case by auto
   qed force+
 qed
 
@@ -903,7 +903,7 @@ next
   qed
   then show ?case by simp
 next
-  case (stable_conj Q p e \<Phi>)
+  case (stable_conj p Q e \<Phi>)
   hence IH: \<open>\<forall>q\<in> Q. hml_srbb_conj.distinguishes (\<Phi> q) p q\<close> by simp
   hence Q: \<open>\<forall>q \<in> Q. hml_srbb_conjunct_models p (\<Phi> q)\<close> by simp
   hence \<open>(\<forall>q. \<not> p \<mapsto>\<tau> q) \<longrightarrow> hml_srbb_inner.distinguishes_from (StableConj Q \<Phi>) p Q\<close>
